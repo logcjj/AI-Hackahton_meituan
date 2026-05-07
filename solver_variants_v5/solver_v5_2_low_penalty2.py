@@ -42,16 +42,10 @@ def solve(input_text: str) -> list:
     scarce = courier_count <= task_count
     low_willingness = avg_willingness < 0.27
     abundant = courier_count >= len(all_tasks) * 3 // 2 and _singles_cover_all_tasks(singles, all_tasks)
-    has_large_bundle_candidate = any(len(c[1]) > 2 for c in candidates)
 
     if singles:
         single_solution = _solve_single_task_multidispatch(singles, all_tasks)
-        if scarce:
-            scarce_single_deadline = min(deadline, time.monotonic() + 1.2)
-            single_solution = _reassign_single_solution(single_solution, singles, all_tasks, scarce_single_deadline)
-            single_solution = _rebalance_single_solution(single_solution, singles, all_tasks, scarce_single_deadline)
-            single_solution = _reassign_single_solution(single_solution, singles, all_tasks, scarce_single_deadline)
-        else:
+        if not scarce:
             if not low_willingness:
                 single_deadline = min(deadline, time.monotonic() + 5.5) if abundant else min(deadline, time.monotonic() + 1.0)
                 single_solution = _destroy_repair_single_solution(single_solution, singles, all_tasks, single_deadline)
@@ -65,7 +59,30 @@ def solve(input_text: str) -> list:
             if random_solution:
                 solutions.append(random_solution)
 
-    if not abundant or low_willingness or has_large_bundle_candidate:
+    if low_willingness and time.monotonic() < deadline - 0.8:
+        scaled_candidates = _scale_scores(candidates, 0.5)
+        scaled_singles = [c for c in scaled_candidates if len(c[1]) == 1]
+        scaled_solutions = []
+        if scaled_singles:
+            scaled_solutions.append(_solve_single_task_multidispatch(scaled_singles, all_tasks))
+        for mode in ("gain", "cover", "ratio"):
+            if time.monotonic() < deadline - 0.35:
+                scaled_solutions.append(_solve_disjoint_then_multidispatch(scaled_candidates, all_tasks, mode=mode, deadline=deadline))
+        if time.monotonic() < deadline - 0.45:
+            scaled_pair = _solve_pair_potential_matching(
+                scaled_candidates,
+                all_tasks,
+                deadline,
+                lookahead=6,
+                flexible_initial=True,
+            )
+            if scaled_pair:
+                scaled_solutions.append(scaled_pair)
+        for solution in scaled_solutions:
+            if solution:
+                solutions.append(solution)
+
+    if not abundant or low_willingness:
         modes = ("gain", "cover") if low_willingness else ("ratio", "gain", "cover")
         for mode in modes:
             if time.monotonic() < deadline - 0.35:
@@ -84,6 +101,13 @@ def solve(input_text: str) -> list:
             solutions.append(_solve_sparse_cover(candidates, all_tasks, deadline))
     solutions.append(_fallback_official_greedy(candidates))
 
+    if low_willingness:
+        scaled_candidates = _scale_scores(candidates, 0.5)
+        best = min((s for s in solutions if s), key=lambda s: _solution_expected_cost(s, scaled_candidates, all_tasks))
+        if time.monotonic() < deadline - 0.18:
+            best = _local_improve_mixed_solution(best, scaled_candidates, all_tasks, deadline)
+        return best
+
     best = min((s for s in solutions if s), key=lambda s: _solution_expected_cost(s, candidates, all_tasks))
     if time.monotonic() < deadline - 0.18:
         best = _local_improve_mixed_solution(best, candidates, all_tasks, deadline)
@@ -93,6 +117,13 @@ def solve(input_text: str) -> list:
 def _singles_cover_all_tasks(singles, all_tasks):
     covered = {c[1][0] for c in singles}
     return all(task in covered for task in all_tasks)
+
+
+def _scale_scores(candidates, factor):
+    return [
+        (task_key, task_ids, courier_id, score * factor, willingness, row_index)
+        for task_key, task_ids, courier_id, score, willingness, row_index in candidates
+    ]
 
 
 def _solve_single_task_multidispatch(singles, all_tasks):
@@ -314,10 +345,9 @@ def _solve_pair_potential_matching(candidates, all_tasks, deadline, lookahead=4,
         if time.monotonic() > deadline - 0.45:
             break
         task_ids = rows[0][1]
-        if len(task_ids) < 2:
+        if len(task_ids) != 2:
             continue
-        edge_lookahead = max(lookahead, min(8, len(task_ids) + 2))
-        top_rows, cost = _best_group_rows(rows, len(task_ids), edge_lookahead)
+        top_rows, cost = _best_group_rows(rows, len(task_ids), lookahead)
         if not top_rows:
             continue
         potential = 100.0 * len(task_ids) - cost
@@ -533,9 +563,8 @@ def _local_improve_mixed_solution(result, candidates, all_tasks, deadline):
         by_key.setdefault(cand[0], []).append(cand)
         if len(cand[1]) == 1:
             singles_by_task.setdefault(cand[1][0], []).append(cand)
-        elif len(cand[1]) >= 2:
+        elif len(cand[1]) == 2:
             bundles_by_tasks.setdefault(tuple(sorted(cand[1])), []).append(cand)
-    has_large_bundle = any(len(task_ids) > 2 for task_ids in bundles_by_tasks)
 
     best_cost = _selected_cost(selected, all_tasks)
     passes = 0
@@ -559,10 +588,15 @@ def _local_improve_mixed_solution(result, candidates, all_tasks, deadline):
                     changed = True
 
         if time.monotonic() < deadline - 0.12:
-            if has_large_bundle:
-                improved = _improve_covered_bundle_merges(selected, bundles_by_tasks, all_tasks, deadline)
-            else:
-                improved = _improve_single_pair_merges(selected, bundles_by_tasks, all_tasks, deadline)
+            improved = _improve_single_pair_merges(selected, bundles_by_tasks, all_tasks, deadline)
+            if improved:
+                new_cost = _selected_cost(selected, all_tasks)
+                if new_cost < best_cost - 1e-9:
+                    best_cost = new_cost
+                    changed = True
+
+        if time.monotonic() < deadline - 0.12:
+            improved = _improve_pair_rewires(selected, bundles_by_tasks, all_tasks, deadline)
             if improved:
                 new_cost = _selected_cost(selected, all_tasks)
                 if new_cost < best_cost - 1e-9:
@@ -608,26 +642,28 @@ def _improve_bundle_splits(selected, singles_by_task, all_tasks, deadline):
         if time.monotonic() > deadline - 0.12:
             break
         rows = selected.get(task_key)
-        if not rows or len(rows[0][1]) < 2:
+        if not rows or len(rows[0][1]) != 2:
             continue
-        task_ids = rows[0][1]
-        if any(task_id in selected for task_id in task_ids):
+        first_task, second_task = rows[0][1]
+        if first_task in selected or second_task in selected:
             continue
         outside_couriers = _selected_couriers_except(selected, {task_key})
-        split = _best_multi_split_groups(
-            task_ids,
+        split = _best_split_groups(
+            first_task,
+            second_task,
             singles_by_task,
             outside_couriers,
-            max_rows=min(len(rows) + len(task_ids), max(7, len(task_ids) * 2)),
+            max_rows=min(len(rows) + 2, 7),
         )
         if split is None:
             continue
-        old_cost = _group_expected_cost(rows, len(task_ids))
-        new_cost = sum(_group_expected_cost(task_rows, 1) for task_rows in split.values())
+        first_rows, second_rows = split
+        old_cost = _group_expected_cost(rows, 2)
+        new_cost = _group_expected_cost(first_rows, 1) + _group_expected_cost(second_rows, 1)
         if new_cost < old_cost - 1e-9:
             del selected[task_key]
-            for task_id, task_rows in split.items():
-                selected[task_id] = task_rows
+            selected[first_task] = first_rows
+            selected[second_task] = second_rows
             changed = True
     return changed
 
@@ -667,111 +703,6 @@ def _improve_single_pair_merges(selected, bundles_by_tasks, all_tasks, deadline)
                 selected[replacement[0][0]] = replacement
                 changed = True
                 break
-    return changed
-
-
-def _improve_covered_bundle_merges(selected, bundles_by_tasks, all_tasks, deadline):
-    changed = False
-    bundle_items = sorted(
-        bundles_by_tasks.items(),
-        key=lambda item: (-len(item[0]), item[0]),
-    )
-    while time.monotonic() < deadline - 0.12:
-        best = None
-        best_delta = 0.0
-        task_owner = {}
-        for task_key, rows in selected.items():
-            if not rows:
-                continue
-            for task_id in rows[0][1]:
-                task_owner[task_id] = task_key
-
-        for bundle_task_ids, pool in bundle_items:
-            if time.monotonic() > deadline - 0.12:
-                break
-            if len(bundle_task_ids) < 2:
-                continue
-            owner_keys = set()
-            missing = False
-            for task_id in bundle_task_ids:
-                owner = task_owner.get(task_id)
-                if owner is None:
-                    missing = True
-                    break
-                owner_keys.add(owner)
-            if missing or len(owner_keys) == 1:
-                continue
-
-            covered_by_owners = set()
-            old_cost = 0.0
-            old_rows = 0
-            for owner in owner_keys:
-                rows = selected.get(owner)
-                if not rows:
-                    continue
-                covered_by_owners.update(rows[0][1])
-                old_cost += _group_expected_cost(rows, len(rows[0][1]))
-                old_rows += len(rows)
-            if covered_by_owners != set(bundle_task_ids):
-                continue
-
-            outside_couriers = _selected_couriers_except(selected, owner_keys)
-            available = [cand for cand in pool if cand[2] not in outside_couriers]
-            if not available:
-                continue
-            limit = min(len(available), max(1, old_rows + 2), max(7, len(bundle_task_ids) + 3))
-            replacement = _best_group_from_pool(available, len(bundle_task_ids), limit)
-            if not replacement:
-                continue
-            new_cost = _group_expected_cost(replacement, len(bundle_task_ids))
-            delta = new_cost - old_cost
-            if delta < best_delta - 1e-9:
-                best_delta = delta
-                best = (owner_keys, replacement)
-
-        if best is None:
-            break
-        owner_keys, replacement = best
-        for owner in owner_keys:
-            if owner in selected:
-                del selected[owner]
-        selected[replacement[0][0]] = replacement
-        changed = True
-    return changed
-
-
-def _improve_single_bundle_merges(selected, bundles_by_tasks, all_tasks, deadline):
-    changed = False
-    bundle_items = sorted(
-        bundles_by_tasks.items(),
-        key=lambda item: (-len(item[0]), item[0]),
-    )
-    for bundle_task_ids, pool in bundle_items:
-        if time.monotonic() > deadline - 0.12:
-            break
-        if len(bundle_task_ids) < 2:
-            continue
-        if any(task_id not in selected for task_id in bundle_task_ids):
-            continue
-        selected_keys = set(bundle_task_ids)
-        if any(len(selected[task_id][0][1]) != 1 for task_id in bundle_task_ids):
-            continue
-        outside_couriers = _selected_couriers_except(selected, selected_keys)
-        available = [cand for cand in pool if cand[2] not in outside_couriers]
-        if not available:
-            continue
-        old_cost = sum(_group_expected_cost(selected[task_id], 1) for task_id in bundle_task_ids)
-        old_rows = sum(len(selected[task_id]) for task_id in bundle_task_ids)
-        limit = min(len(available), max(1, old_rows + 2), max(7, len(bundle_task_ids) + 3))
-        replacement = _best_group_from_pool(available, len(bundle_task_ids), limit)
-        if not replacement:
-            continue
-        new_cost = _group_expected_cost(replacement, len(bundle_task_ids))
-        if new_cost < old_cost - 1e-9:
-            for task_id in bundle_task_ids:
-                del selected[task_id]
-            selected[replacement[0][0]] = replacement
-            changed = True
     return changed
 
 
@@ -874,13 +805,11 @@ def _best_group_from_pool(pool, task_count, limit):
     return chosen
 
 
-def _best_multi_split_groups(task_ids, singles_by_task, outside_couriers, max_rows):
-    selected = {task_id: [] for task_id in task_ids}
-    current_cost = {task_id: 100.0 for task_id in task_ids}
+def _best_split_groups(first_task, second_task, singles_by_task, outside_couriers, max_rows):
+    selected = {first_task: [], second_task: []}
+    current_cost = {first_task: 100.0, second_task: 100.0}
     used_couriers = set(outside_couriers)
-    pool = []
-    for task_id in task_ids:
-        pool.extend(singles_by_task.get(task_id, []))
+    pool = list(singles_by_task.get(first_task, [])) + list(singles_by_task.get(second_task, []))
     while sum(len(rows) for rows in selected.values()) < max_rows:
         best = None
         best_task = None
@@ -902,9 +831,9 @@ def _best_multi_split_groups(task_ids, singles_by_task, outside_couriers, max_ro
         selected[best_task].append(best)
         current_cost[best_task] = best_cost
         used_couriers.add(best[2])
-    if any(not selected[task_id] for task_id in task_ids):
+    if not selected[first_task] or not selected[second_task]:
         return None
-    return selected
+    return selected[first_task], selected[second_task]
 
 
 class _MinCostFlow:
@@ -1022,77 +951,6 @@ def _rebalance_single_solution(result, singles, all_tasks, deadline):
         move_count += 1
 
     return _format_selected({task_key: rows for task_key, rows in selected.items() if rows})
-
-
-def _reassign_mixed_solution(result, candidates, all_tasks, deadline):
-    row_map = {(c[0], c[2]): c for c in candidates}
-    selected = _result_to_selected(result, row_map)
-    if not selected:
-        return result
-    best_cost = _selected_cost(selected, all_tasks)
-    for _ in range(2):
-        if time.monotonic() > deadline - 0.22:
-            break
-        candidate = _reassign_mixed_selected_once(selected, row_map)
-        candidate_cost = _selected_cost(candidate, all_tasks)
-        if candidate_cost < best_cost - 1e-9:
-            selected = candidate
-            best_cost = candidate_cost
-        else:
-            break
-    return _format_selected(selected)
-
-
-def _reassign_mixed_selected_once(selected, row_map):
-    couriers = sorted({cand[2] for rows in selected.values() for cand in rows})
-    slots = []
-    for task_key in sorted(selected):
-        rows = selected[task_key]
-        task_count = len(rows[0][1])
-        for index, old in enumerate(rows):
-            others = [cand for i, cand in enumerate(rows) if i != index]
-            slots.append((task_key, task_count, others))
-
-    if not couriers or not slots:
-        return selected
-
-    source = 0
-    courier_offset = 1
-    slot_offset = courier_offset + len(couriers)
-    sink = slot_offset + len(slots)
-    flow = _MinCostFlow(sink + 1)
-    edge_map = {}
-
-    for i, courier_id in enumerate(couriers):
-        flow.add_edge(source, courier_offset + i, 1, 0.0)
-    for j in range(len(slots)):
-        flow.add_edge(slot_offset + j, sink, 1, 0.0)
-
-    for i, courier_id in enumerate(couriers):
-        courier_node = courier_offset + i
-        for j, (task_key, task_count, others) in enumerate(slots):
-            if any(cand[2] == courier_id for cand in others):
-                continue
-            cand = row_map.get((task_key, courier_id))
-            if cand is None:
-                continue
-            cost = _group_expected_cost(others + [cand], task_count)
-            edge_index = len(flow.graph[courier_node])
-            flow.add_edge(courier_node, slot_offset + j, 1, cost)
-            edge_map[(courier_node, edge_index)] = (j, cand)
-
-    if flow.min_cost_flow(source, sink, len(slots)) < len(slots):
-        return selected
-
-    new_selected = {task_key: [] for task_key in selected}
-    for (node, edge_index), (slot_index, cand) in edge_map.items():
-        if flow.graph[node][edge_index][1] == 0:
-            task_key = slots[slot_index][0]
-            new_selected[task_key].append(cand)
-
-    if any(len(new_selected.get(k, [])) != len(v) for k, v in selected.items()):
-        return selected
-    return new_selected
 
 
 def _reassign_selected_once(selected, row_map):

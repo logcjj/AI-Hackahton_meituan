@@ -46,12 +46,7 @@ def solve(input_text: str) -> list:
 
     if singles:
         single_solution = _solve_single_task_multidispatch(singles, all_tasks)
-        if scarce:
-            scarce_single_deadline = min(deadline, time.monotonic() + 1.2)
-            single_solution = _reassign_single_solution(single_solution, singles, all_tasks, scarce_single_deadline)
-            single_solution = _rebalance_single_solution(single_solution, singles, all_tasks, scarce_single_deadline)
-            single_solution = _reassign_single_solution(single_solution, singles, all_tasks, scarce_single_deadline)
-        else:
+        if not scarce:
             if not low_willingness:
                 single_deadline = min(deadline, time.monotonic() + 5.5) if abundant else min(deadline, time.monotonic() + 1.0)
                 single_solution = _destroy_repair_single_solution(single_solution, singles, all_tasks, single_deadline)
@@ -1022,77 +1017,6 @@ def _rebalance_single_solution(result, singles, all_tasks, deadline):
         move_count += 1
 
     return _format_selected({task_key: rows for task_key, rows in selected.items() if rows})
-
-
-def _reassign_mixed_solution(result, candidates, all_tasks, deadline):
-    row_map = {(c[0], c[2]): c for c in candidates}
-    selected = _result_to_selected(result, row_map)
-    if not selected:
-        return result
-    best_cost = _selected_cost(selected, all_tasks)
-    for _ in range(2):
-        if time.monotonic() > deadline - 0.22:
-            break
-        candidate = _reassign_mixed_selected_once(selected, row_map)
-        candidate_cost = _selected_cost(candidate, all_tasks)
-        if candidate_cost < best_cost - 1e-9:
-            selected = candidate
-            best_cost = candidate_cost
-        else:
-            break
-    return _format_selected(selected)
-
-
-def _reassign_mixed_selected_once(selected, row_map):
-    couriers = sorted({cand[2] for rows in selected.values() for cand in rows})
-    slots = []
-    for task_key in sorted(selected):
-        rows = selected[task_key]
-        task_count = len(rows[0][1])
-        for index, old in enumerate(rows):
-            others = [cand for i, cand in enumerate(rows) if i != index]
-            slots.append((task_key, task_count, others))
-
-    if not couriers or not slots:
-        return selected
-
-    source = 0
-    courier_offset = 1
-    slot_offset = courier_offset + len(couriers)
-    sink = slot_offset + len(slots)
-    flow = _MinCostFlow(sink + 1)
-    edge_map = {}
-
-    for i, courier_id in enumerate(couriers):
-        flow.add_edge(source, courier_offset + i, 1, 0.0)
-    for j in range(len(slots)):
-        flow.add_edge(slot_offset + j, sink, 1, 0.0)
-
-    for i, courier_id in enumerate(couriers):
-        courier_node = courier_offset + i
-        for j, (task_key, task_count, others) in enumerate(slots):
-            if any(cand[2] == courier_id for cand in others):
-                continue
-            cand = row_map.get((task_key, courier_id))
-            if cand is None:
-                continue
-            cost = _group_expected_cost(others + [cand], task_count)
-            edge_index = len(flow.graph[courier_node])
-            flow.add_edge(courier_node, slot_offset + j, 1, cost)
-            edge_map[(courier_node, edge_index)] = (j, cand)
-
-    if flow.min_cost_flow(source, sink, len(slots)) < len(slots):
-        return selected
-
-    new_selected = {task_key: [] for task_key in selected}
-    for (node, edge_index), (slot_index, cand) in edge_map.items():
-        if flow.graph[node][edge_index][1] == 0:
-            task_key = slots[slot_index][0]
-            new_selected[task_key].append(cand)
-
-    if any(len(new_selected.get(k, [])) != len(v) for k, v in selected.items()):
-        return selected
-    return new_selected
 
 
 def _reassign_selected_once(selected, row_map):
