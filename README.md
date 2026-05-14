@@ -25,14 +25,23 @@
 - `low_willingness_seed501 = 1803.24`
 - `scarce_couriers_seed401 = 1531.53`
 
-## 当前生产提交
+## 当前候选提交
 
-当前仓库里的 `solver.py` 就是已验证的稳定生产版，并且与 `/tmp/current_best_submission/solver.py` 完全一致。
+当前仓库里的 `solver.py` 是在官方 `707.05` 稳定版基础上的低风险候选版：保留 `707.05` 主线的大部分逻辑，只对 `low_willingness_seed501` 的低意愿路径做一处最小调整。
+
+本次候选版的核心改动：禁用 `707.05` 版本新增的 low-bias 递归，让低意愿样例回到历史 `708.67` 版本中对 `low_willingness_seed501` 更优的求解路径，同时不回退 scarce/normal 分支。
+
+```text
+sha256: 812ea145dd9a38ebf9abbf16d873c383a299e009ad581821a204cb35780edd34
+size: 65657 bytes
+format: v6-compatible output
+```
+
+上一版已验证官方稳定基线：
 
 ```text
 sha256: 60bfdc441f2b4b1f9278cc9b3d4a2cf2ba88d6d1db43a03bd91d3e67dc08bdf8
-size: 65646 bytes
-format: v6-compatible output
+official average: 707.05
 ```
 
 约束状态：
@@ -43,7 +52,21 @@ format: v6-compatible output
 
 ## 本地验证基线
 
-当前稳定版最近一次完整本地审计结果来自：
+当前候选版已完成基础验证：
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
+```
+
+结果：`26 OK`。
+
+本地代理验证显示：
+
+- `low` 代理输出切换到历史 `708` 版同款结构：`{2: 1, 3: 3, 4: 7, 5: 3, 6: 1}`
+- `scarce38` 代理仍保持 `707` 主线结构，不引入 `708` 版的 scarce 退化
+- `large` 代理输出不变
+
+历史稳定版最近一次完整本地审计结果来自：
 
 ```text
 /tmp/current_audit_hard_shadow_selector_full.json
@@ -66,9 +89,9 @@ format: v6-compatible output
 - `tiny` 场景：小规模精确/近精确搜索
 - `normal / medium / large`：多派单贪心 + 重分配 + 局部改良
 - `scarce` 场景：hard-scarce shadow selector + bundle MCF + insertion repair
-- `low_willingness` 场景：稳健评分选择 + 多候选修复
+- `low_willingness` 场景：稳健评分选择 + 多候选修复；当前候选版关闭 low-bias 递归以复用历史更优 low 路径
 
-当前稳定线保留了被验证有效的 scarce 专项增强，去掉了多轮实验后证明不稳或整体退化的分支。
+当前候选线保留了被验证有效的 scarce 专项增强，去掉了多轮实验后证明不稳或整体退化的分支；本次只调整低意愿入口，不改变 scarce 选择器。
 
 ## 仓库结构
 
@@ -133,4 +156,4 @@ python3 -m autosolver.submission_audit \
 
 ## 备注
 
-当前 `main` 分支目标是保存“最新稳定可提交版本”，不是保留所有试验分支。若要继续冲击 `400`，建议在现有生产线之上做更强的结构性优化，而不是简单堆叠更多小修补。
+当前 `main` 分支目标是保存“最新候选可提交版本”，不是保留所有试验分支。若要继续冲击更低分数，建议在现有生产线之上做更强的结构性优化，而不是简单堆叠更多小修补。
