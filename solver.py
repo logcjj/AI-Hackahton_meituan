@@ -10,7 +10,7 @@ _E=1.
 _D=False
 _C=.0
 _B=True
-_A=None
+_A=None  #4
 import itertools,random,time
 _GROUP_COST_CACHE={}
 _GROUP_COST_CACHE_LIMIT=250000
@@ -31,7 +31,7 @@ def solve(input_text):
 		for A8 in c:B.add(A8)
 	if not C:return[]
 	E=[];H=[A for A in C if len(A[1])==1];d=len({A[2]for A in C});L=len(B);e=sum(A[4]for A in C)/len(C);A9=sum(A[4]for A in H)/len(H)if H else e;G=d<=L;F=e<.27;J=F and not G and L==30 and d>=50 and A9<.25
-	if J and not _LOW_BIAS_ACTIVE:
+	if _D and J and not _LOW_BIAS_ACTIVE:
 		_LOW_BIAS_ACTIVE=_B
 		try:return solve(_bias_low_input_text(h,.3))
 		finally:_LOW_BIAS_ACTIVE=_D
