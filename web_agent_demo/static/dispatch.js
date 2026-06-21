@@ -85,10 +85,9 @@ const KPI_SKEL=[
 ];
 function renderKpiSkeleton(){
   $('kpis').innerHTML=KPI_SKEL.map(k=>`<div class="panel kpi kpi-skel">
-    <div class="klbl">${safe(k.label)}</div>
+    <div class="klbl">${safe(k.label)}<span class="pend-badge" style="margin-left:auto">待推理</span></div>
     <div class="kval kval-skel">—<span class="unit">${safe(k.unit)}</span></div>
-    <div class="ksub"><span class="skel-bar"></span></div>
-    <div class="karrow"><span class="pend-badge">待推理</span></div>
+    <div class="kdelta"><span class="skel-bar"></span></div>
     <span class="skel-shimmer"></span>
   </div>`).join('');
 }
@@ -106,11 +105,11 @@ function renderKpis(kpis){
     const corner = isDemo?'<span class="kpi-demo-badge" title="演示换算指标：非真实业务成本/财务，由真值按公式派生">演示</span>':'';
     const dec = (k.unit==='%'||k.key==='cost_index')?1:0;
     const col = k.good==='neutral'?'rgba(127,165,151,.55)':(k.good==='up'||k.good==='down'?'rgba(70,240,168,.6)':'rgba(67,213,255,.55)');
+    const subTxt = safe(k.sub||'');
     return `<div class="panel kpi skeleton${isDemo?' kpi-demo':''}">
       <div class="klbl">${tag}${safe(k.label)}</div>
       <div class="kval" data-key="${k.key}" data-val="${k.value??''}" data-unit="${safe(k.unit)}" data-dec="${dec}">—</div>
-      <div class="ksub">${safe(k.sub||'')}</div>
-      <div class="karrow ${acls}"><span class="ad">${arrow}</span></div>
+      <div class="kdelta"><span class="karrow ${acls}"><span class="ad">${arrow}</span></span>${subTxt?`<span class="ksub">${subTxt}</span>`:''}</div>
       ${corner}
       <svg class="spark" viewBox="0 0 100 27" preserveAspectRatio="none">${sparkPath(k.key,col)}</svg>
     </div>`;
