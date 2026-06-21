@@ -114,12 +114,16 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:var(--panel2);border:1px solid var(--line);min-width:150px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);transition:transform .22s cubic-bezier(.22,.61,.36,1),border-color .22s,box-shadow .22s}
 .chip:hover{transform:translateY(-2px);border-color:var(--line2);box-shadow:0 8px 22px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05)}
-.chip .ci{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border-radius:10px;
-  font-size:18px;background:rgba(67,213,255,.14);border:1px solid rgba(67,213,255,.22)}
-.chip-meta{display:flex;flex-direction:column;gap:1px;line-height:1.1}
-.chip .ct{font-size:11px;color:var(--muted);font-weight:800;line-height:1.25}
+/* iter-12：图标改发光「圆形」(border-radius:50%)，更贴目标稿那种发光圆形图标 */
+.chip .ci{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:50%;
+  font-size:18px;background:rgba(67,213,255,.14);border:1px solid rgba(67,213,255,.30)}
+.chip-meta{display:flex;flex-direction:column;gap:2px;line-height:1.1}
+/* iter-12：2 行——场景名主标题行(亮白大字) + 指标行(小标签 + 彩色±%) */
+.chip .chip-scene{font-size:13px;color:#eaf2f7;font-weight:900;line-height:1.2;letter-spacing:.01em}
+.chip .chip-metric{display:flex;align-items:baseline;gap:6px;line-height:1.05}
+.chip .cml{font-size:10.5px;color:var(--muted);font-weight:800}
 .chip .cv{font-size:13px;font-weight:900;font-family:var(--mono);color:var(--cyan)}
-.chip .cp{font-size:17px;font-weight:900;font-family:var(--mono);letter-spacing:-.02em;line-height:1.05}
+.chip .cp{font-size:15px;font-weight:900;font-family:var(--mono);letter-spacing:-.02em;line-height:1.05}
 .chip .cp .float-sup{font-size:7.5px;opacity:.7}
 /* 意愿=青、可用骑手=红(供给紧张)、合单潜力=绿(机会) —— 与目标稿同配色 */
 .chip.c-will .ci{background:rgba(67,213,255,.15);border-color:rgba(67,213,255,.30)}
@@ -294,22 +298,43 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 /* 全局运营网视图：采纳脉络整体略提亮，但依旧是背景而非主角 */
 #accedges.view-global .acc-edge.on{opacity:.26;stroke:#46708a}
 #accedges.view-global .acc-edge.acc-focus.on{opacity:.5}
-.task-high{fill:var(--orange);filter:drop-shadow(0 0 5px rgba(255,159,67,.6))}
-.task-mid{fill:var(--yellow)} .task-low{fill:var(--green)}
-.courier-node{fill:var(--green);filter:drop-shadow(0 0 5px rgba(70,240,168,.6))}
-.courier-idle{fill:#2c4339;filter:none;opacity:.5}
+/* iter-12(P0-1)：地图节点三色高对比——订单按风险红/黄、骑手绿、商家橙(冷底+暖单点)。
+   高风险=红(目标稿那种醒目红点)；普通=琥珀/黄；低风险=去饱和暗琥珀(不抢骑手绿)。 */
+.task-high{fill:var(--red);stroke:#ffb0b0;stroke-width:.6;
+  filter:drop-shadow(0 0 6px rgba(255,107,107,.85)) drop-shadow(0 0 2px rgba(255,80,80,.9))}
+.task-mid{fill:var(--yellow);filter:drop-shadow(0 0 4px rgba(244,220,97,.55))}
+/* 低风险订单不用骑手那种亮绿，改暗琥珀小点，避免与绿骑手抢色 */
+.task-low{fill:#c89a3e;opacity:.92;filter:drop-shadow(0 0 3px rgba(200,154,62,.4))}
+/* 骑手=绿色发光圆点(应明显可见)：更亮的绿 + 强发光 + 内核白点感 */
+.courier-node{fill:var(--green);stroke:#d8fff0;stroke-width:.7;
+  filter:drop-shadow(0 0 6px rgba(70,240,168,.95)) drop-shadow(0 0 2px rgba(70,240,168,1))}
+.courier-idle{fill:#2f6b54;filter:drop-shadow(0 0 2px rgba(70,240,168,.35));opacity:.62}
 /* iter-6 视觉层级：非焦点节点压暗压淡，焦点节点更大更亮 */
 /* iter-7：聚焦视图再压稀一档(.42→.34)，更贴目标稿稀疏聚焦构图 */
 .node-muted{opacity:.34;filter:none !important}
+/* iter-12(P0-1)：非焦点骑手即使压暗也保留可辨绿色 + 轻发光，确保「绿骑手明显可见」 */
+.courier-node.node-muted{opacity:.62;filter:drop-shadow(0 0 3px rgba(70,240,168,.6)) !important}
+.courier-idle.node-muted{opacity:.5}
 .courier-focus{fill:#ffe27a !important;filter:drop-shadow(0 0 7px rgba(255,210,63,.9)) !important}
 .task-focus{filter:drop-shadow(0 0 9px rgba(255,159,67,.95)) drop-shadow(0 0 3px rgba(255,210,63,.9)) !important}
-.district-node{fill:rgba(67,213,255,.12);stroke:var(--cyan2);stroke-width:1.2}
+/* iter-12(P0-1)：商家中心=橙色方块(暖色)，与目标稿一致；区别于红/黄订单与绿骑手 */
+.district-node{fill:rgba(255,159,67,.22);stroke:var(--orange);stroke-width:1.3;
+  filter:drop-shadow(0 0 4px rgba(255,159,67,.5))}
 /* 任务合单圈=亮绿实线发光；骑手兜底圈=青虚线发光（P0-3：两类语义区分） */
 .bundle-ring{fill:rgba(70,240,168,.05);stroke-width:1.4}
 /* iter-6 聚焦视图：非焦点兜底圈压暗，避免抢焦点订单组与黄色射线 */
 .bundle-ring.bundle-dim{opacity:.4;filter:none !important}
 .bundle-ring.task_bundle{stroke:var(--green);stroke-dasharray:none;filter:drop-shadow(0 0 5px rgba(70,240,168,.45))}
 .bundle-ring.multi_courier{stroke:var(--cyan);stroke-dasharray:4 4;fill:rgba(67,213,255,.04);filter:drop-shadow(0 0 4px rgba(67,213,255,.4))}
+/* iter-12(P0-3)：合单/兜底聚合圈醒目药丸标签——发光胶囊 + 粗白字，贴目标稿「3单合单」 */
+.bundle-lbl-fo{overflow:visible;pointer-events:none}
+.bundle-lbl{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;
+  font-size:11px;font-weight:900;line-height:1;letter-spacing:.02em;padding:4px 9px;border-radius:9px;
+  font-family:-apple-system,"PingFang SC",system-ui,sans-serif}
+.bundle-lbl.lbl-tb{color:#0b1612;background:rgba(70,240,168,.92);border:1px solid #46f0a8;
+  box-shadow:0 0 9px rgba(70,240,168,.7),0 2px 6px rgba(0,0,0,.4)}
+.bundle-lbl.lbl-mc{color:#06141b;background:rgba(67,213,255,.9);border:1px solid #43d5ff;
+  box-shadow:0 0 9px rgba(67,213,255,.65),0 2px 6px rgba(0,0,0,.4)}
 .node-hit{cursor:pointer}
 .node-hit.sel{stroke:#fff;stroke-width:2}
 .pulse{animation:pulse 1.6s infinite}

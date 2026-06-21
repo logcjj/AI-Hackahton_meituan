@@ -253,18 +253,43 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
     for row in candidates:
         for t in row[1]:
             task_will[t].append(row[4])
+    # iter-12(P0-1)：先算每个任务的代表 willingness（真值中位），再在「本场景真实
+    # willingness 分布」上取分位阈值派生红/黄/绿三色风险——这样无论场景整体意愿高低，
+    # 都能把**相对最低意愿**的订单读成高风险(红)、相对最高的读成低风险(绿)，恢复目标稿
+    # 的三色高对比。阈值仍 100% 由真实 willingness 派生，不写死任何节点颜色/数量。
+    w_med_by_task: dict[str, float] = {}
+    for t in tasks_sorted:
+        ws = task_will.get(t, [0.4])
+        w_med_by_task[t] = sorted(ws)[len(ws) // 2]
+    _wsorted = sorted(w_med_by_task.values())
+    def _pct(p: float) -> float:
+        if not _wsorted:
+            return 0.0
+        i = min(len(_wsorted) - 1, max(0, int(round(p * (len(_wsorted) - 1)))))
+        return _wsorted[i]
+    # 风险分级以「本场景相对意愿分位」为主轴（真值派生·相对风险排序）：
+    #   本场景意愿最低 ~1/3 → 高风险(红)；最高 ~1/3 → 低风险(琥珀)；中间 → 中风险(黄)。
+    #   这样当整批订单意愿都很低(如 large_seed301 全 <0.3)时，仍能按真实意愿把
+    #   「相对最危险」的订单读成红、「相对最稳」的读成低，恢复三色对比，且全程不写死颜色。
+    #   绝对意愿仅作语义兜底：意愿极低(<0.22)无论分位如何都至少判高风险。
+    q_hi = _pct(0.34)   # 低意愿 1/3 分位（含其下 → 高风险/红）
+    q_lo = _pct(0.66)   # 高意愿 2/3 分位（含其上 → 低风险/琥珀）
     for t in tasks_sorted:
         cl = assign.get(t, 0)
         cx, cy = centers[cl] if cl < len(centers) else centers[0]
         # iter-5(P0-1)：放大簇盘半径，让相邻商圈交叠、任务点铺满全图成网
         x, y = _jitter_point(cx, cy, "task-" + t, radius=92)
-        ws = task_will.get(t, [0.4])
-        w_med = sorted(ws)[len(ws) // 2]
-        risk = "high" if w_med < 0.3 else ("mid" if w_med < 0.55 else "low")
+        w_med = w_med_by_task[t]
+        if w_med <= q_hi or w_med < 0.22:
+            risk = "high"
+        elif w_med >= q_lo:
+            risk = "low"
+        else:
+            risk = "mid"
         task_nodes[t] = {
             "id": t, "x": x, "y": y, "cluster": cl,
             "willingness_repr": round(w_med, 3),   # 真值派生
-            "risk": risk,                           # 真值派生(意愿)
+            "risk": risk,                           # 真值派生(意愿·本场景分位)
         }
 
     # iter-5(P0-2)：全图去重叠——均匀化后簇盘交叠，改为**全局一遍**斥力松弛（而非
@@ -537,11 +562,17 @@ def synth_chips(report: dict[str, Any]) -> list[dict[str, Any]]:
     # iter-7：贴目标稿 3 枚特征胶囊（图标色块 + 标签 + 彩色±%）。
     # narr_pct = 相对中性基准的「叙事偏移%」(演示叙事，由真实感知值确定性派生，非真实业务统计)；
     # tone 决定 ±% 颜色（will=青/supply=红/bundle=绿，贴目标稿）。真值仍保留在 value/real。
+    # iter-12(P0-2/P1)：每枚胶囊补「场景名主标题(scene)」→ 前端渲染 2 行(场景名 + 指标)。
+    #   场景名一律按**真实感知值**派生，绝不写死与真值打架的措辞：
+    #   - 意愿：w_mean<0.45→「雨天低接单意愿」否则「接单意愿平稳」
+    #   - 供给：density d 越高供给越充裕；本例 d≈2.08 → 诚实写「本例骑手供给充裕」而非「紧张」
+    #   - 合单：bundle_fraction 高 → 「合单机会密集」(本场景主 regime=bundle-heavy)
     # 意愿芯片（真值 w_mean → 相对 0.5 中性基准的叙事偏移）
     if w_mean is not None:
         wp = round((w_mean - 0.50) / 0.50 * 100)  # 0.5 为中性基准
         chips.append({
             "icon": "☔", "title": "接单意愿",
+            "scene": "雨天低接单意愿" if w_mean < 0.45 else "接单意愿平稳",
             "value": f"w̄={w_mean}", "delta": "意愿偏低" if w_mean < 0.45 else "意愿正常",
             "narr_pct": wp, "tone": "will",
             "real": {"willingness_mean": w_mean}, "is_demo": False, "narrative": True,
@@ -549,8 +580,11 @@ def synth_chips(report: dict[str, Any]) -> list[dict[str, Any]]:
     if d is not None:
         # 供给：相对 d=2.0「充裕基准」的偏移；d 越低偏移越负（供给越紧张）
         dp = round((d - 2.0) / 2.0 * 100)
+        # 诚实场景名：d≥1.8 供给充裕；1.0~1.8 均衡；<1.0 才是供给紧张（与真值一致，不打架）
+        supply_scene = "本例骑手供给充裕" if d >= 1.8 else ("骑手供给均衡" if d > 1.0 else "骑手供给紧张")
         chips.append({
             "icon": "🧍", "title": "可用骑手",
+            "scene": supply_scene,
             "value": f"d={d}", "delta": "骑手充裕" if d >= 1.8 else ("均衡" if d > 1.0 else "骑手紧张"),
             "narr_pct": dp, "tone": "supply",
             "real": {"density_ratio": d}, "is_demo": False, "narrative": True,
@@ -560,6 +594,7 @@ def synth_chips(report: dict[str, Any]) -> list[dict[str, Any]]:
         # 「合单/兜底潜力」，与满屏兜底圈自洽，绝不伪造任务合单。
         chips.append({
             "icon": "🗂", "title": "合单潜力",
+            "scene": "合单机会密集" if bf >= 0.35 else "合单机会一般",
             "value": f"潜力占比 {round(bf*100,1)}%", "delta": "合单/兜底机会密集" if bf >= 0.35 else "机会一般",
             "narr_pct": round(bf * 100), "tone": "bundle",
             "real": {"bundle_fraction": bf}, "is_demo": False, "narrative": True,

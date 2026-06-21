@@ -130,7 +130,9 @@ function sparkPath(key,col){
   return `<polygon points="${fill}" fill="${fc}" stroke="none"/><polyline points="${d}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round"/>`;
 }
 
-/* ---------- chips（iter-7：贴目标稿——图标色块 + 标签 + 彩色±%；真值挂 title 悬浮）---------- */
+/* ---------- chips（iter-12：恢复 2 行——发光圆形图标 + 「场景名主标题行」+ 指标行）----------
+   场景名(scene) 由 cockpit_story 按真实感知值派生(诚实，不与真值打架)；第 1 枚天气/云雨发光图标。*/
+const CHIP_TONE_ICON={will:'🌧️', supply:'🛵', bundle:'🧩'};
 function renderChips(chips){
   if(!chips||!chips.length) return;
   const tone=c=>c.tone || (/意愿/.test(c.title)?'will':(/供给|骑手|可用/.test(c.title)?'supply':(/合单|兜底|潜力/.test(c.title)?'bundle':'will')));
@@ -140,11 +142,14 @@ function renderChips(chips){
     const hasPct=pct!=null&&!isNaN(pct);
     const sign=hasPct&&pct>=0?'+':'';
     const pctStr=hasPct?`${sign}${pct}%`:'';
-    return `<div class="chip skeleton c-${tn}" title="真值 ${safe(c.value)} · ${safe(c.delta)}（叙事偏移%为演示派生）">
-      <span class="ci">${safe(c.icon)}</span>
+    // 场景名主标题：优先真值派生的 scene，回退指标标签；图标按 tone 给发光圆形(意愿=云雨)
+    const scene=c.scene||c.title;
+    const ico=c.icon||CHIP_TONE_ICON[tn]||'•';
+    return `<div class="chip skeleton c-${tn}" title="${safe(c.title)} · 真值 ${safe(c.value)} · ${safe(c.delta)}（叙事偏移%为演示派生）">
+      <span class="ci">${safe(ico)}</span>
       <div class="chip-meta">
-        <div class="ct">${safe(c.title)}</div>
-        ${hasPct?`<div class="cp">${pctStr}<sup class="float-sup" title="叙事偏移%为演示派生，随场景真值浮动">~浮动</sup></div>`:`<div class="cv">${safe(c.value)}</div>`}
+        <div class="ct chip-scene">${safe(scene)}</div>
+        <div class="chip-metric"><span class="cml">${safe(c.title)}</span>${hasPct?`<span class="cp">${pctStr}<sup class="float-sup" title="叙事偏移%为演示派生，随场景真值浮动">~浮动</sup></span>`:`<span class="cv">${safe(c.value)}</span>`}</div>
       </div>
     </div>`;
   }).join('');
@@ -515,20 +520,27 @@ function renderMap(m){
   // iter-6：聚焦视图大幅减少兜底圈杂讯——只保留合单圈 + 焦点组圈(其余隐藏)，贴目标稿稀疏感；
   // 全局运营网视图才显示全部(限 14)。焦点组的圈交给 fg-ring 高亮，这里不重复画。
   const bsorted=(m.bundles||[]).slice().sort((a,b)=> (a.kind==='task_bundle'?-1:0)-(b.kind==='task_bundle'?-1:0));
-  const bcap = mapView==='global' ? 14 : 6;
+  // iter-12(P0-3)：聚焦视图也多标几组(焦点组及邻近若干组都标，不只焦点 hub)。
+  const bcap = mapView==='global' ? 16 : 9;
   let bdrawn=0;
+  // 发光环 + 醒目药丸标签("N单合单"/"N骑手兜底") —— 标签用 foreignObject 承载带背景的胶囊。
+  const drawBundleLabel=(b,kind)=>{
+    const isTB=kind==='task_bundle';
+    const lw=Math.max(58, b.label.length*12+18), lh=20;
+    const lx=(b.cx-lw/2).toFixed(1), ly=(b.cy-b.r-lh-2).toFixed(1);
+    const fo=el('foreignObject',{x:lx,y:ly,width:lw,height:lh,class:'bundle-lbl-fo'});
+    fo.innerHTML=`<div xmlns="http://www.w3.org/1999/xhtml" class="bundle-lbl ${isTB?'lbl-tb':'lbl-mc'}">${safe(b.label)}</div>`;
+    root.appendChild(fo);
+  };
   bsorted.forEach(b=>{
     const kind=b.kind==='task_bundle'?'task_bundle':'multi_courier';
     if(b.task_key===fgKey0) return;              // 焦点组改由发光环高亮，避免叠画
     // 聚焦视图：优先合单圈；兜底圈仅在配额内象征性保留少量
     if(mapView==='focus' && kind==='multi_courier' && bdrawn>=bcap) return;
-    if(bdrawn>=14) return;
+    if(bdrawn>=16) return;
     root.appendChild(el('circle',{cx:b.cx,cy:b.cy,r:b.r,
       class:'bundle-ring '+kind+(mapView==='focus'?' bundle-dim':'')}));
-    const t=el('text',{x:b.cx,y:b.cy-b.r-4,
-      fill:kind==='task_bundle'?'#46f0a8':'#43d5ff','font-size':'11','font-weight':'800',
-      'text-anchor':'middle','opacity':mapView==='focus'?'0.5':'1'});
-    t.textContent=b.label; root.appendChild(t);
+    drawBundleLabel(b,kind);
     bdrawn++;
   });
   // iter-6 视觉层级：先算出「焦点订单组」相关的实体集合（焦点任务节点 / 焦点候选骑手），
@@ -581,7 +593,8 @@ function renderMap(m){
   // 骑手（iter-6：整体放大一档；焦点候选骑手更大更亮，其余压暗压小，建立视觉层级）
   (m.couriers||[]).forEach(c=>{
     const isFocus=focusCouriers.has(c.id);
-    const r0= isFocus ? 8.5 : (c.active?6:4.5);
+    // iter-12(P0-1)：放大骑手绿点(活跃 6.5/空闲 5)，让绿色骑手在图上明显可见、数量足
+    const r0= isFocus ? 9 : (c.active?6.5:5);
     let cls = c.active?'courier-node node-hit glow-node':'courier-idle node-hit';
     if(isFocus) cls+=' courier-focus';
     else if(mapView==='focus') cls+=' node-muted';   // 非焦点压暗（仅聚焦视图）
