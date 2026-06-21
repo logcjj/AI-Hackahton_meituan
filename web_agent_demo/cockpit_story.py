@@ -120,30 +120,36 @@ def _cluster_tasks(candidates, all_tasks, n_clusters: int = 7) -> dict[str, int]
 
 
 def _cluster_centers(n_clusters: int) -> list[tuple[float, float]]:
-    """商圈中心确定性散布在画布上（环形 + 抖动，避免贴边）。
+    """商圈中心确定性散布在画布上（弱商圈感的「抖动网格」铺满画布）。
 
-    iter-3(P0-2)：把簇心拉得更开（占满画面宽度、簇间留白更明显），让每个商圈成为
-    一个**紧致独立的簇**（配合下方更小的 jitter 半径），贴近目标稿「一簇一商圈」观感。
+    iter-5(P0-1)：从 iter-4 的「紧致环形小团块」改为**铺满全图的均匀散布**——簇心
+    沿一个抖动网格在整张画布上展开（簇间不再留大白），配合下方放大的 jitter 半径，
+    让任务/骑手节点**散布全图、相对均匀**，采纳实线/候选线**跨图成网**，贴近目标
+    f_001 那种「全图配送网络」观感。仍保留弱商圈感（每个网格点是一个商圈锚），但
+    簇心拉远、簇半径放大、相邻簇会自然交叠成网。确定性(seed=20260620)，只动可视化。
     """
     centers = []
-    cx, cy = CANVAS_W / 2, CANVAS_H * 0.50
-    # 用更大的椭圆半径占满画布（x 拉宽到 0.40，y 压扁到 0.30 留出上下空隙）
-    rad_x = CANVAS_W * 0.40
-    rad_y = CANVAS_H * 0.36
+    # 把 n_clusters 个簇心摊到一个近似 cols×rows 的抖动网格上，覆盖画布大部分面积。
+    cols = max(2, round(math.sqrt(n_clusters * CANVAS_W / CANVAS_H)))
+    rows = max(2, math.ceil(n_clusters / cols))
+    # 边距收窄（iter-4 是 120/110→留白太大），让网格几乎铺满画布
+    mx, my = CANVAS_W * 0.09, CANVAS_H * 0.12
+    gw = (CANVAS_W - 2 * mx) / max(1, cols)
+    gh = (CANVAS_H - 2 * my) / max(1, rows)
     for k in range(n_clusters):
-        ang = 2 * math.pi * k / max(1, n_clusters) + _hf("center-ang", k) * 0.45
-        rr = 0.78 + 0.22 * _hf("center-r", k)
-        x = cx + rad_x * rr * math.cos(ang) + (_hf("cx", k) - 0.5) * 36
-        y = cy + rad_y * rr * math.sin(ang) + (_hf("cy", k) - 0.5) * 30
-        # 收进安全框，避免簇心贴边导致节点溢出
-        x = max(120, min(CANVAS_W - 120, x))
-        y = max(110, min(CANVAS_H - 90, y))
+        gi = k % cols
+        gj = k // cols
+        # 每个网格单元中心 + 较大的确定性抖动（±0.42 单元），打破规则栅格但仍铺满
+        cx = mx + gw * (gi + 0.5) + (_hf("cx", k) - 0.5) * gw * 0.84
+        cy = my + gh * (gj + 0.5) + (_hf("cy", k) - 0.5) * gh * 0.84
+        x = max(90, min(CANVAS_W - 90, cx))
+        y = max(80, min(CANVAS_H - 70, cy))
         centers.append((round(x, 1), round(y, 1)))
     return centers
 
 
 def _jitter_point(cx: float, cy: float, key: str, radius: float = 38.0) -> tuple[float, float]:
-    """簇内抖动：iter-3 收紧半径（默认 38），让簇内节点更靠拢成「一坨」。"""
+    """簇内抖动：iter-5 放大半径，让相邻簇盘自然交叠、节点铺满全图成网（不再「一坨」）。"""
     ang = _hf("ja", key) * 2 * math.pi
     # 平方根分布让点更均匀地铺在圆盘内（避免全挤在圆心或全在外环）
     r = radius * math.sqrt(0.18 + 0.82 * _hf("jr", key))
@@ -223,7 +229,8 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
         for t in tids:
             courier_best[cid].append((will, t))
 
-    n_clusters = max(6, min(8, max(1, round(n_tasks / 6))))
+    # iter-5(P0-1)：簇心数提到 9~12，沿抖动网格铺满全图（更均匀的「全图配送网络」）
+    n_clusters = max(9, min(12, max(1, round(n_tasks / 4))))
     if n_tasks <= 8:
         n_clusters = max(1, min(n_tasks, 4))
     assign = _cluster_tasks(candidates, all_tasks, n_clusters)
@@ -239,7 +246,8 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
     for t in tasks_sorted:
         cl = assign.get(t, 0)
         cx, cy = centers[cl] if cl < len(centers) else centers[0]
-        x, y = _jitter_point(cx, cy, "task-" + t, radius=50)
+        # iter-5(P0-1)：放大簇盘半径，让相邻商圈交叠、任务点铺满全图成网
+        x, y = _jitter_point(cx, cy, "task-" + t, radius=92)
         ws = task_will.get(t, [0.4])
         w_med = sorted(ws)[len(ws) // 2]
         risk = "high" if w_med < 0.3 else ("mid" if w_med < 0.55 else "low")
@@ -249,10 +257,9 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
             "risk": risk,                           # 真值派生(意愿)
         }
 
-    # P0-5：簇内去重叠——按簇分组做斥力松弛，使每个商圈内的任务点均匀可读不挤成团。
-    for k in range(n_clusters):
-        grp = [task_nodes[t] for t in tasks_sorted if assign.get(t) == k]
-        _relax_overlap(grp, min_dist=20.0, iters=16, strength=0.6)
+    # iter-5(P0-2)：全图去重叠——均匀化后簇盘交叠，改为**全局一遍**斥力松弛（而非
+    # 按簇分组），让全图任务点保持均匀间距、不重叠、可读成网（min_dist 略放大）。
+    _relax_overlap(list(task_nodes.values()), min_dist=26.0, iters=22, strength=0.55)
 
     # 商圈节点
     district_nodes = []
@@ -304,14 +311,20 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
     all_courier_ids = sorted({row[2] for row in candidates})
     for cid in all_courier_ids:
         mx, my = _courier_centroid(cid)
-        x, y = _jitter_point(mx, my, "courier-" + cid, radius=30)
+        # iter-5：骑手围绕其服务任务质心更大范围散布，使连线较长、跨图成网
+        x, y = _jitter_point(mx, my, "courier-" + cid, radius=58)
         courier_nodes[cid] = {
             "id": cid, "x": x, "y": y,
             "active": cid in used_couriers,   # 真值（是否被采纳）
         }
 
-    # P0-5：骑手节点同样去重叠（全局一遍，避免骑手相互/与簇心堆叠成团）
-    _relax_overlap(list(courier_nodes.values()), min_dist=15.0, iters=12, strength=0.5)
+    # iter-5：骑手节点全局去重叠（min_dist 略放大，均匀铺开不堆叠）。再与任务点一起
+    # 做一遍轻量松弛，避免骑手压在任务点上（全图节点整体均匀可读）。
+    _relax_overlap(list(courier_nodes.values()), min_dist=20.0, iters=16, strength=0.5)
+    _relax_overlap(
+        list(task_nodes.values()) + list(courier_nodes.values()),
+        min_dist=17.0, iters=10, strength=0.4,
+    )
 
     # 连线：采纳=实线（真）；候选虚线=每个任务取若干高意愿候选行（演示采样，标注）
     accepted_edges = []

@@ -328,28 +328,41 @@ function buildStreetTiles(W,H){
   }
   parts.push(`<g class="map-blocks">${blocks}</g>`);
 
-  // —— 河流（保留，已接近目标）：一条贯穿的弯曲河 ——
+  // —— 水系（iter-5：主河 + 一条次级支流/水道，非对称走向，逼近目标底图的水系）——
   let water='';
+  // 主河：横向贯穿、弯曲
   {
-    const y0=H*(0.20+R()*0.12);
+    const y0=H*(0.18+R()*0.14);
     let d=`M ${-20} ${f(y0)}`;
     let x=-20,y=y0;
     while(x<W+20){
-      x+=W/7; y+=(R()-0.42)*H*0.16;
+      x+=W/7; y+=(R()-0.42)*H*0.17;
       y=Math.max(40,Math.min(H-40,y));
-      d+=` Q ${f(x-W/14)} ${f(y+(R()-0.5)*30)} ${f(x)} ${f(y)}`;
+      d+=` Q ${f(x-W/14)} ${f(y+(R()-0.5)*32)} ${f(x)} ${f(y)}`;
     }
     water+=`<path d="${d}" fill="none" stroke="url(#mgRiver)" stroke-width="${(12+R()*7).toFixed(1)}" stroke-linecap="round" opacity="0.42"/>`;
     water+=`<path d="${d}" fill="none" stroke="#2b6f86" stroke-width="1.0" opacity="0.4"/>`;
+  }
+  // 支流/水道：斜向、较细，从右下汇入，打破对称
+  {
+    let x=W*(0.58+R()*0.18), y=H+18;
+    let d=`M ${f(x)} ${f(y)}`;
+    while(y>H*0.22){
+      x+=(R()-0.62)*W*0.12; y-=H*(0.13+R()*0.06);
+      x=Math.max(20,Math.min(W-20,x));
+      d+=` Q ${f(x+(R()-0.5)*40)} ${f(y+H*0.05)} ${f(x)} ${f(y)}`;
+    }
+    water+=`<path d="${d}" fill="none" stroke="url(#mgRiver)" stroke-width="${(6+R()*5).toFixed(1)}" stroke-linecap="round" opacity="0.34"/>`;
+    water+=`<path d="${d}" fill="none" stroke="#2b6f86" stroke-width="0.9" opacity="0.34"/>`;
   }
   parts.push(`<g class="map-water">${water}</g>`);
 
   // —— 次级街道 / 巷道：密度 ~2.5x，中性灰，间距不等 + 断头路/丁字路口，避免方格纸 ——
   let minor='';
   const STREET='#3a4956', STREET2='#303c45';   // 中性灰（非青绿，略提亮增强城市纹理）
-  // 竖向次级街道：间距不等
+  // 竖向次级街道：间距不等（iter-5：再加密一档，间距缩小）
   { let bx=0; while(bx<W){
-      bx += W*(0.028+R()*0.040);            // 不等间距，密度提升
+      bx += W*(0.020+R()*0.030);            // 不等间距，密度再提升
       if(bx>=W) break;
       // 部分街道为「断头路」：只画到画面中段随机位置
       const stub=R()<0.22;
@@ -360,9 +373,9 @@ function buildStreetTiles(W,H){
       const op=(0.42+R()*0.28).toFixed(2);
       minor+=`<path d="${d}" fill="none" stroke="${R()<0.5?STREET:STREET2}" stroke-width="${(0.7+R()*0.6).toFixed(1)}" opacity="${op}"/>`;
   }}
-  // 横向次级街道：间距不等
+  // 横向次级街道：间距不等（iter-5：再加密一档）
   { let by=0; while(by<H){
-      by += H*(0.035+R()*0.05);
+      by += H*(0.026+R()*0.038);
       if(by>=H) break;
       const stub=R()<0.22;
       const xEnd=stub ? W*(0.25+R()*0.55) : W+4;
@@ -372,9 +385,22 @@ function buildStreetTiles(W,H){
       const op=(0.42+R()*0.28).toFixed(2);
       minor+=`<path d="${d}" fill="none" stroke="${R()<0.5?STREET:STREET2}" stroke-width="${(0.7+R()*0.6).toFixed(1)}" opacity="${op}"/>`;
   }}
-  // 散布的短巷/丁字小路（局部加密、随机朝向），强化「真实瓦片」纹理
-  for(let k=0;k<46;k++){
-    const ox=R()*W, oy=R()*H, len=14+R()*46, horiz=R()<0.5;
+  // 斜向次级街巷（iter-5）：少量倾斜短街，制造非正交交叉点、打破方格纸感
+  for(let k=0;k<26;k++){
+    const ox=R()*W, oy=R()*H;
+    const ang=(R()<0.5? 0.32:-0.32)+(R()-0.5)*0.5;   // ~±18° 倾斜
+    const seg=3+((R()*3)|0);
+    let d=`M ${f(ox)} ${f(oy)}`, px=ox, py=oy;
+    for(let s=0;s<seg;s++){
+      const ln=18+R()*40;
+      px+=Math.cos(ang)*ln+(R()-0.5)*8; py+=Math.sin(ang)*ln+(R()-0.5)*8;
+      d+=` L ${f(px)} ${f(py)}`;
+    }
+    minor+=`<path d="${d}" fill="none" stroke="${R()<0.5?STREET:STREET2}" stroke-width="${(0.6+R()*0.6).toFixed(1)}" opacity="${(0.32+R()*0.26).toFixed(2)}"/>`;
+  }
+  // 散布的短巷/丁字小路（iter-5：数量加倍，局部加密、随机朝向），强化高密度瓦片纹理
+  for(let k=0;k<88;k++){
+    const ox=R()*W, oy=R()*H, len=12+R()*44, horiz=R()<0.5;
     const ex=horiz?ox+len*(R()<0.5?1:-1):ox, ey=horiz?oy:oy+len*(R()<0.5?1:-1);
     minor+=`<line x1="${f(ox)}" y1="${f(oy)}" x2="${f(ex)}" y2="${f(ey)}" stroke="${STREET2}" stroke-width="${(0.6+R()*0.5).toFixed(1)}" opacity="${(0.3+R()*0.25).toFixed(2)}"/>`;
   }
@@ -397,23 +423,28 @@ function buildStreetTiles(W,H){
     s+=`<path d="${d}" fill="none" stroke="${MAJ2}" stroke-width="${wHi}" stroke-linecap="round" opacity="0.5"/>`;
     return s;
   };
-  // 2 条竖主干（弯曲）
-  [W*0.30,W*0.68].forEach((bx)=>{
-    const pts=[]; let yy=-12;
-    while(yy<H+12){ pts.push([bx+(R()-0.5)*40, yy]); yy+=H*0.16; }
+  // 2 条竖主干（iter-5：非对称走向——基线随机偏移 + 沿途单向漂移，非镜像对称）
+  [W*0.26,W*0.62].forEach((bx0)=>{
+    const pts=[]; let yy=-12, bx=bx0+(R()-0.5)*60, drift=(R()-0.5)*0.06;
+    while(yy<H+12){ bx+=drift*H*0.16; pts.push([bx+(R()-0.5)*44, yy]); yy+=H*0.15; }
     major+=drawArtery(pts,2.6,0.9);
   });
-  // 2 条横主干（弯曲）
-  [H*0.34,H*0.72].forEach((by)=>{
-    const pts=[]; let xx=-12;
-    while(xx<W+12){ pts.push([xx, by+(R()-0.5)*38]); xx+=W*0.14; }
+  // 2 条横主干（非对称走向）
+  [H*0.30,H*0.70].forEach((by0)=>{
+    const pts=[]; let xx=-12, by=by0+(R()-0.5)*54, drift=(R()-0.5)*0.05;
+    while(xx<W+12){ by+=drift*W*0.14; pts.push([xx, by+(R()-0.5)*42]); xx+=W*0.13; }
     major+=drawArtery(pts,2.6,0.9);
   });
-  // 1 条对角主轴（弯曲）
+  // 2 条对角主轴（iter-5：增加一条反向对角，制造更多主干交叉点、破对称）
   {
-    const pts=[]; let x=-12,y=H*0.88;
-    while(x<W+12){ pts.push([x, y+(R()-0.5)*40]); x+=W*0.12; y-=H*0.88*0.12; }
+    const pts=[]; let x=-12,y=H*0.86;
+    while(x<W+12){ pts.push([x, y+(R()-0.5)*46]); x+=W*0.11; y-=H*0.86*0.11; }
     major+=drawArtery(pts,2.4,0.8);
+  }
+  {
+    const pts=[]; let x=-12,y=H*0.10;
+    while(x<W+12){ pts.push([x, y+(R()-0.5)*44]); x+=W*0.12; y+=H*0.80*0.12; }
+    major+=drawArtery(pts,2.2,0.75);
   }
   parts.push(`<g class="map-major">${major}</g>`);
   return parts.join('');
