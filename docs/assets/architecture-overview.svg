@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
+  <title id="title">AutoSolver Agent architecture overview</title>
+  <desc id="desc">Architecture diagram showing browser demo, Agent controller, solver baseline, self-evolution track, evidence tools, and official result record.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f8efd9"/>
+      <stop offset="0.55" stop-color="#eef0df"/>
+      <stop offset="1" stop-color="#d9e8df"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#1f2e26" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L12,7 L2,12 Z" fill="#2e5f73"/>
+    </marker>
+    <style>
+      .title { font: 800 34px Avenir Next, Arial, sans-serif; fill: #16211e; letter-spacing: -1px; }
+      .subtitle { font: 600 16px Avenir Next, Arial, sans-serif; fill: #66736e; }
+      .box { fill: rgba(255,255,255,0.78); stroke: rgba(22,33,30,0.16); stroke-width: 2; filter: url(#shadow); }
+      .green { fill: #eaf5df; stroke: #77a66c; }
+      .blue { fill: #e5f1f3; stroke: #6d9aac; }
+      .gold { fill: #fbf2d9; stroke: #d8b14a; }
+      .rose { fill: #fff0e9; stroke: #d19273; }
+      .label { font: 800 21px Avenir Next, Arial, sans-serif; fill: #16211e; }
+      .labelSm { font: 800 18px Avenir Next, Arial, sans-serif; fill: #16211e; }
+      .small { font: 600 14px Avenir Next, Arial, sans-serif; fill: #53625d; }
+      .mono { font: 700 13px SFMono-Regular, Consolas, monospace; fill: #285a45; }
+      .arrow { stroke: #2e5f73; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+      .dash { stroke: #c9714a; stroke-width: 3; fill: none; stroke-dasharray: 9 8; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1440" height="760" fill="url(#bg)"/>
+  <path d="M0 68H1440M0 136H1440M0 204H1440M0 272H1440M0 340H1440M0 408H1440M0 476H1440M0 544H1440M0 612H1440M0 680H1440" stroke="#16211e" stroke-opacity="0.045"/>
+  <path d="M72 0V760M144 0V760M216 0V760M288 0V760M360 0V760M432 0V760M504 0V760M576 0V760M648 0V760M720 0V760M792 0V760M864 0V760M936 0V760M1008 0V760M1080 0V760M1152 0V760M1224 0V760M1296 0V760M1368 0V760" stroke="#16211e" stroke-opacity="0.04"/>
+
+  <text x="56" y="70" class="title">AutoSolver Agent System Architecture</text>
+  <text x="56" y="102" class="subtitle">Stable competition solver stays isolated; the web Agent explains perception, planning, trials, critic decisions, rollback, and memory.</text>
+
+  <rect x="56" y="154" width="270" height="130" rx="28" class="box blue"/>
+  <text x="86" y="198" class="label">Browser Demo</text>
+  <text x="86" y="227" class="small">web UI, case switcher</text>
+  <text x="86" y="252" class="mono">http://127.0.0.1:8765</text>
+
+  <rect x="404" y="132" width="310" height="174" rx="28" class="box blue"/>
+  <text x="434" y="170" class="labelSm">web_agent_demo/</text>
+  <text x="434" y="194" class="labelSm">server.py</text>
+  <text x="434" y="224" class="small">HTML, SSE stream, /api/cases</text>
+  <text x="434" y="249" class="small">/api/run and /api/stream</text>
+  <text x="434" y="277" class="mono">no official score rendering</text>
+
+  <rect x="808" y="118" width="560" height="224" rx="32" class="box green"/>
+  <text x="838" y="164" class="label">autosolver_agent/system.py</text>
+  <text x="838" y="194" class="small">Agent controller and event report</text>
+  <rect x="838" y="222" width="150" height="54" rx="15" fill="#fffdf6" stroke="#b9cfac"/>
+  <text x="858" y="256" class="mono">Perception</text>
+  <rect x="1004" y="222" width="132" height="54" rx="15" fill="#fffdf6" stroke="#b9cfac"/>
+  <text x="1034" y="256" class="mono">Planner</text>
+  <rect x="1152" y="222" width="132" height="54" rx="15" fill="#fffdf6" stroke="#b9cfac"/>
+  <text x="1180" y="256" class="mono">Executor</text>
+  <rect x="838" y="286" width="150" height="36" rx="14" fill="#fffdf6" stroke="#b9cfac"/>
+  <text x="886" y="310" class="mono">Critic</text>
+  <rect x="1004" y="286" width="132" height="36" rx="14" fill="#fffdf6" stroke="#b9cfac"/>
+  <text x="1031" y="310" class="mono">Controller</text>
+  <rect x="1152" y="286" width="132" height="36" rx="14" fill="#fffdf6" stroke="#b9cfac"/>
+  <text x="1190" y="310" class="mono">Memory</text>
+
+  <rect x="174" y="426" width="354" height="148" rx="28" class="box gold"/>
+  <text x="204" y="469" class="label">solver.py</text>
+  <text x="204" y="500" class="small">official submission hot path</text>
+  <text x="204" y="526" class="small">solve(input_text) -&gt; assignment list</text>
+  <text x="204" y="552" class="mono">10s budget, single file</text>
+
+  <rect x="624" y="426" width="366" height="160" rx="28" class="box rose"/>
+  <text x="654" y="462" class="labelSm">autosolver_agent/</text>
+  <text x="654" y="486" class="labelSm">evolution.py</text>
+  <text x="654" y="516" class="small">generate strategy, safety gate</text>
+  <text x="654" y="541" class="small">sandbox trial, rollback or promote</text>
+  <text x="654" y="568" class="mono">does not mutate solver.py</text>
+
+  <rect x="1062" y="426" width="306" height="148" rx="28" class="box rose"/>
+  <text x="1092" y="469" class="label">evolution_state/</text>
+  <text x="1092" y="500" class="small">generated strategy files</text>
+  <text x="1092" y="526" class="small">strategy_registry.json</text>
+  <text x="1092" y="552" class="mono">audit memory jsonl</text>
+
+  <rect x="176" y="626" width="352" height="98" rx="24" class="box"/>
+  <text x="206" y="662" class="label">tools/ and tests/</text>
+  <text x="206" y="690" class="small">trace demo, packaging gates</text>
+  <text x="206" y="714" class="small">unit tests, bench</text>
+
+  <rect x="624" y="626" width="374" height="98" rx="24" class="box"/>
+  <text x="654" y="662" class="label">archive/runs official JSON</text>
+  <text x="654" y="690" class="small">official result cited only</text>
+  <text x="654" y="714" class="small">from submission record</text>
+
+  <path d="M326 219 C350 219 374 219 404 219" class="arrow"/>
+  <path d="M714 219 C750 219 770 219 808 219" class="arrow"/>
+  <path d="M918 342 C836 396 635 436 528 486" class="arrow"/>
+  <path d="M1088 342 C1048 386 962 414 850 426" class="dash"/>
+  <path d="M990 500 C1012 500 1036 500 1062 500" class="arrow"/>
+  <path d="M806 586 C792 606 776 618 758 626" class="dash"/>
+  <path d="M352 574 C352 594 352 610 352 626" class="arrow"/>
+  <path d="M528 669 C560 669 590 669 624 669" class="arrow"/>
+</svg>

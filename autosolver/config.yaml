@@ -1,0 +1,12 @@
+objective:
+  weight_expected_accepts: 1.0
+  weight_score: 0.5
+score_direction: "reward"
+reproducibility:
+  enabled: true
+  seed_strategy: "stable_hash_from_instance_id"
+  fallback_seed: 42
+candidate_generation:
+  top_k_riders_per_order: 8
+  min_accept_probability: 0.05
+  max_bundle_size: 2

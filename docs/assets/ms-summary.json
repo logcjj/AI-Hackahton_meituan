@@ -1,0 +1,248 @@
+{
+  "provenance": [
+    [
+      "task_ids",
+      "REAL",
+      "competition column task_id_list (split on ,)"
+    ],
+    [
+      "courier_id",
+      "REAL",
+      "competition column courier_id"
+    ],
+    [
+      "total_score",
+      "REAL",
+      "competition column total_score (the official cost basis)"
+    ],
+    [
+      "willingness",
+      "REAL",
+      "competition column willingness == P(accept)"
+    ],
+    [
+      "expected_cost",
+      "REAL",
+      "derived from REAL fields via official group_expected_cost"
+    ],
+    [
+      "fulfillment_prob",
+      "REAL",
+      "1 - Prod(1 - willingness) over a group's couriers"
+    ],
+    [
+      "ETA_minutes",
+      "SYNTHETIC",
+      "monotone f(total_score, bundle_size): heavier/bundled => longer"
+    ],
+    [
+      "ready_time_minutes",
+      "SYNTHETIC",
+      "f(total_score) + deterministic id-hash jitter"
+    ],
+    [
+      "lateness_minutes",
+      "SYNTHETIC",
+      "ETA vs promised window; asym penalty late 1.8 > early 1.2"
+    ],
+    [
+      "rider_pay",
+      "SYNTHETIC",
+      "pay_per_task + pay_per_score*total_score (illustrative tariff)"
+    ],
+    [
+      "route_minutes",
+      "SYNTHETIC",
+      "== ETA; proxy for on-route fatigue exposure"
+    ],
+    [
+      "empty_drive_minutes",
+      "SYNTHETIC",
+      "id-hashed dead-head minutes per pickup"
+    ],
+    [
+      "worked_minutes",
+      "SYNTHETIC",
+      "route + empty-drive; basis for hourly wage"
+    ],
+    [
+      "merchant_bucket",
+      "SYNTHETIC",
+      "hash(task_id) -> one of n_merchant_buckets storefronts"
+    ],
+    [
+      "merchant_exposure",
+      "SYNTHETIC",
+      "count of dispatched orders per merchant bucket"
+    ]
+  ],
+  "pareto": [
+    {
+      "alpha": 0.0,
+      "expected_cost": 3437.7416915999997,
+      "rider_income_gini": 0.18648684311414265,
+      "rider_worst_hourly": 16.012345266519976,
+      "fulfillment_rate": 0.6657816666666666,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.1,
+      "expected_cost": 3387.0654682,
+      "rider_income_gini": 0.18221401467971376,
+      "rider_worst_hourly": 14.481727592004143,
+      "fulfillment_rate": 0.6661416666666666,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.2,
+      "expected_cost": 3395.8482462999996,
+      "rider_income_gini": 0.17347838668099946,
+      "rider_worst_hourly": 14.481727592004143,
+      "fulfillment_rate": 0.6674583333333332,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.3,
+      "expected_cost": 3438.8719784,
+      "rider_income_gini": 0.14739784975531434,
+      "rider_worst_hourly": 14.481727592004143,
+      "fulfillment_rate": 0.65546,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.4,
+      "expected_cost": 3579.748243500001,
+      "rider_income_gini": 0.13717997813666627,
+      "rider_worst_hourly": 15.7529209012266,
+      "fulfillment_rate": 0.6386183333333335,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.5,
+      "expected_cost": 3678.4646315000005,
+      "rider_income_gini": 0.07365495224628349,
+      "rider_worst_hourly": 14.17119152788254,
+      "fulfillment_rate": 0.62282,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.6,
+      "expected_cost": 3929.318389000001,
+      "rider_income_gini": 0.11154279275184065,
+      "rider_worst_hourly": 12.80024718087288,
+      "fulfillment_rate": 0.5848383333333332,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.7,
+      "expected_cost": 4067.1157754000005,
+      "rider_income_gini": 0.094303923191138,
+      "rider_worst_hourly": 12.40347019417422,
+      "fulfillment_rate": 0.5629649999999998,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.8,
+      "expected_cost": 4267.309157899999,
+      "rider_income_gini": 0.09424150575314338,
+      "rider_worst_hourly": 9.720523425695442,
+      "fulfillment_rate": 0.52459,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 0.9,
+      "expected_cost": 4217.4430186,
+      "rider_income_gini": 0.09002426924024398,
+      "rider_worst_hourly": 9.633257428269985,
+      "fulfillment_rate": 0.5414333333333333,
+      "customer_max_lateness": 0.0
+    },
+    {
+      "alpha": 1.0,
+      "expected_cost": 4610.7391621,
+      "rider_income_gini": 0.1119823700344551,
+      "rider_worst_hourly": 8.575982056648389,
+      "fulfillment_rate": 0.5210333333333332,
+      "customer_max_lateness": 0.0
+    }
+  ],
+  "pareto_nondominated": 5,
+  "wage_floor": [
+    {
+      "floor": 18.012345266519976,
+      "expected_cost": 3638.9181667000007,
+      "rider_income_gini": 0.19482624474108956,
+      "rider_worst_hourly": 18.578675777097082,
+      "covered": 58,
+      "total": 60,
+      "cost_delta_pct": 5.851995092928843
+    },
+    {
+      "floor": 21.012345266519976,
+      "expected_cost": 3732.9053503000005,
+      "rider_income_gini": 0.21811015578749693,
+      "rider_worst_hourly": 21.116377374911934,
+      "covered": 54,
+      "total": 60,
+      "cost_delta_pct": 8.585975479810559
+    },
+    {
+      "floor": 24.012345266519976,
+      "expected_cost": 4786.4922676999995,
+      "rider_income_gini": 0.3052184378481375,
+      "rider_worst_hourly": 24.195271298233877,
+      "covered": 37,
+      "total": 60,
+      "cost_delta_pct": 39.2336218685547
+    }
+  ],
+  "scorecard_efficiency": {
+    "rider": {
+      "income_gini": 0.18648684311414265,
+      "income_jain": 0.8934578629638285,
+      "worst_hourly_wage_rawlsian": 16.012345266519976,
+      "n_riders": 19.0
+    },
+    "merchant": {
+      "mean_ready_alignment_gap_min": 7.29983001905812,
+      "exposure_gini": 0.11944444444444446
+    },
+    "customer": {
+      "max_lateness_min": 0.0,
+      "mean_eta_min": 14.469415999999995
+    },
+    "platform": {
+      "expected_cost": 3437.7416915999997,
+      "fulfillment_rate": 0.6657816666666666,
+      "covered_tasks": 60.0,
+      "total_tasks": 60.0
+    }
+  },
+  "scorecard_fairness": {
+    "rider": {
+      "income_gini": 0.094303923191138,
+      "income_jain": 0.9719299143257609,
+      "worst_hourly_wage_rawlsian": 12.40347019417422,
+      "n_riders": 20.0
+    },
+    "merchant": {
+      "mean_ready_alignment_gap_min": 8.255555352391449,
+      "exposure_gini": 0.11944444444444446
+    },
+    "customer": {
+      "max_lateness_min": 0.0,
+      "mean_eta_min": 15.792728000000002
+    },
+    "platform": {
+      "expected_cost": 4067.1157754000005,
+      "fulfillment_rate": 0.5629649999999998,
+      "covered_tasks": 60.0,
+      "total_tasks": 60.0
+    }
+  },
+  "assets": [
+    "/Users/比赛/美团黑客松决赛/FOR_AutoSolver_706.20_提交版/docs/assets/ms-pareto-front.svg",
+    "/Users/比赛/美团黑客松决赛/FOR_AutoSolver_706.20_提交版/docs/assets/ms-scorecard.svg",
+    "/Users/比赛/美团黑客松决赛/FOR_AutoSolver_706.20_提交版/docs/assets/ms-flywheel.svg"
+  ]
+}

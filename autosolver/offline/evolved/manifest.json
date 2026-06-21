@@ -1,0 +1,18 @@
+[
+  {
+    "strategy_id": "gen01_M1_003",
+    "file": "/Users/比赛/美团黑客松决赛/FOR_AutoSolver_706.20_提交版/autosolver/offline/evolved/gen01_M1_003.py",
+    "regime": "normal",
+    "operator": "M1",
+    "generation": 1,
+    "parent": "gen01_E1_001",
+    "directive": "none",
+    "rank_body": "gfloor = max(w, 0.05)\nparent_key = (-n_tasks, score / max(n_tasks, 1), -w, score, -w)\nkey = (len(task_ids), w * score + (1.0 - w) * 100.0, parent_key)",
+    "thought": "[stub:refine(gen01_E1_001)] operator M1 (gen 1, parent gen01_E1_001). Rank by an objective-aware key for the normal regime: favour bundles only when their coverage gain beats the expected accepted score, protect against the 100/task all-reject penalty via willingness, and break ties on lower score (the objective sums accepted score).",
+    "heldout_mean": 1599.2894,
+    "baseline_seed_heldout_mean": 1607.6367,
+    "solver_v2_heldout_mean": 1030.0161,
+    "honest_note": "Promoted = a real held-out-validated ranking heuristic that beats the SEED ranking baseline; it is NOT stronger than the full solver_v2 pipeline. solver_v3 consumes it as one more argmin candidate and therefore never regresses below solver_v2. R2: the code is an M1 refine of the parent whose dominant term is the documented expected single-point cost w*score+(1-w)*100 (directive 'none' at gen 1); stub mode, no live LLM.",
+    "promoted_at": "2026-06-21T07:22:10"
+  }
+]

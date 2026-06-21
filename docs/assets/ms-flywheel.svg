@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="680" viewBox="0 0 760 680" font-family="Helvetica,Arial,sans-serif"><rect width="760" height="680" fill="white"/><text x="380.0" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222b35">AutoSolver business flywheel</text>
+<rect x="290" y="98" width="180" height="44" rx="10" fill="white" stroke="#1f3a5f" stroke-width="2"/>
+<text x="380" y="124" text-anchor="middle" font-size="11" fill="#222b35">Better four-party dispatch</text>
+<rect x="509" y="257" width="180" height="44" rx="10" fill="white" stroke="#1f3a5f" stroke-width="2"/>
+<text x="599" y="283" text-anchor="middle" font-size="11" fill="#222b35">On-time up / ETA-error down</text>
+<rect x="425" y="514" width="180" height="44" rx="10" fill="white" stroke="#1f3a5f" stroke-width="2"/>
+<text x="515" y="540" text-anchor="middle" font-size="11" fill="#222b35">Conversion & repeat up</text>
+<rect x="155" y="514" width="180" height="44" rx="10" fill="white" stroke="#1f3a5f" stroke-width="2"/>
+<text x="245" y="540" text-anchor="middle" font-size="11" fill="#222b35">Unit cost down / GMV up</text>
+<rect x="71" y="257" width="180" height="44" rx="10" fill="white" stroke="#1f3a5f" stroke-width="2"/>
+<text x="161" y="283" text-anchor="middle" font-size="11" fill="#222b35">Three-sided liquidity up</text>
+<line x1="380" y1="120" x2="599" y2="279" stroke="#9aa3ad" stroke-width="2"/>
+<line x1="599" y1="279" x2="515" y2="536" stroke="#9aa3ad" stroke-width="2"/>
+<line x1="515" y1="536" x2="245" y2="536" stroke="#9aa3ad" stroke-width="2"/>
+<line x1="245" y1="536" x2="161" y2="279" stroke="#9aa3ad" stroke-width="2"/>
+<line x1="161" y1="279" x2="380" y2="120" stroke="#9aa3ad" stroke-width="2"/>
+<text x="380.0" y="350.0" text-anchor="middle" font-size="16" fill="#c7cdd4" font-weight="bold">FLYWHEEL</text>
+</svg>

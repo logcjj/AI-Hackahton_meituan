@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620" font-family="Helvetica,Arial,sans-serif"><rect width="960" height="620" fill="white"/>
+<text x="480.0" y="30.0" text-anchor="middle" font-size="18" font-weight="bold" fill="#222b35">Three-Party Fairness Scorecard  -  efficiency (a=0) vs fairness (a=0.7)</text>
+<text x="480.0" y="50.0" text-anchor="middle" font-size="10.5" font-weight="normal" fill="#5a6572">each bar pair: left = efficiency-leaning a=0, right = fairness-weighted a=0.7   (R1 module: policy-dependent exposure, activated lateness)</text>
+<rect x="40" y="86.0" width="14" height="34" rx="3" fill="#f2b705"/>
+<text x="62.0" y="100.0" text-anchor="start" font-size="12" font-weight="bold" fill="#f2b705">Rider</text>
+<text x="62.0" y="116.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">income Gini (lower fairer)</text>
+<rect x="218.0" y="96.0" width="85.8" height="16" rx="8" fill="#a05a2c" opacity="0.14"/><text x="260.9" y="108.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#a05a2c">SYNTHETIC</text>
+<rect x="300" y="86.0" width="360.0" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="666.0" y="98.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 0.186</text>
+<rect x="300" y="105.0" width="182.0" height="15" rx="3" fill="#f2b705" opacity="0.92"/>
+<text x="488.0" y="117.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 0.094</text>
+<rect x="40" y="140.0" width="14" height="34" rx="3" fill="#f2b705"/>
+<text x="62.0" y="154.0" text-anchor="start" font-size="12" font-weight="bold" fill="#f2b705">Rider</text>
+<text x="62.0" y="170.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">income Jain (higher fairer)</text>
+<rect x="218.0" y="150.0" width="85.8" height="16" rx="8" fill="#a05a2c" opacity="0.14"/><text x="260.9" y="162.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#a05a2c">SYNTHETIC</text>
+<rect x="300" y="140.0" width="330.9" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="636.9" y="152.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 0.893</text>
+<rect x="300" y="159.0" width="360.0" height="15" rx="3" fill="#f2b705" opacity="0.92"/>
+<text x="666.0" y="171.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 0.972</text>
+<rect x="40" y="194.0" width="14" height="34" rx="3" fill="#f2b705"/>
+<text x="62.0" y="208.0" text-anchor="start" font-size="12" font-weight="bold" fill="#f2b705">Rider</text>
+<text x="62.0" y="224.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">worst hourly wage, Rawlsian</text>
+<rect x="218.0" y="204.0" width="85.8" height="16" rx="8" fill="#a05a2c" opacity="0.14"/><text x="260.9" y="216.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#a05a2c">SYNTHETIC</text>
+<rect x="300" y="194.0" width="360.0" height="15" rx="3" fill="#f2b705" opacity="0.92"/>
+<text x="666.0" y="206.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 16.0/h</text>
+<rect x="300" y="213.0" width="278.9" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="584.9" y="225.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 12.4/h</text>
+<rect x="40" y="248.0" width="14" height="34" rx="3" fill="#e07a5f"/>
+<text x="62.0" y="262.0" text-anchor="start" font-size="12" font-weight="bold" fill="#e07a5f">Merchant</text>
+<text x="62.0" y="278.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">exposure Gini (lower fairer)</text>
+<rect x="218.0" y="258.0" width="85.8" height="16" rx="8" fill="#a05a2c" opacity="0.14"/><text x="260.9" y="270.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#a05a2c">SYNTHETIC</text>
+<rect x="300" y="248.0" width="360.0" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="666.0" y="260.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 0.272</text>
+<rect x="300" y="267.0" width="260.8" height="15" rx="3" fill="#e07a5f" opacity="0.92"/>
+<text x="566.8" y="279.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 0.197</text>
+<rect x="40" y="302.0" width="14" height="34" rx="3" fill="#e07a5f"/>
+<text x="62.0" y="316.0" text-anchor="start" font-size="12" font-weight="bold" fill="#e07a5f">Merchant</text>
+<text x="62.0" y="332.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">ready-alignment gap (min)</text>
+<rect x="218.0" y="312.0" width="85.8" height="16" rx="8" fill="#a05a2c" opacity="0.14"/><text x="260.9" y="324.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#a05a2c">SYNTHETIC</text>
+<rect x="300" y="302.0" width="318.3" height="15" rx="3" fill="#e07a5f" opacity="0.92"/>
+<text x="624.3" y="314.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 7.30</text>
+<rect x="300" y="321.0" width="360.0" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="666.0" y="333.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 8.26</text>
+<rect x="40" y="356.0" width="14" height="34" rx="3" fill="#3d8361"/>
+<text x="62.0" y="370.0" text-anchor="start" font-size="12" font-weight="bold" fill="#3d8361">Customer</text>
+<text x="62.0" y="386.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">max lateness (min)</text>
+<rect x="218.0" y="366.0" width="85.8" height="16" rx="8" fill="#a05a2c" opacity="0.14"/><text x="260.9" y="378.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#a05a2c">SYNTHETIC</text>
+<rect x="300" y="356.0" width="182.5" height="15" rx="3" fill="#3d8361" opacity="0.92"/>
+<text x="488.5" y="368.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 2.05</text>
+<rect x="300" y="375.0" width="360.0" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="666.0" y="387.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 4.05</text>
+<rect x="40" y="410.0" width="14" height="34" rx="3" fill="#3d8361"/>
+<text x="62.0" y="424.0" text-anchor="start" font-size="12" font-weight="bold" fill="#3d8361">Customer</text>
+<text x="62.0" y="440.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">mean ETA (min)</text>
+<rect x="218.0" y="420.0" width="85.8" height="16" rx="8" fill="#a05a2c" opacity="0.14"/><text x="260.9" y="432.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#a05a2c">SYNTHETIC</text>
+<rect x="300" y="410.0" width="329.8" height="15" rx="3" fill="#3d8361" opacity="0.92"/>
+<text x="635.8" y="422.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 14.47</text>
+<rect x="300" y="429.0" width="360.0" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="666.0" y="441.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 15.79</text>
+<rect x="40" y="464.0" width="14" height="34" rx="3" fill="#1f3a5f"/>
+<text x="62.0" y="478.0" text-anchor="start" font-size="12" font-weight="bold" fill="#1f3a5f">Platform</text>
+<text x="62.0" y="494.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">expected cost (lower better)</text>
+<rect x="218.0" y="474.0" width="44.8" height="16" rx="8" fill="#1f3a5f" opacity="0.14"/><text x="240.4" y="486.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#1f3a5f">REAL</text>
+<rect x="300" y="464.0" width="304.3" height="15" rx="3" fill="#1f3a5f" opacity="0.92"/>
+<text x="610.3" y="476.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 3438</text>
+<rect x="300" y="483.0" width="360.0" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="666.0" y="495.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 4067</text>
+<rect x="40" y="518.0" width="14" height="34" rx="3" fill="#1f3a5f"/>
+<text x="62.0" y="532.0" text-anchor="start" font-size="12" font-weight="bold" fill="#1f3a5f">Platform</text>
+<text x="62.0" y="548.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">fulfillment rate (higher better)</text>
+<rect x="218.0" y="528.0" width="44.8" height="16" rx="8" fill="#1f3a5f" opacity="0.14"/><text x="240.4" y="540.0" text-anchor="middle" font-size="10" font-weight="bold" fill="#1f3a5f">REAL</text>
+<rect x="300" y="518.0" width="360.0" height="15" rx="3" fill="#1f3a5f" opacity="0.92"/>
+<text x="666.0" y="530.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0: 0.666</text>
+<rect x="300" y="537.0" width="304.4" height="15" rx="3" fill="#9aa5b1" opacity="0.92"/>
+<text x="610.4" y="549.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">a=0.7: 0.563</text>
+<rect x="40" y="576" width="880" height="58" rx="8" fill="#f7f9fb" stroke="#e3e7ec"/>
+<text x="54.0" y="596.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#222b35">Honest reading: fairness (a=0.7) wins rider Gini &amp; Jain, but its worst hourly wage is LOWER (more low-acceptance riders get a slice) and it pays</text>
+<text x="54.0" y="614.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#222b35">+18.3% expected cost / -15.4% fulfillment.  Exposure Gini &amp; lateness are SYNTHETIC and policy-dependent (R1); cost &amp; fulfillment are REAL.</text>
+</svg>

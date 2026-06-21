@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
+  <title id="title">AutoSolver Agent loop</title>
+  <desc id="desc">Agent loop diagram from perception to planner, executor, critic, controller, memory, and self-evolution rollback or promotion.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f8efd9"/>
+      <stop offset="1" stop-color="#d9e8df"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="13" markerHeight="13" refX="10" refY="6.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L11,6.5 L2,11 Z" fill="#236a43"/>
+    </marker>
+    <marker id="warnArrow" markerWidth="13" markerHeight="13" refX="10" refY="6.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L11,6.5 L2,11 Z" fill="#c9714a"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#1f2e26" flood-opacity="0.15"/>
+    </filter>
+    <style>
+      .title { font: 800 34px Avenir Next, Arial, sans-serif; fill: #16211e; letter-spacing: -1px; }
+      .subtitle { font: 600 16px Avenir Next, Arial, sans-serif; fill: #66736e; }
+      .step { fill: rgba(255,255,255,0.82); stroke: rgba(22,33,30,0.16); stroke-width: 2; filter: url(#shadow); }
+      .core { fill: #eaf5df; stroke: #77a66c; }
+      .evo { fill: #fff0e9; stroke: #d19273; }
+      .label { font: 800 21px Avenir Next, Arial, sans-serif; fill: #16211e; }
+      .labelSm { font: 800 18px Avenir Next, Arial, sans-serif; fill: #16211e; }
+      .small { font: 600 14px Avenir Next, Arial, sans-serif; fill: #53625d; }
+      .mono { font: 700 13px SFMono-Regular, Consolas, monospace; fill: #285a45; }
+      .arrow { stroke: #236a43; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .warn { stroke: #c9714a; stroke-width: 4; fill: none; marker-end: url(#warnArrow); stroke-dasharray: 9 8; }
+    </style>
+  </defs>
+  <rect width="1440" height="760" fill="url(#bg)"/>
+  <text x="60" y="72" class="title">AutoSolver Agent Loop</text>
+  <text x="60" y="104" class="subtitle">The page replays real events: sample profile, strategy attempts, critic judgment, rollback, and memory persistence.</text>
+
+  <rect x="78" y="174" width="202" height="112" rx="26" class="step core"/>
+  <text x="110" y="218" class="label">Perception</text>
+  <text x="110" y="248" class="small">case profile</text>
+  <text x="110" y="272" class="mono">tasks, riders, rows</text>
+
+  <rect x="358" y="174" width="202" height="112" rx="26" class="step core"/>
+  <text x="390" y="218" class="label">Planner</text>
+  <text x="390" y="248" class="small">choose portfolio</text>
+  <text x="390" y="272" class="mono">regime-aware order</text>
+
+  <rect x="638" y="174" width="202" height="112" rx="26" class="step core"/>
+  <text x="670" y="218" class="label">Executor</text>
+  <text x="670" y="248" class="small">run strategies</text>
+  <text x="670" y="272" class="mono">solver helpers</text>
+
+  <rect x="918" y="174" width="202" height="112" rx="26" class="step core"/>
+  <text x="950" y="218" class="label">Critic</text>
+  <text x="950" y="248" class="small">accept or reject</text>
+  <text x="950" y="272" class="mono">validity + quality</text>
+
+  <rect x="1198" y="174" width="202" height="112" rx="26" class="step core"/>
+  <text x="1230" y="218" class="label">Controller</text>
+  <text x="1230" y="248" class="small">budget and next move</text>
+  <text x="1230" y="272" class="mono">anytime stop</text>
+
+  <rect x="638" y="334" width="202" height="112" rx="26" class="step core"/>
+  <text x="670" y="378" class="label">Memory</text>
+  <text x="670" y="408" class="small">best-so-far</text>
+  <text x="670" y="432" class="mono">final report</text>
+
+  <path d="M280 230 H358" class="arrow"/>
+  <path d="M560 230 H638" class="arrow"/>
+  <path d="M840 230 H918" class="arrow"/>
+  <path d="M1120 230 H1198" class="arrow"/>
+  <path d="M1299 286 C1296 354 1006 408 840 390" class="arrow"/>
+  <path d="M638 396 C464 438 178 424 178 306" class="arrow"/>
+
+  <rect x="84" y="524" width="190" height="108" rx="24" class="step evo"/>
+  <text x="116" y="566" class="label">Generate</text>
+  <text x="116" y="596" class="small">new strategy ID</text>
+  <text x="116" y="620" class="mono">gen_*_v###</text>
+
+  <rect x="310" y="524" width="190" height="108" rx="24" class="step evo"/>
+  <text x="342" y="566" class="label">Recall</text>
+  <text x="342" y="596" class="small">similar history</text>
+  <text x="342" y="620" class="mono">trusted only</text>
+
+  <rect x="536" y="524" width="190" height="108" rx="24" class="step evo"/>
+  <text x="568" y="566" class="label">Safety Gate</text>
+  <text x="568" y="596" class="small">AST and imports</text>
+  <text x="568" y="620" class="mono">propose API</text>
+
+  <rect x="762" y="524" width="190" height="108" rx="24" class="step evo"/>
+  <text x="794" y="566" class="label">Sandbox</text>
+  <text x="794" y="596" class="small">short trial</text>
+  <text x="794" y="620" class="mono">timeout / quality</text>
+
+  <rect x="988" y="524" width="190" height="108" rx="24" class="step evo"/>
+  <text x="1020" y="566" class="label">Decision</text>
+  <text x="1020" y="596" class="small">rollback or promote</text>
+  <text x="1020" y="620" class="mono">stable baseline</text>
+
+  <rect x="1214" y="524" width="190" height="108" rx="24" class="step evo"/>
+  <text x="1246" y="560" class="labelSm">Evolution</text>
+  <text x="1246" y="584" class="labelSm">Memory</text>
+  <text x="1246" y="610" class="small">audit + candidate pool</text>
+  <text x="1246" y="630" class="mono">replay if accepted</text>
+
+  <path d="M274 578 H310" class="warn"/>
+  <path d="M500 578 H536" class="warn"/>
+  <path d="M726 578 H762" class="warn"/>
+  <path d="M952 578 H988" class="warn"/>
+  <path d="M1178 578 H1214" class="warn"/>
+  <path d="M739 446 C702 482 450 496 179 524" class="warn"/>
+  <path d="M1083 524 C1110 478 1167 413 1235 286" class="warn"/>
+  <text x="876" y="468" class="small">Rejected experiments roll back to stable baseline;</text>
+  <text x="876" y="492" class="small">only accepted candidates can be replayed.</text>
+</svg>

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="720" viewBox="0 0 1440 720" role="img" aria-labelledby="title desc">
+  <title id="title">AutoSolver documentation evidence chain</title>
+  <desc id="desc">Evidence chain connecting code audit, local web screenshots, trace reports, tests, bench, packaging, and official result record.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f8efd9"/>
+      <stop offset="1" stop-color="#d9e8df"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#1f2e26" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L12,7 L2,12 Z" fill="#2e5f73"/>
+    </marker>
+    <style>
+      .title { font: 800 34px Avenir Next, Arial, sans-serif; fill: #16211e; letter-spacing: -1px; }
+      .subtitle { font: 600 16px Avenir Next, Arial, sans-serif; fill: #66736e; }
+      .box { fill: rgba(255,255,255,0.82); stroke: rgba(22,33,30,0.16); stroke-width: 2; filter: url(#shadow); }
+      .label { font: 800 21px Avenir Next, Arial, sans-serif; fill: #16211e; }
+      .small { font: 600 14px Avenir Next, Arial, sans-serif; fill: #53625d; }
+      .mono { font: 700 13px SFMono-Regular, Consolas, monospace; fill: #285a45; }
+      .arrow { stroke: #2e5f73; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .badge { fill: #eaf5df; stroke: #77a66c; }
+      .warn { fill: #fff0e9; stroke: #d19273; }
+      .gold { fill: #fbf2d9; stroke: #d8b14a; }
+    </style>
+  </defs>
+  <rect width="1440" height="720" fill="url(#bg)"/>
+  <text x="60" y="74" class="title">Evidence Chain Used By The Deliverable Docs</text>
+  <text x="60" y="106" class="subtitle">Claims in the docs are tied to local code, live UI screenshots, trace output, validation commands,</text>
+  <text x="60" y="130" class="subtitle">and the archived official submission JSON.</text>
+
+  <rect x="72" y="164" width="260" height="136" rx="28" class="box badge"/>
+  <text x="104" y="208" class="label">1. Code Audit</text>
+  <text x="104" y="238" class="small">read core modules and tests</text>
+  <text x="104" y="264" class="mono">solver.py</text>
+  <text x="104" y="286" class="mono">autosolver_agent/*.py</text>
+
+  <rect x="428" y="164" width="260" height="136" rx="28" class="box badge"/>
+  <text x="460" y="208" class="label">2. Live Web UI</text>
+  <text x="460" y="238" class="small">run local server and capture UI</text>
+  <text x="460" y="264" class="mono">web-agent-home.png</text>
+  <text x="460" y="286" class="mono">evolution-panel-*.png</text>
+
+  <rect x="784" y="164" width="260" height="136" rx="28" class="box gold"/>
+  <text x="816" y="208" class="label">3. Agent Trace</text>
+  <text x="816" y="238" class="small">instrument solver behavior</text>
+  <text x="816" y="264" class="mono">tools/agent_trace_demo.py</text>
+  <text x="816" y="286" class="mono">recorded events and calls</text>
+
+  <rect x="1140" y="164" width="260" height="136" rx="28" class="box warn"/>
+  <text x="1172" y="208" class="label">4. Official Record</text>
+  <text x="1172" y="238" class="small">only source for official score</text>
+  <text x="1172" y="264" class="mono">archive/runs/*.json</text>
+  <text x="1172" y="286" class="mono">avg_score: 706.197</text>
+
+  <rect x="248" y="420" width="302" height="154" rx="30" class="box"/>
+  <text x="282" y="464" class="label">5. Validation Gates</text>
+  <text x="282" y="496" class="mono">python3 -m py_compile ...</text>
+  <text x="282" y="520" class="mono">python3 -m unittest discover ...</text>
+  <text x="282" y="544" class="mono">python3 _bench.py solver.py 1</text>
+
+  <rect x="710" y="420" width="302" height="154" rx="30" class="box"/>
+  <text x="744" y="464" class="label">6. Delivery Boundary</text>
+  <text x="744" y="496" class="small">web Agent explains process</text>
+  <text x="744" y="520" class="small">solver.py remains official hot path</text>
+  <text x="744" y="544" class="mono">no local proxy as official score</text>
+
+  <path d="M342 232 H418" class="arrow"/>
+  <path d="M698 232 H774" class="arrow"/>
+  <path d="M1054 232 H1130" class="arrow"/>
+  <path d="M914 300 C824 362 646 402 560 476" class="arrow"/>
+  <path d="M560 500 H700" class="arrow"/>
+  <path d="M861 420 C902 362 1030 318 1130 282" class="arrow"/>
+</svg>

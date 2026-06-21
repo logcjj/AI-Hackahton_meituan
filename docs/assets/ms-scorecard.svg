@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="420" viewBox="0 0 820 420" font-family="Helvetica,Arial,sans-serif"><rect width="820" height="420" fill="white"/><text x="410.0" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222b35">Fairness scorecard: efficiency-first vs fairness-aware</text>
+<text x="40" y="70" font-size="12" fill="#222b35">rider income Gini (lower better)</text>
+<text x="500" y="70" font-size="12" fill="#888">eff=0.186</text>
+<text x="650" y="70" font-size="12" fill="#d1495b">fair=0.094</text>
+<text x="40" y="118" font-size="12" fill="#222b35">rider worst hourly (higher better)</text>
+<text x="500" y="118" font-size="12" fill="#888">eff=16.012</text>
+<text x="650" y="118" font-size="12" fill="#d1495b">fair=12.403</text>
+<text x="40" y="166" font-size="12" fill="#222b35">merchant ready-gap min (lower better)</text>
+<text x="500" y="166" font-size="12" fill="#888">eff=7.300</text>
+<text x="650" y="166" font-size="12" fill="#d1495b">fair=8.256</text>
+<text x="40" y="214" font-size="12" fill="#222b35">customer max lateness (lower better)</text>
+<text x="500" y="214" font-size="12" fill="#888">eff=0.000</text>
+<text x="650" y="214" font-size="12" fill="#d1495b">fair=0.000</text>
+<text x="40" y="262" font-size="12" fill="#222b35">platform expected cost (lower better)</text>
+<text x="500" y="262" font-size="12" fill="#888">eff=3437.742</text>
+<text x="650" y="262" font-size="12" fill="#d1495b">fair=4067.116</text>
+<text x="40" y="310" font-size="12" fill="#222b35">platform fulfillment (higher better)</text>
+<text x="500" y="310" font-size="12" fill="#888">eff=0.666</text>
+<text x="650" y="310" font-size="12" fill="#d1495b">fair=0.563</text>
+</svg>

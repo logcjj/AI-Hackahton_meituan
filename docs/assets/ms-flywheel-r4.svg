@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="720" viewBox="0 0 900 720" font-family="Helvetica,Arial,sans-serif"><rect width="900" height="720" fill="white"/>
+<text x="450.0" y="34.0" text-anchor="middle" font-size="18" font-weight="bold" fill="#222b35">Multi-Stakeholder Commercial Flywheel  (causal)</text>
+<text x="450.0" y="54.0" text-anchor="middle" font-size="10.5" font-weight="normal" fill="#5a6572">directional mechanism, NOT measured on competition data; external anchors cited, not reproduced here</text>
+<defs><marker id="fw" markerWidth="12" markerHeight="12" refX="8" refY="3.5" orient="auto"><path d="M0,0 L9,3.5 L0,7 Z" fill="#1f3a5f"/></marker></defs>
+<path d="M500.2,165.0 Q534.8,206.0 582.5,230.5" fill="none" stroke="#1f3a5f" stroke-width="2.2" marker-end="url(#fw)" opacity="0.75"/>
+<path d="M636.2,292.5 Q623.1,358.0 636.2,423.5" fill="none" stroke="#1f3a5f" stroke-width="2.2" marker-end="url(#fw)" opacity="0.75"/>
+<path d="M586.0,487.5 Q538.3,512.0 503.7,553.0" fill="none" stroke="#1f3a5f" stroke-width="2.2" marker-end="url(#fw)" opacity="0.75"/>
+<path d="M399.8,555.0 Q365.2,514.0 317.5,489.5" fill="none" stroke="#1f3a5f" stroke-width="2.2" marker-end="url(#fw)" opacity="0.75"/>
+<path d="M263.8,427.5 Q276.9,362.0 263.8,296.5" fill="none" stroke="#1f3a5f" stroke-width="2.2" marker-end="url(#fw)" opacity="0.75"/>
+<path d="M314.0,232.5 Q361.7,208.0 396.3,167.0" fill="none" stroke="#1f3a5f" stroke-width="2.2" marker-end="url(#fw)" opacity="0.75"/>
+<circle cx="450.0" cy="145.0" r="56" fill="white" stroke="#1f3a5f" stroke-width="3"/>
+<circle cx="450.0" cy="145.0" r="56" fill="#1f3a5f" opacity="0.10"/>
+<text x="450.0" y="141.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#1f3a5f">Better four-party</text>
+<text x="450.0" y="155.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#1f3a5f">dispatch</text>
+<circle cx="636.2" cy="252.5" r="56" fill="white" stroke="#3d8361" stroke-width="3"/>
+<circle cx="636.2" cy="252.5" r="56" fill="#3d8361" opacity="0.10"/>
+<text x="636.2" y="248.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#3d8361">On-time rate up,</text>
+<text x="636.2" y="262.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#3d8361">ETA error down</text>
+<circle cx="636.2" cy="467.5" r="56" fill="white" stroke="#3d8361" stroke-width="3"/>
+<circle cx="636.2" cy="467.5" r="56" fill="#3d8361" opacity="0.10"/>
+<text x="636.2" y="463.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#3d8361">Higher conversion</text>
+<text x="636.2" y="477.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#3d8361">&amp; repeat orders</text>
+<circle cx="450.0" cy="575.0" r="56" fill="white" stroke="#1f3a5f" stroke-width="3"/>
+<circle cx="450.0" cy="575.0" r="56" fill="#1f3a5f" opacity="0.10"/>
+<text x="450.0" y="571.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#1f3a5f">Lower cost/order,</text>
+<text x="450.0" y="585.0" text-anchor="middle" font-size="11" font-weight="bold" fill="#1f3a5f">GMV up</text>
+<circle cx="263.8" cy="467.5" r="56" fill="white" stroke="#f2b705" stroke-width="3"/>
+<circle cx="263.8" cy="467.5" r="56" fill="#f2b705" opacity="0.10"/>
+<text x="263.8" y="463.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#f2b705">Three-sided</text>
+<text x="263.8" y="477.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#f2b705">liquidity up</text>
+<circle cx="263.8" cy="252.5" r="56" fill="white" stroke="#f2b705" stroke-width="3"/>
+<circle cx="263.8" cy="252.5" r="56" fill="#f2b705" opacity="0.10"/>
+<text x="263.8" y="248.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#f2b705">Fairer rider income</text>
+<text x="263.8" y="262.5" text-anchor="middle" font-size="11" font-weight="bold" fill="#f2b705">&amp; wage floor</text>
+<text x="450.0" y="354.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#222b35">Self-reinforcing</text>
+<text x="450.0" y="372.0" text-anchor="middle" font-size="14" font-weight="bold" fill="#222b35">loop</text>
+<rect x="48" y="588" width="804" height="104" rx="8" fill="#f7f9fb" stroke="#e3e7ec"/>
+<text x="64.0" y="610.0" text-anchor="start" font-size="11" font-weight="bold" fill="#222b35">External directional anchors (cited, NOT reproduced on our data):</text>
+<text x="64.0" y="630.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#222b35">- Meituan public dispatch direction: delivery time down &gt;30%; courier daily orders 20 -&gt; 30.</text>
+<text x="64.0" y="648.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#222b35">- Nair et al., "Gigs with Guarantees: Achieving Fair Wage for Food Delivery Workers", IJCAI 2022 (arXiv:2205.03530).</text>
+<text x="64.0" y="670.0" text-anchor="start" font-size="10.5" font-weight="normal" fill="#48515c">Our own reproducible lever (this repo): a &gt;=18/h wage floor costs +5.9% expected cost; &gt;=24/h costs +39.2% (coverage 60 -&gt; 37). "Self-estimated, not Meituan-official."</text>
+</svg>

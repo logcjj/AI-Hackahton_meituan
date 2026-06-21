@@ -1,0 +1,2819 @@
+{
+  "started_at": "2026-05-20T13:19:24",
+  "team": "料事如神",
+  "solver": "/Users/比赛/FOR_AutoSolver_706.72/runs/candidate_high_signature_patch_70222083.py",
+  "size": 78516,
+  "sha256": "70222083707d786011d28d7cc1ceab8f3b2ca95e0924b26f8dff2e6a49e865d6",
+  "note": "probe 20260520: recheck high signature historical patch with polling to inspect case details",
+  "health": {
+    "status": "ok",
+    "cases": 10,
+    "queue_depth": 0,
+    "running": 4,
+    "workers": 4,
+    "daily_limit": 20,
+    "judge_timeout": 10
+  },
+  "submit_response": {
+    "job_id": "30677f38564d41d2a8294e42b6bc2dfa",
+    "status": "queued",
+    "team": "料事如神",
+    "queue_depth": 1,
+    "daily_remaining": 11,
+    "daily_limit": 20,
+    "poll_url": "/result/30677f38564d41d2a8294e42b6bc2dfa"
+  },
+  "job_id": "30677f38564d41d2a8294e42b6bc2dfa",
+  "finished_at": "2026-05-20T13:20:26",
+  "result": {
+    "job_id": "30677f38564d41d2a8294e42b6bc2dfa",
+    "status": "ok",
+    "team": "料事如神",
+    "queued_at": "2026-05-20 13:19:26",
+    "started_at": "2026-05-20 13:19:26",
+    "finished_at": "2026-05-20 13:20:22",
+    "avg_score": 706.197,
+    "case_count": 10,
+    "success_count": 10,
+    "case_results": [
+      {
+        "status": "ok",
+        "case_file": "high_noise_seed601.txt",
+        "elapsed_ms": 5635,
+        "validity": true,
+        "errors": [],
+        "total_score": 487.7525,
+        "assigned_count": 30,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C047",
+              "C011",
+              "C000"
+            ],
+            "p_complete": 0.9727,
+            "expected_score": 13.3057,
+            "cost": 15.6692
+          },
+          {
+            "task_id_list": "T0001",
+            "couriers": [
+              "C029",
+              "C050"
+            ],
+            "p_complete": 0.9687,
+            "expected_score": 13.5332,
+            "cost": 16.2418
+          },
+          {
+            "task_id_list": "T0002",
+            "couriers": [
+              "C019",
+              "C054"
+            ],
+            "p_complete": 0.9806,
+            "expected_score": 13.51,
+            "cost": 15.1857
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C055",
+              "C032"
+            ],
+            "p_complete": 0.9715,
+            "expected_score": 14.3159,
+            "cost": 16.7555
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C021",
+              "C035"
+            ],
+            "p_complete": 0.9814,
+            "expected_score": 16.537,
+            "cost": 18.0929
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C053",
+              "C013"
+            ],
+            "p_complete": 0.9459,
+            "expected_score": 15.447,
+            "cost": 20.0184
+          },
+          {
+            "task_id_list": "T0006,T0009",
+            "couriers": [
+              "C006",
+              "C045",
+              "C036"
+            ],
+            "p_complete": 0.9514,
+            "expected_score": 20.7812,
+            "cost": 29.4854
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C034",
+              "C037"
+            ],
+            "p_complete": 0.9763,
+            "expected_score": 13.8885,
+            "cost": 15.9262
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C038",
+              "C026"
+            ],
+            "p_complete": 0.9814,
+            "expected_score": 15.5141,
+            "cost": 17.0857
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C030"
+            ],
+            "p_complete": 0.88,
+            "expected_score": 10.632,
+            "cost": 21.3562
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C043",
+              "C001"
+            ],
+            "p_complete": 0.9853,
+            "expected_score": 13.0007,
+            "cost": 14.2791
+          },
+          {
+            "task_id_list": "T0012,T0021",
+            "couriers": [
+              "C002",
+              "C046",
+              "C022",
+              "C005"
+            ],
+            "p_complete": 0.9788,
+            "expected_score": 25.6202,
+            "cost": 29.3109
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C048",
+              "C010"
+            ],
+            "p_complete": 0.9504,
+            "expected_score": 14.0819,
+            "cost": 18.3406
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C008",
+              "C041"
+            ],
+            "p_complete": 0.9412,
+            "expected_score": 15.1131,
+            "cost": 20.108
+          },
+          {
+            "task_id_list": "T0015",
+            "couriers": [
+              "C027",
+              "C025"
+            ],
+            "p_complete": 0.971,
+            "expected_score": 17.5719,
+            "cost": 19.9609
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C056",
+              "C016"
+            ],
+            "p_complete": 0.98,
+            "expected_score": 11.2399,
+            "cost": 13.0115
+          },
+          {
+            "task_id_list": "T0017,T0026",
+            "couriers": [
+              "C059",
+              "C003",
+              "C017",
+              "C015",
+              "C028"
+            ],
+            "p_complete": 0.987,
+            "expected_score": 27.222,
+            "cost": 29.4611
+          },
+          {
+            "task_id_list": "T0018",
+            "couriers": [
+              "C018",
+              "C058"
+            ],
+            "p_complete": 0.9677,
+            "expected_score": 12.4665,
+            "cost": 15.2935
+          },
+          {
+            "task_id_list": "T0019",
+            "couriers": [
+              "C004",
+              "C033"
+            ],
+            "p_complete": 0.9795,
+            "expected_score": 13.5822,
+            "cost": 15.3558
+          },
+          {
+            "task_id_list": "T0020",
+            "couriers": [
+              "C024",
+              "C044"
+            ],
+            "p_complete": 0.9392,
+            "expected_score": 15.9927,
+            "cost": 21.0976
+          },
+          {
+            "task_id_list": "T0022",
+            "couriers": [
+              "C007",
+              "C031",
+              "C051"
+            ],
+            "p_complete": 0.973,
+            "expected_score": 13.2532,
+            "cost": 15.5988
+          },
+          {
+            "task_id_list": "T0023",
+            "couriers": [
+              "C052",
+              "C042"
+            ],
+            "p_complete": 0.9675,
+            "expected_score": 14.4329,
+            "cost": 17.2177
+          },
+          {
+            "task_id_list": "T0024",
+            "couriers": [
+              "C009",
+              "C057"
+            ],
+            "p_complete": 0.924,
+            "expected_score": 11.9445,
+            "cost": 18.6384
+          },
+          {
+            "task_id_list": "T0025",
+            "couriers": [
+              "C040",
+              "C023"
+            ],
+            "p_complete": 0.9915,
+            "expected_score": 11.6745,
+            "cost": 12.4242
+          },
+          {
+            "task_id_list": "T0027",
+            "couriers": [
+              "C012",
+              "C020"
+            ],
+            "p_complete": 0.9856,
+            "expected_score": 11.3766,
+            "cost": 12.6552
+          },
+          {
+            "task_id_list": "T0028",
+            "couriers": [
+              "C014",
+              "C049"
+            ],
+            "p_complete": 0.9791,
+            "expected_score": 11.8283,
+            "cost": 13.6755
+          },
+          {
+            "task_id_list": "T0029",
+            "couriers": [
+              "C039"
+            ],
+            "p_complete": 0.9475,
+            "expected_score": 10.825,
+            "cost": 15.5067
+          }
+        ],
+        "total_tasks": 30,
+        "total_couriers": 60
+      },
+      {
+        "status": "ok",
+        "case_file": "large_seed301.txt",
+        "elapsed_ms": 6014,
+        "validity": true,
+        "errors": [],
+        "total_score": 654.2935,
+        "assigned_count": 40,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C067",
+              "C044"
+            ],
+            "p_complete": 0.9809,
+            "expected_score": 12.3312,
+            "cost": 14.0061
+          },
+          {
+            "task_id_list": "T0001",
+            "couriers": [
+              "C059",
+              "C015"
+            ],
+            "p_complete": 0.9688,
+            "expected_score": 12.2991,
+            "cost": 15.0378
+          },
+          {
+            "task_id_list": "T0002",
+            "couriers": [
+              "C079",
+              "C017"
+            ],
+            "p_complete": 0.9898,
+            "expected_score": 14.3493,
+            "cost": 15.221
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C035",
+              "C068"
+            ],
+            "p_complete": 0.9703,
+            "expected_score": 13.8833,
+            "cost": 16.4409
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C026",
+              "C045"
+            ],
+            "p_complete": 0.9776,
+            "expected_score": 14.4805,
+            "cost": 16.3954
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C025",
+              "C052"
+            ],
+            "p_complete": 0.9802,
+            "expected_score": 11.6903,
+            "cost": 13.4359
+          },
+          {
+            "task_id_list": "T0006",
+            "couriers": [
+              "C055",
+              "C008",
+              "C064"
+            ],
+            "p_complete": 0.9607,
+            "expected_score": 14.3429,
+            "cost": 17.7067
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C034",
+              "C061"
+            ],
+            "p_complete": 0.9824,
+            "expected_score": 13.6179,
+            "cost": 15.139
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C033",
+              "C001"
+            ],
+            "p_complete": 0.9708,
+            "expected_score": 11.8078,
+            "cost": 14.3834
+          },
+          {
+            "task_id_list": "T0009",
+            "couriers": [
+              "C010",
+              "C066"
+            ],
+            "p_complete": 0.9872,
+            "expected_score": 10.994,
+            "cost": 12.135
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C005",
+              "C037"
+            ],
+            "p_complete": 0.9887,
+            "expected_score": 15.7542,
+            "cost": 16.703
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C032",
+              "C018",
+              "C056"
+            ],
+            "p_complete": 0.9799,
+            "expected_score": 18.3606,
+            "cost": 20.0048
+          },
+          {
+            "task_id_list": "T0012",
+            "couriers": [
+              "C002",
+              "C022"
+            ],
+            "p_complete": 0.9418,
+            "expected_score": 13.2823,
+            "cost": 18.3331
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C062",
+              "C076"
+            ],
+            "p_complete": 0.9785,
+            "expected_score": 14.2745,
+            "cost": 16.1208
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C047",
+              "C073"
+            ],
+            "p_complete": 0.9791,
+            "expected_score": 13.4457,
+            "cost": 15.2577
+          },
+          {
+            "task_id_list": "T0015",
+            "couriers": [
+              "C006",
+              "C051"
+            ],
+            "p_complete": 0.9673,
+            "expected_score": 16.1132,
+            "cost": 18.8534
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C000",
+              "C023"
+            ],
+            "p_complete": 0.9891,
+            "expected_score": 11.91,
+            "cost": 12.8745
+          },
+          {
+            "task_id_list": "T0017",
+            "couriers": [
+              "C043",
+              "C053"
+            ],
+            "p_complete": 0.9574,
+            "expected_score": 15.3868,
+            "cost": 18.9953
+          },
+          {
+            "task_id_list": "T0018",
+            "couriers": [
+              "C063",
+              "C004"
+            ],
+            "p_complete": 0.9724,
+            "expected_score": 13.9711,
+            "cost": 16.3414
+          },
+          {
+            "task_id_list": "T0019",
+            "couriers": [
+              "C007",
+              "C012"
+            ],
+            "p_complete": 0.9643,
+            "expected_score": 12.8783,
+            "cost": 15.9845
+          },
+          {
+            "task_id_list": "T0020",
+            "couriers": [
+              "C050",
+              "C058"
+            ],
+            "p_complete": 0.9705,
+            "expected_score": 15.5915,
+            "cost": 18.0843
+          },
+          {
+            "task_id_list": "T0021",
+            "couriers": [
+              "C027",
+              "C049"
+            ],
+            "p_complete": 0.9715,
+            "expected_score": 14.8298,
+            "cost": 17.2547
+          },
+          {
+            "task_id_list": "T0022",
+            "couriers": [
+              "C041",
+              "C011"
+            ],
+            "p_complete": 0.9674,
+            "expected_score": 15.4598,
+            "cost": 18.2178
+          },
+          {
+            "task_id_list": "T0023",
+            "couriers": [
+              "C038",
+              "C036"
+            ],
+            "p_complete": 0.9519,
+            "expected_score": 17.2948,
+            "cost": 21.2696
+          },
+          {
+            "task_id_list": "T0024",
+            "couriers": [
+              "C016",
+              "C024"
+            ],
+            "p_complete": 0.9642,
+            "expected_score": 12.679,
+            "cost": 15.8014
+          },
+          {
+            "task_id_list": "T0025",
+            "couriers": [
+              "C013",
+              "C065"
+            ],
+            "p_complete": 0.9884,
+            "expected_score": 14.2799,
+            "cost": 15.2773
+          },
+          {
+            "task_id_list": "T0026",
+            "couriers": [
+              "C020"
+            ],
+            "p_complete": 0.9351,
+            "expected_score": 10.854,
+            "cost": 16.6396
+          },
+          {
+            "task_id_list": "T0027",
+            "couriers": [
+              "C019",
+              "C030"
+            ],
+            "p_complete": 0.9662,
+            "expected_score": 13.0862,
+            "cost": 16.0248
+          },
+          {
+            "task_id_list": "T0028",
+            "couriers": [
+              "C046",
+              "C074"
+            ],
+            "p_complete": 0.9797,
+            "expected_score": 13.3071,
+            "cost": 15.0656
+          },
+          {
+            "task_id_list": "T0029",
+            "couriers": [
+              "C071",
+              "C003"
+            ],
+            "p_complete": 0.9448,
+            "expected_score": 12.49,
+            "cost": 17.3167
+          },
+          {
+            "task_id_list": "T0030",
+            "couriers": [
+              "C077",
+              "C072"
+            ],
+            "p_complete": 0.9578,
+            "expected_score": 15.7075,
+            "cost": 19.2627
+          },
+          {
+            "task_id_list": "T0031",
+            "couriers": [
+              "C031",
+              "C029"
+            ],
+            "p_complete": 0.957,
+            "expected_score": 11.5938,
+            "cost": 15.394
+          },
+          {
+            "task_id_list": "T0032",
+            "couriers": [
+              "C078"
+            ],
+            "p_complete": 0.9227,
+            "expected_score": 12.32,
+            "cost": 19.0977
+          },
+          {
+            "task_id_list": "T0033",
+            "couriers": [
+              "C039"
+            ],
+            "p_complete": 0.9489,
+            "expected_score": 12.543,
+            "cost": 17.0121
+          },
+          {
+            "task_id_list": "T0034",
+            "couriers": [
+              "C042",
+              "C070",
+              "C054"
+            ],
+            "p_complete": 0.9748,
+            "expected_score": 11.94,
+            "cost": 14.1562
+          },
+          {
+            "task_id_list": "T0035",
+            "couriers": [
+              "C028",
+              "C069"
+            ],
+            "p_complete": 0.9818,
+            "expected_score": 14.2149,
+            "cost": 15.7788
+          },
+          {
+            "task_id_list": "T0036",
+            "couriers": [
+              "C057",
+              "C021"
+            ],
+            "p_complete": 0.9684,
+            "expected_score": 12.4265,
+            "cost": 15.1929
+          },
+          {
+            "task_id_list": "T0037",
+            "couriers": [
+              "C009",
+              "C075"
+            ],
+            "p_complete": 0.9516,
+            "expected_score": 10.5063,
+            "cost": 14.8398
+          },
+          {
+            "task_id_list": "T0038",
+            "couriers": [
+              "C060",
+              "C040"
+            ],
+            "p_complete": 0.976,
+            "expected_score": 17.0487,
+            "cost": 19.0416
+          },
+          {
+            "task_id_list": "T0039",
+            "couriers": [
+              "C014",
+              "C048"
+            ],
+            "p_complete": 0.9907,
+            "expected_score": 13.3879,
+            "cost": 14.1961
+          }
+        ],
+        "total_tasks": 40,
+        "total_couriers": 80
+      },
+      {
+        "status": "ok",
+        "case_file": "large_seed302.txt",
+        "elapsed_ms": 7244,
+        "validity": true,
+        "errors": [],
+        "total_score": 627.0114,
+        "assigned_count": 40,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C031",
+              "C030"
+            ],
+            "p_complete": 0.9912,
+            "expected_score": 11.9676,
+            "cost": 12.7444
+          },
+          {
+            "task_id_list": "T0001",
+            "couriers": [
+              "C056",
+              "C066"
+            ],
+            "p_complete": 0.962,
+            "expected_score": 17.4729,
+            "cost": 20.6053
+          },
+          {
+            "task_id_list": "T0002",
+            "couriers": [
+              "C077",
+              "C039"
+            ],
+            "p_complete": 0.9766,
+            "expected_score": 14.3223,
+            "cost": 16.3239
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C008",
+              "C079"
+            ],
+            "p_complete": 0.9685,
+            "expected_score": 12.1586,
+            "cost": 14.9215
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C041",
+              "C018"
+            ],
+            "p_complete": 0.9454,
+            "expected_score": 13.3353,
+            "cost": 18.0694
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C004"
+            ],
+            "p_complete": 0.9237,
+            "expected_score": 10.405,
+            "cost": 17.2411
+          },
+          {
+            "task_id_list": "T0006",
+            "couriers": [
+              "C023",
+              "C044"
+            ],
+            "p_complete": 0.9843,
+            "expected_score": 12.3708,
+            "cost": 13.7503
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C038",
+              "C059"
+            ],
+            "p_complete": 0.982,
+            "expected_score": 11.1927,
+            "cost": 12.7878
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C045",
+              "C050"
+            ],
+            "p_complete": 0.9872,
+            "expected_score": 11.3132,
+            "cost": 12.45
+          },
+          {
+            "task_id_list": "T0009",
+            "couriers": [
+              "C078",
+              "C075"
+            ],
+            "p_complete": 0.988,
+            "expected_score": 12.0447,
+            "cost": 13.1039
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C009"
+            ],
+            "p_complete": 0.8991,
+            "expected_score": 10.786,
+            "cost": 19.7877
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C067",
+              "C033"
+            ],
+            "p_complete": 0.9689,
+            "expected_score": 12.9249,
+            "cost": 15.633
+          },
+          {
+            "task_id_list": "T0012",
+            "couriers": [
+              "C002",
+              "C047"
+            ],
+            "p_complete": 0.9886,
+            "expected_score": 14.0471,
+            "cost": 15.0285
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C057",
+              "C062"
+            ],
+            "p_complete": 0.9796,
+            "expected_score": 13.5802,
+            "cost": 15.3409
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C001",
+              "C019"
+            ],
+            "p_complete": 0.9496,
+            "expected_score": 13.0159,
+            "cost": 17.4028
+          },
+          {
+            "task_id_list": "T0015",
+            "couriers": [
+              "C046",
+              "C006",
+              "C076"
+            ],
+            "p_complete": 0.9658,
+            "expected_score": 17.9462,
+            "cost": 20.7535
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C016",
+              "C025"
+            ],
+            "p_complete": 0.9839,
+            "expected_score": 12.0709,
+            "cost": 13.4849
+          },
+          {
+            "task_id_list": "T0017",
+            "couriers": [
+              "C040",
+              "C058"
+            ],
+            "p_complete": 0.9861,
+            "expected_score": 22.0552,
+            "cost": 23.1377
+          },
+          {
+            "task_id_list": "T0018",
+            "couriers": [
+              "C065",
+              "C021"
+            ],
+            "p_complete": 0.9916,
+            "expected_score": 12.9216,
+            "cost": 13.6562
+          },
+          {
+            "task_id_list": "T0019",
+            "couriers": [
+              "C053",
+              "C007"
+            ],
+            "p_complete": 0.9914,
+            "expected_score": 17.5751,
+            "cost": 18.2816
+          },
+          {
+            "task_id_list": "T0020",
+            "couriers": [
+              "C024",
+              "C032"
+            ],
+            "p_complete": 0.9794,
+            "expected_score": 14.2945,
+            "cost": 16.0576
+          },
+          {
+            "task_id_list": "T0021",
+            "couriers": [
+              "C012",
+              "C005"
+            ],
+            "p_complete": 0.9448,
+            "expected_score": 11.7456,
+            "cost": 16.6168
+          },
+          {
+            "task_id_list": "T0022",
+            "couriers": [
+              "C027",
+              "C073"
+            ],
+            "p_complete": 0.9836,
+            "expected_score": 10.5395,
+            "cost": 12.0056
+          },
+          {
+            "task_id_list": "T0023",
+            "couriers": [
+              "C036",
+              "C043"
+            ],
+            "p_complete": 0.986,
+            "expected_score": 19.2522,
+            "cost": 20.3848
+          },
+          {
+            "task_id_list": "T0024",
+            "couriers": [
+              "C035",
+              "C052"
+            ],
+            "p_complete": 0.9438,
+            "expected_score": 12.2034,
+            "cost": 17.1416
+          },
+          {
+            "task_id_list": "T0025",
+            "couriers": [
+              "C068",
+              "C048"
+            ],
+            "p_complete": 0.9737,
+            "expected_score": 12.0434,
+            "cost": 14.3525
+          },
+          {
+            "task_id_list": "T0026",
+            "couriers": [
+              "C011",
+              "C020",
+              "C069"
+            ],
+            "p_complete": 0.9807,
+            "expected_score": 12.679,
+            "cost": 14.3638
+          },
+          {
+            "task_id_list": "T0027",
+            "couriers": [
+              "C029",
+              "C015"
+            ],
+            "p_complete": 0.9673,
+            "expected_score": 17.2342,
+            "cost": 19.9438
+          },
+          {
+            "task_id_list": "T0028",
+            "couriers": [
+              "C013",
+              "C000"
+            ],
+            "p_complete": 0.9734,
+            "expected_score": 11.3294,
+            "cost": 13.6862
+          },
+          {
+            "task_id_list": "T0029",
+            "couriers": [
+              "C074",
+              "C010"
+            ],
+            "p_complete": 0.9847,
+            "expected_score": 13.8484,
+            "cost": 15.1634
+          },
+          {
+            "task_id_list": "T0030",
+            "couriers": [
+              "C064",
+              "C070"
+            ],
+            "p_complete": 0.9802,
+            "expected_score": 11.3778,
+            "cost": 13.1318
+          },
+          {
+            "task_id_list": "T0031",
+            "couriers": [
+              "C071",
+              "C017"
+            ],
+            "p_complete": 0.9935,
+            "expected_score": 11.3805,
+            "cost": 11.9606
+          },
+          {
+            "task_id_list": "T0032",
+            "couriers": [
+              "C034",
+              "C026"
+            ],
+            "p_complete": 0.9731,
+            "expected_score": 11.5551,
+            "cost": 13.9373
+          },
+          {
+            "task_id_list": "T0033",
+            "couriers": [
+              "C003"
+            ],
+            "p_complete": 0.9399,
+            "expected_score": 12.083,
+            "cost": 17.3668
+          },
+          {
+            "task_id_list": "T0034",
+            "couriers": [
+              "C051",
+              "C014"
+            ],
+            "p_complete": 0.9901,
+            "expected_score": 11.6095,
+            "cost": 12.4833
+          },
+          {
+            "task_id_list": "T0035",
+            "couriers": [
+              "C022",
+              "C060",
+              "C072"
+            ],
+            "p_complete": 0.9773,
+            "expected_score": 14.4829,
+            "cost": 16.4242
+          },
+          {
+            "task_id_list": "T0036",
+            "couriers": [
+              "C037",
+              "C028"
+            ],
+            "p_complete": 0.9756,
+            "expected_score": 11.8109,
+            "cost": 13.9642
+          },
+          {
+            "task_id_list": "T0037",
+            "couriers": [
+              "C042",
+              "C049"
+            ],
+            "p_complete": 0.9809,
+            "expected_score": 14.4584,
+            "cost": 16.0912
+          },
+          {
+            "task_id_list": "T0038",
+            "couriers": [
+              "C054",
+              "C055"
+            ],
+            "p_complete": 0.9803,
+            "expected_score": 10.6016,
+            "cost": 12.3655
+          },
+          {
+            "task_id_list": "T0039",
+            "couriers": [
+              "C061",
+              "C063"
+            ],
+            "p_complete": 0.9812,
+            "expected_score": 13.4344,
+            "cost": 15.066
+          }
+        ],
+        "total_tasks": 40,
+        "total_couriers": 80
+      },
+      {
+        "status": "ok",
+        "case_file": "low_willingness_seed501.txt",
+        "elapsed_ms": 9178,
+        "validity": true,
+        "errors": [],
+        "total_score": 1799.9031,
+        "assigned_count": 30,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C017",
+              "C051"
+            ],
+            "p_complete": 0.479,
+            "expected_score": 18.0381,
+            "cost": 60.7403
+          },
+          {
+            "task_id_list": "T0001",
+            "couriers": [
+              "C021",
+              "C019"
+            ],
+            "p_complete": 0.4628,
+            "expected_score": 17.6634,
+            "cost": 61.8923
+          },
+          {
+            "task_id_list": "T0002",
+            "couriers": [
+              "C015",
+              "C016"
+            ],
+            "p_complete": 0.4425,
+            "expected_score": 13.575,
+            "cost": 61.7599
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C025",
+              "C000"
+            ],
+            "p_complete": 0.5011,
+            "expected_score": 21.0979,
+            "cost": 60.463
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C033",
+              "C001"
+            ],
+            "p_complete": 0.4356,
+            "expected_score": 14.5891,
+            "cost": 62.798
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C043",
+              "C023"
+            ],
+            "p_complete": 0.4954,
+            "expected_score": 14.8316,
+            "cost": 57.8097
+          },
+          {
+            "task_id_list": "T0006",
+            "couriers": [
+              "C034",
+              "C038"
+            ],
+            "p_complete": 0.4658,
+            "expected_score": 17.8802,
+            "cost": 61.7497
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C002",
+              "C026"
+            ],
+            "p_complete": 0.4802,
+            "expected_score": 15.6673,
+            "cost": 59.5019
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C013",
+              "C041"
+            ],
+            "p_complete": 0.5015,
+            "expected_score": 13.0642,
+            "cost": 56.4021
+          },
+          {
+            "task_id_list": "T0009",
+            "couriers": [
+              "C024",
+              "C059"
+            ],
+            "p_complete": 0.4911,
+            "expected_score": 22.0677,
+            "cost": 61.7274
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C047",
+              "C027"
+            ],
+            "p_complete": 0.4622,
+            "expected_score": 14.1086,
+            "cost": 60.2994
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C057",
+              "C039"
+            ],
+            "p_complete": 0.4866,
+            "expected_score": 14.233,
+            "cost": 58.2661
+          },
+          {
+            "task_id_list": "T0012",
+            "couriers": [
+              "C042",
+              "C005"
+            ],
+            "p_complete": 0.4602,
+            "expected_score": 18.5234,
+            "cost": 62.5017
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C029",
+              "C056"
+            ],
+            "p_complete": 0.4594,
+            "expected_score": 15.2,
+            "cost": 61.0391
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C044",
+              "C032"
+            ],
+            "p_complete": 0.4835,
+            "expected_score": 14.942,
+            "cost": 58.878
+          },
+          {
+            "task_id_list": "T0015",
+            "couriers": [
+              "C040",
+              "C045"
+            ],
+            "p_complete": 0.4756,
+            "expected_score": 14.7524,
+            "cost": 59.4528
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C011",
+              "C008"
+            ],
+            "p_complete": 0.4832,
+            "expected_score": 22.064,
+            "cost": 62.3386
+          },
+          {
+            "task_id_list": "T0017",
+            "couriers": [
+              "C004",
+              "C046"
+            ],
+            "p_complete": 0.5002,
+            "expected_score": 16.5221,
+            "cost": 58.2459
+          },
+          {
+            "task_id_list": "T0018",
+            "couriers": [
+              "C036",
+              "C022"
+            ],
+            "p_complete": 0.4835,
+            "expected_score": 13.0136,
+            "cost": 57.944
+          },
+          {
+            "task_id_list": "T0019",
+            "couriers": [
+              "C007",
+              "C020"
+            ],
+            "p_complete": 0.4904,
+            "expected_score": 12.5986,
+            "cost": 57.1355
+          },
+          {
+            "task_id_list": "T0020",
+            "couriers": [
+              "C053",
+              "C009"
+            ],
+            "p_complete": 0.4691,
+            "expected_score": 17.2731,
+            "cost": 61.1896
+          },
+          {
+            "task_id_list": "T0021",
+            "couriers": [
+              "C058",
+              "C014"
+            ],
+            "p_complete": 0.4662,
+            "expected_score": 12.1983,
+            "cost": 59.0679
+          },
+          {
+            "task_id_list": "T0022",
+            "couriers": [
+              "C049",
+              "C048"
+            ],
+            "p_complete": 0.4825,
+            "expected_score": 15.6298,
+            "cost": 59.2874
+          },
+          {
+            "task_id_list": "T0023",
+            "couriers": [
+              "C010",
+              "C050"
+            ],
+            "p_complete": 0.4963,
+            "expected_score": 13.4122,
+            "cost": 57.0239
+          },
+          {
+            "task_id_list": "T0024",
+            "couriers": [
+              "C006",
+              "C055"
+            ],
+            "p_complete": 0.4664,
+            "expected_score": 11.712,
+            "cost": 58.8237
+          },
+          {
+            "task_id_list": "T0025",
+            "couriers": [
+              "C003",
+              "C037"
+            ],
+            "p_complete": 0.5047,
+            "expected_score": 10.3767,
+            "cost": 54.7695
+          },
+          {
+            "task_id_list": "T0026",
+            "couriers": [
+              "C052",
+              "C031"
+            ],
+            "p_complete": 0.4486,
+            "expected_score": 12.3238,
+            "cost": 60.6674
+          },
+          {
+            "task_id_list": "T0027",
+            "couriers": [
+              "C018",
+              "C054"
+            ],
+            "p_complete": 0.4337,
+            "expected_score": 13.8858,
+            "cost": 62.6548
+          },
+          {
+            "task_id_list": "T0028",
+            "couriers": [
+              "C030",
+              "C035"
+            ],
+            "p_complete": 0.4527,
+            "expected_score": 16.3556,
+            "cost": 62.1352
+          },
+          {
+            "task_id_list": "T0029",
+            "couriers": [
+              "C028",
+              "C012"
+            ],
+            "p_complete": 0.4257,
+            "expected_score": 13.8719,
+            "cost": 63.3383
+          }
+        ],
+        "total_tasks": 30,
+        "total_couriers": 60
+      },
+      {
+        "status": "ok",
+        "case_file": "medium_seed201.txt",
+        "elapsed_ms": 5851,
+        "validity": true,
+        "errors": [],
+        "total_score": 478.3143,
+        "assigned_count": 30,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000,T0026",
+            "couriers": [
+              "C012",
+              "C053",
+              "C040"
+            ],
+            "p_complete": 0.9492,
+            "expected_score": 25.0217,
+            "cost": 33.906
+          },
+          {
+            "task_id_list": "T0001",
+            "couriers": [
+              "C004",
+              "C046"
+            ],
+            "p_complete": 0.9868,
+            "expected_score": 10.6702,
+            "cost": 11.8473
+          },
+          {
+            "task_id_list": "T0002",
+            "couriers": [
+              "C021",
+              "C029"
+            ],
+            "p_complete": 0.9673,
+            "expected_score": 13.0493,
+            "cost": 15.891
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C010",
+              "C050"
+            ],
+            "p_complete": 0.9908,
+            "expected_score": 13.4745,
+            "cost": 14.273
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C042",
+              "C028",
+              "C022"
+            ],
+            "p_complete": 0.9593,
+            "expected_score": 13.6039,
+            "cost": 17.1225
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C036",
+              "C019"
+            ],
+            "p_complete": 0.9693,
+            "expected_score": 11.7157,
+            "cost": 14.4296
+          },
+          {
+            "task_id_list": "T0006",
+            "couriers": [
+              "C044"
+            ],
+            "p_complete": 0.9495,
+            "expected_score": 10.011,
+            "cost": 14.5554
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C008",
+              "C002"
+            ],
+            "p_complete": 0.9773,
+            "expected_score": 15.3786,
+            "cost": 17.2984
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C041",
+              "C047"
+            ],
+            "p_complete": 0.9525,
+            "expected_score": 11.6523,
+            "cost": 15.8494
+          },
+          {
+            "task_id_list": "T0009",
+            "couriers": [
+              "C051",
+              "C011"
+            ],
+            "p_complete": 0.9921,
+            "expected_score": 15.5181,
+            "cost": 16.1859
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C014",
+              "C054",
+              "C031"
+            ],
+            "p_complete": 0.9876,
+            "expected_score": 12.8519,
+            "cost": 13.9313
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C038",
+              "C007",
+              "C000"
+            ],
+            "p_complete": 0.9702,
+            "expected_score": 17.2432,
+            "cost": 19.7066
+          },
+          {
+            "task_id_list": "T0012",
+            "couriers": [
+              "C025",
+              "C006"
+            ],
+            "p_complete": 0.9667,
+            "expected_score": 11.4246,
+            "cost": 14.3721
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C023",
+              "C049"
+            ],
+            "p_complete": 0.9595,
+            "expected_score": 12.4967,
+            "cost": 16.043
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C052"
+            ],
+            "p_complete": 0.918,
+            "expected_score": 13.61,
+            "cost": 20.694
+          },
+          {
+            "task_id_list": "T0015",
+            "couriers": [
+              "C005",
+              "C013"
+            ],
+            "p_complete": 0.9486,
+            "expected_score": 14.2634,
+            "cost": 18.6695
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C018",
+              "C043"
+            ],
+            "p_complete": 0.9779,
+            "expected_score": 14.9621,
+            "cost": 16.8383
+          },
+          {
+            "task_id_list": "T0017",
+            "couriers": [
+              "C020",
+              "C027"
+            ],
+            "p_complete": 0.9747,
+            "expected_score": 13.9519,
+            "cost": 16.1273
+          },
+          {
+            "task_id_list": "T0018",
+            "couriers": [
+              "C057",
+              "C030"
+            ],
+            "p_complete": 0.9488,
+            "expected_score": 11.1688,
+            "cost": 15.7156
+          },
+          {
+            "task_id_list": "T0019",
+            "couriers": [
+              "C055",
+              "C009"
+            ],
+            "p_complete": 0.9778,
+            "expected_score": 10.6219,
+            "cost": 12.6099
+          },
+          {
+            "task_id_list": "T0020",
+            "couriers": [
+              "C045",
+              "C016"
+            ],
+            "p_complete": 0.9797,
+            "expected_score": 11.6519,
+            "cost": 13.4494
+          },
+          {
+            "task_id_list": "T0021",
+            "couriers": [
+              "C017",
+              "C056"
+            ],
+            "p_complete": 0.9797,
+            "expected_score": 14.6541,
+            "cost": 16.3875
+          },
+          {
+            "task_id_list": "T0022",
+            "couriers": [
+              "C034",
+              "C037"
+            ],
+            "p_complete": 0.9952,
+            "expected_score": 13.3205,
+            "cost": 13.7409
+          },
+          {
+            "task_id_list": "T0023",
+            "couriers": [
+              "C039",
+              "C026"
+            ],
+            "p_complete": 0.9258,
+            "expected_score": 12.5671,
+            "cost": 19.0536
+          },
+          {
+            "task_id_list": "T0024",
+            "couriers": [
+              "C033",
+              "C059"
+            ],
+            "p_complete": 0.9886,
+            "expected_score": 13.3064,
+            "cost": 14.2928
+          },
+          {
+            "task_id_list": "T0025",
+            "couriers": [
+              "C001",
+              "C015"
+            ],
+            "p_complete": 0.9511,
+            "expected_score": 12.2645,
+            "cost": 16.5574
+          },
+          {
+            "task_id_list": "T0027",
+            "couriers": [
+              "C048",
+              "C024"
+            ],
+            "p_complete": 0.9905,
+            "expected_score": 13.7256,
+            "cost": 14.5435
+          },
+          {
+            "task_id_list": "T0028",
+            "couriers": [
+              "C058",
+              "C035"
+            ],
+            "p_complete": 0.9881,
+            "expected_score": 14.5139,
+            "cost": 15.535
+          },
+          {
+            "task_id_list": "T0029",
+            "couriers": [
+              "C032",
+              "C003"
+            ],
+            "p_complete": 0.991,
+            "expected_score": 17.9462,
+            "cost": 18.688
+          }
+        ],
+        "total_tasks": 30,
+        "total_couriers": 60
+      },
+      {
+        "status": "ok",
+        "case_file": "medium_seed202.txt",
+        "elapsed_ms": 5520,
+        "validity": true,
+        "errors": [],
+        "total_score": 524.0195,
+        "assigned_count": 30,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C050",
+              "C033"
+            ],
+            "p_complete": 0.9475,
+            "expected_score": 13.1335,
+            "cost": 17.694
+          },
+          {
+            "task_id_list": "T0001",
+            "couriers": [
+              "C030",
+              "C021"
+            ],
+            "p_complete": 0.9505,
+            "expected_score": 15.5032,
+            "cost": 19.6825
+          },
+          {
+            "task_id_list": "T0002",
+            "couriers": [
+              "C031",
+              "C045"
+            ],
+            "p_complete": 0.933,
+            "expected_score": 16.7027,
+            "cost": 22.2814
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C015",
+              "C039"
+            ],
+            "p_complete": 0.9863,
+            "expected_score": 13.2562,
+            "cost": 14.4438
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C042",
+              "C003"
+            ],
+            "p_complete": 0.9659,
+            "expected_score": 12.4054,
+            "cost": 15.3956
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C007",
+              "C043"
+            ],
+            "p_complete": 0.9551,
+            "expected_score": 12.6234,
+            "cost": 16.5476
+          },
+          {
+            "task_id_list": "T0006",
+            "couriers": [
+              "C009",
+              "C027"
+            ],
+            "p_complete": 0.9565,
+            "expected_score": 15.5833,
+            "cost": 19.257
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C047",
+              "C051"
+            ],
+            "p_complete": 0.9419,
+            "expected_score": 10.5024,
+            "cost": 15.706
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C000",
+              "C029"
+            ],
+            "p_complete": 0.969,
+            "expected_score": 14.2996,
+            "cost": 16.9551
+          },
+          {
+            "task_id_list": "T0009",
+            "couriers": [
+              "C025",
+              "C053"
+            ],
+            "p_complete": 0.9857,
+            "expected_score": 13.2727,
+            "cost": 14.5116
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C013",
+              "C059"
+            ],
+            "p_complete": 0.9529,
+            "expected_score": 14.0793,
+            "cost": 18.1265
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C012",
+              "C038"
+            ],
+            "p_complete": 0.9421,
+            "expected_score": 13.658,
+            "cost": 18.653
+          },
+          {
+            "task_id_list": "T0012",
+            "couriers": [
+              "C014",
+              "C002"
+            ],
+            "p_complete": 0.954,
+            "expected_score": 11.5374,
+            "cost": 15.6049
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C020"
+            ],
+            "p_complete": 0.946,
+            "expected_score": 15.526,
+            "cost": 20.0876
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C046",
+              "C054"
+            ],
+            "p_complete": 0.983,
+            "expected_score": 15.0622,
+            "cost": 16.5076
+          },
+          {
+            "task_id_list": "T0015",
+            "couriers": [
+              "C055",
+              "C011"
+            ],
+            "p_complete": 0.9753,
+            "expected_score": 20.3779,
+            "cost": 22.3476
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C010",
+              "C044"
+            ],
+            "p_complete": 0.9581,
+            "expected_score": 14.6534,
+            "cost": 18.2257
+          },
+          {
+            "task_id_list": "T0017",
+            "couriers": [
+              "C035",
+              "C026"
+            ],
+            "p_complete": 0.9251,
+            "expected_score": 13.6039,
+            "cost": 20.0791
+          },
+          {
+            "task_id_list": "T0018",
+            "couriers": [
+              "C032",
+              "C037"
+            ],
+            "p_complete": 0.9436,
+            "expected_score": 14.8641,
+            "cost": 19.663
+          },
+          {
+            "task_id_list": "T0019",
+            "couriers": [
+              "C040",
+              "C005"
+            ],
+            "p_complete": 0.949,
+            "expected_score": 12.1929,
+            "cost": 16.6714
+          },
+          {
+            "task_id_list": "T0020",
+            "couriers": [
+              "C034",
+              "C016",
+              "C023"
+            ],
+            "p_complete": 0.9382,
+            "expected_score": 14.0443,
+            "cost": 19.3582
+          },
+          {
+            "task_id_list": "T0021",
+            "couriers": [
+              "C006",
+              "C004"
+            ],
+            "p_complete": 0.9864,
+            "expected_score": 10.3811,
+            "cost": 11.6044
+          },
+          {
+            "task_id_list": "T0022",
+            "couriers": [
+              "C028",
+              "C017",
+              "C048"
+            ],
+            "p_complete": 0.9795,
+            "expected_score": 19.0221,
+            "cost": 20.6841
+          },
+          {
+            "task_id_list": "T0023",
+            "couriers": [
+              "C057",
+              "C052"
+            ],
+            "p_complete": 0.9639,
+            "expected_score": 14.1875,
+            "cost": 17.2861
+          },
+          {
+            "task_id_list": "T0024",
+            "couriers": [
+              "C041",
+              "C058"
+            ],
+            "p_complete": 0.96,
+            "expected_score": 10.9511,
+            "cost": 14.513
+          },
+          {
+            "task_id_list": "T0025",
+            "couriers": [
+              "C024",
+              "C049"
+            ],
+            "p_complete": 0.9921,
+            "expected_score": 12.1863,
+            "cost": 12.8838
+          },
+          {
+            "task_id_list": "T0026",
+            "couriers": [
+              "C019",
+              "C056"
+            ],
+            "p_complete": 0.9777,
+            "expected_score": 16.1769,
+            "cost": 18.046
+          },
+          {
+            "task_id_list": "T0027",
+            "couriers": [
+              "C018"
+            ],
+            "p_complete": 0.9479,
+            "expected_score": 12.391,
+            "cost": 16.9554
+          },
+          {
+            "task_id_list": "T0028",
+            "couriers": [
+              "C001",
+              "C022"
+            ],
+            "p_complete": 0.9817,
+            "expected_score": 13.114,
+            "cost": 14.7013
+          },
+          {
+            "task_id_list": "T0029",
+            "couriers": [
+              "C036",
+              "C008"
+            ],
+            "p_complete": 0.9673,
+            "expected_score": 16.8241,
+            "cost": 19.5461
+          }
+        ],
+        "total_tasks": 30,
+        "total_couriers": 60
+      },
+      {
+        "status": "ok",
+        "case_file": "medium_seed203.txt",
+        "elapsed_ms": 5720,
+        "validity": true,
+        "errors": [],
+        "total_score": 501.0067,
+        "assigned_count": 30,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C052",
+              "C048"
+            ],
+            "p_complete": 0.9867,
+            "expected_score": 13.6826,
+            "cost": 14.831
+          },
+          {
+            "task_id_list": "T0001",
+            "couriers": [
+              "C037",
+              "C014"
+            ],
+            "p_complete": 0.9733,
+            "expected_score": 14.0817,
+            "cost": 16.3741
+          },
+          {
+            "task_id_list": "T0002",
+            "couriers": [
+              "C058",
+              "C010",
+              "C039"
+            ],
+            "p_complete": 0.9526,
+            "expected_score": 13.3639,
+            "cost": 17.4719
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C050",
+              "C031"
+            ],
+            "p_complete": 0.9883,
+            "expected_score": 12.7346,
+            "cost": 13.7578
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C007"
+            ],
+            "p_complete": 0.9437,
+            "expected_score": 10.024,
+            "cost": 15.0896
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C029",
+              "C009",
+              "C018"
+            ],
+            "p_complete": 0.9622,
+            "expected_score": 13.7681,
+            "cost": 17.0252
+          },
+          {
+            "task_id_list": "T0006",
+            "couriers": [
+              "C025",
+              "C041"
+            ],
+            "p_complete": 0.9611,
+            "expected_score": 14.0187,
+            "cost": 17.3619
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C030"
+            ],
+            "p_complete": 0.9374,
+            "expected_score": 11.325,
+            "cost": 16.8761
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C057",
+              "C036"
+            ],
+            "p_complete": 0.9771,
+            "expected_score": 18.7669,
+            "cost": 20.6245
+          },
+          {
+            "task_id_list": "T0009",
+            "couriers": [
+              "C043",
+              "C017"
+            ],
+            "p_complete": 0.9886,
+            "expected_score": 14.5282,
+            "cost": 15.5007
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C000",
+              "C035"
+            ],
+            "p_complete": 0.972,
+            "expected_score": 15.2875,
+            "cost": 17.658
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C056",
+              "C027"
+            ],
+            "p_complete": 0.9515,
+            "expected_score": 14.4386,
+            "cost": 18.5843
+          },
+          {
+            "task_id_list": "T0012",
+            "couriers": [
+              "C051",
+              "C040"
+            ],
+            "p_complete": 0.9427,
+            "expected_score": 13.3916,
+            "cost": 18.3555
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C042",
+              "C059"
+            ],
+            "p_complete": 0.9803,
+            "expected_score": 11.1929,
+            "cost": 12.9441
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C008",
+              "C023"
+            ],
+            "p_complete": 0.9682,
+            "expected_score": 11.9717,
+            "cost": 14.7678
+          },
+          {
+            "task_id_list": "T0015",
+            "couriers": [
+              "C001",
+              "C005"
+            ],
+            "p_complete": 0.9865,
+            "expected_score": 18.029,
+            "cost": 19.1339
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C038",
+              "C002",
+              "C028"
+            ],
+            "p_complete": 0.9696,
+            "expected_score": 15.7794,
+            "cost": 18.3433
+          },
+          {
+            "task_id_list": "T0017",
+            "couriers": [
+              "C003",
+              "C006"
+            ],
+            "p_complete": 0.9836,
+            "expected_score": 13.6225,
+            "cost": 15.0358
+          },
+          {
+            "task_id_list": "T0018",
+            "couriers": [
+              "C045",
+              "C015"
+            ],
+            "p_complete": 0.9674,
+            "expected_score": 14.365,
+            "cost": 17.1597
+          },
+          {
+            "task_id_list": "T0019",
+            "couriers": [
+              "C047",
+              "C012"
+            ],
+            "p_complete": 0.9755,
+            "expected_score": 14.3339,
+            "cost": 16.434
+          },
+          {
+            "task_id_list": "T0020",
+            "couriers": [
+              "C033",
+              "C022"
+            ],
+            "p_complete": 0.9825,
+            "expected_score": 10.4684,
+            "cost": 12.0378
+          },
+          {
+            "task_id_list": "T0021",
+            "couriers": [
+              "C049",
+              "C034"
+            ],
+            "p_complete": 0.9767,
+            "expected_score": 16.08,
+            "cost": 18.0369
+          },
+          {
+            "task_id_list": "T0022",
+            "couriers": [
+              "C004",
+              "C020"
+            ],
+            "p_complete": 0.9573,
+            "expected_score": 10.9716,
+            "cost": 14.772
+          },
+          {
+            "task_id_list": "T0023",
+            "couriers": [
+              "C013",
+              "C026"
+            ],
+            "p_complete": 0.9687,
+            "expected_score": 12.0366,
+            "cost": 14.79
+          },
+          {
+            "task_id_list": "T0024",
+            "couriers": [
+              "C046"
+            ],
+            "p_complete": 0.9405,
+            "expected_score": 11.617,
+            "cost": 16.8758
+          },
+          {
+            "task_id_list": "T0025",
+            "couriers": [
+              "C021",
+              "C011"
+            ],
+            "p_complete": 0.9863,
+            "expected_score": 20.1957,
+            "cost": 21.2863
+          },
+          {
+            "task_id_list": "T0026",
+            "couriers": [
+              "C016",
+              "C044"
+            ],
+            "p_complete": 0.9717,
+            "expected_score": 14.9627,
+            "cost": 17.3672
+          },
+          {
+            "task_id_list": "T0027",
+            "couriers": [
+              "C055",
+              "C053"
+            ],
+            "p_complete": 0.9546,
+            "expected_score": 13.8154,
+            "cost": 17.7294
+          },
+          {
+            "task_id_list": "T0028",
+            "couriers": [
+              "C032",
+              "C054"
+            ],
+            "p_complete": 0.9773,
+            "expected_score": 15.5607,
+            "cost": 17.4808
+          },
+          {
+            "task_id_list": "T0029",
+            "couriers": [
+              "C024",
+              "C019"
+            ],
+            "p_complete": 0.9557,
+            "expected_score": 13.4639,
+            "cost": 17.3009
+          }
+        ],
+        "total_tasks": 30,
+        "total_couriers": 60
+      },
+      {
+        "status": "ok",
+        "case_file": "scarce_couriers_seed401.txt",
+        "elapsed_ms": 8724,
+        "validity": true,
+        "errors": [],
+        "total_score": 1531.5317,
+        "assigned_count": 39,
+        "unassigned_count": 1,
+        "unassigned_penalty": 100,
+        "detail": [
+          {
+            "task_id_list": "T0000,T0027",
+            "couriers": [
+              "C005"
+            ],
+            "p_complete": 0.8102,
+            "expected_score": 42.329,
+            "cost": 72.255
+          },
+          {
+            "task_id_list": "T0001,T0035",
+            "couriers": [
+              "C018"
+            ],
+            "p_complete": 0.6251,
+            "expected_score": 52.658,
+            "cost": 107.8965
+          },
+          {
+            "task_id_list": "T0002,T0038",
+            "couriers": [
+              "C009"
+            ],
+            "p_complete": 0.8318,
+            "expected_score": 30.378,
+            "cost": 58.9084
+          },
+          {
+            "task_id_list": "T0003,T0024",
+            "couriers": [
+              "C012"
+            ],
+            "p_complete": 0.9098,
+            "expected_score": 53.839,
+            "cost": 67.0227
+          },
+          {
+            "task_id_list": "T0004,T0018",
+            "couriers": [
+              "C007"
+            ],
+            "p_complete": 0.8921,
+            "expected_score": 50.475,
+            "cost": 66.6087
+          },
+          {
+            "task_id_list": "T0005,T0036",
+            "couriers": [
+              "C019"
+            ],
+            "p_complete": 0.8014,
+            "expected_score": 53.7,
+            "cost": 82.7552
+          },
+          {
+            "task_id_list": "T0006,T0030",
+            "couriers": [
+              "C003"
+            ],
+            "p_complete": 0.8836,
+            "expected_score": 46.837,
+            "cost": 64.6652
+          },
+          {
+            "task_id_list": "T0007,T0008",
+            "couriers": [
+              "C001"
+            ],
+            "p_complete": 0.8881,
+            "expected_score": 75.4,
+            "cost": 89.3427
+          },
+          {
+            "task_id_list": "T0009,T0011",
+            "couriers": [
+              "C014"
+            ],
+            "p_complete": 0.8368,
+            "expected_score": 41.873,
+            "cost": 67.6793
+          },
+          {
+            "task_id_list": "T0010,T0029",
+            "couriers": [
+              "C004"
+            ],
+            "p_complete": 0.7586,
+            "expected_score": 61.356,
+            "cost": 94.8247
+          },
+          {
+            "task_id_list": "T0012,T0019",
+            "couriers": [
+              "C010"
+            ],
+            "p_complete": 0.669,
+            "expected_score": 41.433,
+            "cost": 93.9187
+          },
+          {
+            "task_id_list": "T0013,T0039",
+            "couriers": [
+              "C013"
+            ],
+            "p_complete": 0.7837,
+            "expected_score": 24.769,
+            "cost": 62.6715
+          },
+          {
+            "task_id_list": "T0014,T0031",
+            "couriers": [
+              "C008"
+            ],
+            "p_complete": 0.7863,
+            "expected_score": 33.449,
+            "cost": 69.0409
+          },
+          {
+            "task_id_list": "T0015,T0034",
+            "couriers": [
+              "C015"
+            ],
+            "p_complete": 0.8438,
+            "expected_score": 49.487,
+            "cost": 72.9971
+          },
+          {
+            "task_id_list": "T0016",
+            "couriers": [
+              "C000"
+            ],
+            "p_complete": 0.8105,
+            "expected_score": 13.839,
+            "cost": 30.1665
+          },
+          {
+            "task_id_list": "T0017,T0032",
+            "couriers": [
+              "C002"
+            ],
+            "p_complete": 0.785,
+            "expected_score": 24.78,
+            "cost": 62.4523
+          },
+          {
+            "task_id_list": "T0020,T0023",
+            "couriers": [
+              "C016"
+            ],
+            "p_complete": 0.6546,
+            "expected_score": 30.81,
+            "cost": 89.2482
+          },
+          {
+            "task_id_list": "T0021,T0026",
+            "couriers": [
+              "C017"
+            ],
+            "p_complete": 0.8621,
+            "expected_score": 24.388,
+            "cost": 48.6049
+          },
+          {
+            "task_id_list": "T0022,T0037",
+            "couriers": [
+              "C011"
+            ],
+            "p_complete": 0.8796,
+            "expected_score": 40.231,
+            "cost": 59.4672
+          },
+          {
+            "task_id_list": "T0025,T0028",
+            "couriers": [
+              "C006"
+            ],
+            "p_complete": 0.816,
+            "expected_score": 41.919,
+            "cost": 71.0059
+          }
+        ],
+        "total_tasks": 40,
+        "total_couriers": 20
+      },
+      {
+        "status": "ok",
+        "case_file": "small_seed100.txt",
+        "elapsed_ms": 107,
+        "validity": true,
+        "errors": [],
+        "total_score": 303.7211,
+        "assigned_count": 15,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C005"
+            ],
+            "p_complete": 0.8997,
+            "expected_score": 11.437,
+            "cost": 20.3199
+          },
+          {
+            "task_id_list": "T0001,T0003",
+            "couriers": [
+              "C007",
+              "C023",
+              "C002"
+            ],
+            "p_complete": 0.939,
+            "expected_score": 35.0701,
+            "cost": 45.1233
+          },
+          {
+            "task_id_list": "T0002,T0006",
+            "couriers": [
+              "C016",
+              "C010"
+            ],
+            "p_complete": 0.9749,
+            "expected_score": 34.5338,
+            "cost": 38.6947
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C011",
+              "C009"
+            ],
+            "p_complete": 0.9458,
+            "expected_score": 11.4787,
+            "cost": 16.273
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C004",
+              "C001"
+            ],
+            "p_complete": 0.9234,
+            "expected_score": 13.0431,
+            "cost": 19.7065
+          },
+          {
+            "task_id_list": "T0007",
+            "couriers": [
+              "C000",
+              "C017"
+            ],
+            "p_complete": 0.9087,
+            "expected_score": 13.6627,
+            "cost": 21.544
+          },
+          {
+            "task_id_list": "T0008",
+            "couriers": [
+              "C024",
+              "C018"
+            ],
+            "p_complete": 0.8726,
+            "expected_score": 16.0547,
+            "cost": 26.7527
+          },
+          {
+            "task_id_list": "T0009",
+            "couriers": [
+              "C014",
+              "C008"
+            ],
+            "p_complete": 0.9546,
+            "expected_score": 21.295,
+            "cost": 24.8686
+          },
+          {
+            "task_id_list": "T0010",
+            "couriers": [
+              "C003"
+            ],
+            "p_complete": 0.9479,
+            "expected_score": 18.304,
+            "cost": 22.5604
+          },
+          {
+            "task_id_list": "T0011",
+            "couriers": [
+              "C012",
+              "C015"
+            ],
+            "p_complete": 0.9369,
+            "expected_score": 10.9789,
+            "cost": 16.5998
+          },
+          {
+            "task_id_list": "T0012",
+            "couriers": [
+              "C020",
+              "C019"
+            ],
+            "p_complete": 0.9862,
+            "expected_score": 12.3418,
+            "cost": 13.5528
+          },
+          {
+            "task_id_list": "T0013",
+            "couriers": [
+              "C021",
+              "C022"
+            ],
+            "p_complete": 0.9587,
+            "expected_score": 11.6165,
+            "cost": 15.2678
+          },
+          {
+            "task_id_list": "T0014",
+            "couriers": [
+              "C013",
+              "C006"
+            ],
+            "p_complete": 0.9528,
+            "expected_score": 18.6206,
+            "cost": 22.4576
+          }
+        ],
+        "total_tasks": 15,
+        "total_couriers": 25
+      },
+      {
+        "status": "ok",
+        "case_file": "tiny_seed42.txt",
+        "elapsed_ms": 764,
+        "validity": true,
+        "errors": [],
+        "total_score": 154.4163,
+        "assigned_count": 6,
+        "unassigned_count": 0,
+        "unassigned_penalty": 0,
+        "detail": [
+          {
+            "task_id_list": "T0000",
+            "couriers": [
+              "C008",
+              "C002"
+            ],
+            "p_complete": 0.8982,
+            "expected_score": 19.7679,
+            "cost": 27.9388
+          },
+          {
+            "task_id_list": "T0001,T0002",
+            "couriers": [
+              "C003",
+              "C006",
+              "C007",
+              "C009"
+            ],
+            "p_complete": 0.9274,
+            "expected_score": 36.6177,
+            "cost": 48.4733
+          },
+          {
+            "task_id_list": "T0003",
+            "couriers": [
+              "C005"
+            ],
+            "p_complete": 0.8657,
+            "expected_score": 14.22,
+            "cost": 25.7403
+          },
+          {
+            "task_id_list": "T0004",
+            "couriers": [
+              "C001"
+            ],
+            "p_complete": 0.8387,
+            "expected_score": 21.692,
+            "cost": 34.3231
+          },
+          {
+            "task_id_list": "T0005",
+            "couriers": [
+              "C000",
+              "C004"
+            ],
+            "p_complete": 0.9658,
+            "expected_score": 15.0375,
+            "cost": 17.9409
+          }
+        ],
+        "total_tasks": 6,
+        "total_couriers": 10
+      }
+    ],
+    "finished_ts": 1779254422.4779117
+  }
+}

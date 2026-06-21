@@ -1,0 +1,1 @@
+"""AutoSolver package."""

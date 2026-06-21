@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.venv/
+venv/
+.claude/
+.learnings/
+autosolver_agent/evolution_state/
+autosolver_agent/evolution_state/generated_strategies/
+autosolver_agent/evolution_state/evolution_memory.jsonl
+autosolver_agent/evolution_state/strategy_registry.json
+submission_dryrun/
+submission_final/

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="560" viewBox="0 0 820 560" font-family="Helvetica,Arial,sans-serif"><rect width="820" height="560" fill="white"/><text x="410.0" y="28" text-anchor="middle" font-size="18" font-weight="bold" fill="#222b35">Efficiency vs Rider-Income Gini  Pareto front</text>
+<line x1="70" y1="490" x2="750" y2="490" stroke="#222b35"/>
+<line x1="70" y1="70" x2="70" y2="490" stroke="#222b35"/>
+<polyline points="70.0,390.0 168.7,205.0 194.1,187.9 194.4,256.6 298.3,303.9 301.0,70.0 452.8,423.9 514.4,472.2 671.6,487.0 724.2,490.0 750.0,472.6" fill="none" stroke="#d1495b" stroke-width="2.5"/>
+<circle cx="750.0" cy="472.6" r="6" fill="#1f3a5f"/>
+<text x="758.0" y="472.6" font-size="9" fill="#222b35">a=0.0</text>
+<circle cx="724.2" cy="490.0" r="6" fill="#1f3a5f"/>
+<text x="732.2" y="490.0" font-size="9" fill="#222b35">a=0.1</text>
+<circle cx="671.6" cy="487.0" r="6" fill="#1f3a5f"/>
+<text x="679.6" y="487.0" font-size="9" fill="#222b35">a=0.2</text>
+<circle cx="514.4" cy="472.2" r="6" fill="#1f3a5f"/>
+<text x="522.4" y="472.2" font-size="9" fill="#222b35">a=0.3</text>
+<circle cx="452.8" cy="423.9" r="6" fill="#1f3a5f"/>
+<text x="460.8" y="423.9" font-size="9" fill="#222b35">a=0.4</text>
+<circle cx="70.0" cy="390.0" r="6" fill="#1f3a5f"/>
+<text x="78.0" y="390.0" font-size="9" fill="#222b35">a=0.5</text>
+<circle cx="298.3" cy="303.9" r="6" fill="#1f3a5f"/>
+<text x="306.3" y="303.9" font-size="9" fill="#222b35">a=0.6</text>
+<circle cx="194.4" cy="256.6" r="6" fill="#1f3a5f"/>
+<text x="202.4" y="256.6" font-size="9" fill="#222b35">a=0.7</text>
+<circle cx="194.1" cy="187.9" r="6" fill="#1f3a5f"/>
+<text x="202.1" y="187.9" font-size="9" fill="#222b35">a=0.8</text>
+<circle cx="168.7" cy="205.0" r="6" fill="#1f3a5f"/>
+<text x="176.7" y="205.0" font-size="9" fill="#222b35">a=0.9</text>
+<circle cx="301.0" cy="70.0" r="6" fill="#1f3a5f"/>
+<text x="309.0" y="70.0" font-size="9" fill="#222b35">a=1.0</text>
+<text x="410.0" y="540" text-anchor="middle" font-size="12" fill="#222b35">Rider income Gini (lower fairer)</text>
+<text x="20" y="280.0" font-size="12" fill="#222b35" transform="rotate(-90 20 280.0)">Expected cost (lower better)</text>
+</svg>

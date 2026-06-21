@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoSolver Agent · 即时履约智能调度指挥舱</title>
+<link rel="stylesheet" href="/static/dispatch.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ 顶栏 ============ -->
+  <header class="panel topbar" id="topbar">
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <div class="name">AutoSolver Agent</div>
+        <h1>即时履约智能调度指挥舱</h1>
+        <div class="sub">10 秒内生成高可靠派单方案，降低无人接单风险与履约成本</div>
+      </div>
+    </div>
+    <div class="sysstat">
+      <div class="statblock">
+        <div class="lbl">系统状态</div>
+        <div class="runlight idle" id="runlight"><span class="dot"></span><span id="runtext">待机</span></div>
+      </div>
+      <div class="statblock">
+        <div class="lbl">已运行</div>
+        <div class="val" id="timer">00:00:00</div>
+      </div>
+      <div class="statblock">
+        <div class="lbl">求解器</div>
+        <div class="val" id="solverused" style="font-size:12px">—</div>
+      </div>
+    </div>
+    <div class="chips" id="chips">
+      <div class="chip"><span class="ci">☔</span><div><div class="ct">接单意愿</div><div class="cv">—</div></div></div>
+    </div>
+  </header>
+
+  <!-- ============ 启动条 ============ -->
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+    <button id="runbtn" class="roi-btn" style="width:auto;padding:10px 22px;background:linear-gradient(135deg,var(--green),var(--green2));color:#04221a">▶ 开始智能调度推理 (large_seed301)</button>
+    <span class="pill" id="phase" style="font-size:12px;color:var(--muted)">点击开始，对赛题真实数据 large_seed301 现场跑 Agent（约 10 秒内 SSE 逐事件点亮）</span>
+  </div>
+
+  <!-- ============ KPI 行 ============ -->
+  <section class="kpis" id="kpis"></section>
+
+  <!-- ============ 主三列 ============ -->
+  <section class="main3">
+    <!-- 左列 -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-h"><span class="ico">🧭</span>业务场景 · AI 判定</div>
+        <div class="panel-b">
+          <div class="scene-list" id="scenelist"></div>
+          <div class="verdict" id="verdict">
+            <div class="vt">● AI 实时判定</div>
+            <div class="vv" id="verdict-name">等待推理…</div>
+            <div class="vr" id="verdict-rule">感知模块将据尺寸解耦特征当场判出场景</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span class="ico">⚠️</span>场景风险画像</div>
+        <div class="panel-b" id="risk"><div class="empty-ph">待推理</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span class="ico">🎯</span>推荐 Agent 策略<span class="narr-tag">Planner 镜像解读·叙事</span></div>
+        <div class="panel-b" id="strategy"><div class="empty-ph">待推理</div></div>
+      </div>
+    </div>
+
+    <!-- 中央地图 -->
+    <div class="panel mapwrap col">
+      <div class="panel-h" style="position:absolute;z-index:6;background:none;border:none"><span class="ico">🗺️</span>调度可视化地图</div>
+      <div class="panel-b" style="height:100%">
+        <div class="maptop">
+          <div class="legend">
+            <div class="lg"><span class="sw" style="background:var(--red)"></span>订单(高风险)</div>
+            <div class="lg"><span class="sw" style="background:var(--yellow)"></span>订单(普通)</div>
+            <div class="lg"><span class="sw" style="background:var(--orange)"></span>骑手</div>
+            <div class="lg"><span class="sw dash"></span>候选方案</div>
+            <div class="lg"><span class="sw line"></span>已分配方案</div>
+          </div>
+        </div>
+        <svg id="mapsvg" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="mapctl">
+          <button id="zoomin">+</button>
+          <button id="zoomout">−</button>
+          <button id="zoomreset">⟲</button>
+        </div>
+        <div class="demobadge" id="mapdemo">演示·seed20260620 坐标合成·非GPS</div>
+        <div class="focuscard" id="focuscard"></div>
+      </div>
+    </div>
+
+    <!-- 右列 决策解释 -->
+    <div class="col">
+      <div class="panel">
+        <div class="panel-h"><span class="ico">💡</span>决策解释</div>
+        <div class="panel-b" id="decision"><div class="empty-ph">点击地图节点或推理后聚焦合单组</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span class="ico">📜</span>最优性证书 <span class="narr-tag">gap·r1</span></div>
+        <div class="panel-b" id="cert"><div class="empty-ph">待推理</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 底部三区 ============ -->
+  <section class="bottom3">
+    <div class="panel">
+      <div class="panel-h"><span class="ico">⚙️</span>Agent 工作流程</div>
+      <div class="panel-b"><div class="rings" id="rings"></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><span class="ico">🔬</span>候选方案评估</div>
+      <div class="panel-b"><div class="cand-cols" id="candidates"><div class="empty-ph" style="grid-column:1/-1">待推理</div></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><span class="ico">📊</span>Baseline vs AutoSolver 对比 <span class="real-dot"></span><span class="tiny muted">纯贪心真跑</span></div>
+      <div class="panel-b" id="baseline"><div class="empty-ph">待推理</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 自进化 + ROI ============ -->
+  <section class="bottom2">
+    <div class="panel collapsed" id="evopanel">
+      <div class="panel-h collapse-h" id="evotoggle">
+        <span><span class="ico">🧬</span>自进化与安全回退 (Self-Evolving Code Loop)
+        <span class="narr-tag">机制内部指标·非派单成绩·对最终成绩零贡献</span></span>
+        <span class="ar">▾</span>
+      </div>
+      <div class="panel-b collapse-b">
+        <div class="evo-flow">
+          <div class="evo-node"><span class="ei">🧠</span>1 生成实验策略</div><span class="evo-arrow">→</span>
+          <div class="evo-node"><span class="ei">🛡️</span>2 安全门检查</div><span class="evo-arrow">→</span>
+          <div class="evo-node"><span class="ei">📦</span>3 沙箱试跑</div><span class="evo-arrow">→</span>
+          <div class="evo-node"><span class="ei">📊</span>4 质量门评估</div><span class="evo-arrow">→</span>
+          <div class="evo-node"><span class="ei">💾</span>5 进入候选记忆</div>
+        </div>
+        <div id="evobody"><div class="empty-ph">推理后接入 report.evolution（真·机制，stub 无 live LLM）</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><span class="ico">💰</span>商业价值 ROI 模拟器 <span class="demo-tag">演示假设</span></div>
+      <div class="panel-b">
+        <div class="roi-in">
+          <label>城市日订单量<input id="roi-orders" type="number" value="500000"></label>
+          <label>单个无人接单亏损 (¥)<input id="roi-loss" type="number" value="15"></label>
+          <label>部署商圈数量<input id="roi-districts" type="number" value="50"></label>
+        </div>
+        <button class="roi-btn" id="roi-calc">重新计算</button>
+        <div class="roi-out" id="roi-out">
+          <div class="roi-card"><div class="rv" id="roi-daily">—</div><div class="rl">每日减少损失</div></div>
+          <div class="roi-card"><div class="rv" id="roi-monthly">—</div><div class="rl">每月节省成本</div></div>
+          <div class="roi-card"><div class="rv" id="roi-stab">—</div><div class="rl">履约稳定性</div></div>
+        </div>
+        <div class="tiny muted" style="margin-top:8px;line-height:1.5">公式：减少损失 = 订单量 × 无人接单下降比例 × 单位亏损 × 商圈覆盖率。下降比例系数默认绑真实成本改善(成本口径)。</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot" id="foot">
+    <b>数据边界</b>：真实字段来自 solver_v4/感知/证书/四方/进化真实输出 + 纯贪心真跑（task/courier 派单·意愿·分数·成本·覆盖·gap r1）；
+    地图坐标·距离·ETA·天气·商圈·金额为演示合成层（seed=20260620），非真实 GPS/财务。
+    「严格优于」仅指成本口径（期望成本更低 + 覆盖不更差），不宣称省骑手；自进化机制真实但对最终派单成绩零贡献。
+  </footer>
+</div>
+
+<script src="/static/dispatch.js"></script>
+</body>
+</html>
