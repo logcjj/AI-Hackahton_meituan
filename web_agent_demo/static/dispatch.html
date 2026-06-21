@@ -78,11 +78,13 @@
       <div class="panel-b" style="height:100%">
         <div class="maptop">
           <div class="legend">
-            <div class="lg"><span class="sw" style="background:var(--red)"></span>订单(高风险)</div>
+            <div class="lg"><span class="sw" style="background:var(--orange)"></span>订单(高风险)</div>
             <div class="lg"><span class="sw" style="background:var(--yellow)"></span>订单(普通)</div>
-            <div class="lg"><span class="sw" style="background:var(--orange)"></span>骑手</div>
+            <div class="lg"><span class="sw" style="background:var(--green)"></span>骑手</div>
             <div class="lg"><span class="sw dash"></span>候选方案</div>
-            <div class="lg"><span class="sw line"></span>已分配方案</div>
+            <div class="lg"><span class="sw line"></span>已采纳方案</div>
+            <div class="lg"><span class="sw ring-task"></span>任务合单圈</div>
+            <div class="lg"><span class="sw ring-multi"></span>骑手兜底圈</div>
           </div>
         </div>
         <svg id="mapsvg" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet"></svg>
@@ -158,7 +160,7 @@
           <div class="roi-card"><div class="rv" id="roi-monthly">—</div><div class="rl">每月节省成本</div></div>
           <div class="roi-card"><div class="rv" id="roi-stab">—</div><div class="rl">履约稳定性</div></div>
         </div>
-        <div class="tiny muted" style="margin-top:8px;line-height:1.5">公式：减少损失 = 订单量 × 无人接单下降比例 × 单位亏损 × 商圈覆盖率。下降比例系数默认绑真实成本改善(成本口径)。</div>
+        <div class="roi-chain" id="roi-chain"></div>
       </div>
     </div>
   </section>

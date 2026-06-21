@@ -381,9 +381,11 @@ def synth_chips(report: dict[str, Any]) -> list[dict[str, Any]]:
             "real": {"density_ratio": d}, "is_demo": False, "narrative": True,
         })
     if bf is not None:
+        # iter-2(P0-3)：large_seed301 上 v4 解为「多骑手兜底」非任务合单，故措辞改为
+        # 「合单/兜底潜力」，与满屏兜底圈自洽，绝不伪造任务合单。
         chips.append({
-            "icon": "🗂", "title": "合单潜力",
-            "value": f"合单占比 {round(bf*100,1)}%", "delta": "合单机会密集" if bf >= 0.35 else "合单一般",
+            "icon": "🗂", "title": "合单/兜底潜力",
+            "value": f"潜力占比 {round(bf*100,1)}%", "delta": "合单/兜底机会密集" if bf >= 0.35 else "机会一般",
             "real": {"bundle_fraction": bf}, "is_demo": False, "narrative": True,
         })
     return chips
@@ -610,6 +612,96 @@ def synth_decision(text: str, report: dict[str, Any], layout: dict[str, Any]) ->
 
 
 # --------------------------------------------------------------------------- #
+# 7b. 自进化面板（透传 report.evolution 真值；拿不到的子字段直接删，不造假）    #
+# --------------------------------------------------------------------------- #
+def synth_evolution(report: dict[str, Any]) -> dict[str, Any]:
+    """把 run_blind_solve 的 **真实** report["evolution"] 提炼成前端面板数据。
+
+    iteration-2 修「自进化假占位」雷：旧前端把实验策略 #18-21 写死。本函数改为
+    **只透传真值**：
+      - promoted_card：真实 promoted 策略（gen01_M1_003 / operator / parent /
+        directive / safety_passed / held-out 改进量 Δ）。
+      - registry_summary：注册表真实条数 + accepted 真实条数 + directive 直方图。
+      - causal_demo：同一 parent + 不同 ReEvo lesson directive → 生成不同 rank
+        代码（distinct_final_lines / causal_proven / 各 variant 的 final_key_line）。
+    任一子字段拿不到则置 None，前端据此**删掉该段**（绝不补假数据），只保留
+    「5 步机制流程图 + 真实注册表条数 + 诚实声明」。
+
+    诚实声明铁律（方案 §7 / 红线）：机制可验证、对最终派单成绩零贡献、stub 无
+    live LLM；改进量 Δ 为机制内部 held-out 指标，非派单成绩。
+    """
+    evo = report.get("evolution") or {}
+    card = evo.get("promoted_card") or {}
+    summ = evo.get("registry_summary") or {}
+    demo = evo.get("causal_demo") or {}
+
+    # promoted_card 真值（只挑展示需要、确定存在的字段；available=False 时降级）
+    promoted = None
+    if card.get("available") and card.get("status"):
+        promoted = {
+            "strategy_id": card.get("strategy_id"),
+            "status": card.get("status"),
+            "operator": card.get("operator"),
+            "generation": card.get("generation"),
+            "parent": card.get("parent"),
+            "target_regime": card.get("target_regime"),
+            "directive": card.get("directive"),
+            "safety_passed": card.get("safety_passed"),
+            "safety_reason": card.get("safety_reason"),
+            "last_decision": card.get("last_decision"),
+            "last_reason": card.get("last_reason"),
+            "heldout_mean": card.get("heldout_mean"),
+            "baseline_heldout_mean": card.get("baseline_heldout_mean"),
+            "improvement_vs_baseline": card.get("improvement_vs_baseline"),
+            "source": card.get("source"),
+        }
+
+    # registry_summary 真值（条数 + directive 直方图）
+    registry = None
+    if summ:
+        registry = {
+            "total_strategies": summ.get("total_strategies"),
+            "promoted": summ.get("promoted") or [],
+            "accepted_or_better": summ.get("accepted_or_better") or [],
+            "n_accepted": len(summ.get("accepted_or_better") or []),
+            "directive_histogram": summ.get("directive_histogram") or {},
+            "source": summ.get("source"),
+        }
+
+    # causal_demo 真值（同 parent / 不同 directive → 不同 rank 代码）
+    causal = None
+    variants = demo.get("variants") or []
+    if variants:
+        causal = {
+            "distinct_final_lines": demo.get("distinct_final_lines"),
+            "causal_proven": demo.get("causal_proven"),
+            "directives_contrasted": demo.get("directives_contrasted") or [],
+            "parent": demo.get("parent"),
+            "variants": [
+                {
+                    "directive": v.get("directive"),
+                    "final_key_line": v.get("final_key_line"),
+                }
+                for v in variants
+            ],
+            "mechanism": demo.get("mechanism", ""),
+        }
+
+    return {
+        "is_demo": False,            # 机制真值（非演示合成）
+        "is_mechanism_only": True,   # 但对最终派单成绩零贡献
+        "live_llm": False,           # stub 生成，无 live LLM
+        "promoted_card": promoted,   # None → 前端删该段
+        "registry_summary": registry,
+        "causal_demo": causal,       # None → 前端删该段
+        "honesty": (
+            "机制可验证·对最终派单成绩零贡献·stub 无 live LLM；"
+            "改进量 Δ 为机制内部 held-out 指标，非派单成绩。"
+        ),
+    }
+
+
+# --------------------------------------------------------------------------- #
 # 主入口：把 report + baseline → 完整指挥舱 payload                            #
 # --------------------------------------------------------------------------- #
 def build_story(text: str, report: dict[str, Any], baseline: dict[str, Any]) -> dict[str, Any]:
@@ -628,6 +720,7 @@ def build_story(text: str, report: dict[str, Any], baseline: dict[str, Any]) -> 
         "decision": synth_decision(text, report, layout),
         "candidates": synth_candidates(report, baseline),
         "certificate": report.get("certificate", {}),   # r1，真值透传
+        "evolution": synth_evolution(report),            # iter-2：透传真值，删假占位
         "baseline": baseline,
         "solution_summary": report.get("solution_summary", {}),
         "solve_time_s": report.get("solve_time_s"),

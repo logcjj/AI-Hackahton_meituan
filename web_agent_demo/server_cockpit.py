@@ -71,6 +71,48 @@ def _read_case_text(case: str | None) -> str:
     return DEFAULT_CASE.read_text(encoding="utf-8")
 
 
+# 前端 5 场景 id → 压力测试 regime（脱敏样例参数）。只读复用，不改后端算法。
+_SCENE_TO_REGIME = {
+    "peak": "large",           # 午高峰爆单：大规模高负载
+    "rain": "low_willing",     # 雨天低接单意愿
+    "scarce": "scarce",        # 骑手稀缺商圈
+    "bundle": "bundle_heavy",  # 合单机会密集
+    "newshop": "high_noise",   # 新店突发订单：高噪声/不确定
+}
+
+
+def _generate_scene(scene: str, seed: int) -> dict:
+    """合成一个全新脱敏样例 + 跑感知重判（真实判出 regime/chips/risk）。"""
+    try:
+        from tools.generalization_stress_test import REGIME_BANK, generate_case
+    except Exception as exc:
+        return {"status": "error", "error": f"generator unavailable: {type(exc).__name__}: {exc}",
+                "fallback": True}
+    regime_key = _SCENE_TO_REGIME.get(scene, "bundle_heavy")
+    spec = REGIME_BANK.get(regime_key) or REGIME_BANK.get("medium")
+    text = generate_case(spec, seed)
+    candidates, all_tasks = cstory.parse_candidates(text)
+    perc = orch.size_decoupled_perception(candidates, all_tasks)
+    stub_report = {"perception": perc, "solution": [], "solution_summary": {
+        "groups": 0, "used_couriers": 0, "covered_tasks": 0,
+        "total_tasks": len(all_tasks), "valid": False}}
+    return {
+        "status": "ok",
+        "scene": scene,
+        "regime_key": regime_key,
+        "is_synthetic_sample": True,   # 脱敏全新随机样例，非记忆/官方数据
+        "n_tasks": len(all_tasks),
+        "n_rows": len(candidates),
+        "perception": perc,
+        "regime_verdict": {"regime": perc.get("regime"), "rules": perc.get("rules", []),
+                           "is_demo": False, "is_synthetic": True},
+        "chips": cstory.synth_chips(stub_report),
+        "risk": cstory.synth_risk(stub_report),
+        "note": ("脱敏样例：用 generalization_stress_test.generate_case 现场合成全新随机实例"
+                 "(seed 可变)，感知模块真实判出 regime；非官方数据、非记忆样例。"),
+    }
+
+
 class Handler(BaseHTTPRequestHandler):
     # ----- response helpers -----
     def _json(self, payload, status=200):
@@ -142,6 +184,16 @@ class Handler(BaseHTTPRequestHandler):
                     "map_skeleton": layout,
                     "data_boundary": cstory.build_story.__doc__ or "",
                 })
+                return
+            if parsed.path == "/api/generate":
+                # iter-2(P1-7)：5 业务场景脱敏样例。用 generalization_stress_test 的
+                # generate_case 现场合成一个**全新随机**实例（非记忆样例），跑感知重判，
+                # 返回 regime/chips/risk，让前端切换场景时「感知真实判出」。只读、不改后端。
+                qs = parse_qs(parsed.query)
+                scene = qs.get("regime", ["bundle"])[0]
+                seed = int(qs.get("seed", ["20260620"])[0])
+                payload = _generate_scene(scene, seed)
+                self._json(payload)
                 return
             if parsed.path == "/api/baseline":
                 qs = parse_qs(parsed.query)

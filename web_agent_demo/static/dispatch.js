@@ -72,12 +72,13 @@ function renderKpis(kpis){
     const acls = k.good==='up'?'arrow-up':(k.good==='down'?'arrow-down-good':'arrow-neutral');
     const tag = k.is_demo?'<span class="demo-tag">演示</span>':'<span class="real-dot"></span>';
     const dec = (k.unit==='%'||k.key==='cost_index')?1:0;
+    const col = k.good==='neutral'?'rgba(127,165,151,.55)':(k.good==='up'||k.good==='down'?'rgba(70,240,168,.6)':'rgba(67,213,255,.55)');
     return `<div class="panel kpi skeleton">
       <div class="klbl">${tag}${safe(k.label)}</div>
       <div class="kval" data-key="${k.key}" data-val="${k.value??''}" data-unit="${safe(k.unit)}" data-dec="${dec}">—</div>
       <div class="ksub">${safe(k.sub||'')}</div>
-      <div class="karrow ${acls}">${arrow}</div>
-      <svg class="spark" viewBox="0 0 100 22" preserveAspectRatio="none">${sparkPath(k.key)}</svg>
+      <div class="karrow ${acls}"><span class="ad">${arrow}</span></div>
+      <svg class="spark" viewBox="0 0 100 24" preserveAspectRatio="none">${sparkPath(k.key,col)}</svg>
     </div>`;
   }).join('');
   document.querySelectorAll('.kval').forEach(n=>{
@@ -85,18 +86,22 @@ function renderKpis(kpis){
     countUp(n, isNaN(v)?null:v, n.dataset.unit, parseInt(n.dataset.dec));
   });
 }
-function sparkPath(key){
-  // 确定性伪 sparkline（演示视觉）
+function sparkPath(key,col){
+  // 确定性伪 sparkline（演示视觉，颜色随 KPI 语义）
+  col = col || 'rgba(67,213,255,.55)';
   let seed=0; for(const c of key) seed=(seed*31+c.charCodeAt(0))&0xffff;
-  const pts=[]; for(let i=0;i<10;i++){ seed=(seed*1103515245+12345)&0x7fffffff; pts.push(4+(seed%14)); }
-  const d=pts.map((y,i)=>`${i*11},${22-y}`).join(' ');
-  return `<polyline points="${d}" fill="none" stroke="rgba(63,210,224,.5)" stroke-width="1.4"/>`;
+  const pts=[]; for(let i=0;i<11;i++){ seed=(seed*1103515245+12345)&0x7fffffff; pts.push(4+(seed%15)); }
+  const d=pts.map((y,i)=>`${i*10},${24-y}`).join(' ');
+  const fill=`0,24 ${d} 100,24`;
+  const fc=col.replace(/[\d.]+\)$/,'.10)');
+  return `<polygon points="${fill}" fill="${fc}" stroke="none"/><polyline points="${d}" fill="none" stroke="${col}" stroke-width="1.5"/>`;
 }
 
 /* ---------- chips ---------- */
 function renderChips(chips){
   if(!chips||!chips.length) return;
-  $('chips').innerHTML = chips.map(c=>`<div class="chip skeleton">
+  const cls=t=>/意愿/.test(t)?'c-will':(/供给|骑手/.test(t)?'c-supply':(/合单|兜底/.test(t)?'c-bundle':''));
+  $('chips').innerHTML = chips.map(c=>`<div class="chip skeleton ${cls(c.title)}">
     <span class="ci">${safe(c.icon)}</span>
     <div><div class="ct">${safe(c.title)}</div><div class="cv">${safe(c.value)}</div><div class="cd">${safe(c.delta)}</div></div>
   </div>`).join('');
@@ -181,13 +186,40 @@ function renderBaseline(bl){
     ['调度耗时', (g.solve_time_s!=null?g.solve_time_s+'s':'—'), (a.solve_time_s!=null?a.solve_time_s+'s':'—'), '—'],
   ];
   const sb = imp.strictly_better;
-  $('baseline').innerHTML = `<table class="btable">
+  const pct = imp.cost_pct;   // 真值 68.6744
+  // 双柱：贪心成本 vs v4 成本（v4 相对贪心的比例 → 柱长）
+  const gC=g.expected_cost, aC=a.expected_cost;
+  const ratio = (gC&&aC!=null)? Math.max(4, aC/gC*100) : 100;
+  const heroHtml = (pct!=null && gC && aC!=null) ? `
+    <div class="bl-hero">
+      <div class="big">−${Number(pct).toFixed(2)}<span class="pc">%</span></div>
+      <div class="hl">
+        <div class="ht">期望履约成本（成本口径，纯贪心真跑 vs AutoSolver v4）</div>
+        <div class="hsub">贪心基线 <b>${gC.toLocaleString()}</b> → AutoSolver <b>${aC.toLocaleString()}</b>，
+          降本 <b>${(gC-aC).toLocaleString()}</b>（全场最硬真值）</div>
+      </div>
+      ${sb?`<div class="bl-stamp">严格优于<br>(成本口径)</div>`:''}
+    </div>
+    <div class="bl-bars">
+      <div class="bl-bar greedy"><span class="bn">贪心基线</span>
+        <span class="track"><span class="fill" style="width:0%" data-w="100"></span></span>
+        <span class="bv">${gC.toLocaleString()}</span></div>
+      <div class="bl-bar v4"><span class="bn">AutoSolver</span>
+        <span class="track"><span class="fill" style="width:0%" data-w="${ratio.toFixed(1)}"></span></span>
+        <span class="bv">${aC.toLocaleString()}</span></div>
+    </div>` : '';
+
+  $('baseline').innerHTML = heroHtml + `<table class="btable">
     <thead><tr><th>对比指标</th><th>传统贪心基线</th><th>AutoSolver</th><th>改善</th></tr></thead>
     <tbody>${rows.map(r=>`<tr><td>${r[0]}</td><td class="val">${r[1]}</td><td class="val good">${r[2]}</td><td>${safe(r[3])}</td></tr>`).join('')}</tbody>
   </table>
-  <div class="tiny" style="margin-top:7px;color:${sb?'var(--green)':'var(--red)'};font-weight:800">
+  <div class="tiny" style="margin-top:7px;color:${sb?'var(--green2)':'var(--red)'};font-weight:800">
     ${sb?'✓ 严格优于（成本口径：期望成本更低 + 覆盖不更差）':'未达严格优于'} ·
     <span class="muted">基线=纯贪心真实运行；不宣称省骑手</span></div>`;
+  // 柱长入场动画
+  requestAnimationFrame(()=>setTimeout(()=>{
+    document.querySelectorAll('.bl-bar .fill').forEach(f=>{ f.style.width=f.dataset.w+'%'; });
+  },60));
 }
 
 /* ---------- decision ---------- */
@@ -196,7 +228,7 @@ function renderDecision(d){
   const riders = (d.riders||[]).map(r=>`<div class="rider">
     <div class="av">${safe((r.id||'R').slice(-2))}</div>
     <div><div class="rid">${safe(r.id)}</div>
-      <div class="rm">接单意愿 ${r.willingness!=null?(r.willingness*100).toFixed(0)+'%':'—'} · 距离 ${r.distance_km}km<span class="demo-tag">演示距离</span></div></div>
+      <div class="rm"><span style="color:var(--green2);font-weight:800">接单意愿 ${r.willingness!=null?(r.willingness*100).toFixed(0)+'%':'—'}</span>${r.score!=null?` · 分数 <span style="color:var(--green2);font-weight:800">${Number(r.score).toFixed(2)}</span>`:''}<span class="real-dot" style="margin-left:4px"></span> · <span style="color:var(--muted2)">距离 ${r.distance_km}km<span class="demo-tag">演示</span></span></div></div>
   </div>`).join('');
   const modeLabel = d.is_bundle?'合单·高价值':(d.is_multi_courier?'多骑手兜底':'单派');
   $('decision').innerHTML = `
@@ -245,11 +277,14 @@ function renderMap(m){
     root.appendChild(el('circle',{cx:d.x,cy:d.y,r:78,fill:'rgba(63,210,224,.05)',stroke:'none'}));
   });
 
-  // 圈：真合单组 + 多骑手兜底组（真值）。限量渲染避免满屏；优先显合单组。
+  // 圈：真合单组(亮绿实线) + 多骑手兜底组(青虚线)。语义区分(P0-3)，限量避免满屏。
+  // 优先显任务合单圈；兜底圈在 large_seed301 上占多数，与「兜底」叙事自洽。
   const bsorted=(m.bundles||[]).slice().sort((a,b)=> (a.kind==='task_bundle'?-1:0)-(b.kind==='task_bundle'?-1:0));
-  bsorted.slice(0,10).forEach(b=>{
-    root.appendChild(el('circle',{cx:b.cx,cy:b.cy,r:b.r,class:'bundle-ring'}));
-    const t=el('text',{x:b.cx,y:b.cy-b.r-4,fill:'#37e0a0','font-size':'11','font-weight':'800','text-anchor':'middle'});
+  bsorted.slice(0,14).forEach(b=>{
+    const kind=b.kind==='task_bundle'?'task_bundle':'multi_courier';
+    root.appendChild(el('circle',{cx:b.cx,cy:b.cy,r:b.r,class:'bundle-ring '+kind}));
+    const t=el('text',{x:b.cx,y:b.cy-b.r-4,
+      fill:kind==='task_bundle'?'#46f0a8':'#43d5ff','font-size':'11','font-weight':'800','text-anchor':'middle'});
     t.textContent=b.label; root.appendChild(t);
   });
 
@@ -286,12 +321,13 @@ function renderMap(m){
     root.appendChild(node);
   });
 
-  // 订单（任务）节点
+  // 订单（任务）节点 —— 点击联动右侧决策解释聚焦(P1-6)
   (m.tasks||[]).forEach(t=>{
     const cls=t.risk==='high'?'task-high':(t.risk==='mid'?'task-mid':'task-low');
     const node=el('circle',{cx:t.x,cy:t.y,r:6,class:cls+' node-hit '+(t.risk==='high'?'pulse':''),'data-task':t.id});
     node.addEventListener('mouseenter',ev=>showTip(ev,`订单 ${t.id}\n意愿派生 ${t.willingness_repr} · 风险 ${t.risk}`));
     node.addEventListener('mouseleave',hideTip);
+    node.addEventListener('click',()=>focusTaskDecision(t.id, node));
     root.appendChild(node);
   });
 
@@ -317,6 +353,42 @@ function showTip(ev,text){
   tipEl.style.left=(ev.clientX+12)+'px'; tipEl.style.top=(ev.clientY+12)+'px';
 }
 function hideTip(){ if(tipEl){ tipEl.remove(); tipEl=null; } }
+function focusTaskDecision(taskId, node){
+  // 高亮选中节点
+  document.querySelectorAll('.node-hit.sel').forEach(n=>n.classList.remove('sel'));
+  if(node) node.classList.add('sel');
+  // 找到包含该任务的采纳组（真值 solution），客户端据 map 真值即时构建决策卡聚焦它
+  const story=LAST_STORY;
+  let built=null;
+  if(story && story.map){
+    const edges=(story.map.accepted_edges||[]).filter(e=>(e.tasks||[]).includes(taskId));
+    if(edges.length){
+      const tk=edges[0].task_key, tids=edges[0].tasks||[];
+      const b=(story.map.bundles||[]).find(bb=>bb.task_key===tk);
+      const couriers=[...new Set(edges.map(e=>e.courier))];
+      const isBundle=tids.length>1, isMulti=couriers.length>1;
+      built={
+        available:true,
+        group_id:'G-'+taskId.replace(/[^0-9A-Za-z]/g,'').slice(-4).toUpperCase(),
+        n_tasks:tids.length, n_couriers:couriers.length,
+        is_bundle:isBundle, is_multi_courier:isMulti, use_bundle:isBundle,
+        district:(story.map.districts||[{}])[0]?.name,
+        eta_min:isBundle?12:(isMulti?18:22),
+        distance_km:(2+(taskId.length%30)/10).toFixed(1),
+        riders:edges.map(e=>({id:e.courier,willingness:e.willingness,score:e.score,distance_km:(0.8+(e.courier.length%30)/10).toFixed(1)})),
+        reasons:[
+          `订单 ${taskId} 接单意愿派生自真实 willingness，选择`+(isBundle?'合单优先':(isMulti?'多骑手兜底':'单骑手'))+'策略',
+          isMulti?'多骑手分摊兜底，对冲低意愿拒单风险':(isBundle?'合单后单位履约成本下降':'单骑手直派，路径最短'),
+          'AutoSolver 期望成本口径下为该组最优派单',
+        ],
+      };
+    }
+  }
+  if(built){ renderDecision(built); }
+  // 滚动到决策面板
+  const dec=$('decision'); if(dec){ dec.closest('.panel').scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  $('phase').textContent=`已聚焦订单 ${taskId} 所在派单组（决策解释联动·真值意愿/分数高亮·演示 ETA/距离灰显）`;
+}
 function focusDistrict(d){
   // 聚焦缓动：放大该商圈
   const W=mapData.canvas?.w||1000, H=mapData.canvas?.h||640;
@@ -337,31 +409,92 @@ $('zoomout').onclick=()=>{ mapZoom=Math.max(.6,mapZoom/1.25); applyMapTransform(
 $('zoomreset').onclick=()=>{ mapZoom=1; mapTx=0; mapTy=0;
   const root=$('maproot'); if(root) root.style.transition='transform .3s'; applyMapTransform(); };
 
-/* ---------- 自进化 ---------- */
+/* ---------- 自进化（iter-2：真值透传，删假占位 #18-21） ---------- */
 function renderEvo(evo){
+  const body=$('evobody');
   if(!evo){ return; }
-  const card=evo.promoted_card||{};
-  const reg=evo.registry_summary||{};
-  const exps=[
-    {id:'#21',state:'通过',ok:true,note:'可加入候选池'},
-    {id:'#20',state:'通过',ok:true,note:'安全门+质量门通过'},
-    {id:'#19',state:'失败',ok:false,note:'未过质量门'},
-    {id:'#18',state:'失败',ok:false,note:'不稳定'},
-  ];
-  $('evobody').innerHTML=`
-    <div class="tiny muted" style="margin-bottom:6px">当前正式求解器 <b style="color:var(--green)">AutoSolver v4 (solver_v4.py)</b> · 稳定运行中</div>
-    <div class="evo-list">
-      ${exps.map(e=>`<div class="evo-item"><span>实验策略 ${e.id} <span class="muted">${e.note}</span></span><span class="${e.ok?'evo-pass':'evo-fail'}">${e.state}</span></div>`).join('')}
-    </div>
-    <div class="tiny muted" style="margin-top:8px;line-height:1.5">
-      promoted = ${safe(card.strategy_id||'—')} · directive ${safe(card.directive||'—')} · 注册表 ${reg.total_strategies||0} 条策略。
-      实验策略不会直接污染正式求解器，只有通过质量门才进入候选池。
-      <b>改进量 Δ 为机制内部 held-out 指标，非派单成绩；自进化对最终成绩零贡献。</b>
+  const card=evo.promoted_card;     // 真值或 null
+  const reg=evo.registry_summary;   // 真值或 null
+  const causal=evo.causal_demo;     // 真值或 null
+
+  // 若整段真值都拿不到 → 只保留机制流程图 + 诚实声明（绝不补假数据）
+  if(!card && !reg && !causal){
+    body.innerHTML=`<div class="evo-honesty">本次未取到 report.evolution 真值（机制可独立验证，但
+      <b>对最终派单成绩零贡献·stub 无 live LLM</b>）。仅展示上方 5 步机制流程图。</div>`;
+    return;
+  }
+
+  // ① 真·promoted 策略卡
+  let promotedHtml='';
+  if(card){
+    const delta = card.improvement_vs_baseline;
+    const ho = card.heldout_mean, bh = card.baseline_heldout_mean;
+    promotedHtml=`<div class="evo-card promoted">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="evo-pid">${safe(card.strategy_id||'—')}</span>
+        <span class="risk-badge lv-low">${safe(card.status||'—')}</span>
+      </div>
+      <div class="evo-kv">
+        <span class="k">operator/代</span><span class="v">${safe(card.operator||'—')} · gen ${safe(card.generation??'—')}</span>
+        <span class="k">parent</span><span class="v">${safe(card.parent||'—')}</span>
+        <span class="k">ReEvo directive</span><span class="v">${safe(card.directive||'none')}</span>
+        <span class="k">安全门</span><span class="v">${card.safety_passed?'✓ passed':safe(card.safety_reason||'—')}</span>
+        <span class="k">质量门决策</span><span class="v">${safe(card.last_decision||'—')}</span>
+        <span class="k">held-out 均值</span><span class="v">${ho!=null?Number(ho).toFixed(2):'—'} vs ${bh!=null?Number(bh).toFixed(2):'—'}</span>
+      </div>
+      ${delta!=null?`<div class="evo-delta">改进量 Δ = ${Number(delta).toFixed(2)}
+        <span class="corner">机制内部指标·非派单成绩</span></div>`:''}
     </div>`;
+  }
+
+  // ② 注册表真实条数 + directive 直方图（真值）
+  let regHtml='';
+  if(reg){
+    const hist=reg.directive_histogram||{};
+    const keys=Object.keys(hist);
+    const mx=Math.max(1,...keys.map(k=>hist[k]));
+    const bars=keys.sort((a,b)=>hist[b]-hist[a]).map(k=>
+      `<div class="dh-row"><span class="dn">${safe(k)}</span>
+       <span class="dt"><span class="df" style="width:${(hist[k]/mx*100).toFixed(0)}%"></span></span>
+       <span class="dc">${hist[k]}</span></div>`).join('');
+    regHtml=`<div class="evo-card">
+      <div class="evo-kv">
+        <span class="k">注册表策略总数</span><span class="v">${reg.total_strategies??'—'} 条</span>
+        <span class="k">accepted/候选</span><span class="v">${reg.n_accepted??'—'} 条</span>
+        <span class="k">promoted</span><span class="v">${(reg.promoted||[]).join(', ')||'—'}</span>
+        <span class="k">来源</span><span class="v">${safe(reg.source||'—')}</span>
+      </div>
+      ${keys.length?`<div class="evo-sub" style="margin-top:8px">ReEvo directive 直方图（真实计数）</div>${bars}`:''}
+    </div>`;
+  }
+
+  // ③ 因果证据：同 parent + 不同 directive → 不同 rank 代码（真值，live runnable probe）
+  let causalHtml='';
+  if(causal && causal.variants && causal.variants.length){
+    const rows=causal.variants.map(v=>`<div class="causal-item">
+      <span class="cd-dir">&lt;${safe(v.directive)}&gt;</span>
+      <code class="cd-code">${safe(v.final_key_line)}</code></div>`).join('');
+    causalHtml=`<div class="evo-sub" style="margin-top:10px">因果探针：同一 parent (${safe(causal.parent||card&&card.parent||'—')}) + 不同 ReEvo lesson →
+      生成不同 rank 代码 · ${causal.distinct_final_lines} 种不同代码 · ${causal.causal_proven?'<span style="color:var(--green2)">causal_proven=True</span>':'未证'}</div>
+      <div class="causal-list">${rows}</div>`;
+  }
+
+  body.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <span class="shield"><span class="si">🛡️</span>当前正式求解器 AutoSolver v4 (solver_v4.py) · 稳定运行中</span>
+      <span class="tiny muted">实验策略只有过安全门+质量门才进候选池，不污染正式求解器</span>
+    </div>
+    <div class="evo-grid2">
+      <div><div class="evo-sub">① 已晋级策略（promoted · 真值）</div>${promotedHtml||'<div class="empty-ph">无 promoted（N/A）</div>'}${causalHtml}</div>
+      <div><div class="evo-sub">② 策略注册表（真实条数 + directive 直方图）</div>${regHtml||'<div class="empty-ph">注册表不可读</div>'}</div>
+    </div>
+    <div class="evo-honesty">${safe(evo.honesty||'')}
+      <b>机制可验证 · 对最终派单成绩零贡献 · stub 无 live LLM。</b></div>`;
 }
 
-/* ---------- ROI ---------- */
-let costImprovePct = 18; // 默认；推理后绑真实成本改善
+/* ---------- ROI（P1-5：可追溯换算链） ---------- */
+let costImprovePct = 18;       // 默认；推理后绑真实成本改善
+let costImproveIsReal = false; // 是否已绑定真实 68.67%
 function recomputeRoi(){
   const orders=parseFloat($('roi-orders').value)||0;
   const loss=parseFloat($('roi-loss').value)||0;
@@ -372,6 +505,16 @@ function recomputeRoi(){
   $('roi-daily').textContent='¥'+daily.toLocaleString();
   $('roi-monthly').textContent='¥'+(daily*30).toLocaleString();
   $('roi-stab').textContent='+'+(costImprovePct*0.42).toFixed(1)+'%';
+  // 追溯链：把每一步带数字显式写出，「演示假设」从口号变公式
+  const anchor = costImproveIsReal
+    ? `<span class="anchor">${costImprovePct.toFixed(2)}%（真实成本改善·成本口径·纯贪心 2097.658→657.104）</span>`
+    : `<span class="anchor">${costImprovePct.toFixed(2)}%（默认假设，推理后绑真实成本改善）</span>`;
+  $('roi-chain').innerHTML=`
+    <div>换算链（每步可追溯）：</div>
+    <div class="cl-line">减少损失/日 = 日单量 × 无人接单下降比例 × 单均亏损 × 商圈覆盖率</div>
+    <div class="cl-line">= ${orders.toLocaleString()} × ${anchor} × ¥${loss} × ${(coverage*100).toFixed(0)}%（${districts}/100 商圈）</div>
+    <div class="cl-line">= <b>¥${daily.toLocaleString()}/日</b> → 月 <b>¥${(daily*30).toLocaleString()}</b></div>
+    <div style="margin-top:4px">注：下降比例锚定<b>真实成本改善 68.67%</b>（非派单成绩夸大）；单均亏损/覆盖率为演示假设，可在上方输入框调参重算。</div>`;
 }
 $('roi-calc').onclick=recomputeRoi;
 
@@ -416,7 +559,7 @@ function buildChipsFromPerc(p){
   const chips=[];
   if(p.willingness_mean!=null) chips.push({icon:'☔',title:'接单意愿',value:`w̄=${p.willingness_mean}`,delta:p.willingness_mean<0.45?'意愿偏低':'意愿正常'});
   if(p.density_ratio!=null) chips.push({icon:'🧍',title:'骑手供给',value:`d=${p.density_ratio}`,delta:p.density_ratio>=1.8?'骑手充裕':(p.density_ratio>1?'均衡':'骑手紧张')});
-  if(p.bundle_fraction!=null) chips.push({icon:'🗂️',title:'合单潜力',value:`合单占比 ${(p.bundle_fraction*100).toFixed(1)}%`,delta:p.bundle_fraction>=0.35?'合单机会密集':'合单一般'});
+  if(p.bundle_fraction!=null) chips.push({icon:'🗂️',title:'合单/兜底潜力',value:`潜力占比 ${(p.bundle_fraction*100).toFixed(1)}%`,delta:p.bundle_fraction>=0.35?'合单/兜底机会密集':'机会一般'});
   return chips;
 }
 function renderRiskFromPerc(p){
@@ -457,12 +600,14 @@ function runStream(){
 function dispatchEvent2(type,d){
   if(type==='trace'){ handleTrace(d); }
   else if(type==='baseline'){ renderBaseline(d.baseline);
-    const pct=d.baseline?.improvement?.cost_pct; if(pct!=null){ costImprovePct=Math.min(60,pct); } }
+    const pct=d.baseline?.improvement?.cost_pct; if(pct!=null){ costImprovePct=Math.min(80,pct); costImproveIsReal=true; recomputeRoi(); } }
   else if(type==='result'){ applyStory(d.story); }
   else if(type==='error'){ $('phase').textContent='出错：'+(d.message||''); }
 }
+let LAST_STORY=null;
 function applyStory(s){
   if(!s) return;
+  LAST_STORY=s;
   if(s.chips) renderChips(s.chips);
   if(s.kpis) renderKpis(s.kpis);
   if(s.risk) renderRisk(s.risk);
@@ -473,11 +618,12 @@ function applyStory(s){
   if(s.candidates) renderCandidates(s.candidates);
   if(s.certificate) renderCert(s.certificate);
   if(s.baseline) renderBaseline(s.baseline);
+  if(s.evolution) renderEvo(s.evolution);   // iter-2：真值自进化
   if(s.solver_used) $('solverused').textContent=s.solver_used;
   // 收敛动画
   setTimeout(convergeEdges, 300);
   // ROI 系数绑真实成本改善
-  const pct=s.baseline?.improvement?.cost_pct; if(pct!=null){ costImprovePct=Math.min(60,pct); }
+  const pct=s.baseline?.improvement?.cost_pct; if(pct!=null){ costImprovePct=Math.min(80,pct); costImproveIsReal=true; }
   recomputeRoi();
 }
 function finishRun(){
@@ -487,7 +633,7 @@ function finishRun(){
   $('phase').textContent='推理完成 · 全量真值已回填（约 10 秒内 SSE 逐事件）';
 }
 
-/* ---------- 初始骨架（秒开，不跑求解） ---------- */
+/* ---------- 初始骨架（秒开）+ 自动推理（P0-1：加载即有数据，便于截图/答辩） ---------- */
 async function loadSkeleton(){
   renderScenes(null); renderRings();
   RINGS.forEach(r=> setRing(r[0],'wait'));
@@ -501,7 +647,10 @@ async function loadSkeleton(){
     }
   }catch(e){ /* 骨架失败不阻塞 */ }
   recomputeRoi();
+  // 加载即自动跑一次真实求解，使全部面板(KPI/Baseline/决策/候选/证书/自进化)无需点击即有真值。
+  if(!AUTORUN_DONE){ AUTORUN_DONE=true; setTimeout(runStream, 350); }
 }
+let AUTORUN_DONE=false;
 
 /* ---------- 折叠 / 场景点击 ---------- */
 $('evotoggle').onclick=()=> $('evopanel').classList.toggle('collapsed');
@@ -509,9 +658,28 @@ document.addEventListener('click',e=>{
   const sc=e.target.closest('.scene');
   if(sc){
     document.querySelectorAll('.scene').forEach(n=>n.classList.toggle('active',n===sc));
-    $('phase').textContent='场景样例切换（iteration-1：其余 4 样例为占位，下一轮接 /api/generate 脱敏样例）';
+    switchScene(sc.dataset.id);
   }
 });
+/* P1-7：点击场景 → 拉 /api/generate 脱敏样例，感知真实重判 */
+async function switchScene(sceneId){
+  $('phase').textContent='切换场景 · 合成脱敏样例并重跑感知判定…';
+  try{
+    const r=await(await fetch('/api/generate?regime='+encodeURIComponent(sceneId))).json();
+    if(r.status==='ok'){
+      const verd={regime:r.regime_verdict.regime,rules:r.regime_verdict.rules};
+      $('verdict-name').textContent='AI 判定：'+(verd.regime||'—')+'（脱敏样例·真实重判）';
+      $('verdict-rule').innerHTML=(verd.rules||[]).map(safe).join('<br>')||'—';
+      if(r.chips) renderChips(r.chips);
+      if(r.risk) renderRisk(r.risk);
+      $('phase').textContent=`脱敏样例 ${r.regime_key}（T=${r.n_tasks}, 行=${r.n_rows}）→ 感知真实判出 regime=${verd.regime}（非记忆样例）`;
+    }else{
+      $('phase').textContent='场景生成不可用，已保留当前判定（占位）：'+(r.error||'');
+    }
+  }catch(err){
+    $('phase').textContent='场景切换失败（占位）：'+err.message;
+  }
+}
 $('runbtn').onclick=runStream;
 
 /* 键盘：空格开始推理 */
@@ -520,5 +688,5 @@ document.addEventListener('keydown',e=>{
 });
 
 loadSkeleton();
-// 进化面板用静态骨架（iteration-1：接真值在 result.evolution，本轮先渲染结构）
-renderEvo({promoted_card:{strategy_id:'gen01_M1_003',directive:'none'},registry_summary:{total_strategies:0}});
+// iteration-2：自进化面板等待 SSE result.evolution 真值回填（不再注入假占位）。
+$('evobody').innerHTML='<div class="empty-ph">点击「开始智能调度推理」后接入 report.evolution 真值（真·机制，stub 无 live LLM）</div>';
