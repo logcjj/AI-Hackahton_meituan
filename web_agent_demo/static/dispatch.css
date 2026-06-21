@@ -84,12 +84,30 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .statblock{text-align:center}
 .statblock .lbl{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .statblock .val{font-size:16px;font-weight:900;font-family:var(--mono)}
-.runlight{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--green)}
+.runlight{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--green);
+  transition:color .3s var(--ease)}
 .runlight .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
   animation:breathe 1.5s infinite}
 .runlight.idle{color:var(--muted)}
 .runlight.idle .dot{background:var(--muted);box-shadow:none;animation:none}
+/* P0-1 运行中态：脉冲绿点 + 双层呼吸光环，强化"调度运行中"动态感 */
+.runlight.running{color:var(--green)}
+.runlight.running .dot{background:var(--green);box-shadow:0 0 12px var(--green);animation:runpulse 1.1s ease-in-out infinite}
+/* 终态：绿勾"● 完成"，停脉冲、稳定发光，定格 */
+.runlight.done{color:var(--green2)}
+.runlight.done .dot{background:var(--green2);box-shadow:0 0 9px var(--green2);animation:none}
 @keyframes breathe{50%{opacity:.35;transform:scale(.8)}}
+@keyframes runpulse{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 6px var(--green)}
+  50%{opacity:.55;transform:scale(1.25);box-shadow:0 0 16px var(--green),0 0 4px var(--green)}}
+/* P0-2 重新演示按钮：低调描边款，求解完成后才出现 */
+.replay-btn{display:inline-flex;align-items:center;gap:5px;padding:9px 16px;border-radius:10px;cursor:pointer;
+  font-weight:900;font-size:12.5px;color:var(--cyan);background:rgba(67,213,255,.08);
+  border:1px solid rgba(67,213,255,.32);
+  transition:transform .15s var(--ease),box-shadow .22s var(--ease),background .2s,border-color .2s}
+.replay-btn:hover{transform:translateY(-1px);background:rgba(67,213,255,.14);border-color:var(--cyan);
+  box-shadow:0 8px 20px rgba(67,213,255,.22)}
+.replay-btn:active{transform:translateY(1px) scale(.98)}
+.replay-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(67,213,255,.3)}
 .chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 /* iter-7：贴目标稿——彩色图标圆角方块 + 标签 + 彩色±%；hover 微升 */
 .chip{display:flex;align-items:center;gap:11px;padding:8px 15px 8px 9px;border-radius:14px;
@@ -151,6 +169,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background:rgba(63,210,224,.12);color:var(--cyan);transition:background .2s,box-shadow .2s}
 .scene .st{font-size:13px;font-weight:800}
 .scene .sd{font-size:10.5px;color:var(--muted)}
+/* P1-5 诚实注脚（极小、不抢视觉）：真值随场景浮动 */
+.float-note{font-size:9.5px;color:var(--muted2);line-height:1.5;margin-top:8px;padding-top:7px;
+  border-top:1px dashed var(--line)}
+.float-note b{color:var(--muted);font-weight:800}
+.float-sup{font-size:8px;font-weight:700;color:var(--muted2);margin-left:3px;vertical-align:super;
+  letter-spacing:.02em;opacity:.85}
 .verdict{margin-top:10px;padding:11px;border-radius:12px;background:rgba(55,224,160,.08);
   border:1px solid rgba(55,224,160,.25)}
 .verdict .vt{font-size:11px;color:var(--green);font-weight:800;letter-spacing:.05em}
@@ -178,8 +202,15 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .mapwrap{position:relative;overflow:hidden;min-height:560px}
 .mapwrap .panel-b{padding:0}
 #mapsvg{width:100%;height:100%;display:block;border-radius:0 0 16px 16px;cursor:grab}
+/* P1-4 地图标题 overlay 防重叠：半透底色块 + 内边距 + 高 z-index，与 legend 留白错开 */
+.map-title{position:absolute;z-index:7;top:11px;left:14px;padding:5px 11px;
+  background:rgba(7,13,20,.72);border:1px solid var(--line);border-radius:9px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 4px 16px rgba(0,0,0,.34)}
+/* legend 下移，为左上标题块留出净空，避免文字叠压；toggle 保持右上对齐 */
 .maptop{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
-  align-items:flex-start;padding:11px 14px;z-index:5;pointer-events:none}
+  align-items:flex-start;padding:11px 14px;z-index:5;pointer-events:none;gap:10px}
+.maptop .legend{margin-top:42px}
 .legend{display:flex;gap:12px;flex-wrap:wrap;background:rgba(7,13,20,.7);border:1px solid var(--line);
   border-radius:10px;padding:7px 11px;backdrop-filter:blur(8px)}
 .legend .lg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
@@ -335,10 +366,19 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 
 /* ---------- 自进化回路 / ROI ---------- */
 .bottom2{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
-.collapse-h{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.collapse-h{display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:10px;flex-wrap:wrap}
+.collapse-h>span:first-child{flex:1 1 auto;min-width:0}
 .collapse-h .ar{transition:.2s;color:var(--muted)}
 .collapsed .ar{transform:rotate(-90deg)}
 .collapsed .collapse-b{display:none}
+/* P0-3 自进化证据引导：默认展开时隐藏，折叠时显形为醒目"点击展开看可验证证据"一行，
+ * 避免答辩时强证据被折叠错过 */
+.evo-peek{display:none;font-size:10.5px;font-weight:800;color:var(--gold);
+  background:rgba(244,220,97,.10);border:1px solid rgba(244,220,97,.30);border-radius:7px;
+  padding:3px 9px;animation:peekpulse 2.4s ease-in-out infinite;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.collapsed .evo-peek{display:inline-block}
+@keyframes peekpulse{0%,100%{box-shadow:0 0 0 0 rgba(244,220,97,0)}50%{box-shadow:0 0 0 3px rgba(244,220,97,.12)}}
 .evo-flow{display:flex;align-items:center;gap:4px;margin:6px 0 10px}
 .evo-node{flex:1;text-align:center;padding:8px 4px;border-radius:9px;background:var(--panel2);
   border:1px solid var(--line);font-size:10.5px}

@@ -41,6 +41,7 @@
   <!-- ============ 启动条 ============ -->
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
     <button id="runbtn" class="roi-btn" style="width:auto;padding:10px 22px;background:linear-gradient(135deg,var(--green),var(--green2));color:#04221a">▶ 开始智能调度推理 (large_seed301)</button>
+    <button id="replaybtn" class="replay-btn" style="display:none">▶ 重新演示</button>
     <span class="pill" id="phase" style="font-size:12px;color:var(--muted)">点击开始，对赛题真实数据 large_seed301 现场跑 Agent（约 10 秒内 SSE 逐事件点亮）</span>
   </div>
 
@@ -77,7 +78,7 @@
 
     <!-- 中央地图 -->
     <div class="panel mapwrap col">
-      <div class="panel-h" style="position:absolute;z-index:6;background:none;border:none"><span class="ico">🗺️</span>调度可视化地图</div>
+      <div class="panel-h map-title"><span class="ico">🗺️</span>调度可视化地图</div>
       <div class="panel-b" style="height:100%">
         <div class="maptop">
           <div class="legend">
@@ -136,10 +137,11 @@
 
   <!-- ============ 自进化 + ROI ============ -->
   <section class="bottom2">
-    <div class="panel collapsed" id="evopanel">
+    <div class="panel" id="evopanel">
       <div class="panel-h collapse-h" id="evotoggle">
         <span><span class="ico">🧬</span>自进化与安全回退 (Self-Evolving Code Loop)
-        <span class="narr-tag">机制内部指标·非派单成绩·对最终成绩零贡献</span></span>
+        <span class="narr-tag">机制内部指标·对最终成绩零贡献·stub无live LLM</span></span>
+        <span class="evo-peek" id="evopeek">▾ 已晋级 gen01_M1_003 · 注册表 24 条/19 采纳 · 因果可验证 — 点击展开看可验证证据</span>
         <span class="ar">▾</span>
       </div>
       <div class="panel-b collapse-b">

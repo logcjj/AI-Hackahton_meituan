@@ -140,7 +140,7 @@ function renderChips(chips){
       <span class="ci">${safe(c.icon)}</span>
       <div class="chip-meta">
         <div class="ct">${safe(c.title)}</div>
-        ${hasPct?`<div class="cp">${pctStr}</div>`:`<div class="cv">${safe(c.value)}</div>`}
+        ${hasPct?`<div class="cp">${pctStr}<sup class="float-sup" title="叙事偏移%为演示派生，随场景真值浮动">~浮动</sup></div>`:`<div class="cv">${safe(c.value)}</div>`}
       </div>
     </div>`;
   }).join('');
@@ -161,7 +161,9 @@ function renderRisk(risk){
     const lv = r.level==='high'?'高风险':(r.level==='mid'?'中风险':'低风险');
     return `<div class="risk-row"><div><div class="rn">${safe(r.name)}</div><div class="rb">${safe(r.basis)}</div></div>
       <span class="risk-badge lv-${safe(r.level)}">${lv}</span></div>`;
-  }).join('');
+  }).join('')
+  // P1-5：诚实注脚——风险等级由感知模块按当前场景真值即时判定，随场景真值浮动
+  + `<div class="float-note"><span class="real-dot"></span>等级/依据据当前场景感知真值即时判定，<b>随场景真值浮动</b></div>`;
 }
 
 /* ---------- strategy ---------- */
@@ -841,12 +843,16 @@ function renderBoundary(b){
 
 /* ---------- 计时器 ---------- */
 let timerH=null, timerStart=0;
+function fmtElapsed(ms){ const s=Math.floor(ms/1000);
+  const hh=String(Math.floor(s/3600)).padStart(2,'0'), mm=String(Math.floor(s%3600/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0');
+  return `${hh}:${mm}:${ss}`; }
 function startTimer(){ timerStart=Date.now(); clearInterval(timerH);
-  timerH=setInterval(()=>{ const s=Math.floor((Date.now()-timerStart)/1000);
-    const hh=String(Math.floor(s/3600)).padStart(2,'0'), mm=String(Math.floor(s%3600/60)).padStart(2,'0'), ss=String(s%60).padStart(2,'0');
-    $('timer').textContent=`${hh}:${mm}:${ss}`; },250);
+  $('timer').textContent='00:00:00';
+  timerH=setInterval(()=>{ $('timer').textContent=fmtElapsed(Date.now()-timerStart); },250);
 }
-function stopTimer(){ clearInterval(timerH); }
+/* stopTimer：定格总耗时（不归零），让终态留住"本次求解总耗时"真值感 */
+function stopTimer(){ clearInterval(timerH); timerH=null;
+  if(timerStart){ $('timer').textContent=fmtElapsed(Date.now()-timerStart); } }
 
 /* ---------- SSE 主流程 ---------- */
 function handleTrace(d){
@@ -896,7 +902,9 @@ function renderRiskFromPerc(p){
 
 function runStream(){
   $('runbtn').disabled=true;
-  $('runlight').classList.remove('idle'); $('runtext').textContent='调度运行中';
+  // P0-1 运行中态：脉冲绿「● 调度运行中」+ 计时器走动（贴目标稿系统状态）
+  const rl=$('runlight'); rl.classList.remove('idle','done'); rl.classList.add('running');
+  $('runtext').textContent='调度运行中';
   $('phase').textContent='盲测求解中…（solver_v4：v3 base + 余量精修，约 10 秒内逐事件点亮）';
   renderRings();
   RINGS.forEach((r,i)=> setRing(r[0], i===0?'run':'wait'));
@@ -949,9 +957,14 @@ function applyStory(s){
 }
 function finishRun(){
   $('runbtn').disabled=false;
-  $('runlight').classList.add('idle'); $('runtext').textContent='完成';
+  // P0-1 终态：SSE 收敛后切「● 完成」（绿勾·停脉冲），计时器定格本次总耗时
+  const rl=$('runlight'); rl.classList.remove('running','idle'); rl.classList.add('done');
+  $('runtext').textContent='完成';
   stopTimer();
-  $('phase').textContent='推理完成 · 全量真值已回填（约 10 秒内 SSE 逐事件）';
+  const total=timerStart?fmtElapsed(Date.now()-timerStart):'';
+  $('phase').textContent=`推理完成 · 全量真值已回填${total?`（本次求解总耗时 ${total}）`:''}`;
+  // 重新演示按钮：求解完成后可见，便于答辩反复演示整段动画
+  const rb=$('replaybtn'); if(rb) rb.style.display='inline-flex';
 }
 
 /* ---------- 初始骨架（秒开）+ 自动推理（P0-1：加载即有数据，便于截图/答辩） ---------- */
@@ -1011,6 +1024,30 @@ async function switchScene(sceneId){
   }
 }
 $('runbtn').onclick=runStream;
+
+/* P0-2：「▶ 重新演示」——一键把整舱重置回骨架态，再完整重放一段"AI 自主求解"动画。
+ * 便于答辩反复演示：五环逐格点亮、KPI count-up、地图候选→采纳收敛、Baseline/证书末态弹入。 */
+function replayDemo(){
+  if($('runbtn').disabled) return;            // 正在跑则忽略
+  const rb=$('replaybtn'); rb.style.display='none';
+  // 1) 系统状态回待机 + 计时器归零
+  const rl=$('runlight'); rl.classList.remove('running','done'); rl.classList.add('idle');
+  $('runtext').textContent='待机'; $('timer').textContent='00:00:00'; timerStart=0;
+  $('solverused').textContent='—';
+  // 2) 面板回骨架（与首屏 loadSkeleton 一致），制造"从零重新求解"观感
+  renderRings(); RINGS.forEach(r=> setRing(r[0],'wait'));
+  renderKpiSkeleton();
+  $('risk').innerHTML=skeletonPanel('感知模块据尺寸解耦特征当场判风险');
+  $('strategy').innerHTML=skeletonPanel('Planner 镜像解读策略链');
+  $('decision').innerHTML=skeletonPanel('点击地图节点或推理后聚焦合单组');
+  $('cert').innerHTML=skeletonPanel('solver_v4 求解后回填 gap·r1 证书');
+  $('candidates').innerHTML=`<div style="grid-column:1/-1">${skeletonPanel('方案 A/B/C 自动评估')}</div>`;
+  $('baseline').innerHTML=skeletonPanel('纯贪心真跑 vs AutoSolver 对比');
+  // 3) 短暂停顿后重放整段
+  $('phase').textContent='重新演示 · 重置整舱并重放 AI 自主求解动画…';
+  setTimeout(runStream, 320);
+}
+$('replaybtn').onclick=replayDemo;
 
 /* 键盘：空格开始推理 */
 document.addEventListener('keydown',e=>{
