@@ -120,22 +120,33 @@ def _cluster_tasks(candidates, all_tasks, n_clusters: int = 7) -> dict[str, int]
 
 
 def _cluster_centers(n_clusters: int) -> list[tuple[float, float]]:
-    """商圈中心确定性散布在画布上（环形 + 抖动，避免贴边）。"""
+    """商圈中心确定性散布在画布上（环形 + 抖动，避免贴边）。
+
+    iter-3(P0-2)：把簇心拉得更开（占满画面宽度、簇间留白更明显），让每个商圈成为
+    一个**紧致独立的簇**（配合下方更小的 jitter 半径），贴近目标稿「一簇一商圈」观感。
+    """
     centers = []
-    cx, cy = CANVAS_W / 2, CANVAS_H / 2
-    rad = min(CANVAS_W, CANVAS_H) * 0.34
+    cx, cy = CANVAS_W / 2, CANVAS_H * 0.50
+    # 用更大的椭圆半径占满画布（x 拉宽到 0.40，y 压扁到 0.30 留出上下空隙）
+    rad_x = CANVAS_W * 0.40
+    rad_y = CANVAS_H * 0.36
     for k in range(n_clusters):
-        ang = 2 * math.pi * k / max(1, n_clusters) + _hf("center-ang", k) * 0.6
-        r = rad * (0.7 + 0.3 * _hf("center-r", k))
-        x = cx + r * math.cos(ang) + (_hf("cx", k) - 0.5) * 60
-        y = cy + r * math.sin(ang) * 0.78 + (_hf("cy", k) - 0.5) * 50
+        ang = 2 * math.pi * k / max(1, n_clusters) + _hf("center-ang", k) * 0.45
+        rr = 0.78 + 0.22 * _hf("center-r", k)
+        x = cx + rad_x * rr * math.cos(ang) + (_hf("cx", k) - 0.5) * 36
+        y = cy + rad_y * rr * math.sin(ang) + (_hf("cy", k) - 0.5) * 30
+        # 收进安全框，避免簇心贴边导致节点溢出
+        x = max(120, min(CANVAS_W - 120, x))
+        y = max(110, min(CANVAS_H - 90, y))
         centers.append((round(x, 1), round(y, 1)))
     return centers
 
 
-def _jitter_point(cx: float, cy: float, key: str, radius: float = 56.0) -> tuple[float, float]:
+def _jitter_point(cx: float, cy: float, key: str, radius: float = 38.0) -> tuple[float, float]:
+    """簇内抖动：iter-3 收紧半径（默认 38），让簇内节点更靠拢成「一坨」。"""
     ang = _hf("ja", key) * 2 * math.pi
-    r = radius * (0.35 + 0.65 * _hf("jr", key))
+    # 平方根分布让点更均匀地铺在圆盘内（避免全挤在圆心或全在外环）
+    r = radius * math.sqrt(0.18 + 0.82 * _hf("jr", key))
     x = max(24, min(CANVAS_W - 24, cx + r * math.cos(ang)))
     y = max(24, min(CANVAS_H - 24, cy + r * math.sin(ang)))
     return round(x, 1), round(y, 1)
@@ -186,7 +197,7 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
     for t in tasks_sorted:
         cl = assign.get(t, 0)
         cx, cy = centers[cl] if cl < len(centers) else centers[0]
-        x, y = _jitter_point(cx, cy, "task-" + t, radius=58)
+        x, y = _jitter_point(cx, cy, "task-" + t, radius=42)
         ws = task_will.get(t, [0.4])
         w_med = sorted(ws)[len(ws) // 2]
         risk = "high" if w_med < 0.3 else ("mid" if w_med < 0.55 else "low")
@@ -246,7 +257,7 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
     all_courier_ids = sorted({row[2] for row in candidates})
     for cid in all_courier_ids:
         mx, my = _courier_centroid(cid)
-        x, y = _jitter_point(mx, my, "courier-" + cid, radius=42)
+        x, y = _jitter_point(mx, my, "courier-" + cid, radius=30)
         courier_nodes[cid] = {
             "id": cid, "x": x, "y": y,
             "active": cid in used_couriers,   # 真值（是否被采纳）
@@ -327,7 +338,8 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
         cx = sum(p[0] for p in pts) / len(pts)
         cy = sum(p[1] for p in pts) / len(pts)
         spread = max((abs(p[0] - cx) + abs(p[1] - cy)) for p in pts) if len(pts) > 1 else 0
-        r = max(30, spread + 30)
+        # iter-3：节点收紧后聚合圈也收紧（更像目标稿那种贴着节点的紧致发光圈）
+        r = max(22, spread * 0.6 + 22)
         if is_task_bundle:
             label = f"{len(tids)}单合单"
             kind = "task_bundle"
@@ -340,6 +352,36 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
             "label": label, "kind": kind,  # 真值
         })
 
+    # iter-3(P0-2)：挑一个**代表性任务组**做默认显示的 G-028 风格浮卡。
+    # 优先真合单组(任务数最多)；无则取骑手数最多的多骑手兜底组。group_id 与右侧
+    # 决策卡同口径(G-+sha1[:4])，浮卡字段：订单数/预计送达/无人接单风险/候选方案数。
+    featured_group = None
+    if bundles:
+        def _rank(b):
+            return (len(b["tasks"]) > 1, len(b["tasks"]), len(b["couriers"]))
+        fb = max(bundles, key=_rank)
+        f_tids = fb["tasks"]
+        f_is_bundle = len(f_tids) > 1
+        # 该组无人接单风险：取组内任务最低意愿派生（越低风险越高）
+        f_wills = [task_nodes[t]["willingness_repr"] for t in f_tids if t in task_nodes]
+        wmin = min(f_wills) if f_wills else 0.4
+        f_risk = "中高" if wmin < 0.3 else ("中" if wmin < 0.55 else "低")
+        # 候选方案数：该组在候选虚线/候选行里出现的不同骑手数(≥2 时叙事=多候选)
+        f_cands = len({row[2] for row in candidates if row[0] == fb["task_key"]})
+        featured_group = {
+            "group_id": "G-" + (hashlib.sha1(fb["task_key"].encode()).hexdigest()[:4].upper()),
+            "task_key": fb["task_key"],
+            "cx": fb["cx"], "cy": fb["cy"], "r": fb["r"],
+            "n_tasks": len(f_tids),
+            "n_couriers": len(fb["couriers"]),
+            "is_bundle": f_is_bundle,
+            "eta_min": 12 if f_is_bundle else 22,          # 演示
+            "risk_text": f_risk,                            # 真值意愿派生
+            "n_candidates": max(2, min(f_cands, 5)),        # 真值候选骑手数(裁切叙事区间)
+            "district": (district_nodes[0]["name"] if district_nodes else None),  # 演示
+            "is_demo": True,
+        }
+
     return {
         "is_demo": True,
         "demo_tag": DEMO_TAG,
@@ -351,6 +393,7 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
         "accepted_edges": accepted_edges,
         "candidate_edges": candidate_edges,
         "bundles": bundles,
+        "featured_group": featured_group,
         "note": (
             "脱敏可视化沙盘：派单/意愿/分数来自赛题真实数据 large_seed301；"
             "地理坐标为确定性合成(seed=20260620，赛题数据不含位置)，非真实 GPS。"
@@ -672,11 +715,20 @@ def synth_evolution(report: dict[str, Any]) -> dict[str, Any]:
     causal = None
     variants = demo.get("variants") or []
     if variants:
+        # P1-6：report.evolution.causal_demo 顶层未带 parent（None），但同一批 variant
+        # 的真实 parent 与 promoted_card.parent 同源（gen01_E1_001）。这里**回填真实
+        # parent**（优先 causal 自带 → variant 自带 → promoted_card.parent），让前端不再
+        # 兜底显示「—」。仍是真值（mechanism live runnable probe 的真实 parent）。
+        causal_parent = (
+            demo.get("parent")
+            or next((v.get("parent") for v in variants if v.get("parent")), None)
+            or card.get("parent")
+        )
         causal = {
             "distinct_final_lines": demo.get("distinct_final_lines"),
             "causal_proven": demo.get("causal_proven"),
             "directives_contrasted": demo.get("directives_contrasted") or [],
-            "parent": demo.get("parent"),
+            "parent": causal_parent,
             "variants": [
                 {
                     "directive": v.get("directive"),

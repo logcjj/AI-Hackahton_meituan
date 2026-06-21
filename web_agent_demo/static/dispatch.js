@@ -6,6 +6,18 @@ const safe = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&l
 const NS = 'http://www.w3.org/2000/svg';
 const el = (n, attrs = {}) => { const e = document.createElementNS(NS, n); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
 
+/* P1-5：骑手首字母彩色 avatar（确定性渐变底 + 首字母），贴近目标稿头像观感 */
+const AV_PALETTES=[['#46f0a8','#1c9b6c'],['#43d5ff','#1f6fb0'],['#f4b14a','#d0731c'],
+  ['#9a7cf0','#5e44c0'],['#ff8aa0','#c0445a'],['#5ad6c8','#1e8a82']];
+function avatarHtml(id){
+  const s=String(id||'R');
+  let h=0; for(const c of s) h=(h*131+c.charCodeAt(0))>>>0;
+  const pal=AV_PALETTES[h%AV_PALETTES.length];
+  // 首字母：取最后一段数字前的字母，没有就取首字符（R-102 → R）
+  const letter=(s.match(/[A-Za-z]/)||[s[0]||'R'])[0].toUpperCase();
+  return `<div class="av" style="background:linear-gradient(135deg,${pal[0]},${pal[1]})">${safe(letter)}</div>`;
+}
+
 /* ---------- 静态：业务场景 5 样例（iteration-1：第2项 active，切换为占位） ---------- */
 const SCENES = [
   {id:'peak',   ico:'📈', t:'午高峰爆单',   d:'订单量激增 156%'},
@@ -64,6 +76,23 @@ function countUp(node, target, unit, decimals){
   requestAnimationFrame(frame);
   setTimeout(()=>node.removeAttribute('data-counting'), dur+50);
 }
+
+/* ---------- KPI 骨架（P0-3：idle 首屏灰显 + 「待推理」角标，避免空白） ---------- */
+const KPI_SKEL=[
+  {label:'预计完成率',unit:'%'},{label:'预计无人接单数',unit:'单'},
+  {label:'履约成本指数',unit:''},{label:'骑手占用数',unit:'人'},
+  {label:'相对省心基线改善',unit:'%'},{label:'预计商业收益',unit:'¥/日'},
+];
+function renderKpiSkeleton(){
+  $('kpis').innerHTML=KPI_SKEL.map(k=>`<div class="panel kpi kpi-skel">
+    <div class="klbl">${safe(k.label)}</div>
+    <div class="kval kval-skel">—<span class="unit">${safe(k.unit)}</span></div>
+    <div class="ksub"><span class="skel-bar"></span></div>
+    <div class="karrow"><span class="pend-badge">待推理</span></div>
+    <span class="skel-shimmer"></span>
+  </div>`).join('');
+}
+function skeletonPanel(txt){ return `<div class="empty-ph skel-ph"><span class="pend-badge">待推理</span> ${safe(txt||'加载即自动现场求解…')}</div>`; }
 
 /* ---------- KPI ---------- */
 function renderKpis(kpis){
@@ -226,7 +255,7 @@ function renderBaseline(bl){
 function renderDecision(d){
   if(!d||!d.available){ $('decision').innerHTML='<div class="empty-ph">无合单组</div>'; return; }
   const riders = (d.riders||[]).map(r=>`<div class="rider">
-    <div class="av">${safe((r.id||'R').slice(-2))}</div>
+    ${avatarHtml(r.id)}
     <div><div class="rid">${safe(r.id)}</div>
       <div class="rm"><span style="color:var(--green2);font-weight:800">接单意愿 ${r.willingness!=null?(r.willingness*100).toFixed(0)+'%':'—'}</span>${r.score!=null?` · 分数 <span style="color:var(--green2);font-weight:800">${Number(r.score).toFixed(2)}</span>`:''}<span class="real-dot" style="margin-left:4px"></span> · <span style="color:var(--muted2)">距离 ${r.distance_km}km<span class="demo-tag">演示</span></span></div></div>
   </div>`).join('');
@@ -251,30 +280,138 @@ function renderDecision(d){
 
 /* ---------- 地图 ---------- */
 let mapData=null, mapZoom=1, mapTx=0, mapTy=0;
+
+/* 确定性伪随机（seed=20260620）—— mulberry32，保证每次刷新路网完全一致 */
+function mulberry32(seed){
+  let a=seed>>>0;
+  return function(){
+    a|=0; a=(a+0x6D2B79F5)|0;
+    let t=Math.imul(a^(a>>>15),1|a);
+    t=(t+Math.imul(t^(t>>>7),61|t))^t;
+    return ((t^(t>>>14))>>>0)/4294967296;
+  };
+}
+
+/* P0-1：程序化生成「暗色城市街道路网」SVG 底图（确定性 seed=20260620）。
+ * 主干道(略亮) + 次级街道网格(带不规则抖动) + 1~2 条河流/对角主路 + 街区色块。
+ * 纯演示可视化沙盘，不接外部地图 API、不宣称真实 GPS。返回拼好的 SVG 字符串。*/
+function buildStreetTiles(W,H){
+  const R=mulberry32(20260620);
+  const parts=[];
+  // —— 底：径向暗底 + 极淡街区色块 ——
+  parts.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="url(#mgBase)"/>`);
+  // 街区色块（block fills）：在网格单元里随机填极淡冷色，模拟建筑街区
+  const COLS=11, ROWS=8, cw=W/COLS, ch=H/ROWS;
+  let blocks='';
+  for(let i=0;i<COLS;i++) for(let j=0;j<ROWS;j++){
+    const r=R(); if(r<0.34) continue;                  // 部分留空（空地/水域）
+    const pad=2+R()*5;
+    const bx=i*cw+pad+(R()-0.5)*5, by=j*ch+pad+(R()-0.5)*5;
+    const bw=cw-pad*2-(R()*7), bh=ch-pad*2-(R()*7);
+    if(bw<6||bh<6) continue;
+    const tone=r<0.55?'#0b1a16':(r<0.78?'#0d201a':'#0e241d'); // 暗青绿街区
+    const op=(0.5+R()*0.4).toFixed(2);
+    blocks+=`<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${(1+R()*2).toFixed(1)}" fill="${tone}" opacity="${op}"/>`;
+  }
+  parts.push(`<g class="map-blocks">${blocks}</g>`);
+
+  // —— 河流/对角主路（1~2 条，宽缓曲线）——
+  let water='';
+  // 一条贯穿对角的河（青蓝、略宽、低透明）
+  {
+    const y0=H*(0.18+R()*0.12);
+    let d=`M ${-20} ${y0.toFixed(1)}`;
+    let x=-20,y=y0;
+    while(x<W+20){
+      x+=W/7; y+=(R()-0.42)*H*0.16;
+      y=Math.max(40,Math.min(H-40,y));
+      d+=` Q ${(x-W/14).toFixed(1)} ${(y+(R()-0.5)*30).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    }
+    water+=`<path d="${d}" fill="none" stroke="url(#mgRiver)" stroke-width="${(13+R()*7).toFixed(1)}" stroke-linecap="round" opacity="0.5"/>`;
+    water+=`<path d="${d}" fill="none" stroke="#1b6e8a" stroke-width="1.2" opacity="0.5"/>`;
+  }
+  parts.push(`<g class="map-water">${water}</g>`);
+
+  // —— 次级街道网格（带不规则抖动）——
+  // 竖向 + 横向，每条线在沿途加入轻微位移，避免死板正交。
+  let minor='';
+  const vN=14, hN=10;
+  for(let i=1;i<vN;i++){
+    const base=W*i/vN; let d=`M ${base.toFixed(1)} 0`; let yy=0;
+    while(yy<H){ yy+=H/9; const jx=base+(R()-0.5)*16; d+=` L ${jx.toFixed(1)} ${Math.min(H,yy).toFixed(1)}`; }
+    minor+=`<path d="${d}" fill="none" stroke="#2e5e55" stroke-width="1.0" opacity="0.7"/>`;
+  }
+  for(let j=1;j<hN;j++){
+    const base=H*j/hN; let d=`M 0 ${base.toFixed(1)}`; let xx=0;
+    while(xx<W){ xx+=W/12; const jy=base+(R()-0.5)*16; d+=` L ${Math.min(W,xx).toFixed(1)} ${jy.toFixed(1)}`; }
+    minor+=`<path d="${d}" fill="none" stroke="#2e5e55" stroke-width="1.0" opacity="0.7"/>`;
+  }
+  parts.push(`<g class="map-minor">${minor}</g>`);
+
+  // —— 主干道（略亮、略宽、贯穿全图，含 1 条对角主路）——
+  let major='';
+  // 2 条竖主干 + 2 条横主干（位置确定性挑选，避开正中）
+  const vMain=[W*0.27,W*0.66], hMain=[H*0.36,H*0.70];
+  vMain.forEach((bx,k)=>{
+    let d=`M ${bx.toFixed(1)} -10`; let yy=-10;
+    while(yy<H+10){ yy+=H/6; const jx=bx+(R()-0.5)*22; d+=` L ${jx.toFixed(1)} ${yy.toFixed(1)}`; }
+    major+=`<path d="${d}" fill="none" stroke="#3a6f64" stroke-width="2.6" opacity="0.7"/>`;
+    major+=`<path d="${d}" fill="none" stroke="#56b89e" stroke-width="0.8" opacity="0.5"/>`;
+  });
+  hMain.forEach((by,k)=>{
+    let d=`M -10 ${by.toFixed(1)}`; let xx=-10;
+    while(xx<W+10){ xx+=W/7; const jy=by+(R()-0.5)*22; d+=` L ${xx.toFixed(1)} ${jy.toFixed(1)}`; }
+    major+=`<path d="${d}" fill="none" stroke="#3a6f64" stroke-width="2.6" opacity="0.7"/>`;
+    major+=`<path d="${d}" fill="none" stroke="#56b89e" stroke-width="0.8" opacity="0.5"/>`;
+  });
+  // 1 条对角主路（贯穿，营造城市主轴）
+  {
+    let d=`M -10 ${(H*0.86).toFixed(1)}`; let x=-10,y=H*0.86;
+    while(x<W+10){ x+=W/8; y-=H*0.86/8 + (R()-0.5)*24; d+=` L ${x.toFixed(1)} ${y.toFixed(1)}`; }
+    major+=`<path d="${d}" fill="none" stroke="#3a6f64" stroke-width="2.4" opacity="0.65"/>`;
+    major+=`<path d="${d}" fill="none" stroke="#56b89e" stroke-width="0.8" opacity="0.45"/>`;
+  }
+  parts.push(`<g class="map-major">${major}</g>`);
+  return parts.join('');
+}
+
 function renderMap(m){
   mapData=m;
   const svg=$('mapsvg'); svg.innerHTML='';
   const W=m.canvas?.w||1000, H=m.canvas?.h||640;
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
 
-  // 暗色路网底纹
+  // 暗色城市路网底图（程序化生成·seed20260620）渐变/滤镜定义
   const defs=el('defs');
-  defs.innerHTML=`<radialGradient id="mgrad" cx="50%" cy="48%" r="70%">
-    <stop offset="0%" stop-color="#0d1b2c"/><stop offset="100%" stop-color="#070d14"/></radialGradient>`;
+  defs.innerHTML=`
+    <radialGradient id="mgBase" cx="50%" cy="46%" r="75%">
+      <stop offset="0%" stop-color="#0c1a16"/><stop offset="62%" stop-color="#09140f"/>
+      <stop offset="100%" stop-color="#06100c"/></radialGradient>
+    <linearGradient id="mgRiver" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#114a5e"/><stop offset="50%" stop-color="#176a86"/>
+      <stop offset="100%" stop-color="#114a5e"/></linearGradient>
+    <filter id="nodeGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="2.4" result="b"/><feMerge>
+      <feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
   svg.appendChild(defs);
-  svg.appendChild(el('rect',{x:0,y:0,width:W,height:H,fill:'url(#mgrad)'}));
-  // 网格
-  const grid=el('g',{opacity:'0.13'});
-  for(let x=0;x<=W;x+=62) grid.appendChild(el('line',{x1:x,y1:0,x2:x,y2:H,stroke:'#3fd2e0','stroke-width':'0.5'}));
-  for(let y=0;y<=H;y+=62) grid.appendChild(el('line',{x1:0,y1:y,x2:W,y2:y,stroke:'#3fd2e0','stroke-width':'0.5'}));
-  svg.appendChild(grid);
+
+  // 路网底图（一次性 innerHTML 注入，确定性）
+  const base=el('g',{class:'map-tiles'});
+  base.innerHTML=buildStreetTiles(W,H);
+  svg.appendChild(base);
+  // 暗角(vignette)叠层 — 让边缘下沉，中心更聚焦，贴近暗色地图瓦片观感
+  svg.appendChild(el('rect',{x:0,y:0,width:W,height:H,fill:'url(#mgVignette)',class:'map-vignette'}));
+  // vignette 渐变需在 defs；补一个
+  defs.innerHTML+=`<radialGradient id="mgVignette" cx="50%" cy="48%" r="70%">
+      <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#04100b" stop-opacity="0.55"/></radialGradient>`;
 
   const root=el('g',{id:'maproot'});
   svg.appendChild(root);
 
-  // 商圈区块（柔光）
+  // 商圈区块（柔光）—— 簇收紧后半径收小，作为该商圈的「光晕底座」叠在路网上
   (m.districts||[]).forEach(d=>{
-    root.appendChild(el('circle',{cx:d.x,cy:d.y,r:78,fill:'rgba(63,210,224,.05)',stroke:'none'}));
+    root.appendChild(el('circle',{cx:d.x,cy:d.y,r:56,fill:'rgba(70,240,168,.045)',stroke:'none'}));
   });
 
   // 圈：真合单组(亮绿实线) + 多骑手兜底组(青虚线)。语义区分(P0-3)，限量避免满屏。
@@ -312,26 +449,55 @@ function renderMap(m){
     root.appendChild(g);
   });
 
-  // 骑手
+  // 骑手（发光叠在路网上；hover 放大）
   (m.couriers||[]).forEach(c=>{
-    const node=el('circle',{cx:c.x,cy:c.y,r:c.active?5.5:4,
-      class:c.active?'courier-node node-hit':'courier-idle node-hit','data-courier':c.id});
-    node.addEventListener('mouseenter',ev=>showTip(ev,`骑手 ${c.id}\n${c.active?'已采纳派单(真)':'未采纳'}`));
-    node.addEventListener('mouseleave',hideTip);
+    const r0=c.active?5.5:4;
+    const node=el('circle',{cx:c.x,cy:c.y,r:r0,'data-r':r0,
+      class:c.active?'courier-node node-hit glow-node':'courier-idle node-hit','data-courier':c.id});
+    node.addEventListener('mouseenter',ev=>{ showTip(ev,`骑手 ${c.id}\n${c.active?'已采纳派单(真)':'未采纳'}`); node.setAttribute('r',(r0*1.7).toFixed(1)); });
+    node.addEventListener('mouseleave',()=>{ hideTip(); node.setAttribute('r',r0); });
     root.appendChild(node);
   });
 
-  // 订单（任务）节点 —— 点击联动右侧决策解释聚焦(P1-6)
+  // 订单（任务）节点 —— 点击联动右侧决策解释聚焦(P1-6)；发光 + hover 放大
   (m.tasks||[]).forEach(t=>{
     const cls=t.risk==='high'?'task-high':(t.risk==='mid'?'task-mid':'task-low');
-    const node=el('circle',{cx:t.x,cy:t.y,r:6,class:cls+' node-hit '+(t.risk==='high'?'pulse':''),'data-task':t.id});
-    node.addEventListener('mouseenter',ev=>showTip(ev,`订单 ${t.id}\n意愿派生 ${t.willingness_repr} · 风险 ${t.risk}`));
-    node.addEventListener('mouseleave',hideTip);
+    const node=el('circle',{cx:t.x,cy:t.y,r:6,'data-r':'6',class:cls+' node-hit glow-node '+(t.risk==='high'?'pulse':''),'data-task':t.id});
+    node.addEventListener('mouseenter',ev=>{ showTip(ev,`订单 ${t.id}\n意愿派生 ${t.willingness_repr} · 风险 ${t.risk}`); node.setAttribute('r','9.5'); });
+    node.addEventListener('mouseleave',()=>{ hideTip(); node.setAttribute('r','6'); });
     node.addEventListener('click',()=>focusTaskDecision(t.id, node));
     root.appendChild(node);
   });
 
+  // P0-2：代表性任务组 G-XXX 风格浮卡（默认显示，叠在路网/聚合圈旁，贴近目标稿）
+  renderFeaturedGroup(m.featured_group, root, W, H);
+
   applyMapTransform();
+}
+
+/* P0-2：地图内的 G-028 风格浮卡（SVG foreignObject 锚定到代表组坐标） */
+function renderFeaturedGroup(fg, root, W, H){
+  if(!fg) return;
+  // 高亮聚合圈（更亮的发光环）
+  root.appendChild(el('circle',{cx:fg.cx,cy:fg.cy,r:(fg.r+4),class:'fg-ring'}));
+  // 卡片放在圈右侧（若靠右则放左侧），用 foreignObject 承载 HTML
+  const cardW=176, cardH=fg.is_bundle?108:98;
+  let fx=fg.cx+fg.r+12, fy=fg.cy-cardH/2;
+  if(fx+cardW>W-8) fx=fg.cx-fg.r-12-cardW;
+  fy=Math.max(8,Math.min(H-cardH-8,fy));
+  const modeLabel=fg.is_bundle?`${fg.n_tasks}单合单`:`${fg.n_couriers}骑手兜底`;
+  const riskCls=fg.risk_text==='中高'?'rk-high':(fg.risk_text==='中'?'rk-mid':'rk-low');
+  const fo=el('foreignObject',{x:fx.toFixed(1),y:fy.toFixed(1),width:cardW,height:cardH,class:'fg-fo'});
+  fo.innerHTML=`<div xmlns="http://www.w3.org/1999/xhtml" class="fg-card">
+    <div class="fg-h">订单组 ${safe(fg.group_id)} <span class="fg-mode">${modeLabel}</span></div>
+    <div class="fg-row"><span>预计送达</span><span class="fg-v">${fg.eta_min}分钟<i class="demo-tag">演示</i></span></div>
+    <div class="fg-row"><span>无人接单风险</span><span class="fg-v ${riskCls}">${safe(fg.risk_text)}</span></div>
+    <div class="fg-row"><span>候选方案数</span><span class="fg-v">${fg.n_candidates}个</span></div>
+  </div>`;
+  root.appendChild(fo);
+  // 连接圈与卡的细引导线
+  root.appendChild(el('line',{x1:fg.cx,y1:fg.cy,x2:(fx<fg.cx?fx+cardW:fx).toFixed(1),y2:(fy+18).toFixed(1),
+    stroke:'rgba(67,213,255,.5)','stroke-width':'1','stroke-dasharray':'3 3'}));
 }
 function applyMapTransform(){
   const root=$('maproot'); if(!root) return;
@@ -474,7 +640,7 @@ function renderEvo(evo){
     const rows=causal.variants.map(v=>`<div class="causal-item">
       <span class="cd-dir">&lt;${safe(v.directive)}&gt;</span>
       <code class="cd-code">${safe(v.final_key_line)}</code></div>`).join('');
-    causalHtml=`<div class="evo-sub" style="margin-top:10px">因果探针：同一 parent (${safe(causal.parent||card&&card.parent||'—')}) + 不同 ReEvo lesson →
+    causalHtml=`<div class="evo-sub" style="margin-top:10px">因果探针：同一 parent (${safe(causal.parent||'—')}) + 不同 ReEvo lesson →
       生成不同 rank 代码 · ${causal.distinct_final_lines} 种不同代码 · ${causal.causal_proven?'<span style="color:var(--green2)">causal_proven=True</span>':'未证'}</div>
       <div class="causal-list">${rows}</div>`;
   }
@@ -637,6 +803,14 @@ function finishRun(){
 async function loadSkeleton(){
   renderScenes(null); renderRings();
   RINGS.forEach(r=> setRing(r[0],'wait'));
+  // P0-3：idle 首屏不留空白 —— KPI 灰显骨架 + 各面板「待推理」角标
+  renderKpiSkeleton();
+  $('risk').innerHTML=skeletonPanel('感知模块据尺寸解耦特征当场判风险');
+  $('strategy').innerHTML=skeletonPanel('Planner 镜像解读策略链');
+  $('decision').innerHTML=skeletonPanel('点击地图节点或推理后聚焦合单组');
+  $('cert').innerHTML=skeletonPanel('solver_v4 求解后回填 gap·r1 证书');
+  $('candidates').innerHTML=`<div style="grid-column:1/-1">${skeletonPanel('方案 A/B/C 自动评估')}</div>`;
+  $('baseline').innerHTML=skeletonPanel('纯贪心真跑 vs AutoSolver 对比');
   try{
     const r=await(await fetch('/api/cockpit/case')).json();
     if(r.status==='ok'){

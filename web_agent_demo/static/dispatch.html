@@ -46,6 +46,9 @@
 
   <!-- ============ KPI 行 ============ -->
   <section class="kpis" id="kpis"></section>
+  <div class="kpi-note" id="kpinote">
+    <span class="real-dot"></span>稿面为<b>设计示意值</b>，本屏为对 <b>large_seed301</b> 真跑真值（完成率/无人接单/骑手占用/成本改善口径直读求解器输出；成本指数/商业收益为演示换算）
+  </div>
 
   <!-- ============ 主三列 ============ -->
   <section class="main3">
@@ -149,6 +152,7 @@
     <div class="panel">
       <div class="panel-h"><span class="ico">💰</span>商业价值 ROI 模拟器 <span class="demo-tag">演示假设</span></div>
       <div class="panel-b">
+        <div class="kpi-note" style="margin:0 0 9px"><span class="real-dot"></span>下降比例锚定<b>真实成本改善 68.67%</b>（真跑真值）；单均亏损/覆盖率为<b>演示假设</b>，可调参重算</div>
         <div class="roi-in">
           <label>城市日订单量<input id="roi-orders" type="number" value="500000"></label>
           <label>单个无人接单亏损 (¥)<input id="roi-loss" type="number" value="15"></label>
