@@ -99,14 +99,19 @@ function renderKpis(kpis){
   $('kpis').innerHTML = kpis.map(k=>{
     const arrow = k.good==='up'?'↑':(k.good==='down'?'↓':'·');
     const acls = k.good==='up'?'arrow-up':(k.good==='down'?'arrow-down-good':'arrow-neutral');
-    const tag = k.is_demo?'<span class="demo-tag">演示</span>':'<span class="real-dot"></span>';
+    // 真值卡：绿点高亮；演示换算卡：标签前置「演示换算」+ 右上角醒目徽标 + 虚线半透卡（kpi-demo），
+    // 让评委一眼分清「真实业务真值」与「演示换算指标」，绝不被误读为真实业务成本。
+    const isDemo = !!k.is_demo;
+    const tag = isDemo?'<span class="kpi-demo-lbl">演示换算</span>':'<span class="real-dot"></span>';
+    const corner = isDemo?'<span class="kpi-demo-badge" title="演示换算指标：非真实业务成本/财务，由真值按公式派生">演示</span>':'';
     const dec = (k.unit==='%'||k.key==='cost_index')?1:0;
     const col = k.good==='neutral'?'rgba(127,165,151,.55)':(k.good==='up'||k.good==='down'?'rgba(70,240,168,.6)':'rgba(67,213,255,.55)');
-    return `<div class="panel kpi skeleton">
+    return `<div class="panel kpi skeleton${isDemo?' kpi-demo':''}">
       <div class="klbl">${tag}${safe(k.label)}</div>
       <div class="kval" data-key="${k.key}" data-val="${k.value??''}" data-unit="${safe(k.unit)}" data-dec="${dec}">—</div>
       <div class="ksub">${safe(k.sub||'')}</div>
       <div class="karrow ${acls}"><span class="ad">${arrow}</span></div>
+      ${corner}
       <svg class="spark" viewBox="0 0 100 27" preserveAspectRatio="none">${sparkPath(k.key,col)}</svg>
     </div>`;
   }).join('');

@@ -150,6 +150,31 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .arrow-up{color:var(--green2)} .arrow-down-good{color:var(--green2)} .arrow-neutral{color:var(--muted)}
 .arrow-down-bad{color:var(--red)}
 
+/* iter-10：演示换算 KPI 强视觉区分 —— 4 张真值卡保持高亮，2 张演示换算卡
+ * (履约成本指数 / 预计商业收益) 用「金色虚线边框 + 半透明降权 + 右上醒目"演示"徽标 +
+ * 标签前"演示换算"金标」，让评委一眼分清「真实业务真值」vs「演示换算指标」，绝不误读为真实业务成本。*/
+.kpi.kpi-demo{
+  border:1px dashed rgba(244,220,97,.42);
+  background:repeating-linear-gradient(135deg,rgba(244,220,97,.045),rgba(244,220,97,.045) 9px,rgba(14,31,27,.55) 9px,rgba(14,31,27,.55) 18px);
+  opacity:.93;
+}
+.kpi.kpi-demo:hover{border-color:rgba(244,220,97,.7);
+  box-shadow:0 16px 40px rgba(0,0,0,.46),0 0 0 1px rgba(244,220,97,.16),inset 0 1px 0 rgba(255,255,255,.05)}
+.kpi.kpi-demo .kval{color:var(--gold);text-shadow:0 0 16px rgba(244,220,97,.16)}
+.kpi.kpi-demo .karrow{top:auto;bottom:32px;right:14px}   /* 让出右上角给"演示"徽标 */
+/* 标签前金色"演示换算"小标，替代不起眼的灰 demo-tag */
+.kpi-demo-lbl{display:inline-block;font-size:8.5px;font-weight:900;letter-spacing:.04em;
+  color:#241c00;background:linear-gradient(135deg,var(--gold),#e8c84a);border-radius:5px;
+  padding:1px 5px;margin-right:5px;vertical-align:middle}
+/* 右上角醒目"演示"徽标（带斜纹微脉冲，与真值卡形成强对比） */
+.kpi-demo-badge{position:absolute;top:11px;right:12px;z-index:3;font-size:9.5px;font-weight:900;
+  letter-spacing:.06em;color:#241c00;background:linear-gradient(135deg,var(--gold),#e8c84a);
+  border-radius:6px;padding:2px 8px;box-shadow:0 2px 8px rgba(244,220,97,.3);
+  animation:demoBadgePulse 2.8s ease-in-out infinite}
+@keyframes demoBadgePulse{0%,100%{box-shadow:0 2px 8px rgba(244,220,97,.22)}
+  50%{box-shadow:0 2px 8px rgba(244,220,97,.22),0 0 0 3px rgba(244,220,97,.14)}}
+@media(prefers-reduced-motion:reduce){.kpi-demo-badge{animation:none}}
+
 /* ---------- 主三列 ---------- */
 .main3{display:grid;grid-template-columns:268px 1fr 320px;gap:10px;margin-bottom:10px;align-items:start}
 .col{display:flex;flex-direction:column;gap:10px}
