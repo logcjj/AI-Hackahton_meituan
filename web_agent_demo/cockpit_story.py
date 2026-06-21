@@ -445,6 +445,50 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
             "is_demo": True,
         }
 
+        # iter-6（可视化层级）：确保「焦点订单组」始终有几条黄色候选射线作为地图叙事主角。
+        # 候选全局采样(top-2/任务·上限60)可能恰好没覆盖到焦点组，导致主角射线缺失。
+        # 这里**仅对焦点组**补齐候选射线：取该组真实候选行里 willingness 最高、且未采纳的
+        # 若干骑手(真值排序、真坐标)，作为「该订单可能选择的派单」虚线。绝不伪造意愿/采纳。
+        fb_key = fb["task_key"]
+        existing_focus_couriers = {
+            e["courier"] for e in candidate_edges if e["task_key"] == fb_key
+        }
+        fb_anchor = next(
+            ((e["x2"], e["y2"]) for e in (accepted_edges + candidate_edges)
+             if e["task_key"] == fb_key),
+            None,
+        )
+        if fb_anchor is None:
+            f_valid = [t for t in fb["tasks"] if t in task_nodes]
+            if f_valid:
+                fb_anchor = (
+                    round(sum(task_nodes[t]["x"] for t in f_valid) / len(f_valid), 1),
+                    round(sum(task_nodes[t]["y"] for t in f_valid) / len(f_valid), 1),
+                )
+        if fb_anchor is not None:
+            fb_accepted = {c for (tk, c) in accepted_pairs if tk == fb_key}
+            # 该组的真实候选行（willingness 降序），排除已采纳 / 已有候选线 / 无坐标
+            fb_rows = sorted(
+                (r for r in candidates if r[0] == fb_key),
+                key=lambda r: (r[4] if r[4] is not None else -1.0),
+                reverse=True,
+            )
+            for row in fb_rows:
+                cid = row[2]
+                if cid in fb_accepted or cid in existing_focus_couriers:
+                    continue
+                cn = courier_nodes.get(cid)
+                if not cn:
+                    continue
+                candidate_edges.append({
+                    "task_key": fb_key, "courier": cid,
+                    "x1": cn["x"], "y1": cn["y"],
+                    "x2": fb_anchor[0], "y2": fb_anchor[1],
+                })
+                existing_focus_couriers.add(cid)
+                if len(existing_focus_couriers) >= 4:   # 焦点射线 3~4 条，贴目标稿稀疏感
+                    break
+
     return {
         "is_demo": True,
         "demo_tag": DEMO_TAG,

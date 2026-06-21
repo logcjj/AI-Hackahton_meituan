@@ -280,6 +280,9 @@ function renderDecision(d){
 
 /* ---------- 地图 ---------- */
 let mapData=null, mapZoom=1, mapTx=0, mapTy=0;
+// iter-6：地图视图模式。默认「聚焦故事视图」(贴目标稿：稀疏聚焦、单订单组叙事)；
+// 可切「全局运营网」(点亮全部采纳脉络)。默认必须 focus。
+let mapView='focus';   // 'focus' | 'global'
 
 /* 确定性伪随机（seed=20260620）—— mulberry32，保证每次刷新路网完全一致 */
 function mulberry32(seed){
@@ -490,48 +493,64 @@ function renderMap(m){
     root.appendChild(el('circle',{cx:d.x,cy:d.y,r:52,fill:'rgba(70,240,168,.028)',stroke:'none'}));
   });
 
-  // 圈：真合单组(亮绿实线) + 多骑手兜底组(青虚线)。语义区分(P0-3)，限量避免满屏。
-  // 优先显任务合单圈；兜底圈在 large_seed301 上占多数，与「兜底」叙事自洽。
-  const bsorted=(m.bundles||[]).slice().sort((a,b)=> (a.kind==='task_bundle'?-1:0)-(b.kind==='task_bundle'?-1:0));
-  bsorted.slice(0,14).forEach(b=>{
-    const kind=b.kind==='task_bundle'?'task_bundle':'multi_courier';
-    root.appendChild(el('circle',{cx:b.cx,cy:b.cy,r:b.r,class:'bundle-ring '+kind}));
-    const t=el('text',{x:b.cx,y:b.cy-b.r-4,
-      fill:kind==='task_bundle'?'#46f0a8':'#43d5ff','font-size':'11','font-weight':'800','text-anchor':'middle'});
-    t.textContent=b.label; root.appendChild(t);
-  });
-
-  // 候选虚线（先画，底层）。P0-4：限量降噪——只「点亮」焦点商圈/featured 组附近的候选
-  // 虚线（强调收敛感），其余候选极淡甚至隐藏，消除满图交叉噪声、突出焦点簇整洁。
-  const candG=el('g',{id:'candedges'});
   const fg=m.featured_group;
-  const allCand=(m.candidate_edges||[]);
-  // 每条候选线到 featured 组中心的距离（用线段中点近似）
-  const FG_R = fg ? (fg.r + 120) : 9999;   // featured 圈附近的影响半径
-  const NEAR_CAP = 18;                      // 焦点附近最多点亮多少条，避免过密
-  let nearCount=0;
-  allCand.forEach(e=>{
-    const mx=(e.x1+e.x2)/2, my=(e.y1+e.y2)/2;
-    let near=false;
-    if(fg){
-      const d=Math.hypot(mx-fg.cx, my-fg.cy);
-      // 端点也算进焦点圈内则视为「焦点候选」
-      const d1=Math.hypot(e.x1-fg.cx,e.y1-fg.cy), d2=Math.hypot(e.x2-fg.cx,e.y2-fg.cy);
-      near = (Math.min(d,d1,d2) < FG_R) && (nearCount < NEAR_CAP);
-    }
-    const ln=el('line',{x1:e.x1,y1:e.y1,x2:e.x2,y2:e.y2,
-      class:'cand-edge'+(near?' cand-focus':' cand-dim')});
-    if(near) nearCount++;
-    candG.appendChild(ln);
+  const fgKey0 = fg ? fg.task_key : null;
+  // 圈：真合单组(亮绿实线) + 多骑手兜底组(青虚线)。语义区分(P0-3)。
+  // iter-6：聚焦视图大幅减少兜底圈杂讯——只保留合单圈 + 焦点组圈(其余隐藏)，贴目标稿稀疏感；
+  // 全局运营网视图才显示全部(限 14)。焦点组的圈交给 fg-ring 高亮，这里不重复画。
+  const bsorted=(m.bundles||[]).slice().sort((a,b)=> (a.kind==='task_bundle'?-1:0)-(b.kind==='task_bundle'?-1:0));
+  const bcap = mapView==='global' ? 14 : 6;
+  let bdrawn=0;
+  bsorted.forEach(b=>{
+    const kind=b.kind==='task_bundle'?'task_bundle':'multi_courier';
+    if(b.task_key===fgKey0) return;              // 焦点组改由发光环高亮，避免叠画
+    // 聚焦视图：优先合单圈；兜底圈仅在配额内象征性保留少量
+    if(mapView==='focus' && kind==='multi_courier' && bdrawn>=bcap) return;
+    if(bdrawn>=14) return;
+    root.appendChild(el('circle',{cx:b.cx,cy:b.cy,r:b.r,
+      class:'bundle-ring '+kind+(mapView==='focus'?' bundle-dim':'')}));
+    const t=el('text',{x:b.cx,y:b.cy-b.r-4,
+      fill:kind==='task_bundle'?'#46f0a8':'#43d5ff','font-size':'11','font-weight':'800',
+      'text-anchor':'middle','opacity':mapView==='focus'?'0.5':'1'});
+    t.textContent=b.label; root.appendChild(t);
+    bdrawn++;
   });
-  root.appendChild(candG);
+  // iter-6 视觉层级：先算出「焦点订单组」相关的实体集合（焦点任务节点 / 焦点候选骑手），
+  // 用于把焦点做大做亮、其余压暗压小，让画面读成「一个订单的派单决策故事」。
+  const focusTaskKey = fg ? fg.task_key : null;
+  const focusTids = new Set(fg ? (fg.task_key||'').split(',').filter(Boolean) : []);
+  // 焦点组的候选骑手 = candidate_edges 里 task_key 命中焦点组的那几条的终点骑手（真值采样）
+  const focusCouriers = new Set();
+  (m.candidate_edges||[]).forEach(e=>{ if(e.task_key===focusTaskKey) focusCouriers.add(e.courier); });
+  // 焦点组的采纳骑手也算焦点（实线锚点骑手），一并点亮
+  (m.accepted_edges||[]).forEach(e=>{ if(e.task_key===focusTaskKey) focusCouriers.add(e.courier); });
 
-  // 采纳实线（默认隐藏，收敛动画点亮）
-  const accG=el('g',{id:'accedges'});
+  // ---- 采纳实线：iter-6 弱化为极淡背景「全局派单脉络」（绝不做成抢眼绿网）----
+  // 聚焦视图下 80 条采纳线只作青灰暗背景(opacity~.14、1px、无强发光)；
+  // 「全局运营网」视图下才略提亮，但仍是背景而非主角。
+  const accG=el('g',{id:'accedges',class:mapView==='global'?'view-global':'view-focus'});
   (m.accepted_edges||[]).forEach(e=>{
-    accG.appendChild(el('line',{x1:e.x1,y1:e.y1,x2:e.x2,y2:e.y2,class:'acc-edge'}));
+    const isFocus=(e.task_key===focusTaskKey);
+    accG.appendChild(el('line',{x1:e.x1,y1:e.y1,x2:e.x2,y2:e.y2,
+      class:'acc-edge'+(isFocus?' acc-focus':'')}));
   });
   root.appendChild(accG);
+
+  // ---- 候选虚线：iter-6 地图叙事主角 ----
+  // 焦点订单组射向其候选骑手的几条「粗一档·高对比·流动」黄色虚线 = 主角(cand-feature)。
+  // 其余候选线全部隐藏(聚焦视图)或极淡(全局视图)，让黄色射线不被淹没。
+  const candG=el('g',{id:'candedges'});
+  (m.candidate_edges||[]).forEach(e=>{
+    const isFeature=(e.task_key===focusTaskKey);
+    if(isFeature){
+      candG.appendChild(el('line',{x1:e.x1,y1:e.y1,x2:e.x2,y2:e.y2,class:'cand-edge cand-feature'}));
+    } else {
+      // 非焦点候选：聚焦视图隐藏；全局视图保留极淡一层
+      candG.appendChild(el('line',{x1:e.x1,y1:e.y1,x2:e.x2,y2:e.y2,
+        class:'cand-edge cand-dim'+(mapView==='focus'?' cand-hidden':'')}));
+    }
+  });
+  root.appendChild(candG);
 
   // 商圈节点（方块代表商家中心）
   (m.districts||[]).forEach(d=>{
@@ -543,22 +562,30 @@ function renderMap(m){
     root.appendChild(g);
   });
 
-  // 骑手（发光叠在路网上；hover 放大）
+  // 骑手（iter-6：整体放大一档；焦点候选骑手更大更亮，其余压暗压小，建立视觉层级）
   (m.couriers||[]).forEach(c=>{
-    const r0=c.active?5.5:4;
-    const node=el('circle',{cx:c.x,cy:c.y,r:r0,'data-r':r0,
-      class:c.active?'courier-node node-hit glow-node':'courier-idle node-hit','data-courier':c.id});
-    node.addEventListener('mouseenter',ev=>{ showTip(ev,`骑手 ${c.id}\n${c.active?'已采纳派单(真)':'未采纳'}`); node.setAttribute('r',(r0*1.7).toFixed(1)); });
+    const isFocus=focusCouriers.has(c.id);
+    const r0= isFocus ? 8.5 : (c.active?6:4.5);
+    let cls = c.active?'courier-node node-hit glow-node':'courier-idle node-hit';
+    if(isFocus) cls+=' courier-focus';
+    else if(mapView==='focus') cls+=' node-muted';   // 非焦点压暗（仅聚焦视图）
+    const node=el('circle',{cx:c.x,cy:c.y,r:r0,'data-r':r0,class:cls,'data-courier':c.id});
+    node.addEventListener('mouseenter',ev=>{ showTip(ev,`骑手 ${c.id}\n${isFocus?'焦点组候选骑手(真)':(c.active?'已采纳派单(真)':'未采纳')}`); node.setAttribute('r',(r0*1.6).toFixed(1)); });
     node.addEventListener('mouseleave',()=>{ hideTip(); node.setAttribute('r',r0); });
     root.appendChild(node);
   });
 
-  // 订单（任务）节点 —— 点击联动右侧决策解释聚焦(P1-6)；发光 + hover 放大
+  // 订单（任务）节点 —— iter-6：焦点组订单更大更亮，其余压暗；点击联动右侧决策解释聚焦
   (m.tasks||[]).forEach(t=>{
+    const isFocus=focusTids.has(t.id);
     const cls=t.risk==='high'?'task-high':(t.risk==='mid'?'task-mid':'task-low');
-    const node=el('circle',{cx:t.x,cy:t.y,r:6,'data-r':'6',class:cls+' node-hit glow-node '+(t.risk==='high'?'pulse':''),'data-task':t.id});
-    node.addEventListener('mouseenter',ev=>{ showTip(ev,`订单 ${t.id}\n意愿派生 ${t.willingness_repr} · 风险 ${t.risk}`); node.setAttribute('r','9.5'); });
-    node.addEventListener('mouseleave',()=>{ hideTip(); node.setAttribute('r','6'); });
+    const r0= isFocus ? 9 : 6.5;
+    let full=cls+' node-hit glow-node '+(t.risk==='high'?'pulse':'');
+    if(isFocus) full+=' task-focus';
+    else if(mapView==='focus') full+=' node-muted';
+    const node=el('circle',{cx:t.x,cy:t.y,r:r0,'data-r':r0,class:full,'data-task':t.id});
+    node.addEventListener('mouseenter',ev=>{ showTip(ev,`订单 ${t.id}\n意愿派生 ${t.willingness_repr} · 风险 ${t.risk}`); node.setAttribute('r',(r0+3.5).toFixed(1)); });
+    node.addEventListener('mouseleave',()=>{ hideTip(); node.setAttribute('r',r0); });
     node.addEventListener('click',()=>focusTaskDecision(t.id, node));
     root.appendChild(node);
   });
@@ -572,7 +599,8 @@ function renderMap(m){
 /* P0-2：地图内的 G-028 风格浮卡（SVG foreignObject 锚定到代表组坐标） */
 function renderFeaturedGroup(fg, root, W, H){
   if(!fg) return;
-  // 高亮聚合圈（更亮的发光环）
+  // iter-6 焦点订单组：橙/黄发光脉冲环（双环），作为画面唯一高亮焦点
+  root.appendChild(el('circle',{cx:fg.cx,cy:fg.cy,r:(fg.r+14),class:'fg-ring-outer'}));
   root.appendChild(el('circle',{cx:fg.cx,cy:fg.cy,r:(fg.r+4),class:'fg-ring'}));
   // 卡片放在圈右侧（若靠右则放左侧），用 foreignObject 承载 HTML
   const cardW=176, cardH=fg.is_bundle?108:98;
@@ -598,10 +626,10 @@ function applyMapTransform(){
   root.setAttribute('transform',`translate(${mapTx},${mapTy}) scale(${mapZoom})`);
 }
 function convergeEdges(){
-  // 候选虚线渐隐 + 采纳实线点亮（收敛感）
-  const cand=$('candedges'); if(cand) cand.style.transition='opacity 1s', cand.style.opacity='0.18';
+  // iter-6 收敛动画：采纳实线渐次点亮为「极淡背景脉络」（不再做成抢眼绿网）；
+  // 焦点黄色候选射线(cand-feature)保持流动高亮，不参与渐隐——它是地图主角。
   const accs=document.querySelectorAll('.acc-edge');
-  accs.forEach((e,i)=> setTimeout(()=>e.classList.add('on'), 40*i));
+  accs.forEach((e,i)=> setTimeout(()=>e.classList.add('on'), 22*i));
 }
 let tipEl=null;
 function showTip(ev,text){
@@ -668,6 +696,18 @@ $('zoomin').onclick=()=>{ mapZoom=Math.min(3,mapZoom*1.25); applyMapTransform();
 $('zoomout').onclick=()=>{ mapZoom=Math.max(.6,mapZoom/1.25); applyMapTransform(); };
 $('zoomreset').onclick=()=>{ mapZoom=1; mapTx=0; mapTy=0;
   const root=$('maproot'); if(root) root.style.transition='transform .3s'; applyMapTransform(); };
+
+// iter-6 视图切换：默认「聚焦故事」(贴目标稿)，可切「全局运营网」(点亮全部采纳脉络)。
+const _mvt=$('mapviewtoggle');
+if(_mvt){
+  _mvt.addEventListener('click',e=>{
+    const b=e.target.closest('.mv-btn'); if(!b) return;
+    const v=b.dataset.view; if(v===mapView) return;
+    mapView=v;
+    _mvt.querySelectorAll('.mv-btn').forEach(x=>x.classList.toggle('active',x.dataset.view===v));
+    if(mapData){ renderMap(mapData); setTimeout(convergeEdges,200); }
+  });
+}
 
 /* ---------- 自进化（iter-2：真值透传，删假占位 #18-21） ---------- */
 function renderEvo(evo){

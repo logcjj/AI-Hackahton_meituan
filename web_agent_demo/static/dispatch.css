@@ -165,6 +165,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .lg .sw.dash{width:18px;height:0;border-top:2px dashed var(--gold)}
 .lg .sw.ring-task{width:12px;height:12px;border-radius:50%;background:transparent;border:1.6px solid var(--green);box-shadow:0 0 6px rgba(70,240,168,.5)}
 .lg .sw.ring-multi{width:12px;height:12px;border-radius:50%;background:transparent;border:1.6px dashed var(--cyan);box-shadow:0 0 6px rgba(67,213,255,.45)}
+/* iter-6 地图视图切换：默认「聚焦故事」(贴目标稿)，可切「全局运营网」 */
+.mapview-toggle{display:flex;gap:2px;background:rgba(7,13,20,.78);border:1px solid var(--line);
+  border-radius:10px;padding:3px;backdrop-filter:blur(8px);pointer-events:auto}
+.mapview-toggle .mv-btn{font-size:11px;font-weight:800;color:var(--muted);background:none;border:none;
+  border-radius:7px;padding:5px 10px;cursor:pointer;transition:all .15s}
+.mapview-toggle .mv-btn:hover{color:var(--cyan)}
+.mapview-toggle .mv-btn.active{color:#08110d;background:linear-gradient(135deg,#ffd23f,#ffb84d)}
 .mapctl{position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;z-index:5}
 .mapctl button{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);
   background:rgba(7,13,20,.78);color:var(--ink);font-size:16px;font-weight:900;cursor:pointer;
@@ -181,22 +188,40 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .focuscard .fl span:last-child{font-family:var(--mono)}
 
 /* 地图 svg 元素动效 */
+/* ===== iter-6 视觉层级重排（贴目标稿 f_001：稀疏聚焦·单订单组叙事）===== */
+/* 候选虚线 = 地图叙事主角：焦点订单组射向其候选骑手的黄色粗虚线，高对比·流动 */
 .cand-edge{stroke:var(--gold);stroke-width:1.4;stroke-dasharray:5 5;opacity:.5;fill:none}
-/* P0-4 限量降噪：焦点附近候选线点亮+流动；其余候选极淡，消除满图交叉噪声 */
-.cand-edge.cand-focus{opacity:.62;stroke-width:1.5;animation:dashflow 1.1s linear infinite}
-/* iter-5(P1-4)：dim 候选线略提亮(暗背景下可辨)，保留多候选择优叙事，不回到满图噪声 */
-.cand-edge.cand-dim{opacity:.16;stroke-width:1;stroke-dasharray:4 7;animation:none}
-@keyframes dashflow{to{stroke-dashoffset:-20}}
-.acc-edge{stroke:var(--green);stroke-width:2.2;fill:none;opacity:0;filter:drop-shadow(0 0 4px rgba(70,240,168,.6));
-  transition:opacity .5s}
-.acc-edge.on{opacity:.9}
+.cand-edge.cand-feature{
+  stroke:#ffd23f;stroke-width:3;stroke-dasharray:9 7;opacity:1;
+  stroke-linecap:round;
+  filter:drop-shadow(0 0 5px rgba(255,210,63,.85)) drop-shadow(0 0 2px rgba(255,210,63,1));
+  animation:dashflow .9s linear infinite}
+/* 非焦点候选：聚焦视图隐藏；全局视图保留极淡一层（不回满图噪声） */
+.cand-edge.cand-dim{opacity:.12;stroke-width:1;stroke-dasharray:4 7;animation:none}
+.cand-edge.cand-hidden{display:none}
+@keyframes dashflow{to{stroke-dashoffset:-32}}
+/* 采纳实线 = 极淡「全局派单脉络」背景（绝不做成抢眼绿网；青灰偏暗·1px·无强发光） */
+.acc-edge{stroke:#3a5a64;stroke-width:1;fill:none;opacity:0;transition:opacity .5s}
+.acc-edge.on{opacity:.14}
+/* 焦点组的采纳实线略可辨（仍是背景级别，不抢黄色射线） */
+.acc-edge.acc-focus{stroke:#5fb6c4;stroke-width:1.2}
+.acc-edge.acc-focus.on{opacity:.34}
+/* 全局运营网视图：采纳脉络整体略提亮，但依旧是背景而非主角 */
+#accedges.view-global .acc-edge.on{opacity:.26;stroke:#46708a}
+#accedges.view-global .acc-edge.acc-focus.on{opacity:.5}
 .task-high{fill:var(--orange);filter:drop-shadow(0 0 5px rgba(255,159,67,.6))}
 .task-mid{fill:var(--yellow)} .task-low{fill:var(--green)}
 .courier-node{fill:var(--green);filter:drop-shadow(0 0 5px rgba(70,240,168,.6))}
 .courier-idle{fill:#2c4339;filter:none;opacity:.5}
+/* iter-6 视觉层级：非焦点节点压暗压淡，焦点节点更大更亮 */
+.node-muted{opacity:.42;filter:none !important}
+.courier-focus{fill:#ffe27a !important;filter:drop-shadow(0 0 7px rgba(255,210,63,.9)) !important}
+.task-focus{filter:drop-shadow(0 0 9px rgba(255,159,67,.95)) drop-shadow(0 0 3px rgba(255,210,63,.9)) !important}
 .district-node{fill:rgba(67,213,255,.12);stroke:var(--cyan2);stroke-width:1.2}
 /* 任务合单圈=亮绿实线发光；骑手兜底圈=青虚线发光（P0-3：两类语义区分） */
 .bundle-ring{fill:rgba(70,240,168,.05);stroke-width:1.4}
+/* iter-6 聚焦视图：非焦点兜底圈压暗，避免抢焦点订单组与黄色射线 */
+.bundle-ring.bundle-dim{opacity:.4;filter:none !important}
 .bundle-ring.task_bundle{stroke:var(--green);stroke-dasharray:none;filter:drop-shadow(0 0 5px rgba(70,240,168,.45))}
 .bundle-ring.multi_courier{stroke:var(--cyan);stroke-dasharray:4 4;fill:rgba(67,213,255,.04);filter:drop-shadow(0 0 4px rgba(67,213,255,.4))}
 .node-hit{cursor:pointer}
@@ -400,9 +425,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 circle.task-high,circle.task-mid,circle.task-low,circle.courier-node{transition:r .15s cubic-bezier(.4,0,.2,1)}
 
 /* 代表组 G-XXX 浮卡（P0-2） */
-.fg-ring{fill:rgba(70,240,168,.06);stroke:var(--green);stroke-width:2;
-  filter:drop-shadow(0 0 8px rgba(70,240,168,.6));animation:fgpulse 2.2s ease-in-out infinite}
-@keyframes fgpulse{50%{stroke-opacity:.55}}
+/* iter-6 焦点订单组发光环：橙/黄脉冲（画面唯一高亮焦点，贴目标稿 G-028 发光环） */
+.fg-ring{fill:rgba(255,159,67,.05);stroke:#ffb84d;stroke-width:2.4;
+  filter:drop-shadow(0 0 10px rgba(255,180,77,.85));animation:fgpulse 2.2s ease-in-out infinite}
+.fg-ring-outer{fill:none;stroke:#ffd23f;stroke-width:1.4;opacity:.5;
+  filter:drop-shadow(0 0 8px rgba(255,210,63,.7));animation:fgpulseOuter 2.2s ease-in-out infinite}
+@keyframes fgpulse{50%{stroke-opacity:.55;stroke-width:3}}
+@keyframes fgpulseOuter{0%,100%{opacity:.22;transform-origin:center}50%{opacity:.6}}
 .fg-fo{overflow:visible}
 .fg-card{font-family:"PingFang SC",-apple-system,sans-serif;background:rgba(8,18,15,.95);
   border:1px solid var(--cyan);border-radius:11px;padding:8px 10px;
