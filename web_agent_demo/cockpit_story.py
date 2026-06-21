@@ -35,6 +35,16 @@ from tools.agent_trace_demo import parse_candidates
 SEED = 20260620
 DEMO_TAG = "演示·seed20260620"
 
+# iter-7：诚实边界结构化数据（让「真实 vs 演示」边界可被前端数据化呈现，而非散落文案）。
+# real_fields = 直读求解器/感知/证书/基线真值；demo_fields = 仅供可视化的合成层（绝不进指标）。
+DATA_BOUNDARY = {
+    "claim": "真实字段直读求解器/感知/证书/基线；演示合成层仅供可视化、绝不进任何指标计算",
+    "real_fields": ["派单", "意愿", "分数", "expected_cost", "感知", "覆盖", "gap(r1)"],
+    "demo_fields": ["坐标", "天气", "距离", "ETA", "金额"],
+    "seed": SEED,
+    "note": "演示合成层 seed=20260620 · 非真实 GPS/财务",
+}
+
 # 画布逻辑坐标系（前端 SVG viewBox 0..1000 x 0..640）
 CANVAS_W = 1000
 CANVAS_H = 640
@@ -431,10 +441,26 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
         f_risk = "中高" if wmin < 0.3 else ("中" if wmin < 0.55 else "低")
         # 候选方案数：该组在候选虚线/候选行里出现的不同骑手数(≥2 时叙事=多候选)
         f_cands = len({row[2] for row in candidates if row[0] == fb["task_key"]})
+        # iter-7（纯演示构图）：把焦点组锚点向画布中部轻拉(0.30)，让叙事焦点更居中、
+        # 贴目标稿 G-028 居中构图。仅移动「浮卡/发光环」的展示锚点，不动任何真实坐标/指标。
+        f_cx = round(fb["cx"] + (CANVAS_W * 0.5 - fb["cx"]) * 0.30, 1)
+        f_cy = round(fb["cy"] + (CANVAS_H * 0.46 - fb["cy"]) * 0.30, 1)
+        # 同步平移焦点组的「订单点」与「采纳/候选连线终点」(只动焦点组、只动演示坐标)，
+        # 让订单点、发光环、黄色射线三者居中对齐，避免环与点分离。
+        _dx, _dy = f_cx - fb["cx"], f_cy - fb["cy"]
+        for _t in fb["tasks"]:
+            _n = task_nodes.get(_t)
+            if _n:
+                _n["x"] = round(_n["x"] + _dx, 1)
+                _n["y"] = round(_n["y"] + _dy, 1)
+        for _e in (accepted_edges + candidate_edges):
+            if _e["task_key"] == fb["task_key"]:
+                _e["x2"] = round(_e["x2"] + _dx, 1)
+                _e["y2"] = round(_e["y2"] + _dy, 1)
         featured_group = {
             "group_id": "G-" + (hashlib.sha1(fb["task_key"].encode()).hexdigest()[:4].upper()),
             "task_key": fb["task_key"],
-            "cx": fb["cx"], "cy": fb["cy"], "r": fb["r"],
+            "cx": f_cx, "cy": f_cy, "r": fb["r"],
             "n_tasks": len(f_tids),
             "n_couriers": len(fb["couriers"]),
             "is_bundle": f_is_bundle,
@@ -453,18 +479,9 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
         existing_focus_couriers = {
             e["courier"] for e in candidate_edges if e["task_key"] == fb_key
         }
-        fb_anchor = next(
-            ((e["x2"], e["y2"]) for e in (accepted_edges + candidate_edges)
-             if e["task_key"] == fb_key),
-            None,
-        )
-        if fb_anchor is None:
-            f_valid = [t for t in fb["tasks"] if t in task_nodes]
-            if f_valid:
-                fb_anchor = (
-                    round(sum(task_nodes[t]["x"] for t in f_valid) / len(f_valid), 1),
-                    round(sum(task_nodes[t]["y"] for t in f_valid) / len(f_valid), 1),
-                )
+        # iter-7：焦点组的发光环/浮卡已轻拉向中部(f_cx/f_cy)，故补齐的黄色候选射线
+        # 终点也用 f_cx/f_cy，保证射线收敛到居中的发光环（仍是纯演示坐标）。
+        fb_anchor = (f_cx, f_cy)
         if fb_anchor is not None:
             fb_accepted = {c for (tk, c) in accepted_pairs if tk == fb_key}
             # 该组的真实候选行（willingness 降序），排除已采纳 / 已有候选线 / 无坐标
@@ -517,25 +534,34 @@ def synth_chips(report: dict[str, Any]) -> list[dict[str, Any]]:
     d = perc.get("density_ratio")
     bf = perc.get("bundle_fraction")
     chips = []
-    # 意愿芯片（真值 w_mean，叙事百分比）
+    # iter-7：贴目标稿 3 枚特征胶囊（图标色块 + 标签 + 彩色±%）。
+    # narr_pct = 相对中性基准的「叙事偏移%」(演示叙事，由真实感知值确定性派生，非真实业务统计)；
+    # tone 决定 ±% 颜色（will=青/supply=红/bundle=绿，贴目标稿）。真值仍保留在 value/real。
+    # 意愿芯片（真值 w_mean → 相对 0.5 中性基准的叙事偏移）
     if w_mean is not None:
+        wp = round((w_mean - 0.50) / 0.50 * 100)  # 0.5 为中性基准
         chips.append({
             "icon": "☔", "title": "接单意愿",
             "value": f"w̄={w_mean}", "delta": "意愿偏低" if w_mean < 0.45 else "意愿正常",
+            "narr_pct": wp, "tone": "will",
             "real": {"willingness_mean": w_mean}, "is_demo": False, "narrative": True,
         })
     if d is not None:
+        # 供给：相对 d=2.0「充裕基准」的偏移；d 越低偏移越负（供给越紧张）
+        dp = round((d - 2.0) / 2.0 * 100)
         chips.append({
-            "icon": "🧍", "title": "骑手供给",
+            "icon": "🧍", "title": "可用骑手",
             "value": f"d={d}", "delta": "骑手充裕" if d >= 1.8 else ("均衡" if d > 1.0 else "骑手紧张"),
+            "narr_pct": dp, "tone": "supply",
             "real": {"density_ratio": d}, "is_demo": False, "narrative": True,
         })
     if bf is not None:
         # iter-2(P0-3)：large_seed301 上 v4 解为「多骑手兜底」非任务合单，故措辞改为
         # 「合单/兜底潜力」，与满屏兜底圈自洽，绝不伪造任务合单。
         chips.append({
-            "icon": "🗂", "title": "合单/兜底潜力",
+            "icon": "🗂", "title": "合单潜力",
             "value": f"潜力占比 {round(bf*100,1)}%", "delta": "合单/兜底机会密集" if bf >= 0.35 else "机会一般",
+            "narr_pct": round(bf * 100), "tone": "bundle",
             "real": {"bundle_fraction": bf}, "is_demo": False, "narrative": True,
         })
     return chips
@@ -886,10 +912,7 @@ def build_story(text: str, report: dict[str, Any], baseline: dict[str, Any]) -> 
         "wall_time_s": report.get("wall_time_s"),
         "solver_used": report.get("solver_used"),
         "perception": report.get("perception", {}),
-        "data_boundary": (
-            "真实字段来自 solver_v4/感知/证书/四方/进化真实输出 + 纯贪心真跑；"
-            "地图坐标·距离·ETA·天气·商圈·金额为演示合成层(seed=20260620)，非真实 GPS/财务。"
-        ),
+        "data_boundary": DATA_BOUNDARY,
     }
 
 

@@ -182,7 +182,7 @@ class Handler(BaseHTTPRequestHandler):
                     "risk": cstory.synth_risk(stub_report),
                     "regime_verdict": {"regime": perc.get("regime"), "rules": perc.get("rules", []), "is_demo": False},
                     "map_skeleton": layout,
-                    "data_boundary": cstory.build_story.__doc__ or "",
+                    "data_boundary": cstory.DATA_BOUNDARY,
                 })
                 return
             if parsed.path == "/api/generate":

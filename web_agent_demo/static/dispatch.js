@@ -107,7 +107,7 @@ function renderKpis(kpis){
       <div class="kval" data-key="${k.key}" data-val="${k.value??''}" data-unit="${safe(k.unit)}" data-dec="${dec}">—</div>
       <div class="ksub">${safe(k.sub||'')}</div>
       <div class="karrow ${acls}"><span class="ad">${arrow}</span></div>
-      <svg class="spark" viewBox="0 0 100 24" preserveAspectRatio="none">${sparkPath(k.key,col)}</svg>
+      <svg class="spark" viewBox="0 0 100 27" preserveAspectRatio="none">${sparkPath(k.key,col)}</svg>
     </div>`;
   }).join('');
   document.querySelectorAll('.kval').forEach(n=>{
@@ -119,21 +119,31 @@ function sparkPath(key,col){
   // 确定性伪 sparkline（演示视觉，颜色随 KPI 语义）
   col = col || 'rgba(67,213,255,.55)';
   let seed=0; for(const c of key) seed=(seed*31+c.charCodeAt(0))&0xffff;
-  const pts=[]; for(let i=0;i<11;i++){ seed=(seed*1103515245+12345)&0x7fffffff; pts.push(4+(seed%15)); }
-  const d=pts.map((y,i)=>`${i*10},${24-y}`).join(' ');
-  const fill=`0,24 ${d} 100,24`;
-  const fc=col.replace(/[\d.]+\)$/,'.10)');
-  return `<polygon points="${fill}" fill="${fc}" stroke="none"/><polyline points="${d}" fill="none" stroke="${col}" stroke-width="1.5"/>`;
+  const pts=[]; for(let i=0;i<13;i++){ seed=(seed*1103515245+12345)&0x7fffffff; pts.push(5+(seed%17)); }
+  const d=pts.map((y,i)=>`${i*(100/12)},${27-y}`).join(' ');
+  const fill=`0,27 ${d} 100,27`;
+  const fc=col.replace(/[\d.]+\)$/,'.13)');
+  return `<polygon points="${fill}" fill="${fc}" stroke="none"/><polyline points="${d}" fill="none" stroke="${col}" stroke-width="1.6" stroke-linejoin="round"/>`;
 }
 
-/* ---------- chips ---------- */
+/* ---------- chips（iter-7：贴目标稿——图标色块 + 标签 + 彩色±%；真值挂 title 悬浮）---------- */
 function renderChips(chips){
   if(!chips||!chips.length) return;
-  const cls=t=>/意愿/.test(t)?'c-will':(/供给|骑手/.test(t)?'c-supply':(/合单|兜底/.test(t)?'c-bundle':''));
-  $('chips').innerHTML = chips.map(c=>`<div class="chip skeleton ${cls(c.title)}">
-    <span class="ci">${safe(c.icon)}</span>
-    <div><div class="ct">${safe(c.title)}</div><div class="cv">${safe(c.value)}</div><div class="cd">${safe(c.delta)}</div></div>
-  </div>`).join('');
+  const tone=c=>c.tone || (/意愿/.test(c.title)?'will':(/供给|骑手|可用/.test(c.title)?'supply':(/合单|兜底|潜力/.test(c.title)?'bundle':'will')));
+  $('chips').innerHTML = chips.map(c=>{
+    const tn=tone(c);
+    let pct=c.narr_pct;
+    const hasPct=pct!=null&&!isNaN(pct);
+    const sign=hasPct&&pct>=0?'+':'';
+    const pctStr=hasPct?`${sign}${pct}%`:'';
+    return `<div class="chip skeleton c-${tn}" title="真值 ${safe(c.value)} · ${safe(c.delta)}（叙事偏移%为演示派生）">
+      <span class="ci">${safe(c.icon)}</span>
+      <div class="chip-meta">
+        <div class="ct">${safe(c.title)}</div>
+        ${hasPct?`<div class="cp">${pctStr}</div>`:`<div class="cv">${safe(c.value)}</div>`}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 /* ---------- verdict / scenes ---------- */
@@ -818,6 +828,17 @@ function recomputeRoi(){
 }
 $('roi-calc').onclick=recomputeRoi;
 
+/* ---------- 数据边界（iter-7：诚实边界数据化，真实 vs 演示分色 token 化） ---------- */
+function renderBoundary(b){
+  const strip=$('boundary-strip'); if(!strip||!b||typeof b!=='object') return;
+  const real=(b.real_fields||[]).map(f=>`<span class="bt bt-real">${safe(f)}</span>`).join('');
+  const demo=(b.demo_fields||[]).map(f=>`<span class="bt bt-demo">${safe(f)}</span>`).join('');
+  strip.innerHTML=`<span class="bt-lbl"><span class="real-dot"></span>真实字段</span>${real}
+    <span class="bt-sep">·</span><span class="bt-lbl bt-lbl-demo">演示合成层 seed=${safe(b.seed||'20260620')}·非GPS</span>${demo}`;
+  const claim=$('boundary-claim');
+  if(claim&&b.claim) claim.innerHTML=`<b>数据边界</b>：${safe(b.claim)}（${safe(b.note||'')}）`;
+}
+
 /* ---------- 计时器 ---------- */
 let timerH=null, timerStart=0;
 function startTimer(){ timerStart=Date.now(); clearInterval(timerH);
@@ -952,6 +973,7 @@ async function loadSkeleton(){
       if(r.risk) renderRisk(r.risk);
       if(r.regime_verdict) renderVerdict(r.regime_verdict);
       if(r.map_skeleton) renderMap(r.map_skeleton);
+      if(r.data_boundary) renderBoundary(r.data_boundary);
     }
   }catch(e){ /* 骨架失败不阻塞 */ }
   recomputeRoi();
