@@ -51,6 +51,29 @@
     <span class="real-dot"></span>稿面为<b>设计示意值</b>，本屏为对 <b>large_seed301</b> 真跑真值（完成率/无人接单/骑手占用/成本改善口径直读求解器输出；成本指数/商业收益为演示换算）
   </div>
 
+  <!-- ============ iter-9 首屏强证据带：自进化常驻角标 + 数据真实/演示边界（scrollY=0 即见） ============ -->
+  <div class="evidence-row" id="evidence-row">
+    <!-- 自进化常驻角标（真值证据，点击平滑滚动到底部自进化全面板） -->
+    <button class="evo-badge" id="evo-badge" title="点击滚动到底部自进化全面板，查看可验证证据">
+      <span class="eb-ico">🧬</span>
+      <span class="eb-main"><b>自进化机制</b> <span class="eb-ok">✓ 可验证</span></span>
+      <span class="eb-sep"></span>
+      <span class="eb-kv">已晋级 <b id="eb-promoted">gen01_M1_003</b></span>
+      <span class="eb-sep"></span>
+      <span class="eb-kv">注册表 <b id="eb-registry">24 条 / 19 采纳</b></span>
+      <span class="eb-sep"></span>
+      <span class="eb-kv eb-causal">因果可复现 · <span class="eb-zero">对最终成绩零贡献</span></span>
+      <span class="eb-cta">查看证据 ↓</span>
+    </button>
+    <!-- 数据真实/演示边界首屏精简提示（与页脚 DATA_BOUNDARY 一致） -->
+    <div class="bound-mini" id="bound-mini">
+      <span class="bm-grp bm-real"><span class="real-dot"></span><span class="bm-lbl">真实</span>
+        派单/意愿/分数/成本/感知/覆盖/最优性<span class="bm-r1">(r1)</span></span>
+      <span class="bm-grp bm-demo"><span class="demo-dot"></span><span class="bm-lbl bm-lbl-d">演示合成</span>
+        地图坐标/距离/ETA/天气/金额 <span class="bm-seed">(seed20260620·非GPS)</span></span>
+    </div>
+  </div>
+
   <!-- ============ 主三列 ============ -->
   <section class="main3">
     <!-- 左列 -->
@@ -137,7 +160,7 @@
 
   <!-- ============ 自进化 + ROI ============ -->
   <section class="bottom2">
-    <div class="panel" id="evopanel">
+    <div class="panel collapsed" id="evopanel">
       <div class="panel-h collapse-h" id="evotoggle">
         <span><span class="ico">🧬</span>自进化与安全回退 (Self-Evolving Code Loop)
         <span class="narr-tag">机制内部指标·对最终成绩零贡献·stub无live LLM</span></span>

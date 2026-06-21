@@ -729,6 +729,18 @@ function renderEvo(evo){
   const reg=evo.registry_summary;   // 真值或 null
   const causal=evo.causal_demo;     // 真值或 null
 
+  // iter-9：把首屏自进化角标的真值与 report.evolution 实时对齐（晋级 ID / 注册表条数）
+  if(reg){
+    const total=reg.total_strategies, acc=reg.n_accepted;
+    if(total!=null && acc!=null){
+      const ebR=$('eb-registry'); if(ebR) ebR.textContent=`${total} 条 / ${acc} 采纳`;
+    }
+    const promoted=(reg.promoted||[]);
+    if(promoted.length){ const ebP=$('eb-promoted'); if(ebP) ebP.textContent=promoted[0]; }
+  } else if(card && card.strategy_id){
+    const ebP=$('eb-promoted'); if(ebP) ebP.textContent=card.strategy_id;
+  }
+
   // 若整段真值都拿不到 → 只保留机制流程图 + 诚实声明（绝不补假数据）
   if(!card && !reg && !causal){
     body.innerHTML=`<div class="evo-honesty">本次未取到 report.evolution 真值（机制可独立验证，但
@@ -997,6 +1009,18 @@ let AUTORUN_DONE=false;
 
 /* ---------- 折叠 / 场景点击 ---------- */
 $('evotoggle').onclick=()=> $('evopanel').classList.toggle('collapsed');
+
+/* iter-9：首屏自进化常驻角标 → 平滑滚动到底部自进化全面板并展开（折叠态时先展开露出证据） */
+(function(){
+  const badge=$('evo-badge'); if(!badge) return;
+  badge.addEventListener('click',()=>{
+    const panel=$('evopanel');
+    if(panel){
+      panel.classList.remove('collapsed');                 // 确保展开后能看到全证据
+      panel.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  });
+})();
 document.addEventListener('click',e=>{
   const sc=e.target.closest('.scene');
   if(sc){

@@ -487,6 +487,49 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   border-radius:9px;background:rgba(67,213,255,.05);border:1px solid rgba(67,213,255,.14)}
 .kpi-note b{color:var(--cyan);font-weight:800}
 
+/* ===== iter-9 首屏强证据带：自进化常驻角标 + 数据边界精简提示（scrollY=0 即见，克制不喧宾夺主） ===== */
+.evidence-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:stretch;margin:0 0 10px}
+/* 自进化常驻角标：金色描边小卡，一行真值证据，可点击平滑滚动到底部全面板 */
+.evo-badge{display:flex;align-items:center;gap:9px;padding:8px 13px;border-radius:11px;cursor:pointer;
+  text-align:left;font-family:inherit;
+  background:linear-gradient(135deg,rgba(244,220,97,.10),rgba(70,240,168,.05));
+  border:1px solid rgba(244,220,97,.34);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 4px 16px rgba(0,0,0,.22);
+  transition:transform .2s var(--ease),border-color .2s,box-shadow .2s}
+.evo-badge:hover{transform:translateY(-1px);border-color:rgba(244,220,97,.6);
+  box-shadow:0 8px 22px rgba(244,220,97,.16),inset 0 1px 0 rgba(255,255,255,.05)}
+.evo-badge:active{transform:translateY(0) scale(.995)}
+.evo-badge:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(244,220,97,.3)}
+.evo-badge .eb-ico{font-size:17px;flex:0 0 auto;filter:drop-shadow(0 0 6px rgba(244,220,97,.4))}
+.evo-badge .eb-main{font-size:12px;color:var(--ink);font-weight:700;white-space:nowrap}
+.evo-badge .eb-main b{color:var(--gold);font-weight:900}
+.evo-badge .eb-ok{font-size:11px;font-weight:900;color:var(--green2);
+  background:rgba(70,240,168,.12);border-radius:6px;padding:1px 6px;margin-left:2px}
+.evo-badge .eb-sep{width:1px;height:16px;background:rgba(244,220,97,.22);flex:0 0 auto}
+.evo-badge .eb-kv{font-size:11px;color:var(--muted);font-weight:700;white-space:nowrap}
+.evo-badge .eb-kv b{color:var(--ink);font-family:var(--mono);font-weight:800}
+.evo-badge .eb-causal{color:var(--muted)}
+.evo-badge .eb-zero{color:var(--muted2);font-weight:800}
+.evo-badge .eb-cta{margin-left:auto;font-size:10.5px;font-weight:900;color:#241c00;white-space:nowrap;
+  background:linear-gradient(135deg,var(--gold),#e8c84a);border-radius:7px;padding:3px 9px;flex:0 0 auto;
+  animation:ebpulse 2.6s ease-in-out infinite}
+@keyframes ebpulse{0%,100%{box-shadow:0 0 0 0 rgba(244,220,97,0)}50%{box-shadow:0 0 0 3px rgba(244,220,97,.16)}}
+/* 数据真实/演示边界精简提示 */
+.bound-mini{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 13px;border-radius:11px;
+  background:rgba(7,16,13,.5);border:1px solid var(--line);font-size:11px;line-height:1.4}
+.bound-mini .bm-grp{display:inline-flex;align-items:center;gap:5px;color:var(--ink)}
+.bound-mini .bm-lbl{font-weight:900;color:var(--green2)}
+.bound-mini .bm-lbl-d{color:var(--muted)}
+.bound-mini .bm-real{color:var(--ink)}
+.bound-mini .bm-demo{color:var(--muted)}
+.bound-mini .bm-r1{color:var(--gold);font-weight:800;font-family:var(--mono);font-size:10px}
+.bound-mini .bm-seed{color:var(--muted2);font-size:10px}
+.demo-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--muted2);
+  margin-right:1px;vertical-align:middle;box-shadow:none}
+/* 入场错峰：紧随 KPI 之后点亮 */
+.evidence-row{animation:panelIn .5s var(--ease) both;animation-delay:.28s}
+@media(prefers-reduced-motion:reduce){.evidence-row{animation:none}}
+
 /* idle 骨架（P0-3）：灰显 KPI + 「待推理」角标 */
 .pend-badge{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.06em;color:var(--gold);
   background:rgba(244,220,97,.12);border:1px solid rgba(244,220,97,.3);border-radius:6px;padding:2px 7px}
@@ -555,4 +598,14 @@ circle.task-high,circle.task-mid,circle.task-low,circle.courier-node{transition:
   .chips{justify-content:flex-start}
   .topbar{grid-template-columns:1fr}
   .sysstat{justify-content:flex-start}
+  /* 自进化角标与边界提示纵向堆叠，避免窄屏挤压/溢出 */
+  .evidence-row{grid-template-columns:1fr}
+  .evo-badge{flex-wrap:wrap;gap:7px}
+  .evo-badge .eb-cta{margin-left:0}
+}
+/* ≤1100px：进一步让角标可换行、隐藏细分隔符，杜绝横向溢出/截断 */
+@media(max-width:1100px){
+  .evo-badge .eb-sep{display:none}
+  .evo-badge .eb-kv,.evo-badge .eb-main{white-space:normal}
+  .bound-mini{gap:10px}
 }
