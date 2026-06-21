@@ -292,84 +292,128 @@ function mulberry32(seed){
   };
 }
 
-/* P0-1：程序化生成「暗色城市街道路网」SVG 底图（确定性 seed=20260620）。
- * 主干道(略亮) + 次级街道网格(带不规则抖动) + 1~2 条河流/对角主路 + 街区色块。
- * 纯演示可视化沙盘，不接外部地图 API、不宣称真实 GPS。返回拼好的 SVG 字符串。*/
+/* P0-1（iter-04）：程序化生成「暗色城市街道地图」SVG 底图（确定性 seed=20260620）。
+ * 目标：对标高德/Google 暗色地图——中性灰底 + 细密不规则路网 + 大小不一街区瓦片 +
+ * 去饱和暖灰主干道（轻微贝塞尔弯曲）+ 河流。底图本身近乎中性灰，彩色只留给上层
+ * 节点/连线/聚合圈/河流，使「绿色权重」显著下降。纯演示沙盘，不接外部地图 API、不宣称 GPS。*/
 function buildStreetTiles(W,H){
   const R=mulberry32(20260620);
+  const f=(n)=>(+n).toFixed(1);
   const parts=[];
-  // —— 底：径向暗底 + 极淡街区色块 ——
+
+  // —— 底：中性暗底（#07100e 系，去青绿）——
   parts.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="url(#mgBase)"/>`);
-  // 街区色块（block fills）：在网格单元里随机填极淡冷色，模拟建筑街区
-  const COLS=11, ROWS=8, cw=W/COLS, ch=H/ROWS;
+
+  // —— 街区瓦片（block fills）：递归切分网格 -> 大小不一、随机留白、提亮到可见。
+  //    用中性深蓝灰(#141d24~#1b2730)，营造真实瓦片质感（非格纸）。——
   let blocks='';
-  for(let i=0;i<COLS;i++) for(let j=0;j<ROWS;j++){
-    const r=R(); if(r<0.34) continue;                  // 部分留空（空地/水域）
-    const pad=2+R()*5;
-    const bx=i*cw+pad+(R()-0.5)*5, by=j*ch+pad+(R()-0.5)*5;
-    const bw=cw-pad*2-(R()*7), bh=ch-pad*2-(R()*7);
-    if(bw<6||bh<6) continue;
-    const tone=r<0.55?'#0b1a16':(r<0.78?'#0d201a':'#0e241d'); // 暗青绿街区
-    const op=(0.5+R()*0.4).toFixed(2);
-    blocks+=`<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${(1+R()*2).toFixed(1)}" fill="${tone}" opacity="${op}"/>`;
+  // 把画布切成不等宽的列带 / 行带（间距不等），再在每个单元里随机决定是否填街区。
+  const colEdges=[0]; { let x=0; while(x<W-18){ x+=W*(0.045+R()*0.055); colEdges.push(Math.min(W,x)); } if(colEdges[colEdges.length-1]<W) colEdges.push(W); }
+  const rowEdges=[0]; { let y=0; while(y<H-16){ y+=H*(0.05+R()*0.06); rowEdges.push(Math.min(H,y)); } if(rowEdges[rowEdges.length-1]<H) rowEdges.push(H); }
+  const blockTones=['#121b22','#16212a','#19262f','#1b2a33','#0f181e'];
+  for(let i=0;i<colEdges.length-1;i++) for(let j=0;j<rowEdges.length-1;j++){
+    const r=R(); if(r<0.20) continue;                   // 部分留空（空地/广场/水域）
+    const x0=colEdges[i], x1=colEdges[i+1], y0=rowEdges[j], y1=rowEdges[j+1];
+    const pad=1.5+R()*3.5;
+    let bx=x0+pad+(R()-0.5)*3, by=y0+pad+(R()-0.5)*3;
+    let bw=(x1-x0)-pad*2-(R()*6), bh=(y1-y0)-pad*2-(R()*6);
+    if(bw<5||bh<5) continue;
+    // 偶尔把相邻两格并成一个大街区，制造大小不一
+    if(R()<0.16 && i<colEdges.length-2){ bw += (colEdges[i+2]-x1); }
+    if(R()<0.13 && j<rowEdges.length-2){ bh += (rowEdges[j+2]-y1); }
+    const tone=blockTones[(R()*blockTones.length)|0];
+    const op=(0.55+R()*0.42).toFixed(2);
+    const rx=(0.5+R()*2).toFixed(1);
+    blocks+=`<rect x="${f(bx)}" y="${f(by)}" width="${f(bw)}" height="${f(bh)}" rx="${rx}" fill="${tone}" opacity="${op}"/>`;
   }
   parts.push(`<g class="map-blocks">${blocks}</g>`);
 
-  // —— 河流/对角主路（1~2 条，宽缓曲线）——
+  // —— 河流（保留，已接近目标）：一条贯穿的弯曲河 ——
   let water='';
-  // 一条贯穿对角的河（青蓝、略宽、低透明）
   {
-    const y0=H*(0.18+R()*0.12);
-    let d=`M ${-20} ${y0.toFixed(1)}`;
+    const y0=H*(0.20+R()*0.12);
+    let d=`M ${-20} ${f(y0)}`;
     let x=-20,y=y0;
     while(x<W+20){
       x+=W/7; y+=(R()-0.42)*H*0.16;
       y=Math.max(40,Math.min(H-40,y));
-      d+=` Q ${(x-W/14).toFixed(1)} ${(y+(R()-0.5)*30).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
+      d+=` Q ${f(x-W/14)} ${f(y+(R()-0.5)*30)} ${f(x)} ${f(y)}`;
     }
-    water+=`<path d="${d}" fill="none" stroke="url(#mgRiver)" stroke-width="${(13+R()*7).toFixed(1)}" stroke-linecap="round" opacity="0.5"/>`;
-    water+=`<path d="${d}" fill="none" stroke="#1b6e8a" stroke-width="1.2" opacity="0.5"/>`;
+    water+=`<path d="${d}" fill="none" stroke="url(#mgRiver)" stroke-width="${(12+R()*7).toFixed(1)}" stroke-linecap="round" opacity="0.42"/>`;
+    water+=`<path d="${d}" fill="none" stroke="#2b6f86" stroke-width="1.0" opacity="0.4"/>`;
   }
   parts.push(`<g class="map-water">${water}</g>`);
 
-  // —— 次级街道网格（带不规则抖动）——
-  // 竖向 + 横向，每条线在沿途加入轻微位移，避免死板正交。
+  // —— 次级街道 / 巷道：密度 ~2.5x，中性灰，间距不等 + 断头路/丁字路口，避免方格纸 ——
   let minor='';
-  const vN=14, hN=10;
-  for(let i=1;i<vN;i++){
-    const base=W*i/vN; let d=`M ${base.toFixed(1)} 0`; let yy=0;
-    while(yy<H){ yy+=H/9; const jx=base+(R()-0.5)*16; d+=` L ${jx.toFixed(1)} ${Math.min(H,yy).toFixed(1)}`; }
-    minor+=`<path d="${d}" fill="none" stroke="#2e5e55" stroke-width="1.0" opacity="0.7"/>`;
-  }
-  for(let j=1;j<hN;j++){
-    const base=H*j/hN; let d=`M 0 ${base.toFixed(1)}`; let xx=0;
-    while(xx<W){ xx+=W/12; const jy=base+(R()-0.5)*16; d+=` L ${Math.min(W,xx).toFixed(1)} ${jy.toFixed(1)}`; }
-    minor+=`<path d="${d}" fill="none" stroke="#2e5e55" stroke-width="1.0" opacity="0.7"/>`;
+  const STREET='#3a4956', STREET2='#303c45';   // 中性灰（非青绿，略提亮增强城市纹理）
+  // 竖向次级街道：间距不等
+  { let bx=0; while(bx<W){
+      bx += W*(0.028+R()*0.040);            // 不等间距，密度提升
+      if(bx>=W) break;
+      // 部分街道为「断头路」：只画到画面中段随机位置
+      const stub=R()<0.22;
+      const yEnd=stub ? H*(0.25+R()*0.55) : H+4;
+      const yStart=stub&&R()<0.5 ? H*(R()*0.4) : -4;
+      let d=`M ${f(bx)} ${f(yStart)}`; let yy=yStart;
+      while(yy<yEnd){ yy+=H*(0.055+R()*0.04); const jx=bx+(R()-0.5)*9; d+=` L ${f(jx)} ${f(Math.min(yEnd,yy))}`; }
+      const op=(0.42+R()*0.28).toFixed(2);
+      minor+=`<path d="${d}" fill="none" stroke="${R()<0.5?STREET:STREET2}" stroke-width="${(0.7+R()*0.6).toFixed(1)}" opacity="${op}"/>`;
+  }}
+  // 横向次级街道：间距不等
+  { let by=0; while(by<H){
+      by += H*(0.035+R()*0.05);
+      if(by>=H) break;
+      const stub=R()<0.22;
+      const xEnd=stub ? W*(0.25+R()*0.55) : W+4;
+      const xStart=stub&&R()<0.5 ? W*(R()*0.4) : -4;
+      let d=`M ${f(xStart)} ${f(by)}`; let xx=xStart;
+      while(xx<xEnd){ xx+=W*(0.045+R()*0.035); const jy=by+(R()-0.5)*9; d+=` L ${f(Math.min(xEnd,xx))} ${f(jy)}`; }
+      const op=(0.42+R()*0.28).toFixed(2);
+      minor+=`<path d="${d}" fill="none" stroke="${R()<0.5?STREET:STREET2}" stroke-width="${(0.7+R()*0.6).toFixed(1)}" opacity="${op}"/>`;
+  }}
+  // 散布的短巷/丁字小路（局部加密、随机朝向），强化「真实瓦片」纹理
+  for(let k=0;k<46;k++){
+    const ox=R()*W, oy=R()*H, len=14+R()*46, horiz=R()<0.5;
+    const ex=horiz?ox+len*(R()<0.5?1:-1):ox, ey=horiz?oy:oy+len*(R()<0.5?1:-1);
+    minor+=`<line x1="${f(ox)}" y1="${f(oy)}" x2="${f(ex)}" y2="${f(ey)}" stroke="${STREET2}" stroke-width="${(0.6+R()*0.5).toFixed(1)}" opacity="${(0.3+R()*0.25).toFixed(2)}"/>`;
   }
   parts.push(`<g class="map-minor">${minor}</g>`);
 
-  // —— 主干道（略亮、略宽、贯穿全图，含 1 条对角主路）——
+  // —— 主干道（去饱和暖灰、略亮略宽、轻微贝塞尔弯曲）——
   let major='';
-  // 2 条竖主干 + 2 条横主干（位置确定性挑选，避开正中）
-  const vMain=[W*0.27,W*0.66], hMain=[H*0.36,H*0.70];
-  vMain.forEach((bx,k)=>{
-    let d=`M ${bx.toFixed(1)} -10`; let yy=-10;
-    while(yy<H+10){ yy+=H/6; const jx=bx+(R()-0.5)*22; d+=` L ${jx.toFixed(1)} ${yy.toFixed(1)}`; }
-    major+=`<path d="${d}" fill="none" stroke="#3a6f64" stroke-width="2.6" opacity="0.7"/>`;
-    major+=`<path d="${d}" fill="none" stroke="#56b89e" stroke-width="0.8" opacity="0.5"/>`;
+  const MAJ='#4a5560', MAJ2='#5a6470';   // 去饱和暖灰
+  // 用平滑曲线画一条主干道（沿主轴轻微蛇形）
+  const drawArtery=(pts,wMain,wHi)=>{
+    if(pts.length<2) return '';
+    let d=`M ${f(pts[0][0])} ${f(pts[0][1])}`;
+    for(let i=1;i<pts.length;i++){
+      const p0=pts[i-1], p1=pts[i];
+      const mx=(p0[0]+p1[0])/2, my=(p0[1]+p1[1])/2;
+      d+=` Q ${f(p0[0])} ${f(p0[1])} ${f(mx)} ${f(my)}`;
+    }
+    d+=` L ${f(pts[pts.length-1][0])} ${f(pts[pts.length-1][1])}`;
+    let s=`<path d="${d}" fill="none" stroke="${MAJ}" stroke-width="${wMain}" stroke-linecap="round" opacity="0.78"/>`;
+    s+=`<path d="${d}" fill="none" stroke="${MAJ2}" stroke-width="${wHi}" stroke-linecap="round" opacity="0.5"/>`;
+    return s;
+  };
+  // 2 条竖主干（弯曲）
+  [W*0.30,W*0.68].forEach((bx)=>{
+    const pts=[]; let yy=-12;
+    while(yy<H+12){ pts.push([bx+(R()-0.5)*40, yy]); yy+=H*0.16; }
+    major+=drawArtery(pts,2.6,0.9);
   });
-  hMain.forEach((by,k)=>{
-    let d=`M -10 ${by.toFixed(1)}`; let xx=-10;
-    while(xx<W+10){ xx+=W/7; const jy=by+(R()-0.5)*22; d+=` L ${xx.toFixed(1)} ${jy.toFixed(1)}`; }
-    major+=`<path d="${d}" fill="none" stroke="#3a6f64" stroke-width="2.6" opacity="0.7"/>`;
-    major+=`<path d="${d}" fill="none" stroke="#56b89e" stroke-width="0.8" opacity="0.5"/>`;
+  // 2 条横主干（弯曲）
+  [H*0.34,H*0.72].forEach((by)=>{
+    const pts=[]; let xx=-12;
+    while(xx<W+12){ pts.push([xx, by+(R()-0.5)*38]); xx+=W*0.14; }
+    major+=drawArtery(pts,2.6,0.9);
   });
-  // 1 条对角主路（贯穿，营造城市主轴）
+  // 1 条对角主轴（弯曲）
   {
-    let d=`M -10 ${(H*0.86).toFixed(1)}`; let x=-10,y=H*0.86;
-    while(x<W+10){ x+=W/8; y-=H*0.86/8 + (R()-0.5)*24; d+=` L ${x.toFixed(1)} ${y.toFixed(1)}`; }
-    major+=`<path d="${d}" fill="none" stroke="#3a6f64" stroke-width="2.4" opacity="0.65"/>`;
-    major+=`<path d="${d}" fill="none" stroke="#56b89e" stroke-width="0.8" opacity="0.45"/>`;
+    const pts=[]; let x=-12,y=H*0.88;
+    while(x<W+12){ pts.push([x, y+(R()-0.5)*40]); x+=W*0.12; y-=H*0.88*0.12; }
+    major+=drawArtery(pts,2.4,0.8);
   }
   parts.push(`<g class="map-major">${major}</g>`);
   return parts.join('');
@@ -384,12 +428,12 @@ function renderMap(m){
   // 暗色城市路网底图（程序化生成·seed20260620）渐变/滤镜定义
   const defs=el('defs');
   defs.innerHTML=`
-    <radialGradient id="mgBase" cx="50%" cy="46%" r="75%">
-      <stop offset="0%" stop-color="#0c1a16"/><stop offset="62%" stop-color="#09140f"/>
-      <stop offset="100%" stop-color="#06100c"/></radialGradient>
+    <radialGradient id="mgBase" cx="50%" cy="46%" r="78%">
+      <stop offset="0%" stop-color="#0c151a"/><stop offset="58%" stop-color="#0a1115"/>
+      <stop offset="100%" stop-color="#07100e"/></radialGradient>
     <linearGradient id="mgRiver" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#114a5e"/><stop offset="50%" stop-color="#176a86"/>
-      <stop offset="100%" stop-color="#114a5e"/></linearGradient>
+      <stop offset="0%" stop-color="#15414f"/><stop offset="50%" stop-color="#1c5e74"/>
+      <stop offset="100%" stop-color="#15414f"/></linearGradient>
     <filter id="nodeGlow" x="-60%" y="-60%" width="220%" height="220%">
       <feGaussianBlur stdDeviation="2.4" result="b"/><feMerge>
       <feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
@@ -404,14 +448,15 @@ function renderMap(m){
   // vignette 渐变需在 defs；补一个
   defs.innerHTML+=`<radialGradient id="mgVignette" cx="50%" cy="48%" r="70%">
       <stop offset="55%" stop-color="#000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#04100b" stop-opacity="0.55"/></radialGradient>`;
+      <stop offset="100%" stop-color="#040a0d" stop-opacity="0.55"/></radialGradient>`;
 
   const root=el('g',{id:'maproot'});
   svg.appendChild(root);
 
   // 商圈区块（柔光）—— 簇收紧后半径收小，作为该商圈的「光晕底座」叠在路网上
+  // P1-6：底图中性化后压低商圈柔光，避免整体绿色权重过高
   (m.districts||[]).forEach(d=>{
-    root.appendChild(el('circle',{cx:d.x,cy:d.y,r:56,fill:'rgba(70,240,168,.045)',stroke:'none'}));
+    root.appendChild(el('circle',{cx:d.x,cy:d.y,r:52,fill:'rgba(70,240,168,.028)',stroke:'none'}));
   });
 
   // 圈：真合单组(亮绿实线) + 多骑手兜底组(青虚线)。语义区分(P0-3)，限量避免满屏。
@@ -425,10 +470,28 @@ function renderMap(m){
     t.textContent=b.label; root.appendChild(t);
   });
 
-  // 候选虚线（先画，底层）
+  // 候选虚线（先画，底层）。P0-4：限量降噪——只「点亮」焦点商圈/featured 组附近的候选
+  // 虚线（强调收敛感），其余候选极淡甚至隐藏，消除满图交叉噪声、突出焦点簇整洁。
   const candG=el('g',{id:'candedges'});
-  (m.candidate_edges||[]).forEach(e=>{
-    candG.appendChild(el('line',{x1:e.x1,y1:e.y1,x2:e.x2,y2:e.y2,class:'cand-edge'}));
+  const fg=m.featured_group;
+  const allCand=(m.candidate_edges||[]);
+  // 每条候选线到 featured 组中心的距离（用线段中点近似）
+  const FG_R = fg ? (fg.r + 120) : 9999;   // featured 圈附近的影响半径
+  const NEAR_CAP = 18;                      // 焦点附近最多点亮多少条，避免过密
+  let nearCount=0;
+  allCand.forEach(e=>{
+    const mx=(e.x1+e.x2)/2, my=(e.y1+e.y2)/2;
+    let near=false;
+    if(fg){
+      const d=Math.hypot(mx-fg.cx, my-fg.cy);
+      // 端点也算进焦点圈内则视为「焦点候选」
+      const d1=Math.hypot(e.x1-fg.cx,e.y1-fg.cy), d2=Math.hypot(e.x2-fg.cx,e.y2-fg.cy);
+      near = (Math.min(d,d1,d2) < FG_R) && (nearCount < NEAR_CAP);
+    }
+    const ln=el('line',{x1:e.x1,y1:e.y1,x2:e.x2,y2:e.y2,
+      class:'cand-edge'+(near?' cand-focus':' cand-dim')});
+    if(near) nearCount++;
+    candG.appendChild(ln);
   });
   root.appendChild(candG);
 

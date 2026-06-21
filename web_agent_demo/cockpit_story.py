@@ -152,6 +152,48 @@ def _jitter_point(cx: float, cy: float, key: str, radius: float = 38.0) -> tuple
     return round(x, 1), round(y, 1)
 
 
+def _relax_overlap(
+    nodes: list[dict[str, Any]],
+    min_dist: float = 16.0,
+    iters: int = 14,
+    strength: float = 0.5,
+) -> None:
+    """P0-5：簇内/全局去重叠——确定性斥力松弛，使节点像目标稿一样均匀可读，
+    不挤成一坨。原地修改每个 dict 的 x/y（仍是演示坐标，不动任何真实字段）。
+
+    纯几何后处理：节点过近时互相轻推，重复若干轮后收敛；无随机数，结果确定。
+    """
+    n = len(nodes)
+    if n < 2:
+        return
+    md2 = min_dist * min_dist
+    for _ in range(iters):
+        for i in range(n):
+            ni = nodes[i]
+            for j in range(i + 1, n):
+                nj = nodes[j]
+                dx = ni["x"] - nj["x"]
+                dy = ni["y"] - nj["y"]
+                d2 = dx * dx + dy * dy
+                if d2 >= md2:
+                    continue
+                d = math.sqrt(d2) if d2 > 1e-6 else 0.0
+                if d < 1e-6:
+                    # 完全重合：用索引派生的确定性方向分开
+                    ang = (i * 2.399963) % (2 * math.pi)
+                    dx, dy, d = math.cos(ang), math.sin(ang), 1.0
+                push = (min_dist - d) * 0.5 * strength
+                ux, uy = dx / d, dy / d
+                ni["x"] += ux * push
+                ni["y"] += uy * push
+                nj["x"] -= ux * push
+                nj["y"] -= uy * push
+    # 收回安全框并定点
+    for nd in nodes:
+        nd["x"] = round(max(20, min(CANVAS_W - 20, nd["x"])), 1)
+        nd["y"] = round(max(20, min(CANVAS_H - 20, nd["y"])), 1)
+
+
 # --------------------------------------------------------------------------- #
 # 2. 合成地图布局                                                              #
 # --------------------------------------------------------------------------- #
@@ -197,7 +239,7 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
     for t in tasks_sorted:
         cl = assign.get(t, 0)
         cx, cy = centers[cl] if cl < len(centers) else centers[0]
-        x, y = _jitter_point(cx, cy, "task-" + t, radius=42)
+        x, y = _jitter_point(cx, cy, "task-" + t, radius=50)
         ws = task_will.get(t, [0.4])
         w_med = sorted(ws)[len(ws) // 2]
         risk = "high" if w_med < 0.3 else ("mid" if w_med < 0.55 else "low")
@@ -206,6 +248,11 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
             "willingness_repr": round(w_med, 3),   # 真值派生
             "risk": risk,                           # 真值派生(意愿)
         }
+
+    # P0-5：簇内去重叠——按簇分组做斥力松弛，使每个商圈内的任务点均匀可读不挤成团。
+    for k in range(n_clusters):
+        grp = [task_nodes[t] for t in tasks_sorted if assign.get(t) == k]
+        _relax_overlap(grp, min_dist=20.0, iters=16, strength=0.6)
 
     # 商圈节点
     district_nodes = []
@@ -262,6 +309,9 @@ def synth_layout(text: str, report: dict[str, Any]) -> dict[str, Any]:
             "id": cid, "x": x, "y": y,
             "active": cid in used_couriers,   # 真值（是否被采纳）
         }
+
+    # P0-5：骑手节点同样去重叠（全局一遍，避免骑手相互/与簇心堆叠成团）
+    _relax_overlap(list(courier_nodes.values()), min_dist=15.0, iters=12, strength=0.5)
 
     # 连线：采纳=实线（真）；候选虚线=每个任务取若干高意愿候选行（演示采样，标注）
     accepted_edges = []
