@@ -86,6 +86,14 @@
 验证标准：5 条策略在 10 个样本集合中都能出现为 selected 或主要 evaluating；不同场景不会总是同一条策略胜出。
 
 完成记录：
+- 已把仿真样本策略选择从固定 `strategy_cycle` 展示升级为样本特征评分模型：先生成商家、骑手、候选派单，再根据订单密度、候选竞争、骑手稀缺、低意愿风险、路况压力、低峰稳定性计算 S1-S5 分数，最高分策略才成为 `selected_strategy_id`。
+- `strategy_path` 现在按真实分数排名输出，包含 `rank` 和动态 `evidence`；左侧策略卡片会展示对应样本的中文证据，例如密度、候选竞争、稀缺、低意愿和低峰稳定性，不再只是固定卡片文案。
+- 已补强场景样本压力信号：商圈高峰、骑手稀缺等场景不再只走一条路径；雨天和活动场景仍保持风险平衡为主，但会让合单/多派/修复进入主评估。
+- 已新增单测断言：60 个样本中 S1-S5 全部可成为最高分选中策略；每个样本选中策略必须等于 `strategy_path` 第一名；每个场景 10 个样本至少有 2 条策略胜出，前三主评估集合至少覆盖 4 条策略。
+- 策略覆盖审计产物：`goal/goal-6/task6-strategy-coverage-audit.json`。审计结果显示全局胜出分布为 S1=14、S2=21、S3=5、S4=5、S5=15，所有样本 `selected_is_top_score_for_all_samples=true`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
 
 ## Task 7: 第二轮大型全面检查-debug循环
 

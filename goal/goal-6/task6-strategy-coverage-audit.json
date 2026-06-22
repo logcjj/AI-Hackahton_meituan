@@ -1,0 +1,50 @@
+{
+  "checked_at": "2026-06-23T00:00:00+08:00",
+  "sample_count": 60,
+  "global_selected_distribution": {
+    "S1": 14,
+    "S2": 21,
+    "S3": 5,
+    "S4": 5,
+    "S5": 15
+  },
+  "all_selected_strategies": ["S1", "S2", "S3", "S4", "S5"],
+  "selected_is_top_score_for_all_samples": true,
+  "scene_summary": {
+    "commerce_peak": {
+      "selected_distribution": {"S1": 5, "S2": 5},
+      "top3_union": ["S1", "S2", "S3", "S4", "S5"],
+      "major_evaluated_count": 5
+    },
+    "medium_parallel": {
+      "selected_distribution": {"S1": 3, "S2": 7},
+      "top3_union": ["S1", "S2", "S3", "S4", "S5"],
+      "major_evaluated_count": 5
+    },
+    "scarce_repair": {
+      "selected_distribution": {"S1": 1, "S2": 2, "S3": 5, "S5": 2},
+      "top3_union": ["S1", "S2", "S3", "S4", "S5"],
+      "major_evaluated_count": 5
+    },
+    "rain_low_willingness": {
+      "selected_distribution": {"S1": 1, "S2": 1, "S5": 8},
+      "top3_union": ["S1", "S2", "S3", "S5"],
+      "major_evaluated_count": 4
+    },
+    "offpeak_greedy": {
+      "selected_distribution": {"S1": 1, "S2": 4, "S4": 5},
+      "top3_union": ["S1", "S2", "S3", "S4", "S5"],
+      "major_evaluated_count": 5
+    },
+    "event_mixed_pressure": {
+      "selected_distribution": {"S1": 3, "S2": 2, "S5": 5},
+      "top3_union": ["S1", "S2", "S3", "S5"],
+      "major_evaluated_count": 4
+    }
+  },
+  "notes": [
+    "strategy selection is now driven by generated sample features: density, candidate competition, courier scarcity, willingness risk, traffic pressure and off-peak stability",
+    "the selected strategy is the highest score in every generated sample",
+    "scene-level variation is intentionally constrained by business semantics: rain and event scenes keep S5 prominent, offpeak keeps S4 prominent, scarce keeps S3 prominent"
+  ]
+}

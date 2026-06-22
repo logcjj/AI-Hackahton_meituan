@@ -248,6 +248,8 @@ class WebAgentDemoTest(unittest.TestCase):
 
         samples = build_simulated_scenario_samples()
         selected = {sample["selected_strategy_id"] for sample in samples}
+        selected_by_scene = {}
+        major_evaluated_by_scene = {}
 
         self.assertEqual(len(samples), 60)
         self.assertTrue({"S1", "S2", "S3", "S4", "S5"}.issubset(selected))
@@ -255,6 +257,14 @@ class WebAgentDemoTest(unittest.TestCase):
             path = sample["strategy_path"]
             self.assertEqual(len(path), 5)
             self.assertEqual(sum(1 for item in path if item["status"] == "selected"), 1)
+            self.assertEqual(path[0]["id"], sample["selected_strategy_id"])
+            self.assertEqual(path[0]["score"], max(item["score"] for item in path))
+            self.assertIn("strategy_decision", sample)
+            self.assertIn("candidate_competition", sample["strategy_decision"]["metrics"])
+            self.assertTrue(all("evidence" in item for item in path))
+            scene_id = sample["scenario_id"]
+            selected_by_scene.setdefault(scene_id, set()).add(sample["selected_strategy_id"])
+            major_evaluated_by_scene.setdefault(scene_id, set()).update(item["id"] for item in path[:3])
             for assignment in sample["assignments"]:
                 self.assertIn("merchant_id", assignment)
                 self.assertIn("courier_id", assignment)
@@ -262,6 +272,8 @@ class WebAgentDemoTest(unittest.TestCase):
                 self.assertGreater(float(assignment["cost"]), 0)
                 self.assertGreaterEqual(int(assignment["eta_min"]), 6)
                 self.assertIn(assignment["risk"], {"Low", "Medium", "High"})
+        self.assertTrue(all(len(strategies) >= 2 for strategies in selected_by_scene.values()))
+        self.assertTrue(all(len(strategies) >= 4 for strategies in major_evaluated_by_scene.values()))
 
     def test_home_page_keeps_review_alignment_out_of_frontend_layout(self):
         from web_agent_demo.server import render_index

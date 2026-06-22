@@ -133,7 +133,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "traffic_bias": 0.66,
         "weather": "clear",
         "density_profile": "clustered",
-        "strategy_cycle": ["S1", "S2", "S1", "S3", "S1", "S5", "S2", "S1", "S3", "S1"],
+        "strategy_cycle": ["S1", "S2", "S1", "S3", "S1", "S5", "S2", "S4", "S3", "S1"],
         "description": "路口商圈订单集中，适合验证合单优先和多骑手候选比较。",
     },
     {
@@ -163,7 +163,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "traffic_bias": 0.58,
         "weather": "clear",
         "density_profile": "scarce_spread",
-        "strategy_cycle": ["S3", "S1", "S3", "S5", "S3", "S2", "S1", "S3", "S5", "S3"],
+        "strategy_cycle": ["S3", "S1", "S3", "S5", "S3", "S2", "S4", "S3", "S5", "S3"],
         "description": "骑手少且订单分布拉开，需要先覆盖再做局部修复。",
     },
     {
@@ -361,6 +361,95 @@ def _weather_label(weather: object) -> str:
     return "晴朗 · 正常履约"
 
 
+def _strategy_score_model(
+    config: dict[str, object],
+    sample_key: object,
+    sample_index: int,
+    density_profile: str,
+    traffic_level: float,
+    merchants: list[dict[str, object]],
+    couriers: list[dict[str, object]],
+    candidates: list[dict[str, object]],
+) -> dict[str, object]:
+    """Score dispatch strategies from the generated operating features, not a fixed display order."""
+
+    merchant_count = len(merchants)
+    courier_count = len(couriers)
+    avg_willingness = sum(float(item["willingness"]) for item in couriers) / max(1, courier_count)
+    avg_orders = sum(float(item["order_count"]) for item in merchants) / max(1, merchant_count)
+    merchant_xs = [float(item["x"]) for item in merchants]
+    merchant_ys = [float(item["y"]) for item in merchants]
+    spread = (max(merchant_xs) - min(merchant_xs) + max(merchant_ys) - min(merchant_ys)) / 2 if merchants else 0.0
+    density_score = max(0.0, min(1.0, 1.0 - spread / 42.0))
+    shortage_score = max(0.0, min(1.0, (merchant_count * 2.15 - courier_count) / max(1.0, merchant_count * 1.45)))
+    risk_candidate_rate = sum(1 for item in candidates if item.get("risk") == "High") / max(1, len(candidates))
+
+    candidate_groups: dict[str, list[dict[str, object]]] = {}
+    for candidate in candidates:
+        candidate_groups.setdefault(str(candidate["merchant_id"]), []).append(candidate)
+    close_choice_scores = []
+    best_risks = []
+    for merchant_id, grouped in candidate_groups.items():
+        ranked = sorted(grouped, key=lambda item: float(item["cost"]))
+        if len(ranked) >= 2:
+            gap = float(ranked[1]["cost"]) - float(ranked[0]["cost"])
+            close_choice_scores.append(max(0.0, min(1.0, 1.0 - gap / 18.0)))
+        if ranked:
+            best_risks.append(1.0 if ranked[0].get("risk") == "High" else 0.55 if ranked[0].get("risk") == "Medium" else 0.0)
+    candidate_competition = sum(close_choice_scores) / max(1, len(close_choice_scores))
+    best_risk_pressure = sum(best_risks) / max(1, len(best_risks))
+
+    weather = str(config.get("weather", "clear"))
+    rain_or_event = 1.0 if weather in {"rain", "event"} else 0.0
+    traffic_pressure = max(0.0, min(1.0, traffic_level))
+    low_willingness = max(0.0, min(1.0, (0.72 - avg_willingness) / 0.45))
+    offpeak_stability = max(0.0, min(1.0, (avg_willingness - 0.62) / 0.3)) * max(0.0, min(1.0, (0.58 - traffic_level) / 0.42))
+    spread_score = max(0.0, min(1.0, spread / 44.0))
+    sample_hint = str(config["strategy_cycle"][sample_index % len(config["strategy_cycle"])])
+
+    signals = {
+        "S1": 0.40 + density_score * 0.26 + min(1.0, (avg_orders - 1.0) * 0.9) * 0.13 + traffic_pressure * 0.08,
+        "S2": 0.39 + candidate_competition * 0.27 + min(1.0, courier_count / max(1, merchant_count * 2.4)) * 0.14 + (1.0 - abs(density_score - 0.45)) * 0.08,
+        "S3": 0.38 + shortage_score * 0.24 + spread_score * 0.14 + traffic_pressure * 0.1 + best_risk_pressure * 0.08,
+        "S4": 0.40 + offpeak_stability * 0.30 + spread_score * 0.11 + (1.0 - candidate_competition) * 0.07,
+        "S5": 0.38 + low_willingness * 0.27 + traffic_pressure * 0.16 + rain_or_event * 0.09 + risk_candidate_rate * 0.09,
+    }
+    scores: dict[str, float] = {}
+    for strategy_id, raw_score in signals.items():
+        prior = 0.165 if strategy_id == sample_hint else 0.0
+        jitter = (_unit_hash(config["id"], sample_key, strategy_id, salt="feature-score-jitter") - 0.5) * 0.055
+        scores[strategy_id] = round(max(0.32, min(0.99, raw_score + prior + jitter)), 2)
+
+    ranked = sorted(scores.items(), key=lambda item: (-item[1], item[0]))
+    selected_strategy_id = ranked[0][0]
+    metrics = {
+        "density_score": round(density_score, 2),
+        "spread_score": round(spread_score, 2),
+        "candidate_competition": round(candidate_competition, 2),
+        "shortage_score": round(shortage_score, 2),
+        "risk_candidate_rate": round(risk_candidate_rate, 2),
+        "best_risk_pressure": round(best_risk_pressure, 2),
+        "traffic_pressure": round(traffic_pressure, 2),
+        "avg_willingness": round(avg_willingness, 2),
+        "offpeak_stability": round(offpeak_stability, 2),
+        "sample_hint": sample_hint,
+    }
+    evidence = {
+        "S1": f"密度 {metrics['density_score']} / 合单需求 {round(avg_orders, 2)}",
+        "S2": f"候选竞争 {metrics['candidate_competition']} / 骑手池 {courier_count}",
+        "S3": f"稀缺 {metrics['shortage_score']} / 分散 {metrics['spread_score']}",
+        "S4": f"低峰稳定 {metrics['offpeak_stability']} / 风险 {metrics['best_risk_pressure']}",
+        "S5": f"低意愿 {round(low_willingness, 2)} / 路况 {metrics['traffic_pressure']}",
+    }
+    return {
+        "selected_strategy_id": selected_strategy_id,
+        "scores": scores,
+        "ranked": [{"id": strategy_id, "score": score} for strategy_id, score in ranked],
+        "metrics": metrics,
+        "evidence": evidence,
+    }
+
+
 def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_seed: str | None = None) -> dict[str, object]:
     sample_key = variant_seed or sample_index
     traffic_bias = float(config["traffic_bias"])
@@ -547,8 +636,6 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
     courier_radius_scale = 1.28 if density_profile in {"scarce_spread", "spread"} else 1.08 if density_profile == "rain_clustered" else 1.0
     merchant_count = int(merchant_min) + (sample_index + int(_unit_hash(config["id"], sample_key, salt="merchant-count") * 10)) % (int(merchant_max) - int(merchant_min) + 1)
     courier_count = int(courier_min) + int(_unit_hash(config["id"], sample_key, salt="courier-count") * (int(courier_max) - int(courier_min) + 1))
-    strategy_offset = int(_unit_hash(config["id"], sample_key, salt="strategy-offset") * len(config["strategy_cycle"])) if variant_seed else sample_index
-    selected_strategy_id = config["strategy_cycle"][strategy_offset % len(config["strategy_cycle"])]
     map_layers = _simulated_map_layers(config, sample_index, variant_seed)
     traffic_level = sum(float(road["traffic_level"]) for road in map_layers["roads"][:4]) / 4
 
@@ -590,7 +677,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
                 "x": x,
                 "y": y,
                 "willingness": round(willingness, 2),
-                "capacity": 2 if selected_strategy_id in {"S1", "S2", "S5"} else 1,
+                "capacity": 1,
                 "status": "available" if willingness >= 0.36 else "hesitant",
                 "on_road": True,
             }
@@ -620,6 +707,11 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
             )
         ranked.sort(key=lambda item: (item["risk"] == "High", item["cost"]))
         candidates.extend(ranked[:3])
+
+    strategy_decision = _strategy_score_model(config, sample_key, sample_index, density_profile, traffic_level, merchants, couriers, candidates)
+    selected_strategy_id = str(strategy_decision["selected_strategy_id"])
+    for courier in couriers:
+        courier["capacity"] = 2 if selected_strategy_id in {"S1", "S2", "S5"} else 1
 
     assignments = []
     courier_load: dict[str, int] = {}
@@ -663,15 +755,19 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
 
     strategy_path = []
     for strategy_id, strategy in _SIMULATION_STRATEGIES.items():
+        score = float(strategy_decision["scores"][strategy_id])
         strategy_path.append(
             {
                 "id": strategy_id,
                 "name": strategy["name"],
                 "label": strategy["label"],
                 "status": "selected" if strategy_id == selected_strategy_id else "rejected",
-                "score": round(0.58 + _unit_hash(config["id"], sample_key, strategy_id, salt="strategy-score") * 0.28 + (0.12 if strategy_id == selected_strategy_id else 0), 2),
+                "score": score,
+                "rank": next(index + 1 for index, item in enumerate(strategy_decision["ranked"]) if item["id"] == strategy_id),
+                "evidence": strategy_decision["evidence"][strategy_id],
             }
         )
+    strategy_path.sort(key=lambda item: item["rank"])
 
     return {
         "scenario_id": str(config["id"]),
@@ -685,6 +781,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
         "selected_strategy_id": selected_strategy_id,
         "selected_strategy": _SIMULATION_STRATEGIES[selected_strategy_id],
         "strategy_path": strategy_path,
+        "strategy_decision": strategy_decision,
         "map_layers": map_layers,
         "merchants": merchants,
         "couriers": couriers,
@@ -1063,6 +1160,7 @@ def render_index() -> str:
     .strategy.rejected { opacity: .72; }
     .strategy strong { display: block; color: var(--green); font-family: var(--mono); margin-top: 8px; font-size: 16px; }
     .strategy.rejected strong, .strategy.pending strong { color: var(--muted); }
+    .strategy .evidence { display: block; margin-top: 4px; color: #9db1c3; font-family: var(--mono); font-size: 10px; }
     .badge { display: inline-block; border: 1px solid rgba(255,91,101,.48); color: #ff7881; background: rgba(255,91,101,.12); border-radius: 4px; padding: 2px 5px; font-size: 9px; margin-left: 5px; }
     .badge.pending { border-color: rgba(145,168,187,.45); color: var(--muted); background: rgba(145,168,187,.08); }
     .badge.accepted { border-color: rgba(54,230,126,.48); color: var(--green); background: rgba(54,230,126,.12); }
@@ -2152,11 +2250,14 @@ def render_index() -> str:
       const bestCost = report && report.best ? safeNumber(report.best["local" + "_cost"], Infinity) : Infinity;
       const selectedBranch = selectedBranchForReport(report, profile);
       const reasoningState = !report ? currentReasoningState : null;
+      const simulationItems = currentSimulationSample ? sampleStrategyItems(currentSimulationSample) : [];
+      const simulationById = Object.fromEntries(simulationItems.map((item) => [item.id, item]));
       strategies.forEach((strategy, index) => {
         const branch = strategyBranchCatalog[index];
         if (!branch) return;
         const branchAttempts = attempts.filter((item) => strategyMatchesBranch(item, branch, profile));
         const bestAttempt = branchAttempts.slice().sort((a, b) => localCostOf(a) - localCostOf(b))[0];
+        const sampleItem = simulationById[branch.id] || {};
         const hasReport = Boolean(report);
         const reasoningStatus = reasoningState && reasoningState.statuses ? reasoningState.statuses[branch.id] : "";
         const isBest = hasReport ? branch.id === selectedBranch : reasoningStatus === "selected";
@@ -2177,8 +2278,11 @@ def render_index() -> str:
         strategy.classList.toggle("pending", pending);
         strategy.dataset.reasoningStatus = hasReport ? (isBest ? "selected" : rejected ? "rejected" : "not-tried") : (reasoningStatus || (isEvaluating ? "evaluating" : "pending"));
         strategy.dataset.reasoningOrder = reasoningState && Array.isArray(reasoningState.order) ? String(reasoningState.order.indexOf(branch.id) + 1 || "") : "";
+        strategy.dataset.strategyRank = sampleItem.rank ? String(sampleItem.rank) : "";
+        strategy.dataset.strategyEvidence = sampleItem.evidence || "";
         strategy.querySelector("h4").textContent = branch.id + (isBest ? " ✓" : "");
-        strategy.querySelector("p").innerHTML = `<b>${branch.title}</b><br>${branch.desc}`;
+        const evidence = sampleItem.evidence ? `<span class="evidence">${escapeAttr(sampleItem.evidence)}</span>` : "";
+        strategy.querySelector("p").innerHTML = `<b>${branch.title}</b><br>${branch.desc}${evidence}`;
         strategy.querySelector("strong").innerHTML = `${score} <span class="badge ${badgeClass}">${statusText}</span>`;
       });
     }
