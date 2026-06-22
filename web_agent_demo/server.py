@@ -1388,7 +1388,7 @@ def render_index() -> str:
     .dispatch-link.secondary { stroke: rgba(43, 222, 205, .64); stroke-width: 3.1; stroke-dasharray: none; filter: drop-shadow(0 0 4px rgba(32,212,199,.2)); opacity: .9; }
     .dispatch-link.overview-route { stroke: var(--route-color, rgba(43, 222, 205, .76)); stroke-width: 3.55; opacity: .96; filter: drop-shadow(0 0 5px rgba(32,212,199,.24)); }
     .dispatch-link.pickup-leg { stroke: rgba(32, 212, 199, .72); stroke-width: 3.6; filter: drop-shadow(0 0 5px rgba(32,212,199,.18)); }
-    .dispatch-link.pickup-leg.overview-route { stroke: var(--route-color, rgba(32,212,199,.82)); stroke-width: 3.7; }
+    .dispatch-link.pickup-leg.overview-route { stroke: rgba(255, 186, 58, .9); stroke-width: 4.1; }
     .dispatch-link.delivery-leg { stroke: var(--route-color, rgba(118, 201, 76, .88)); stroke-width: 3.25; opacity: .92; }
     .dispatch-link.delivery-leg.active-assignment { stroke-width: 4.8; opacity: 1; }
     .dispatch-link.delivery-leg.overview-route { stroke: var(--route-color, rgba(118, 201, 76, .78)); stroke-width: 3.35; opacity: .88; }
@@ -1486,8 +1486,11 @@ def render_index() -> str:
     .map-frame.focus-selected .pin.active-assignment .mark { box-shadow: 0 0 0 4px rgba(39,230,208,.16), 0 0 18px rgba(39,230,208,.55); }
     .map-frame.focus-selected .dispatch-link.secondary:not(.active-assignment) { opacity: .86; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(32,212,199,.18)); }
     .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .82; fill: rgba(43,222,205,.82); }
-    .map-frame.assignment-overview .dispatch-link.primary,
-    .map-frame.assignment-overview .dispatch-link.secondary { stroke-dashoffset: 0; }
+    .map-frame.assignment-overview .dispatch-link { stroke-dashoffset: 0; }
+    .map-frame.assignment-overview .dispatch-link.primary { stroke: var(--route-color, rgba(43, 222, 205, .78)); stroke-width: 3.7; opacity: .96; filter: drop-shadow(0 0 5px rgba(32,212,199,.22)); }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(255, 186, 58, .92); stroke-width: 4.1; opacity: .98; filter: drop-shadow(0 0 6px rgba(255,186,58,.22)); }
+    .map-frame.assignment-overview .dispatch-link.delivery-leg { stroke-width: 3.05; opacity: .74; stroke-dasharray: 13 9; }
+    .map-frame.assignment-overview .dispatch-arrow { opacity: .8; }
     .map-frame.hide-entities .pin,
     .map-frame.hide-entities .map-label { opacity: .12; pointer-events: none; }
     .map-frame.hide-entities .pin.active-assignment,
@@ -1507,7 +1510,12 @@ def render_index() -> str:
     .map-frame.zoomed .pin { transform: translate(-50%, -50%) scale(1.04); }
     .map-frame.zoomed .map-label { transform: translate(calc(-50% + var(--label-offset-x, 0px)), calc(-50% + var(--label-offset-y, 0px))) scale(1.04); }
     .map-frame.locating .dispatch-link.primary { stroke-width: 6; }
-    .map-frame.hide-candidates .dispatch-link.secondary:not(.overview-route) { display: none; }
+    .map-frame.hide-candidates .dispatch-link.secondary:not(.active-assignment),
+    .map-frame.hide-candidates .dispatch-arrow.secondary:not(.active-assignment),
+    .map-frame.hide-candidates .dispatch-hit-area.secondary:not(.active-assignment) { display: none; }
+    .map-frame.hide-delivery-routes .dispatch-link.delivery-leg:not(.active-assignment),
+    .map-frame.hide-delivery-routes .dispatch-arrow[data-leg="merchant-to-order"]:not(.active-assignment),
+    .map-frame.hide-delivery-routes .dispatch-hit-area[data-leg="merchant-to-order"]:not(.active-assignment) { display: none; }
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
       position: absolute; right: 20px; bottom: 16px; z-index: 4; width: 138px;
@@ -2653,14 +2661,25 @@ def render_index() -> str:
     function displayPositionsForLabels(labels) {
       const placed = [];
       const positions = {};
-      const minDistancePx = 38;
+      const density = currentSimulationSample && currentSimulationSample.summary ? currentSimulationSample.summary.density_profile : "";
+      const isClusteredScene = String(density || "").includes("clustered");
+      const minDistanceFor = (item) => {
+        const kind = item && item.kind ? item.kind : "";
+        if (kind === "merchant_order" || kind === "pickup_cluster") return isClusteredScene ? 24 : 30;
+        if (kind === "order") return 28;
+        if (kind === "courier") return isClusteredScene ? 32 : 36;
+        return 32;
+      };
       const pointDistance = (a, b) => Math.hypot((a.x - b.x) * 9.8, (a.y - b.y) * 6.4);
-      const collides = (candidate) => placed.some((point) => pointDistance(candidate, point) < minDistancePx);
+      const collides = (candidate, item) => placed.some((point) => {
+        const threshold = Math.max(minDistanceFor(item), point.minDistance || 32);
+        return pointDistance(candidate, point) < threshold;
+      });
       (labels || []).forEach((item) => {
         const raw = {x: safeNumber(item.x, 50), y: safeNumber(item.y, 50)};
         let chosen = {...raw};
         let avoided = false;
-        if (collides(chosen)) {
+        if (collides(chosen, item)) {
           const checksum = String(item.id || "").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
           for (let attempt = 0; attempt < 42; attempt += 1) {
             const angle = ((checksum * 37 + attempt * 137) % 360) * Math.PI / 180;
@@ -2669,7 +2688,7 @@ def render_index() -> str:
               x: Math.max(6, Math.min(94, raw.x + Math.cos(angle) * radiusPx / 9.8)),
               y: Math.max(6, Math.min(94, raw.y + Math.sin(angle) * radiusPx / 6.4))
             };
-            if (!collides(candidate)) {
+            if (!collides(candidate, item)) {
               chosen = candidate;
               avoided = true;
               break;
@@ -2683,7 +2702,7 @@ def render_index() -> str:
           rawY: raw.y,
           avoided: avoided || pointDistance(chosen, raw) > 2
         };
-        placed.push({id: item.id, x: chosen.x, y: chosen.y});
+        placed.push({id: item.id, kind: item.kind, x: chosen.x, y: chosen.y, minDistance: minDistanceFor(item)});
       });
       return positions;
     }
@@ -2705,7 +2724,7 @@ def render_index() -> str:
       frame.classList.toggle("focus-selected", focusMode);
       frame.classList.toggle("assignment-overview", Boolean(hasAssignments && !focusMode));
       renderSimulatedBaseMap(profile.dispatchMap && profile.dispatchMap.map_layers);
-      if (hasAssignments && profile.selected) {
+      if (hasAssignments && profile.selected && focusMode) {
         frame.dataset.selectedAssignment = profile.selected;
       } else {
         frame.removeAttribute("data-selected-assignment");
@@ -2911,12 +2930,111 @@ def render_index() -> str:
         return list;
       }, []);
     }
+    function roadNodeKey(point) {
+      return `${safeNumber(point[0], 0).toFixed(2)},${safeNumber(point[1], 0).toFixed(2)}`;
+    }
+    function addRoadGraphNode(graph, point) {
+      const key = roadNodeKey(point);
+      if (!graph.nodes[key]) graph.nodes[key] = [safeNumber(point[0], 0), safeNumber(point[1], 0)];
+      if (!graph.edges[key]) graph.edges[key] = [];
+      return key;
+    }
+    function addRoadGraphEdge(graph, from, to) {
+      const fromKey = addRoadGraphNode(graph, from);
+      const toKey = addRoadGraphNode(graph, to);
+      const weight = Math.max(0.01, distance2D(from, to));
+      graph.edges[fromKey].push({to: toKey, weight});
+      graph.edges[toKey].push({to: fromKey, weight});
+    }
+    function buildRoadGraph(mapLayers, startSnap, endSnap) {
+      const roads = Array.isArray(mapLayers && mapLayers.roads) ? mapLayers.roads : [];
+      const graph = {nodes: {}, edges: {}, segments: []};
+      roads.forEach((road, roadIndex) => {
+        const roadPoints = normalizedRoadPoints(road);
+        for (let index = 0; index < roadPoints.length - 1; index += 1) {
+          const segment = {
+            road,
+            roadIndex,
+            segmentIndex: index,
+            start: roadPoints[index],
+            end: roadPoints[index + 1]
+          };
+          graph.segments.push(segment);
+          addRoadGraphEdge(graph, segment.start, segment.end);
+        }
+      });
+      for (let left = 0; left < graph.segments.length; left += 1) {
+        for (let right = left + 1; right < graph.segments.length; right += 1) {
+          const a = graph.segments[left];
+          const b = graph.segments[right];
+          if (a.roadIndex === b.roadIndex) continue;
+          const intersection = segmentIntersection(a.start, a.end, b.start, b.end);
+          if (!intersection) continue;
+          addRoadGraphEdge(graph, intersection, a.start);
+          addRoadGraphEdge(graph, intersection, a.end);
+          addRoadGraphEdge(graph, intersection, b.start);
+          addRoadGraphEdge(graph, intersection, b.end);
+        }
+      }
+      const connectSnap = (snap) => {
+        if (!snap) return "";
+        const segment = graph.segments.find((item) => item.road === snap.road && item.segmentIndex === snap.segmentIndex);
+        const key = addRoadGraphNode(graph, snap.point);
+        if (segment) {
+          addRoadGraphEdge(graph, snap.point, segment.start);
+          addRoadGraphEdge(graph, snap.point, segment.end);
+        }
+        return key;
+      };
+      return {
+        graph,
+        startKey: connectSnap(startSnap),
+        endKey: connectSnap(endSnap)
+      };
+    }
+    function shortestRoadGraphPath(graphPayload) {
+      const graph = graphPayload && graphPayload.graph;
+      const startKey = graphPayload && graphPayload.startKey;
+      const endKey = graphPayload && graphPayload.endKey;
+      if (!graph || !startKey || !endKey || !graph.nodes[startKey] || !graph.nodes[endKey]) return [];
+      const distances = {[startKey]: 0};
+      const previous = {};
+      const visited = new Set();
+      const queue = [startKey];
+      while (queue.length) {
+        queue.sort((left, right) => safeNumber(distances[left], Infinity) - safeNumber(distances[right], Infinity));
+        const current = queue.shift();
+        if (!current || visited.has(current)) continue;
+        if (current === endKey) break;
+        visited.add(current);
+        (graph.edges[current] || []).forEach((edge) => {
+          const nextDistance = safeNumber(distances[current], Infinity) + safeNumber(edge.weight, Infinity);
+          if (nextDistance < safeNumber(distances[edge.to], Infinity)) {
+            distances[edge.to] = nextDistance;
+            previous[edge.to] = current;
+            queue.push(edge.to);
+          }
+        });
+      }
+      if (startKey !== endKey && !previous[endKey]) return [];
+      const keys = [endKey];
+      while (keys[0] !== startKey) {
+        const parent = previous[keys[0]];
+        if (!parent) return [];
+        keys.unshift(parent);
+      }
+      return keys.map((key) => graph.nodes[key]).filter(Boolean);
+    }
     function roadFollowingRoute(start, end, mapLayers) {
       if (!mapLayers || !Array.isArray(mapLayers.roads)) return [start, end];
       const roadFilter = (road) => road.type !== "service" || distance2D(start, end) < 20;
       const startSnap = nearestRoadSnap(start, mapLayers, roadFilter) || nearestRoadSnap(start, mapLayers);
       const endSnap = nearestRoadSnap(end, mapLayers, roadFilter) || nearestRoadSnap(end, mapLayers);
       if (!startSnap || !endSnap) return [start, end];
+      const graphRoute = shortestRoadGraphPath(buildRoadGraph(mapLayers, startSnap, endSnap));
+      if (graphRoute.length >= 2) {
+        return compactRoutePoints([start, ...graphRoute, end]);
+      }
       if (startSnap.road === endSnap.road) {
         return compactRoutePoints([start, ...chainAlongRoad(startSnap, endSnap), end]);
       }
@@ -2980,7 +3098,7 @@ def render_index() -> str:
         return;
       }
       const focusMode = profile.mapFocusMode === "focus";
-      const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
+      const selectedAssignment = focusMode ? (profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "") : "";
       const mapLayers = profile.dispatchMap.map_layers;
       const routePalette = ["#26dccd", "#55d68a", "#ffcf4a", "#5fb8ff", "#ff9d57", "#c3e56d", "#7de3ff", "#f2b76a"];
       const pathHtml = profile.dispatchMap.assignments.map((assignment, index) => {
@@ -2990,7 +3108,7 @@ def render_index() -> str:
         const pickupPoint = entityPoints[assignment.pickup];
         const orderPoints = orders.map((order) => entityPoints[order]).filter(Boolean);
         if (!pickupPoint || courierPoints.length === 0) return "";
-        const isActive = assignment.id === selectedAssignment;
+        const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
         const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
         const deliveryRoutes = orderPoints.map((orderPoint) => roadFollowingRoute(pickupPoint, orderPoint, mapLayers));
@@ -3054,7 +3172,7 @@ def render_index() -> str:
         return;
       }
       document.querySelectorAll(".map-label, .pin").forEach((node) => {
-        const active = node.dataset.assignment === selectedAssignment;
+        const active = Boolean(focused && node.dataset.assignment === selectedAssignment);
         node.classList.toggle("active-assignment", active);
         if (node.classList.contains("map-label")) {
           node.classList.toggle("selected", active);
@@ -3062,7 +3180,7 @@ def render_index() -> str:
         }
       });
       document.querySelectorAll(".dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
-        const active = node.dataset.assignment === selectedAssignment;
+        const active = Boolean(focused && node.dataset.assignment === selectedAssignment);
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
         node.classList.toggle("secondary", !active);
@@ -3428,6 +3546,44 @@ def render_index() -> str:
       showToast(`已打开表格详情：${cells[0] || rowType}`);
       return true;
     }
+    function renderAssignmentOverviewDetail(profile, report) {
+      const assignments = Object.values((profile && profile.assignments) || {});
+      if (!assignments.length) return false;
+      const totalOrders = assignments.reduce((sum, assignment) => sum + safeNumber(assignment.orderCount, (assignment.orders || []).length || 1), 0);
+      const courierSet = new Set(assignments.flatMap((assignment) => courierTokens(assignment.courier)));
+      const totalCost = assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.cost || "0").replace("$", ""), 0), 0);
+      const avgEta = Math.round(assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.eta || "").replace("min", ""), 0), 0) / Math.max(1, assignments.length));
+      const best = report && report.best ? report.best : {};
+      const coverage = best.total_tasks ? Math.round(safeNumber(best.covered_tasks, best.total_tasks) / safeNumber(best.total_tasks, 1) * 100) : 100;
+      setDetailContext("overview", "", "", "");
+      if (profile) {
+        profile.mapFocusMode = "overview";
+        if (!profile.selected) profile.selected = assignments[0].id;
+        applyMapFocus(profile, profile.selected, false);
+      }
+      $("detail-title").textContent = "派单总览：全部商家已自动连线";
+      $("detail-courier").textContent = `${courierSet.size} 个骑手`;
+      $("detail-merchant").innerHTML = `运行完成后，地图已自动展示 <code>${assignments.length}</code> 个商家 → 骑手取餐链路，以及 <code>${totalOrders}</code> 条商家 → 订单配送链路；不需要逐个点击才连线。`;
+      const chips = assignments.slice(0, 7).map((assignment) => `<span class="chip">${assignment.pickup || assignment.merchant} → ${assignment.courier}</span>`);
+      if (assignments.length > chips.length) chips.push(`<span class="chip">+${assignments.length - chips.length} 个派单包</span>`);
+      $("detail-orders").innerHTML = chips.join("");
+      $("detail-eta").textContent = avgEta ? `${avgEta} min 平均` : "-";
+      $("right-cost").textContent = money(totalCost);
+      document.querySelector(".prob span").textContent = `${coverage}%`;
+      $("detail-reasons").innerHTML = [
+        "<li>当前默认是全局派单总览：所有商家到骑手的取餐线保持可见，配送端点线低噪展示。</li>",
+        "<li>点击任意商家、骑手、订单或线路后，才进入单条派单聚焦模式。</li>",
+        `<li>派单策略：${profile.utilization || "-"}；覆盖 ${assignments.length}/${assignments.length} 个商家订单入口。</li>`,
+        ...assignments.slice(0, 5).map((assignment) => `<li>${assignment.pickup || assignment.merchant} 派给 ${assignment.courier}，ETA ${assignment.eta}，成本 ${assignment.cost}，风险 ${assignment.risk}。</li>`)
+      ].join("");
+      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
+      if (rows[0]) rows[0].textContent = `${coverage}%`;
+      if (rows[1]) rows[1].textContent = `${assignments.length} 个派单包`;
+      if (rows[2]) rows[2].textContent = avgEta ? `${avgEta} min` : "-";
+      if (rows[3]) rows[3].textContent = assignments.some((assignment) => assignment.risk === "High") ? "High" : assignments.some((assignment) => assignment.risk === "Medium") ? "Medium" : "Low";
+      if (rows[4]) rows[4].textContent = profile.utilization;
+      return true;
+    }
     function renderAssignmentDetail(profile, assignmentId, sourceLabel = "", focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
       const resolvedAssignment = assignments[assignmentId] ? assignmentId : (assignments[profile.selected] ? profile.selected : Object.keys(assignments)[0]);
@@ -3465,7 +3621,7 @@ def render_index() -> str:
       const tasks = safeNumber(best.total_tasks || features.tasks, 38);
       const covered = safeNumber(best.covered_tasks, tasks);
       const coverage = tasks > 0 ? Math.round((covered / tasks) * 100) : 100;
-      renderAssignmentDetail(profile, profile.selected, "", false);
+      renderAssignmentOverviewDetail(profile, report);
       const compareRows = document.querySelectorAll(".decision-card:last-child .row strong");
       if (compareRows[0]) compareRows[0].textContent = profile.improvement;
       if (compareRows[1]) compareRows[1].textContent = "-" + Math.max(2, Math.round(used * 0.9)) + " min";
@@ -3803,15 +3959,15 @@ def render_index() -> str:
           }
           if (action === "routes") {
             const active = button.classList.contains("active");
-            document.querySelector(".map-frame").classList.toggle("hide-candidates", active);
+            document.querySelector(".map-frame").classList.toggle("hide-delivery-routes", active);
             document.querySelectorAll(".dispatch-polyline-secondary").forEach((route) => {
               route.style.display = active ? "none" : "";
             });
-            showToast(active ? "候选派单连线已隐藏" : "候选派单连线已显示");
+            showToast(active ? "配送端点线已隐藏，仅保留商家 → 骑手派单关系" : "配送端点线已恢复，展示完整履约链路");
             return;
           }
           if (action === "locate") {
-        document.querySelector(".map-frame").classList.toggle("locating");
+            document.querySelector(".map-frame").classList.add("locating");
             const profile = currentProfile || profileForCase(selectedCase());
             const selected = profile.assignments && (profile.assignments[profile.selected] || profile.assignments.A1);
             if (selected) {
@@ -3824,6 +3980,7 @@ def render_index() -> str:
           }
           if (action === "fit") {
             document.querySelector(".map-frame").classList.remove("zoomed");
+            document.querySelector(".map-frame").classList.remove("locating");
             $("zoom-in").classList.remove("active");
             const profile = currentProfile || profileForCase(selectedCase());
             if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
@@ -3859,7 +4016,7 @@ def render_index() -> str:
         showToast("地图已缩小");
       });
       $("recenter").addEventListener("click", () => {
-        document.querySelector(".map-frame").classList.toggle("locating");
+        document.querySelector(".map-frame").classList.add("locating");
         const profile = currentProfile || profileForCase(selectedCase());
         if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
         if (leafletMap && leafletLastBounds) leafletMap.fitBounds(leafletLastBounds, {padding: [52, 52], maxZoom: 13});

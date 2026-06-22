@@ -174,6 +174,18 @@
 验证标准：刷新、运行、场景切换、图层、候选/最终、定位、适配、缩放、全屏、策略卡片、表格行都有明确状态变化或详情输出。
 
 完成记录：
+- 已把运行完成后的默认右侧详情改为 `派单总览：全部商家已自动连线`，默认展示全部商家 → 骑手取餐链路和商家 → 订单配送链路，不再默认聚焦第一条派单导致视觉上像“只有一条路线”。
+- 已调整地图焦点逻辑：`all` 总览模式下 `activeRoutes=0`，所有派单线默认可见；点击商家、骑手、订单或线路后才进入单条聚焦模式。
+- 已强化派单线视觉层级：商家 → 骑手取餐线在总览态更清晰，商家 → 订单配送线低噪展示；`☷` 按钮改为真实隐藏/恢复配送支线，同时保留商家 → 骑手派单关系。
+- 已把路线生成从最近道路点直连升级为匿名道路图最短路：构建道路节点/交叉点图后生成折线路径，减少线路穿楼、横跨地图的问题。
+- 已修正点位避让逻辑：商圈/雨天/活动等集中场景允许商家保持聚集，骑手仍保持更大间距，避免标题写“集中”但视觉被摊开的情况。
+- 已修复定位按钮状态：`◎` 定位改为确定性添加 `locating`，`□` 适配视图会清理定位态，避免按钮顺序导致定位被反向取消。
+- 浏览器严格审计产物：`goal/goal-6/task11-button-audit.json`，审计结果 `violations=[]`；覆盖 6 个场景、刷新、运行、场景切换、图层 selected/all/candidates、点位弱化、配送线隐藏/恢复、适配、定位、缩放、全屏、策略卡、表格行、路线热区点击。
+- 浏览器审计通过：6 个场景最终态均为 `detailType=overview`、`activeRoutes=0`；每个商家都有取餐线和配送线；雨天场景 `rainStreaks=76`；商圈高峰点位集中；低峰/稀缺点位分散；所有路线 `minRoutePoints>=4`。
+- Console 审计产物：`goal/goal-6/task11-console-errors.json`，错误数 0。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
 
 ## Task 12: 最终严格评审与归档
 
