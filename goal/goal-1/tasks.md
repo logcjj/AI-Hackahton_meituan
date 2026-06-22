@@ -118,8 +118,34 @@
 
 完成记录：
 
+- 已完成。
+- 最终需求审查：
+  - 原始目标要求“参考未来计划，完善里面提到的内容”：`docs/deliverables/未来规划.md` 已改为开发者可执行路线图，覆盖场景元数据、风险画像、Baseline vs AutoSolver、决策解释、抽象结果视图、ROI、风格准则、实施阶段和验证清单。
+  - 原始目标要求“不要按实例图片，太花哨”：`web_agent_demo/server.py` 已删除 radial gradient、玻璃 blur、pulse 动画、位移 transform、强按钮渐变和强视觉装饰。
+  - 原始目标要求“专业一点，适合开发人员使用”：Web demo 已改为 Developer Workbench 信息架构，包含场景摘要、风险标签、技术 ID、策略候选表、结果对比和 Evolution 审计轨道。
+- 最终结构检查：直接调用 `render_index()`，确认 `AutoSolver Agent Workbench`、`场景摘要`、`Baseline vs AutoSolver` 存在，并确认 `radial-gradient`、`backdrop-filter`、`@keyframes pulse`、`local_cost` 不在页面 HTML 中。
+- 最终 case API 检查：直接调用 `list_cases()`，确认返回 10 个场景，所有 case 包含 `scenario_name`、`scenario_type`、`risk_tags`、`operator_note`、`source_type`，且没有 `path` 字段或本地绝对路径泄露。
+- 自动化测试：`python3 -m unittest tests.test_web_agent_demo` 通过 7 个测试。
+- 语法检查：`python3 -m py_compile web_agent_demo/server.py web_agent_demo/sample_cases.py autosolver_agent/system.py tests/test_web_agent_demo.py` 通过。
+- 静态审查：`rg -n -- "Proxy score|local_cost|40/40|本地分数|本地评分|官方成绩|黑科技|降本增效神器|radial-gradient|backdrop-filter|@keyframes pulse|transform: translate" web_agent_demo/server.py web_agent_demo/sample_cases.py docs/deliverables/未来规划.md tests/test_web_agent_demo.py || true` 只命中文档约束说明和测试禁止项/mock payload，页面实现未命中。
+- 路径泄露检查：脚本遍历 `list_cases()` 返回值，`path_leaks: []`。
+- 工作区检查：`git status --short --branch` 显示工作区干净，分支 `main...origin/main [ahead 3]`。
+- 安全性检查：未新增外部依赖、未新增网络传输、未暴露本地路径；页面继续通过 `safe()` 转义动态内容。
+- 可维护性检查：场景元数据集中在 `web_agent_demo/sample_cases.py`；前端区域由 `renderScenarioSummary()`、`renderResultComparison()`、`paintAttempts()` 分别负责，后续扩展点清晰。
+- 结论：最终 review 未发现需要修复的问题；目标已满足。
+
 ## Goal 完成归档
 
 完成状态：
 
+- 已完成。
+
 归档记录：
+
+- Goal 目录：`goal/goal-1/`
+- 记录文件：`input.md`、`plan.md`、`tasks.md`
+- 相关提交：
+  - `5ac8e75 Professionalize web demo workbench IA`
+  - `df537f9 Tone down web demo visual style`
+  - `7a7f925 Record web demo QA pass`
+- 本次最终归档提交会记录 Task 7 和完成状态。
