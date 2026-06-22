@@ -1,0 +1,62 @@
+{
+  "selectedMode": {
+    "assignmentOverview": false,
+    "focusSelected": true,
+    "hideCandidates": true,
+    "layerValue": "selected",
+    "locating": false,
+    "overviewRoutes": 0,
+    "primaryRoutes": 1,
+    "routes": 4,
+    "visibleRoutes": 1,
+    "zoomed": false
+  },
+  "allMode": {
+    "assignmentOverview": true,
+    "focusSelected": false,
+    "hideCandidates": false,
+    "layerValue": "all",
+    "locating": false,
+    "overviewRoutes": 4,
+    "primaryRoutes": 0,
+    "routes": 4,
+    "visibleRoutes": 4,
+    "zoomed": false
+  },
+  "fitMode": {
+    "assignmentOverview": true,
+    "focusSelected": false,
+    "hideCandidates": false,
+    "layerValue": "all",
+    "locating": false,
+    "overviewRoutes": 4,
+    "primaryRoutes": 0,
+    "routes": 4,
+    "visibleRoutes": 4,
+    "zoomed": false
+  },
+  "zoomMode": {
+    "assignmentOverview": true,
+    "focusSelected": false,
+    "hideCandidates": false,
+    "layerValue": "all",
+    "locating": false,
+    "overviewRoutes": 4,
+    "primaryRoutes": 0,
+    "routes": 4,
+    "visibleRoutes": 4,
+    "zoomed": true
+  },
+  "zoomOutMode": {
+    "assignmentOverview": true,
+    "focusSelected": false,
+    "hideCandidates": false,
+    "layerValue": "all",
+    "locating": false,
+    "overviewRoutes": 4,
+    "primaryRoutes": 0,
+    "routes": 4,
+    "visibleRoutes": 4,
+    "zoomed": false
+  }
+}

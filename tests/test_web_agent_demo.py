@@ -29,6 +29,8 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("data-map-action=\"routes\"", html)
         self.assertIn("data-map-action=\"locate\"", html)
         self.assertIn("data-map-action=\"fit\"", html)
+        self.assertIn("data-map-action=\"depots\"", html)
+        self.assertIn("data-map-action=\"fullscreen\"", html)
         self.assertIn("id=\"zoom-in\"", html)
         self.assertIn("id=\"expand-graph\"", html)
         self.assertIn("AI Reasoning Graph", html)
@@ -113,11 +115,20 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("focus-selected", html)
         self.assertIn("data-selected-assignment", html)
         self.assertIn('pin.classList.toggle("active-assignment"', html)
-        self.assertIn('dispatchArrowFor(orderPoints.length ? deliveryRoute : pickupRoute, arrowCls, assignment.id, isActive)', html)
+        self.assertIn('dispatchArrowFor(orderPoints.length ? deliveryRoute : pickupRoute, arrowCls, assignment.id, isActive, routeStyle)', html)
         self.assertIn('event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow")', html)
         self.assertIn("const isActive = assignment.id === selectedAssignment;", html)
-        self.assertIn("stroke: rgba(156, 177, 192, .44)", html)
-        self.assertIn("L${midX.toFixed(1)}", html)
+        self.assertIn("assignment-overview", html)
+        self.assertIn("overview-route", html)
+        self.assertIn("hide-entities", html)
+        self.assertIn(".map-panel.active", html)
+        self.assertIn("roadFollowingRoute", html)
+        self.assertIn("closestRoadTransfer", html)
+        self.assertIn("rain-streak", html)
+        self.assertIn("rain-sheen", html)
+        self.assertIn("density_profile", html)
+        self.assertIn("order_count: orderCount", html)
+        self.assertIn("共 ${orderCount} 单", html)
         self.assertNotIn('const cls = index === 0 ? "dispatch-link primary"', html)
         for forbidden in ["Proxy score", "local_cost", "40/40", "本地分数", "本地评分", "官方成绩"]:
             self.assertNotIn(forbidden, html)
@@ -207,11 +218,24 @@ class WebAgentDemoTest(unittest.TestCase):
                 self.assertGreaterEqual(len(sample["map_layers"]["building_blocks"]), 20)
                 self.assertGreaterEqual(len(sample["map_layers"]["commerce_hotspots"]), 3)
                 self.assertGreaterEqual(len(sample["map_layers"]["intersections"]), 6)
+                self.assertIn(sample["summary"]["weather"], {"clear", "rain", "event"})
+                self.assertIn("density_profile", sample["summary"])
                 self.assertTrue(all(not road["name_visible"] for road in sample["map_layers"]["roads"]))
                 merchant_points = [(float(item["x"]), float(item["y"])) for item in sample["merchants"]]
                 courier_points = [(float(item["x"]), float(item["y"])) for item in sample["couriers"]]
                 self.assertGreater(len(set(merchant_points)), 2)
                 self.assertGreater(len(set(courier_points)), 5)
+
+        rain_sample = build_simulated_scenario_sample("rain_low_willingness", 0)
+        self.assertEqual(rain_sample["summary"]["weather"], "rain")
+        self.assertLess(rain_sample["summary"]["avg_willingness"], 0.55)
+        self.assertGreaterEqual(len(rain_sample["map_layers"]["rain_streaks"]), 60)
+
+        commerce_sample = build_simulated_scenario_sample("commerce_peak", 0)
+        commerce_xs = [float(item["x"]) for item in commerce_sample["merchants"]]
+        commerce_ys = [float(item["y"]) for item in commerce_sample["merchants"]]
+        self.assertLess(max(commerce_xs) - min(commerce_xs), 26)
+        self.assertLess(max(commerce_ys) - min(commerce_ys), 24)
 
     def test_simulated_samples_cover_all_strategy_paths(self):
         from web_agent_demo.server import build_simulated_scenario_samples

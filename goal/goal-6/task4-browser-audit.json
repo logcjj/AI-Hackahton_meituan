@@ -1,0 +1,266 @@
+{
+  "checkedAt": "2026-06-22T15:51:28.884Z",
+  "scenarios": [
+    {
+      "scenario": "commerce_peak",
+      "refreshes": [
+        {
+          "arrows": 0,
+          "assignmentOverview": false,
+          "bodyClass": "pending-run sample-preview",
+          "courierPins": 14,
+          "densityProfile": "clustered",
+          "focusSelected": false,
+          "label": "commerce_peak-refresh-1",
+          "merchantPins": 5,
+          "merchantXRange": 10.5,
+          "merchantYRange": 7.400000000000006,
+          "overviewRoutes": 0,
+          "rainStreaks": 0,
+          "routeSegments": [],
+          "routes": 0,
+          "title": "商圈十字路口高峰 #01",
+          "weather": "clear"
+        },
+        {
+          "arrows": 0,
+          "assignmentOverview": false,
+          "bodyClass": "pending-run sample-preview",
+          "courierPins": 14,
+          "densityProfile": "clustered",
+          "focusSelected": false,
+          "label": "commerce_peak-refresh-2",
+          "merchantPins": 6,
+          "merchantXRange": 13.399999999999999,
+          "merchantYRange": 4.700000000000003,
+          "overviewRoutes": 0,
+          "rainStreaks": 0,
+          "routeSegments": [],
+          "routes": 0,
+          "title": "商圈十字路口高峰 #02",
+          "weather": "clear"
+        }
+      ],
+      "final": {
+        "arrows": 6,
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 14,
+        "densityProfile": "clustered",
+        "focusSelected": false,
+        "label": "commerce_peak-final",
+        "merchantPins": 6,
+        "merchantXRange": 13.399999999999999,
+        "merchantYRange": 4.700000000000003,
+        "overviewRoutes": 6,
+        "rainStreaks": 0,
+        "routeSegments": [
+          {
+            "assignment": "A0201",
+            "hasColor": true,
+            "segments": 8
+          },
+          {
+            "assignment": "A0202",
+            "hasColor": true,
+            "segments": 8
+          },
+          {
+            "assignment": "A0203",
+            "hasColor": true,
+            "segments": 5
+          },
+          {
+            "assignment": "A0204",
+            "hasColor": true,
+            "segments": 7
+          },
+          {
+            "assignment": "A0205",
+            "hasColor": true,
+            "segments": 6
+          },
+          {
+            "assignment": "A0206",
+            "hasColor": true,
+            "segments": 6
+          }
+        ],
+        "routes": 6,
+        "title": "商圈十字路口高峰 #02",
+        "weather": "clear"
+      }
+    },
+    {
+      "scenario": "medium_parallel",
+      "refreshes": [
+        {
+          "arrows": 0,
+          "assignmentOverview": false,
+          "bodyClass": "pending-run sample-preview",
+          "courierPins": 12,
+          "densityProfile": "balanced",
+          "focusSelected": false,
+          "label": "medium_parallel-refresh-1",
+          "merchantPins": 4,
+          "merchantXRange": 24.7,
+          "merchantYRange": 18.9,
+          "overviewRoutes": 0,
+          "rainStreaks": 0,
+          "routeSegments": [],
+          "routes": 0,
+          "title": "中型并行派单 #01",
+          "weather": "clear"
+        },
+        {
+          "arrows": 0,
+          "assignmentOverview": false,
+          "bodyClass": "pending-run sample-preview",
+          "courierPins": 10,
+          "densityProfile": "balanced",
+          "focusSelected": false,
+          "label": "medium_parallel-refresh-2",
+          "merchantPins": 5,
+          "merchantXRange": 25.400000000000002,
+          "merchantYRange": 15.200000000000003,
+          "overviewRoutes": 0,
+          "rainStreaks": 0,
+          "routeSegments": [],
+          "routes": 0,
+          "title": "中型并行派单 #02",
+          "weather": "clear"
+        }
+      ],
+      "final": {
+        "arrows": 5,
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 10,
+        "densityProfile": "balanced",
+        "focusSelected": false,
+        "label": "medium_parallel-final",
+        "merchantPins": 5,
+        "merchantXRange": 25.400000000000002,
+        "merchantYRange": 15.200000000000003,
+        "overviewRoutes": 5,
+        "rainStreaks": 0,
+        "routeSegments": [
+          {
+            "assignment": "A0201",
+            "hasColor": true,
+            "segments": 7
+          },
+          {
+            "assignment": "A0202",
+            "hasColor": true,
+            "segments": 2
+          },
+          {
+            "assignment": "A0203",
+            "hasColor": true,
+            "segments": 7
+          },
+          {
+            "assignment": "A0204",
+            "hasColor": true,
+            "segments": 5
+          },
+          {
+            "assignment": "A0205",
+            "hasColor": true,
+            "segments": 8
+          }
+        ],
+        "routes": 5,
+        "title": "中型并行派单 #02",
+        "weather": "clear"
+      }
+    },
+    {
+      "scenario": "rain_low_willingness",
+      "refreshes": [
+        {
+          "arrows": 0,
+          "assignmentOverview": false,
+          "bodyClass": "pending-run sample-preview",
+          "courierPins": 10,
+          "densityProfile": "rain_clustered",
+          "focusSelected": false,
+          "label": "rain_low_willingness-refresh-1",
+          "merchantPins": 5,
+          "merchantXRange": 17.6,
+          "merchantYRange": 16.799999999999997,
+          "overviewRoutes": 0,
+          "rainStreaks": 76,
+          "routeSegments": [],
+          "routes": 0,
+          "title": "雨天低接单意愿 #01",
+          "weather": "rain"
+        },
+        {
+          "arrows": 0,
+          "assignmentOverview": false,
+          "bodyClass": "pending-run sample-preview",
+          "courierPins": 13,
+          "densityProfile": "rain_clustered",
+          "focusSelected": false,
+          "label": "rain_low_willingness-refresh-2",
+          "merchantPins": 5,
+          "merchantXRange": 18.400000000000006,
+          "merchantYRange": 10.5,
+          "overviewRoutes": 0,
+          "rainStreaks": 76,
+          "routeSegments": [],
+          "routes": 0,
+          "title": "雨天低接单意愿 #02",
+          "weather": "rain"
+        }
+      ],
+      "final": {
+        "arrows": 5,
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 13,
+        "densityProfile": "rain_clustered",
+        "focusSelected": false,
+        "label": "rain_low_willingness-final",
+        "merchantPins": 5,
+        "merchantXRange": 18.400000000000006,
+        "merchantYRange": 10.5,
+        "overviewRoutes": 5,
+        "rainStreaks": 76,
+        "routeSegments": [
+          {
+            "assignment": "A0201",
+            "hasColor": true,
+            "segments": 6
+          },
+          {
+            "assignment": "A0202",
+            "hasColor": true,
+            "segments": 7
+          },
+          {
+            "assignment": "A0203",
+            "hasColor": true,
+            "segments": 6
+          },
+          {
+            "assignment": "A0204",
+            "hasColor": true,
+            "segments": 5
+          },
+          {
+            "assignment": "A0205",
+            "hasColor": true,
+            "segments": 6
+          }
+        ],
+        "routes": 5,
+        "title": "雨天低接单意愿 #02",
+        "weather": "rain"
+      }
+    }
+  ],
+  "consoleErrors": []
+}

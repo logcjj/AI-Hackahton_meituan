@@ -1,0 +1,10 @@
+{
+  "activeRoutes": 1,
+  "detailMerchant": "订单组 O0104 共 2 单，最终派给 R0104",
+  "detailOrders": [
+    "O0104-01",
+    "O0104-02"
+  ],
+  "focusSelected": true,
+  "toast": "O0104 → R0104，2 单"
+}

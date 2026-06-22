@@ -52,6 +52,18 @@
 验证标准：语法、单测、JS 检查、浏览器截图通过；抽查至少 3 个场景的 2 个 sample，确认刷新状态无派单线、点位不拥挤。
 
 完成记录：
+- 已完成第一轮大型检查-debug循环，并按严格评审 Agent 反馈补修 P2 问题。
+- 已强化场景语义：商圈高峰 `density_profile=clustered` 下订单点明显聚集；雨天低接单意愿场景带 `weather=rain`、76 条雨线和雨天文案，平均接单意愿低于普通场景。
+- 已修复最终态派单线：运行后默认进入 `assignment-overview`，每个商家/订单点都有可见派单线和箭头连接到对应骑手，不需要点击后才显示。
+- 已升级路线生成：`roadFollowingRoute()` 通过道路吸附、同路链路和道路间换乘点生成折线，派单线不再是简单直穿线。
+- 已修复按钮真实性：`depots` 会弱化/恢复点位图层；`fullscreen` 会进入/退出地图聚焦布局；`all/selected/fit/zoom` 均有可审计状态变化。
+- 已修复多订单详情：多订单商家会展开为独立订单 chip，详情和 toast 使用真实 `orderCount`，不再把 `2单` 当成一个订单。
+- 严格 verifier 结论：无 P0/P1；指出的两个 P2 已修复并复测通过。
+- 浏览器验证产物：`goal/goal-6/task4-browser-audit.json`、`goal/goal-6/task4-browser-audit.png`、`goal/goal-6/task4-commerce-final.png`、`goal/goal-6/task4-rain-final.png`、`goal/goal-6/task4-control-audit.json`、`goal/goal-6/task4-p2-fix-audit.json`、`goal/goal-6/task4-p2-fix.png`、`goal/goal-6/task4-multi-order-audit.json`。
+- 浏览器审计通过：抽查商圈十字路口高峰、中型并行派单、雨天低接单意愿；每个场景刷新 2 次均为 0 条路线/0 个箭头，运行后路线数与商家点数一致，默认 `assignment-overview=true` 且 `focusSelected=false`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
 
 ## Task 5: 构建推理运行状态机
 

@@ -1,0 +1,68 @@
+{
+  "afterRun": {
+    "detailMerchant": "订单组 O0101 共 1 单，最终派给 R0110",
+    "detailOrders": [
+      "O0101-01"
+    ],
+    "fullscreenButtonText": "↗",
+    "hideEntities": false,
+    "label": "after-run",
+    "mapPanelActive": false,
+    "merchantPins": 5,
+    "routeCount": 5,
+    "toast": "已按当前刷新样本生成最终派单线"
+  },
+  "depotsHidden": {
+    "detailMerchant": "订单组 O0101 共 1 单，最终派给 R0110",
+    "detailOrders": [
+      "O0101-01"
+    ],
+    "fullscreenButtonText": "↗",
+    "hideEntities": true,
+    "label": "depots-hidden",
+    "mapPanelActive": false,
+    "merchantPins": 5,
+    "routeCount": 5,
+    "toast": "点位图层已弱化，仅保留派单关系"
+  },
+  "depotsRestored": {
+    "detailMerchant": "订单组 O0101 共 1 单，最终派给 R0110",
+    "detailOrders": [
+      "O0101-01"
+    ],
+    "fullscreenButtonText": "↗",
+    "hideEntities": false,
+    "label": "depots-restored",
+    "mapPanelActive": false,
+    "merchantPins": 5,
+    "routeCount": 5,
+    "toast": "点位图层已恢复：商家、订单与骑手可见"
+  },
+  "fullscreenOn": {
+    "detailMerchant": "订单组 O0101 共 1 单，最终派给 R0110",
+    "detailOrders": [
+      "O0101-01"
+    ],
+    "fullscreenButtonText": "↙",
+    "hideEntities": false,
+    "label": "fullscreen-on",
+    "mapPanelActive": true,
+    "merchantPins": 5,
+    "routeCount": 5,
+    "toast": "演示视图已进入地图聚焦模式"
+  },
+  "fullscreenOff": {
+    "detailMerchant": "订单组 O0101 共 1 单，最终派给 R0110",
+    "detailOrders": [
+      "O0101-01"
+    ],
+    "fullscreenButtonText": "↗",
+    "hideEntities": false,
+    "label": "fullscreen-off",
+    "mapPanelActive": false,
+    "merchantPins": 5,
+    "routeCount": 5,
+    "toast": "演示视图已退出地图聚焦模式"
+  },
+  "chipsCount": 1
+}

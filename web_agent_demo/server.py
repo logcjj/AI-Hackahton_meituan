@@ -131,6 +131,8 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "courier_range": (11, 14),
         "willingness_base": 0.72,
         "traffic_bias": 0.66,
+        "weather": "clear",
+        "density_profile": "clustered",
         "strategy_cycle": ["S1", "S2", "S1", "S3", "S1", "S5", "S2", "S1", "S3", "S1"],
         "description": "路口商圈订单集中，适合验证合单优先和多骑手候选比较。",
     },
@@ -144,6 +146,8 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "courier_range": (9, 12),
         "willingness_base": 0.68,
         "traffic_bias": 0.45,
+        "weather": "clear",
+        "density_profile": "balanced",
         "strategy_cycle": ["S2", "S1", "S2", "S4", "S2", "S3", "S2", "S1", "S5", "S2"],
         "description": "订单不完全重叠，多个骑手候选质量接近，突出多派候选策略。",
     },
@@ -157,6 +161,8 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "courier_range": (7, 9),
         "willingness_base": 0.58,
         "traffic_bias": 0.58,
+        "weather": "clear",
+        "density_profile": "scarce_spread",
         "strategy_cycle": ["S3", "S1", "S3", "S5", "S3", "S2", "S1", "S3", "S5", "S3"],
         "description": "骑手少且订单分布拉开，需要先覆盖再做局部修复。",
     },
@@ -170,6 +176,8 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "courier_range": (10, 13),
         "willingness_base": 0.42,
         "traffic_bias": 0.74,
+        "weather": "rain",
+        "density_profile": "rain_clustered",
         "strategy_cycle": ["S5", "S3", "S5", "S1", "S5", "S2", "S5", "S3", "S4", "S5"],
         "description": "低意愿和雨天路况同时出现，重点验证无人接单风险控制。",
     },
@@ -183,6 +191,8 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "courier_range": (8, 11),
         "willingness_base": 0.82,
         "traffic_bias": 0.26,
+        "weather": "clear",
+        "density_profile": "spread",
         "strategy_cycle": ["S4", "S2", "S4", "S1", "S4", "S3", "S4", "S2", "S5", "S4"],
         "description": "低峰期订单分散且骑手充足，用于展示贪心基线也可能成为可接受方案。",
     },
@@ -196,6 +206,8 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "courier_range": (12, 15),
         "willingness_base": 0.61,
         "traffic_bias": 0.82,
+        "weather": "event",
+        "density_profile": "event_clustered",
         "strategy_cycle": ["S1", "S5", "S2", "S3", "S1", "S5", "S2", "S3", "S4", "S1"],
         "description": "活动流量导致局部拥堵，策略会在合单、风险平衡和修复之间切换。",
     },
@@ -341,9 +353,19 @@ def _traffic_label(condition: str) -> str:
     return "畅通"
 
 
+def _weather_label(weather: object) -> str:
+    if weather == "rain":
+        return "雨天 · 路面湿滑"
+    if weather == "event":
+        return "活动 · 局部管制"
+    return "晴朗 · 正常履约"
+
+
 def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_seed: str | None = None) -> dict[str, object]:
     sample_key = variant_seed or sample_index
     traffic_bias = float(config["traffic_bias"])
+    density_profile = str(config.get("density_profile", "balanced"))
+    weather = str(config.get("weather", "clear"))
     roads = []
     for index, road in enumerate(_DISPATCH_ROADS):
         traffic_level = max(0.12, min(0.94, traffic_bias + (_unit_hash(config["id"], sample_key, index, salt="traffic") - 0.5) * 0.32))
@@ -422,7 +444,8 @@ def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_
         width = 6.8 + _unit_hash(config["id"], index, salt="block-w") * 7.4
         height = 5.8 + _unit_hash(config["id"], index, salt="block-h") * 8.2
         usage_seed = _unit_hash(config["scene_type"], index, salt="usage")
-        usage = "commerce" if usage_seed > 0.68 else "office" if usage_seed > 0.36 else "residential"
+        commerce_cutoff = 0.48 if "clustered" in density_profile else 0.68
+        usage = "commerce" if usage_seed > commerce_cutoff else "office" if usage_seed > 0.36 else "residential"
         blocks.append(
             {
                 "id": f"B{index + 1:02d}",
@@ -437,7 +460,9 @@ def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_
         )
     center_x, center_y = config["center"]
     hotspots = []
-    for index in range(3):
+    hotspot_count = 4 if "clustered" in density_profile else 3
+    hotspot_base_radius = 10.5 if density_profile in {"clustered", "rain_clustered", "event_clustered"} else 8.0
+    for index in range(hotspot_count):
         hotspot_x = float(center_x) + (index - 1) * 7.0 + (_unit_hash(config["id"], sample_key, index, salt="hotspot-x") - 0.5) * 5.0
         hotspot_y = float(center_y) + (index % 2 - 0.5) * 8.0 + (_unit_hash(config["id"], sample_key, index, salt="hotspot-y") - 0.5) * 4.5
         hotspots.append(
@@ -445,11 +470,25 @@ def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_
                 "id": f"H{index + 1:02d}",
                 "x": round(max(10.0, min(90.0, hotspot_x)), 1),
                 "y": round(max(10.0, min(86.0, hotspot_y)), 1),
-                "radius": round(8.0 + _unit_hash(config["id"], sample_key, index, salt="hotspot-r") * 6.5, 1),
+                "radius": round(hotspot_base_radius + _unit_hash(config["id"], sample_key, index, salt="hotspot-r") * 7.2, 1),
                 "intensity": round(0.34 + _unit_hash(config["id"], sample_key, index, salt="hotspot-i") * 0.48, 2),
                 "type": "commerce_cluster" if index == 1 else "demand_spillover",
             }
         )
+    rain_streaks = []
+    if weather == "rain":
+        for index in range(76):
+            x = _unit_hash(config["id"], sample_key, index, salt="rain-x") * 100
+            y = _unit_hash(config["id"], sample_key, index, salt="rain-y") * 100
+            rain_streaks.append(
+                {
+                    "id": f"W{index + 1:02d}",
+                    "x": round(x, 1),
+                    "y": round(y, 1),
+                    "length": round(4.5 + _unit_hash(config["id"], sample_key, index, salt="rain-l") * 5.8, 1),
+                    "opacity": round(0.18 + _unit_hash(config["id"], sample_key, index, salt="rain-o") * 0.24, 2),
+                }
+            )
     intersections = []
     seen_intersections: set[tuple[int, int]] = set()
     for road in _DISPATCH_ROADS[:8]:
@@ -481,6 +520,10 @@ def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_
         "building_blocks": blocks,
         "commerce_hotspots": hotspots,
         "intersections": intersections,
+        "weather": weather,
+        "weather_label": _weather_label(weather),
+        "density_profile": density_profile,
+        "rain_streaks": rain_streaks,
         "anonymous_note": "Simulated navigation layer only; road names and exact addresses are intentionally hidden.",
     }
 
@@ -492,6 +535,16 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
     center_x, center_y = config["center"]
     merchant_min, merchant_max = config["merchant_range"]
     courier_min, courier_max = config["courier_range"]
+    density_profile = str(config.get("density_profile", "balanced"))
+    if density_profile == "clustered":
+        merchant_radius_scale = 0.42
+    elif density_profile in {"rain_clustered", "event_clustered"}:
+        merchant_radius_scale = 0.54
+    elif density_profile in {"spread", "scarce_spread"}:
+        merchant_radius_scale = 1.42
+    else:
+        merchant_radius_scale = 1.0
+    courier_radius_scale = 1.28 if density_profile in {"scarce_spread", "spread"} else 1.08 if density_profile == "rain_clustered" else 1.0
     merchant_count = int(merchant_min) + (sample_index + int(_unit_hash(config["id"], sample_key, salt="merchant-count") * 10)) % (int(merchant_max) - int(merchant_min) + 1)
     courier_count = int(courier_min) + int(_unit_hash(config["id"], sample_key, salt="courier-count") * (int(courier_max) - int(courier_min) + 1))
     strategy_offset = int(_unit_hash(config["id"], sample_key, salt="strategy-offset") * len(config["strategy_cycle"])) if variant_seed else sample_index
@@ -502,7 +555,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
     merchants = []
     for index in range(merchant_count):
         angle = index / max(1, merchant_count) * math.tau + sample_index * 0.31 + _unit_hash(config["id"], sample_key, index, salt="merchant-angle") * 0.4
-        radius = 5.5 + (index % 3) * 4.2 + _unit_hash(config["id"], sample_key, index, salt="merchant-radius") * 4.8
+        radius = (5.5 + (index % 3) * 4.2 + _unit_hash(config["id"], sample_key, index, salt="merchant-radius") * 4.8) * merchant_radius_scale
         raw_point = (float(center_x) + math.cos(angle) * radius, float(center_y) + math.sin(angle) * radius * 0.78)
         x, y = _snap_to_dispatch_road(_clamp_point(*raw_point), f"{config['id']}:{sample_key}:merchant:{index}", 3.6, min_curb=2.8)
         order_count = 1 + ((sample_index + index) % 2)
@@ -525,7 +578,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
     couriers = []
     for index in range(courier_count):
         angle = index / max(1, courier_count) * math.tau + sample_index * 0.17 + _unit_hash(config["id"], sample_key, index, salt="courier-angle") * 0.55
-        radius = 16 + (index % 4) * 4.5 + _unit_hash(config["id"], sample_key, index, salt="courier-radius") * 9
+        radius = (16 + (index % 4) * 4.5 + _unit_hash(config["id"], sample_key, index, salt="courier-radius") * 9) * courier_radius_scale
         raw_point = (float(center_x) + math.cos(angle) * radius, float(center_y) + math.sin(angle) * radius * 0.88)
         x, y = _snap_to_dispatch_road(_clamp_point(*raw_point), f"{config['id']}:{sample_key}:courier:{index}", 0.42, min_curb=0.02)
         willingness = max(0.18, min(0.96, float(config["willingness_base"]) + (_unit_hash(config["id"], sample_key, index, salt="willingness") - 0.5) * 0.34 - traffic_level * 0.12))
@@ -642,6 +695,9 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
             "courier_count": len(couriers),
             "candidate_count": len(candidates),
             "traffic": _road_condition(traffic_level),
+            "weather": str(config.get("weather", "clear")),
+            "weather_label": _weather_label(config.get("weather", "clear")),
+            "density_profile": density_profile,
             "avg_willingness": round(sum(float(item["willingness"]) for item in couriers) / max(1, len(couriers)), 2),
         },
     }
@@ -1043,6 +1099,16 @@ def render_index() -> str:
       box-shadow: 0 0 18px rgba(39, 230, 208, .26), inset 0 1px 0 rgba(167, 255, 240, .13);
     }
     .map-frame { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #0a121b; }
+    .map-panel.active {
+      position: fixed;
+      inset: 12px;
+      z-index: 80;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 80px rgba(0,0,0,.72), 0 0 0 1px rgba(39,230,208,.28);
+    }
+    .map-panel.active .map-frame { min-height: 0; flex: 1; }
     .real-map { position: absolute; inset: 0; z-index: 0; display: none; background: #07111d; }
     .map-frame.leaflet-ready .real-map { display: block; }
     .leaflet-container { font-family: "Aptos", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
@@ -1169,14 +1235,35 @@ def render_index() -> str:
     .traffic-band.smooth { stroke: rgba(54, 230, 126, .38); }
     .traffic-band.moderate { stroke: rgba(255, 209, 45, .5); stroke-dasharray: 18 11; }
     .traffic-band.heavy { stroke: rgba(255, 91, 101, .62); stroke-dasharray: 12 8; }
+    .weather-rain-layer {
+      pointer-events: none;
+      opacity: .9;
+      mix-blend-mode: screen;
+    }
+    .rain-sheen {
+      fill: rgba(57, 125, 170, .15);
+      filter: blur(.4px);
+      pointer-events: none;
+    }
+    .rain-streak {
+      stroke: rgba(153, 210, 255, .55);
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 2px rgba(90, 176, 255, .28));
+    }
+    .map-bg[data-weather="rain"] .road-core { filter: brightness(.86); }
+    .map-bg[data-weather="rain"] .traffic-band.heavy { stroke: rgba(255, 91, 101, .78); }
     body.sample-preview .traffic-band { opacity: .74; }
     .dispatch-link { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 980; stroke-dashoffset: 980; animation: draw 1.45s ease-out forwards; pointer-events: stroke; cursor: pointer; }
     .dispatch-link.primary { stroke: #20d4c7; stroke-width: 4.8; filter: drop-shadow(0 0 6px rgba(32,212,199,.42)); }
-    .dispatch-link.secondary { stroke: rgba(156, 177, 192, .44); stroke-width: 2; stroke-dasharray: 8 7; filter: none; }
-    .dispatch-link.pickup-leg { stroke: rgba(230, 152, 74, .74); stroke-width: 3.7; filter: none; }
+    .dispatch-link.secondary { stroke: rgba(43, 222, 205, .64); stroke-width: 3.1; stroke-dasharray: none; filter: drop-shadow(0 0 4px rgba(32,212,199,.2)); opacity: .9; }
+    .dispatch-link.overview-route { stroke: var(--route-color, rgba(43, 222, 205, .76)); stroke-width: 3.55; opacity: .96; filter: drop-shadow(0 0 5px rgba(32,212,199,.24)); }
+    .dispatch-link.pickup-leg { stroke: rgba(32, 212, 199, .72); stroke-width: 3.6; filter: drop-shadow(0 0 5px rgba(32,212,199,.18)); }
+    .dispatch-link.pickup-leg.overview-route { stroke: var(--route-color, rgba(32,212,199,.82)); stroke-width: 3.7; }
     .dispatch-link.active-assignment { stroke-width: 5.2; opacity: 1; filter: drop-shadow(0 0 8px rgba(32,212,199,.48)); stroke-dasharray: 980; }
     .dispatch-link.pickup-leg.active-assignment { stroke-width: 4.1; filter: drop-shadow(0 0 7px rgba(230,152,74,.38)); }
-    .dispatch-arrow { fill: #20d4c7; opacity: .84; filter: drop-shadow(0 0 4px rgba(32,212,199,.45)); pointer-events: auto; cursor: pointer; }
+    .dispatch-arrow { fill: #20d4c7; opacity: .9; filter: drop-shadow(0 0 4px rgba(32,212,199,.45)); pointer-events: auto; cursor: pointer; }
+    .dispatch-arrow.overview-route { fill: var(--route-color, #20d4c7); opacity: .94; }
     .dispatch-arrow.active-assignment { opacity: 1; }
     .arrow { fill: var(--cyan); filter: drop-shadow(0 0 6px rgba(39,230,208,.75)); }
     @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -1253,11 +1340,17 @@ def render_index() -> str:
     .map-label small { display: block; color: #d1dae2; font-size: 11px; }
     .map-frame.topology .map-label small { color: #98aebe; }
     .map-frame.focus-selected .map-label:not(.active-assignment) { display: none; }
-    .map-frame.focus-selected .pin:not(.active-assignment) { opacity: .42; transform: translate(-50%, -50%) scale(.72); }
+    .map-frame.focus-selected .pin:not(.active-assignment) { opacity: .78; transform: translate(-50%, -50%) scale(.88); }
     .map-frame.focus-selected .pin.active-assignment { z-index: 5; opacity: 1; }
     .map-frame.focus-selected .pin.active-assignment .mark { box-shadow: 0 0 0 4px rgba(39,230,208,.16), 0 0 18px rgba(39,230,208,.55); }
-    .map-frame.focus-selected .dispatch-link.secondary:not(.active-assignment) { opacity: .34; stroke-width: 1.8; filter: none; }
-    .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .38; fill: rgba(156,177,192,.62); }
+    .map-frame.focus-selected .dispatch-link.secondary:not(.active-assignment) { opacity: .86; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(32,212,199,.18)); }
+    .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .82; fill: rgba(43,222,205,.82); }
+    .map-frame.assignment-overview .dispatch-link.primary,
+    .map-frame.assignment-overview .dispatch-link.secondary { stroke-dashoffset: 0; }
+    .map-frame.hide-entities .pin,
+    .map-frame.hide-entities .map-label { opacity: .12; pointer-events: none; }
+    .map-frame.hide-entities .pin.active-assignment,
+    .map-frame.hide-entities .map-label.active-assignment { opacity: .45; }
     .map-entities { position: absolute; inset: 0; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
     .pin { position: absolute; z-index: 3; width: 22px; height: 22px; transform: translate(-50%, -50%); cursor: pointer; }
@@ -1269,7 +1362,7 @@ def render_index() -> str:
     .map-frame.zoomed .pin { transform: translate(-50%, -50%) scale(1.04); }
     .map-frame.zoomed .map-label { transform: translate(calc(-50% + var(--label-offset-x, 0px)), calc(-50% + var(--label-offset-y, 0px))) scale(1.04); }
     .map-frame.locating .dispatch-link.primary { stroke-width: 6; }
-    .map-frame.hide-candidates .dispatch-link.secondary { display: none; }
+    .map-frame.hide-candidates .dispatch-link.secondary:not(.overview-route) { display: none; }
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
       position: absolute; right: 20px; bottom: 16px; z-index: 4; width: 138px;
@@ -1624,6 +1717,7 @@ def render_index() -> str:
           merchantNote: item.merchant_note || mapPayload.note || "",
           courier: item.courier,
           orders: item.orders || [],
+          orderCount: safeNumber(item.order_count, (item.orders || []).length),
           eta: item.eta,
           cost: item.cost,
           probability: item.probability,
@@ -1709,6 +1803,8 @@ def render_index() -> str:
         const courier = courierById[assignment.courier_id] || {};
         const candidate = candidateByPair[`${assignment.merchant_id}:${assignment.courier_id}`] || assignment;
         const probability = safeNumber(candidate.accept_probability, safeNumber(assignment.accept_probability, 0));
+        const orderCount = Math.max(1, Math.round(safeNumber(merchant.order_count, 1)));
+        const orderIds = Array.from({length: orderCount}, (_, orderIndex) => `${assignment.merchant_id}-${String(orderIndex + 1).padStart(2, "0")}`);
         return {
           id: assignment.id || `A${index + 1}`,
           task_key: assignment.merchant_id,
@@ -1719,7 +1815,8 @@ def render_index() -> str:
           courier: assignment.courier_id,
           map_couriers: [assignment.courier_id],
           map_orders: [],
-          orders: [`${merchant.order_count || 1}单`],
+          orders: orderIds,
+          order_count: orderCount,
           eta: `${assignment.eta_min || candidate.eta_min || merchant.expected_eta_min || "-"} min`,
           cost: money(assignment.cost || candidate.cost || merchant.expected_price),
           probability: `${Math.round(probability * 100)}%`,
@@ -1835,6 +1932,7 @@ def render_index() -> str:
       profile.missedRisk = sample.summary && sample.summary.traffic === "heavy" ? "高" : sample.summary && sample.summary.traffic === "moderate" ? "中" : "低";
       profile.utilization = sample.selected_strategy_id || "-";
       profile.selected = "";
+      profile.mapFocusMode = "overview";
       profile.assignments = {};
       profile.dispatchMap = simulationPreviewMap(sample);
       document.body.classList.add("pending-run", "sample-preview");
@@ -1878,6 +1976,7 @@ def render_index() -> str:
       const profile = currentProfile || profileForCase(selectedCase());
       profile.assignments = normalizeAssignmentsFromMap(mapPayload);
       profile.selected = Object.keys(profile.assignments)[0] || "A1";
+      profile.mapFocusMode = "overview";
       profile.dispatchMap = mapPayload;
       if (mapPayload.total_tasks) profile.totalTasks = mapPayload.total_tasks;
       if (mapPayload.total_couriers) profile.totalCouriers = mapPayload.total_couriers;
@@ -1899,6 +1998,7 @@ def render_index() -> str:
       renderSimulatedBaseMap(null);
       const frame = document.querySelector(".map-frame");
       frame.classList.remove("topology", "focus-selected");
+      frame.classList.remove("assignment-overview");
       frame.removeAttribute("data-selected-assignment");
       document.body.classList.remove("sample-preview");
       $("detail-title").textContent = "等待运行派单推理";
@@ -2189,7 +2289,10 @@ def render_index() -> str:
       const roads = Array.isArray(mapLayers && mapLayers.roads) ? mapLayers.roads.slice() : [];
       const hotspots = Array.isArray(mapLayers && mapLayers.commerce_hotspots) ? mapLayers.commerce_hotspots : [];
       const intersections = Array.isArray(mapLayers && mapLayers.intersections) ? mapLayers.intersections : [];
+      const rainStreaks = Array.isArray(mapLayers && mapLayers.rain_streaks) ? mapLayers.rain_streaks : [];
       if (!mapLayers || roads.length === 0) {
+        svg.dataset.weather = "clear";
+        svg.dataset.densityProfile = "empty";
         svg.innerHTML = [
           `<defs><pattern id="anonymous-grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(148,163,184,.08)" stroke-width="1"/></pattern></defs>`,
           `<rect x="0" y="0" width="980" height="640" fill="url(#anonymous-grid)" opacity=".38"></rect>`,
@@ -2199,6 +2302,8 @@ def render_index() -> str:
         ].join("");
         return;
       }
+      svg.dataset.weather = mapLayers.weather || "clear";
+      svg.dataset.densityProfile = mapLayers.density_profile || "balanced";
       const sortedRoads = roads.sort((a, b) => roadSortWeight(a.type) - roadSortWeight(b.type));
       const districtHtml = districts.map((item) => {
         const opacity = Math.max(0.16, Math.min(0.52, safeNumber(item.intensity, 0.28)));
@@ -2241,6 +2346,15 @@ def render_index() -> str:
         const busy = safeNumber(item.signal_load, 0) > 0.68 ? " busy" : "";
         return `<circle class="intersection-node${busy}" data-intersection="${escapeAttr(item.id)}" cx="${mapX(item.x).toFixed(1)}" cy="${mapY(item.y).toFixed(1)}" r="${busy ? 4.8 : 3.4}"></circle>`;
       }).join("");
+      const weatherHtml = rainStreaks.length
+        ? `<g class="weather-rain-layer"><rect class="rain-sheen" x="0" y="0" width="980" height="640"></rect>${rainStreaks.map((item) => {
+            const x = mapX(item.x);
+            const y = mapY(item.y);
+            const length = safeNumber(item.length, 6) * 6.4;
+            const opacity = Math.max(0.08, Math.min(0.42, safeNumber(item.opacity, 0.18)));
+            return `<line class="rain-streak" data-rain="${escapeAttr(item.id)}" x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x - length * .36).toFixed(1)}" y2="${(y + length).toFixed(1)}" opacity="${opacity.toFixed(2)}"></line>`;
+          }).join("")}</g>`
+        : "";
       svg.innerHTML = [
         `<defs><pattern id="anonymous-grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(148,163,184,.075)" stroke-width="1"/></pattern></defs>`,
         `<rect x="0" y="0" width="980" height="640" fill="#07121b"></rect>`,
@@ -2252,13 +2366,16 @@ def render_index() -> str:
         roadBaseHtml,
         roadCoreHtml,
         trafficHtml,
-        intersectionHtml
+        intersectionHtml,
+        weatherHtml
       ].join("");
     }
     function updateTrafficWidget(summary) {
       const weather = document.querySelector(".weather");
       if (!weather) return;
       const traffic = summary && summary.traffic ? summary.traffic : "moderate";
+      const weatherName = summary && summary.weather ? summary.weather : "clear";
+      const weatherLabel = summary && summary.weather_label ? summary.weather_label : weatherName === "rain" ? "雨天 · 路面湿滑" : weatherName === "event" ? "活动 · 局部管制" : "晴朗 · 正常履约";
       const label = traffic === "heavy" ? "拥堵" : traffic === "smooth" ? "畅通" : "缓行";
       const color = traffic === "heavy" ? "#ff5b65" : traffic === "smooth" ? "#36e67e" : "#ffd12d";
       const percent = traffic === "heavy" ? 86 : traffic === "smooth" ? 34 : 61;
@@ -2271,6 +2388,8 @@ def render_index() -> str:
       if (bar) {
         bar.style.background = `linear-gradient(90deg, ${color} 0 ${percent}%, rgba(255,255,255,.16) ${percent}% 100%)`;
       }
+      const weatherStrong = weather.querySelectorAll(".row strong")[2];
+      if (weatherStrong) weatherStrong.textContent = weatherLabel;
     }
     function updateMapScene(profile) {
       const dynamicLabels = sceneLabels(profile);
@@ -2284,8 +2403,10 @@ def render_index() -> str:
       }
       const frame = document.querySelector(".map-frame");
       const hasAssignments = Boolean(profile.dispatchMap && profile.assignments && Object.keys(profile.assignments).length);
+      const focusMode = Boolean(hasAssignments && profile.selected && profile.mapFocusMode === "focus");
       frame.classList.toggle("topology", Boolean(profile.dispatchMap));
-      frame.classList.toggle("focus-selected", Boolean(hasAssignments && profile.selected));
+      frame.classList.toggle("focus-selected", focusMode);
+      frame.classList.toggle("assignment-overview", Boolean(hasAssignments && !focusMode));
       renderSimulatedBaseMap(profile.dispatchMap && profile.dispatchMap.map_layers);
       if (hasAssignments && profile.selected) {
         frame.dataset.selectedAssignment = profile.selected;
@@ -2341,6 +2462,172 @@ def render_index() -> str:
     function svgPoint(point) {
       return [Number(point[0]) * 9.8, Number(point[1]) * 6.4];
     }
+    function distance2D(a, b) {
+      return Math.hypot(safeNumber(a[0], 0) - safeNumber(b[0], 0), safeNumber(a[1], 0) - safeNumber(b[1], 0));
+    }
+    function projectPointToSegment(point, start, end) {
+      const px = safeNumber(point[0], 0);
+      const py = safeNumber(point[1], 0);
+      const sx = safeNumber(start[0], 0);
+      const sy = safeNumber(start[1], 0);
+      const ex = safeNumber(end[0], 0);
+      const ey = safeNumber(end[1], 0);
+      const dx = ex - sx;
+      const dy = ey - sy;
+      const lengthSq = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((px - sx) * dx + (py - sy) * dy) / lengthSq));
+      const projected = [sx + t * dx, sy + t * dy];
+      return {point: projected, t, distance: distance2D(point, projected)};
+    }
+    function normalizedRoadPoints(road) {
+      return (road && Array.isArray(road.points) ? road.points : []).map((point) => [safeNumber(point.x, 0), safeNumber(point.y, 0)]);
+    }
+    function nearestRoadSnap(point, mapLayers, roadFilter = null) {
+      const roads = Array.isArray(mapLayers && mapLayers.roads) ? mapLayers.roads : [];
+      let best = null;
+      roads.forEach((road) => {
+        if (roadFilter && !roadFilter(road)) return;
+        const roadPoints = normalizedRoadPoints(road);
+        for (let index = 0; index < roadPoints.length - 1; index += 1) {
+          const projection = projectPointToSegment(point, roadPoints[index], roadPoints[index + 1]);
+          if (!best || projection.distance < best.distance) {
+            best = {
+              ...projection,
+              road,
+              roadPoints,
+              segmentIndex: index,
+              roadRank: road.type === "arterial" ? 3 : road.type === "secondary" ? 2 : 1
+            };
+          }
+        }
+      });
+      return best;
+    }
+    function snapOnRoad(point, road) {
+      const roadPoints = normalizedRoadPoints(road);
+      let best = null;
+      for (let index = 0; index < roadPoints.length - 1; index += 1) {
+        const projection = projectPointToSegment(point, roadPoints[index], roadPoints[index + 1]);
+        if (!best || projection.distance < best.distance) {
+          best = {...projection, road, roadPoints, segmentIndex: index};
+        }
+      }
+      return best;
+    }
+    function segmentIntersection(a, b, c, d) {
+      const dax = b[0] - a[0];
+      const day = b[1] - a[1];
+      const dcx = d[0] - c[0];
+      const dcy = d[1] - c[1];
+      const denominator = dax * dcy - day * dcx;
+      if (Math.abs(denominator) < 0.0001) return null;
+      const t = ((c[0] - a[0]) * dcy - (c[1] - a[1]) * dcx) / denominator;
+      const u = ((c[0] - a[0]) * day - (c[1] - a[1]) * dax) / denominator;
+      if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+      return [a[0] + t * dax, a[1] + t * day];
+    }
+    function closestSegmentPair(a, b, c, d) {
+      const intersection = segmentIntersection(a, b, c, d);
+      if (intersection) return {fromPoint: intersection, toPoint: intersection, distance: 0};
+      const candidates = [
+        {fromPoint: projectPointToSegment(c, a, b).point, toPoint: c},
+        {fromPoint: projectPointToSegment(d, a, b).point, toPoint: d},
+        {fromPoint: a, toPoint: projectPointToSegment(a, c, d).point},
+        {fromPoint: b, toPoint: projectPointToSegment(b, c, d).point}
+      ];
+      return candidates.map((item) => ({...item, distance: distance2D(item.fromPoint, item.toPoint)}))
+        .sort((left, right) => left.distance - right.distance)[0];
+    }
+    function closestRoadTransfer(fromRoad, toRoad) {
+      const fromPoints = normalizedRoadPoints(fromRoad);
+      const toPoints = normalizedRoadPoints(toRoad);
+      let best = null;
+      for (let fromIndex = 0; fromIndex < fromPoints.length - 1; fromIndex += 1) {
+        for (let toIndex = 0; toIndex < toPoints.length - 1; toIndex += 1) {
+          const pair = closestSegmentPair(fromPoints[fromIndex], fromPoints[fromIndex + 1], toPoints[toIndex], toPoints[toIndex + 1]);
+          if (!best || pair.distance < best.distance) {
+            best = {...pair, fromIndex, toIndex};
+          }
+        }
+      }
+      return best;
+    }
+    function chainBetweenRoadPoints(road, fromPoint, toPoint) {
+      const fromSnap = snapOnRoad(fromPoint, road);
+      const toSnap = snapOnRoad(toPoint, road);
+      return chainAlongRoad(fromSnap, toSnap);
+    }
+    function connectorRoadBetween(startRoad, endRoad, mapLayers) {
+      const roads = Array.isArray(mapLayers && mapLayers.roads) ? mapLayers.roads : [];
+      const direct = closestRoadTransfer(startRoad, endRoad);
+      let best = direct ? {road: null, score: direct.distance, direct} : null;
+      roads.filter((road) => road !== startRoad && road !== endRoad && road.type !== "service").forEach((road) => {
+        const first = closestRoadTransfer(startRoad, road);
+        const second = closestRoadTransfer(road, endRoad);
+        if (!first || !second) return;
+        const roadPenalty = road.type === "arterial" ? -2.5 : 0;
+        const score = first.distance + second.distance + distance2D(first.toPoint, second.fromPoint) * 0.14 + roadPenalty;
+        if (!best || score < best.score) best = {road, score, first, second, direct};
+      });
+      return best;
+    }
+    function chainAlongRoad(fromSnap, toSnap) {
+      if (!fromSnap || !toSnap || fromSnap.road !== toSnap.road) return [];
+      const roadPoints = fromSnap.roadPoints || [];
+      const forward = fromSnap.segmentIndex <= toSnap.segmentIndex;
+      const chain = [fromSnap.point];
+      if (forward) {
+        for (let index = fromSnap.segmentIndex + 1; index <= toSnap.segmentIndex; index += 1) {
+          if (roadPoints[index]) chain.push(roadPoints[index]);
+        }
+      } else {
+        for (let index = fromSnap.segmentIndex; index > toSnap.segmentIndex; index -= 1) {
+          if (roadPoints[index]) chain.push(roadPoints[index]);
+        }
+      }
+      chain.push(toSnap.point);
+      return chain;
+    }
+    function routeHubBetween(start, end, mapLayers) {
+      const midpoint = [(safeNumber(start[0], 0) + safeNumber(end[0], 0)) / 2, (safeNumber(start[1], 0) + safeNumber(end[1], 0)) / 2];
+      const intersections = Array.isArray(mapLayers && mapLayers.intersections) ? mapLayers.intersections : [];
+      const candidates = intersections.map((item) => [safeNumber(item.x, 50), safeNumber(item.y, 50)]);
+      candidates.push([50, 50], [42, 46], [58, 44]);
+      return candidates.slice().sort((a, b) => distance2D(a, midpoint) - distance2D(b, midpoint))[0];
+    }
+    function compactRoutePoints(points) {
+      return points.filter(Boolean).reduce((list, point) => {
+        const normalized = [Number(point[0]), Number(point[1])];
+        if (!Number.isFinite(normalized[0]) || !Number.isFinite(normalized[1])) return list;
+        const previous = list[list.length - 1];
+        if (!previous || distance2D(previous, normalized) > 0.8) list.push(normalized);
+        return list;
+      }, []);
+    }
+    function roadFollowingRoute(start, end, mapLayers) {
+      if (!mapLayers || !Array.isArray(mapLayers.roads)) return [start, end];
+      const roadFilter = (road) => road.type !== "service" || distance2D(start, end) < 20;
+      const startSnap = nearestRoadSnap(start, mapLayers, roadFilter) || nearestRoadSnap(start, mapLayers);
+      const endSnap = nearestRoadSnap(end, mapLayers, roadFilter) || nearestRoadSnap(end, mapLayers);
+      if (!startSnap || !endSnap) return [start, end];
+      if (startSnap.road === endSnap.road) {
+        return compactRoutePoints([start, ...chainAlongRoad(startSnap, endSnap), end]);
+      }
+      const connector = connectorRoadBetween(startSnap.road, endSnap.road, mapLayers);
+      if (connector && connector.road && connector.first && connector.second) {
+        const startChain = chainBetweenRoadPoints(startSnap.road, startSnap.point, connector.first.fromPoint);
+        const middleChain = chainBetweenRoadPoints(connector.road, connector.first.toPoint, connector.second.fromPoint);
+        const endChain = chainBetweenRoadPoints(endSnap.road, connector.second.toPoint, endSnap.point);
+        return compactRoutePoints([start, ...startChain, connector.first.toPoint, ...middleChain, connector.second.fromPoint, ...endChain, end]);
+      }
+      if (connector && connector.direct) {
+        const startChain = chainBetweenRoadPoints(startSnap.road, startSnap.point, connector.direct.fromPoint);
+        const endChain = chainBetweenRoadPoints(endSnap.road, connector.direct.toPoint, endSnap.point);
+        return compactRoutePoints([start, ...startChain, connector.direct.toPoint, ...endChain, end]);
+      }
+      const hub = routeHubBetween(startSnap.point, endSnap.point, mapLayers);
+      return compactRoutePoints([start, startSnap.point, hub, endSnap.point, end]);
+    }
     function dispatchPathFor(points) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
@@ -2348,29 +2635,25 @@ def render_index() -> str:
       const segments = [`M${startX.toFixed(1)} ${startY.toFixed(1)}`];
       usable.slice(1).forEach((point, index) => {
         const [x, y] = svgPoint(point);
-        const previous = usable[index];
-        const [px, py] = svgPoint(previous);
-        const laneOffset = (index % 2 === 0 ? 1 : -1) * 18;
-        const midX = (px + x) / 2 + laneOffset;
-        const midY = (py + y) / 2 - laneOffset * 0.45;
-        segments.push(`L${midX.toFixed(1)} ${py.toFixed(1)} L${midX.toFixed(1)} ${midY.toFixed(1)} L${x.toFixed(1)} ${midY.toFixed(1)} L${x.toFixed(1)} ${y.toFixed(1)}`);
+        segments.push(`L${x.toFixed(1)} ${y.toFixed(1)}`);
       });
       return segments.join(" ");
     }
-    function dispatchArrowFor(points, cls, assignmentId = "", active = false) {
+    function dispatchArrowFor(points, cls, assignmentId = "", active = false, style = "") {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
       const [x1, y1] = svgPoint(usable[usable.length - 2]);
       const [x2, y2] = svgPoint(usable[usable.length - 1]);
       const angle = Math.atan2(y2 - y1, x2 - x1);
-      const size = cls === "primary" ? 9 : 6;
+      const size = cls.includes("primary") ? 9 : 6;
       const tipX = x2;
       const tipY = y2;
       const leftX = tipX - Math.cos(angle - 0.52) * size;
       const leftY = tipY - Math.sin(angle - 0.52) * size;
       const rightX = tipX - Math.cos(angle + 0.52) * size;
       const rightY = tipY - Math.sin(angle + 0.52) * size;
-      return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}" points="${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
+      const styleAttr = style ? ` style="${style}"` : "";
+      return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}"${styleAttr} points="${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
     }
     function renderDispatchLinks(profile, entityPoints) {
       const svg = document.querySelector(".route-svg");
@@ -2379,40 +2662,47 @@ def render_index() -> str:
         svg.innerHTML = "";
         return;
       }
-      const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id);
-      const pathHtml = profile.dispatchMap.assignments.slice(0, 8).map((assignment) => {
+      const focusMode = profile.mapFocusMode === "focus";
+      const selectedAssignment = focusMode ? (profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id)) : "";
+      const mapLayers = profile.dispatchMap.map_layers;
+      const routePalette = ["#26dccd", "#55d68a", "#ffcf4a", "#5fb8ff", "#ff9d57", "#c3e56d", "#7de3ff", "#f2b76a"];
+      const pathHtml = profile.dispatchMap.assignments.slice(0, 8).map((assignment, index) => {
         const couriers = assignment.map_couriers || courierTokens(assignment.courier);
         const orders = assignment.map_orders || assignment.orders || [];
         const courierPoints = couriers.map((courier) => entityPoints[courier]).filter(Boolean);
         const pickupPoint = entityPoints[assignment.pickup];
         const orderPoints = orders.map((order) => entityPoints[order]).filter(Boolean);
         if (!pickupPoint || courierPoints.length === 0) return "";
-        const isActive = assignment.id === selectedAssignment;
-        const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary";
-        const deliveryRoute = orderPoints.length ? [pickupPoint, ...orderPoints] : [];
-        const pickupRoute = [courierPoints[0], pickupPoint];
+        const isActive = focusMode && assignment.id === selectedAssignment;
+        const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
+        const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
+        const deliveryRoute = orderPoints.length ? roadFollowingRoute(pickupPoint, orderPoints[0], mapLayers) : [];
+        const pickupRoute = roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers);
         const pickupD = dispatchPathFor(pickupRoute);
         const deliveryD = dispatchPathFor(deliveryRoute);
-        const arrowCls = isActive ? "primary" : "secondary";
+        const arrowCls = isActive ? "primary" : "secondary overview-route";
         const routeParts = [
-          `<path class="${cls} pickup-leg" data-assignment="${assignment.id}" d="${pickupD}"></path>`,
-          dispatchArrowFor(orderPoints.length ? deliveryRoute : pickupRoute, arrowCls, assignment.id, isActive)
+          `<path class="${cls} pickup-leg" data-assignment="${assignment.id}" style="${routeStyle}" d="${pickupD}"></path>`,
+          dispatchArrowFor(orderPoints.length ? deliveryRoute : pickupRoute, arrowCls, assignment.id, isActive, routeStyle)
         ];
-        if (deliveryD) routeParts.splice(1, 0, `<path class="${cls}" data-assignment="${assignment.id}" d="${deliveryD}"></path>`);
+        if (deliveryD) routeParts.splice(1, 0, `<path class="${cls}" data-assignment="${assignment.id}" style="${routeStyle}" d="${deliveryD}"></path>`);
         return routeParts.join("");
       }).join("");
       svg.innerHTML = pathHtml;
     }
-    function applyMapFocus(profile, assignmentId) {
+    function applyMapFocus(profile, assignmentId, focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
       const hasDispatch = Boolean(profile && profile.dispatchMap && Object.keys(assignments).length);
       const fallbackAssignment = Object.keys(assignments)[0] || (profile && profile.selected) || "A1";
       const selectedAssignment = assignments[assignmentId] ? assignmentId : fallbackAssignment;
+      if (profile) profile.mapFocusMode = focusMap ? "focus" : "overview";
       if (profile) profile.selected = hasDispatch ? selectedAssignment : "";
+      const focused = Boolean(hasDispatch && focusMap);
       const frame = document.querySelector(".map-frame");
       if (frame) {
-        frame.classList.toggle("focus-selected", hasDispatch);
-        if (hasDispatch) {
+        frame.classList.toggle("focus-selected", focused);
+        frame.classList.toggle("assignment-overview", Boolean(hasDispatch && !focused));
+        if (hasDispatch && focused) {
           frame.dataset.selectedAssignment = selectedAssignment;
         } else {
           frame.removeAttribute("data-selected-assignment");
@@ -2426,7 +2716,7 @@ def render_index() -> str:
         return;
       }
       document.querySelectorAll(".map-label, .pin").forEach((node) => {
-        const active = node.dataset.assignment === selectedAssignment;
+        const active = focused && node.dataset.assignment === selectedAssignment;
         node.classList.toggle("active-assignment", active);
         if (node.classList.contains("map-label")) {
           node.classList.toggle("selected", active);
@@ -2434,10 +2724,11 @@ def render_index() -> str:
         }
       });
       document.querySelectorAll(".dispatch-link, .dispatch-arrow").forEach((node) => {
-        const active = node.dataset.assignment === selectedAssignment;
+        const active = focused && node.dataset.assignment === selectedAssignment;
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
         node.classList.toggle("secondary", !active);
+        node.classList.toggle("overview-route", !focused);
       });
     }
     function renderEntityPreviewDetail(profile, entityId) {
@@ -2505,20 +2796,21 @@ def render_index() -> str:
       }
       return false;
     }
-    function renderAssignmentDetail(profile, assignmentId, sourceLabel = "") {
+    function renderAssignmentDetail(profile, assignmentId, sourceLabel = "", focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
       const resolvedAssignment = assignments[assignmentId] ? assignmentId : (assignments[profile.selected] ? profile.selected : Object.keys(assignments)[0]);
       const assignment = assignments[resolvedAssignment];
       if (!assignment) return;
       const changedSelection = profile.selected !== resolvedAssignment;
       profile.selected = resolvedAssignment;
-      applyMapFocus(profile, resolvedAssignment);
+      applyMapFocus(profile, resolvedAssignment, focusMap);
       if (changedSelection && profile.dispatchMap && document.querySelector(".map-frame").classList.contains("leaflet-ready")) {
         updateMapScene(profile);
       }
       $("detail-title").textContent = sourceLabel ? "派单详情：" + sourceLabel : "Selected Dispatch Assignment";
       $("detail-courier").textContent = assignment.courier;
-      $("detail-merchant").innerHTML = `订单组 <code>${assignment.merchant}</code> 最终派给 ${assignment.courier}`;
+      const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
+      $("detail-merchant").innerHTML = `订单组 <code>${assignment.merchant}</code> 共 ${orderCount} 单，最终派给 ${assignment.courier}`;
       $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
       $("detail-eta").textContent = assignment.eta;
       $("right-cost").textContent = assignment.cost;
@@ -2531,7 +2823,7 @@ def render_index() -> str:
       if (rows[2]) rows[2].textContent = assignment.risk === "High" ? "Warning" : "Good";
       if (rows[3]) rows[3].textContent = assignment.risk;
       if (rows[4]) rows[4].textContent = profile.utilization;
-      showToast(`${assignment.merchant} → ${assignment.courier}，${assignment.orders.length} 单`);
+      showToast(`${assignment.merchant} → ${assignment.courier}，${orderCount} 单`);
     }
     function updateDecisionPanel(profile, report) {
       const best = report && report.best ? report.best : {};
@@ -2540,7 +2832,7 @@ def render_index() -> str:
       const tasks = safeNumber(best.total_tasks || features.tasks, 38);
       const covered = safeNumber(best.covered_tasks, tasks);
       const coverage = tasks > 0 ? Math.round((covered / tasks) * 100) : 100;
-      renderAssignmentDetail(profile, profile.selected);
+      renderAssignmentDetail(profile, profile.selected, "", false);
       const compareRows = document.querySelectorAll(".decision-card:last-child .row strong");
       if (compareRows[0]) compareRows[0].textContent = profile.improvement;
       if (compareRows[1]) compareRows[1].textContent = "-" + Math.max(2, Math.round(used * 0.9)) + " min";
@@ -2610,6 +2902,7 @@ def render_index() -> str:
       profile.dispatchMap = null;
       profile.assignments = {};
       profile.selected = "";
+      profile.mapFocusMode = "overview";
       $("case-id").textContent = activeCase;
       $("runtime").textContent = "--:--:--";
       $("completion-rate").textContent = "--";
@@ -2785,6 +3078,13 @@ def render_index() -> str:
     }
     function setLayerMode(mode) {
       const frame = document.querySelector(".map-frame");
+      const profile = currentProfile || profileForCase(selectedCase());
+      if (mode === "selected" && profile.assignments && Object.keys(profile.assignments).length) {
+        applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], true);
+      }
+      if (mode === "all" && profile.assignments && Object.keys(profile.assignments).length) {
+        applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
+      }
       frame.classList.toggle("hide-candidates", mode === "selected");
       document.querySelectorAll(".dispatch-link.secondary").forEach((route) => {
         route.style.opacity = mode === "candidates" ? "1" : "";
@@ -2807,6 +3107,12 @@ def render_index() -> str:
         button.addEventListener("click", () => {
           const action = button.dataset.mapAction;
           button.classList.toggle("active");
+          if (action === "depots") {
+            const hidden = button.classList.contains("active");
+            document.querySelector(".map-frame").classList.toggle("hide-entities", hidden);
+            showToast(hidden ? "点位图层已弱化，仅保留派单关系" : "点位图层已恢复：商家、订单与骑手可见");
+            return;
+          }
           if (action === "routes") {
             const active = button.classList.contains("active");
             document.querySelector(".map-frame").classList.toggle("hide-candidates", active);
@@ -2831,13 +3137,16 @@ def render_index() -> str:
           if (action === "fit") {
             document.querySelector(".map-frame").classList.remove("zoomed");
             $("zoom-in").classList.remove("active");
+            const profile = currentProfile || profileForCase(selectedCase());
+            if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
             if (leafletMap && leafletLastBounds) leafletMap.fitBounds(leafletLastBounds, {padding: [52, 52], maxZoom: 13});
             showToast("视图已适配全部派单关系");
             return;
           }
           if (action === "fullscreen") {
-            document.querySelector(".map-panel").classList.toggle("active");
-            showToast("演示视图已聚焦地图区域");
+            const expanded = document.querySelector(".map-panel").classList.toggle("active");
+            button.textContent = expanded ? "↙" : "↗";
+            showToast(expanded ? "演示视图已进入地图聚焦模式" : "演示视图已退出地图聚焦模式");
             return;
           }
           showToast("仓库、商家、目的地与骑手图层可见");
@@ -2863,6 +3172,8 @@ def render_index() -> str:
       });
       $("recenter").addEventListener("click", () => {
         document.querySelector(".map-frame").classList.toggle("locating");
+        const profile = currentProfile || profileForCase(selectedCase());
+        if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
         if (leafletMap && leafletLastBounds) leafletMap.fitBounds(leafletLastBounds, {padding: [52, 52], maxZoom: 13});
         showToast("已回到当前派单关系中心");
       });
