@@ -755,6 +755,124 @@ def synth_candidates(report: dict[str, Any], baseline: dict[str, Any]) -> list[d
 
 
 # --------------------------------------------------------------------------- #
+# 6b. 四方共赢 / 多方平衡面板（iter-13）                                        #
+#     直接透传 report.stakeholders 真值：                                       #
+#       · 平台 expected_cost / fulfillment_rate  = REAL（官方成本口径，657.104）#
+#       · 骑手 Gini/Jain/时薪、商家 gap/曝光Gini、顾客 ETA/延误 = 演示合成层    #
+#         (seed=20260620，由真实 task/courier/score/willingness 单调派生)       #
+#     不重算、不臆造键名；前端 α 滑块在已有 pareto_front 5 点间吸附/插值。       #
+# --------------------------------------------------------------------------- #
+def synth_stakeholders(report: dict[str, Any]) -> dict[str, Any]:
+    st = report.get("stakeholders") or {}
+    if not st:
+        return {"available": False}
+    card = st.get("scorecard") or {}
+    pareto = st.get("pareto_front") or []
+
+    # 每个标量标注 real/synthetic，让前端逐项分色（不靠整面板一刀切）。
+    def _field(value, real: bool):
+        return {"value": value, "real": real}
+
+    cust = card.get("customer") or {}
+    rider = card.get("rider") or {}
+    merch = card.get("merchant") or {}
+    plat = card.get("platform") or {}
+
+    scorecard = {
+        # 🛵 骑手：收入公平 + Rawlsian 最低时薪（全部演示合成层）
+        "rider": {
+            "icon": "🛵", "name": "骑手",
+            "income_gini": _field(rider.get("income_gini"), False),
+            "income_jain": _field(rider.get("income_jain"), False),
+            "worst_hourly": _field(rider.get("worst_hourly_wage_rawlsian"), False),
+            "n_riders": _field(rider.get("n_riders"), True),  # 出场骑手数=真实派单口径
+        },
+        # 🏪 商家：出餐-到达对齐 gap + 曝光公平（演示合成层）
+        "merchant": {
+            "icon": "🏪", "name": "商家",
+            "ready_gap_min": _field(merch.get("mean_ready_alignment_gap_min"), False),
+            "exposure_gini": _field(merch.get("exposure_gini"), False),
+        },
+        # 🙋 顾客：最大延误 + 平均 ETA（演示合成层）
+        "customer": {
+            "icon": "🙋", "name": "顾客",
+            "max_lateness_min": _field(cust.get("max_lateness_min"), False),
+            "mean_eta_min": _field(cust.get("mean_eta_min"), False),
+        },
+        # 🏢 平台：期望成本(657.104 真值) + 履约率(真值)
+        "platform": {
+            "icon": "🏢", "name": "平台",
+            "expected_cost": _field(plat.get("expected_cost"), True),
+            "fulfillment_rate": _field(plat.get("fulfillment_rate"), True),
+            "covered_tasks": _field(plat.get("covered_tasks"), True),
+            "total_tasks": _field(plat.get("total_tasks"), True),
+        },
+    }
+
+    # Pareto 前沿真值点：x=expected_cost(真实，↓更好)，y=rider_income_gini(合成，↓更好)
+    front = [
+        {
+            "alpha": p.get("alpha"),
+            "expected_cost": p.get("expected_cost"),       # REAL
+            "rider_income_gini": p.get("rider_income_gini"),  # 合成层
+            "rider_worst_hourly": p.get("rider_worst_hourly"),  # 合成层
+            "fulfillment_rate": p.get("fulfillment_rate"),  # REAL
+            "customer_max_lateness": p.get("customer_max_lateness"),  # 合成层
+            "efficient": bool(p.get("pareto_efficient")),
+        }
+        for p in pareto
+    ]
+
+    # 公平的真实代价：在「非支配(efficient)解」内比较，不拿被支配的纯公平极端
+    # α=1.0(成本崩盘/履约腰斩)做对照——那点已被支配、误导。
+    #   from = α 最小的非支配点（效率角）
+    #   to   = Gini 最低的非支配点（最公平且仍非支配）
+    # 成本↑ / Gini↓ / 履约↓ 全部由真值现算，不写死任何百分比。
+    tradeoff = None
+    eff_pts = [p for p in front if p.get("efficient")] or front
+    if len(eff_pts) >= 2:
+        a0 = min(eff_pts, key=lambda p: (p.get("alpha") if p.get("alpha") is not None else 0))
+        a1 = min(eff_pts, key=lambda p: (p.get("rider_income_gini")
+                                         if p.get("rider_income_gini") is not None else 1e9))
+
+        def _pct(new, old):
+            if old in (None, 0) or new is None:
+                return None
+            return round((new - old) / abs(old) * 100.0, 1)
+
+        tradeoff = {
+            "alpha_from": a0.get("alpha"),
+            "alpha_to": a1.get("alpha"),
+            "cost_pct": _pct(a1.get("expected_cost"), a0.get("expected_cost")),
+            "gini_pct": _pct(a1.get("rider_income_gini"), a0.get("rider_income_gini")),
+            "fulfillment_pct": _pct(a1.get("fulfillment_rate"), a0.get("fulfillment_rate")),
+            "cost_from": a0.get("expected_cost"),
+            "cost_to": a1.get("expected_cost"),
+            "gini_from": a0.get("rider_income_gini"),
+            "gini_to": a1.get("rider_income_gini"),
+            "ful_from": a0.get("fulfillment_rate"),
+            "ful_to": a1.get("fulfillment_rate"),
+        }
+
+    return {
+        "available": True,
+        "preset": st.get("preset"),
+        "weights": st.get("weights"),
+        "utilities": st.get("utilities"),   # 四方加权效用真值(Uc/Ur/Um/Up/U)
+        "scorecard": scorecard,
+        "pareto_front": front,
+        "tradeoff": tradeoff,
+        "seed": SEED,
+        # 公平有真实代价：成本↑/履约↓ 与 Gini↓ 如实并列，不夸大。
+        "honesty": (
+            "平台 expected_cost / 履约率为官方成本口径真值；骑手 Gini/时薪、商家 gap/曝光、"
+            "顾客 ETA/延误为演示合成层(seed=20260620，由真实 task/courier/score/willingness 单调派生)。"
+            "α 提升公平(Gini↓)有真实代价：期望成本↑、履约率↓，二者如实并列。"
+        ),
+    }
+
+
+# --------------------------------------------------------------------------- #
 # 7. 决策解释（聚焦第一个合单组，真值 + 演示距离/ETA）                          #
 # --------------------------------------------------------------------------- #
 def synth_decision(text: str, report: dict[str, Any], layout: dict[str, Any]) -> dict[str, Any]:
@@ -939,6 +1057,7 @@ def build_story(text: str, report: dict[str, Any], baseline: dict[str, Any]) -> 
         "map": layout,
         "decision": synth_decision(text, report, layout),
         "candidates": synth_candidates(report, baseline),
+        "stakeholders": synth_stakeholders(report),      # iter-13：四方共赢面板真值透传
         "certificate": report.get("certificate", {}),   # r1，真值透传
         "evolution": synth_evolution(report),            # iter-2：透传真值，删假占位
         "baseline": baseline,

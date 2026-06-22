@@ -859,6 +859,122 @@ function recomputeRoi(){
 }
 $('roi-calc').onclick=recomputeRoi;
 
+/* ---------- iter-13 四方共赢 · 多方平衡（Keeta 健康生态） ----------
+ * 全部接 report.stakeholders 真值：
+ *   平台 expected_cost(657.104)/履约率 = REAL（官方成本口径，绿点·real）
+ *   骑手 Gini/Jain/时薪、商家 gap/曝光、顾客 ETA/延误 = 演示合成层(seed=20260620)
+ * Pareto 前沿用真实 pareto_front 点；α 滑块在已有 5 点间吸附最近点（不重算后端）。
+ * 公平有真实代价：α↑ → Gini↓ 但 成本↑/履约↓，如实并列。 */
+let STK=null;            // 缓存真值
+let STK_ALPHA_IDX=0;     // 当前 α 选中点下标
+function fmtPct(x){ return x==null?'—':(x>=0?'+':'')+x+'%'; }
+function fmtNum(x,d){ return x==null?'—':(d!=null?Number(x).toFixed(d):x); }
+function realDot(real){ return real?'<span class="real-dot" title="官方成本口径真值"></span>'
+  :'<span class="stk-syn" title="演示合成层 seed=20260620，由真实 task/courier/score/willingness 单调派生">合成</span>'; }
+function stkMetric(label,f,unit,fmt){
+  const v=f&&f.value!=null?(fmt?fmt(f.value):f.value):null;
+  return `<div class="stk-m"><span class="stk-ml">${safe(label)}${realDot(f&&f.real)}</span>
+    <span class="stk-mv ${f&&f.real?'real':'syn'}">${v==null?'—':safe(v)}${v!=null&&unit?`<i>${safe(unit)}</i>`:''}</span></div>`;
+}
+function renderStakeholders(st){
+  const body=$('stkbody'); if(!body) return;
+  if(!st||st.available===false){ body.innerHTML='<div class="empty-ph">本次未取到 report.stakeholders 真值</div>'; return; }
+  STK=st; const sc=st.scorecard||{};
+  const front=(st.pareto_front||[]);
+  // α 滑块默认吸附到「非支配 + α 最小」的高效点
+  let defIdx=front.findIndex(p=>p.efficient); if(defIdx<0) defIdx=0; STK_ALPHA_IDX=defIdx;
+
+  const r=sc.rider||{}, m=sc.merchant||{}, c=sc.customer||{}, p=sc.platform||{};
+  const cards=`
+    <div class="stk-card stk-rider"><div class="stk-h">${r.icon||'🛵'} 骑手 <i>公平 & 收入</i></div>
+      ${stkMetric('收入 Gini',r.income_gini,'',v=>Number(v).toFixed(4))}
+      ${stkMetric('Jain 公平指数',r.income_jain,'',v=>Number(v).toFixed(4))}
+      ${stkMetric('最低时薪(Rawlsian)',r.worst_hourly,'¥/时',v=>Number(v).toFixed(2))}
+      ${stkMetric('出场骑手数',r.n_riders,'人',v=>Math.round(v))}</div>
+    <div class="stk-card stk-merch"><div class="stk-h">${m.icon||'🏪'} 商家 <i>出餐 & 曝光</i></div>
+      ${stkMetric('出餐-到达 gap',m.ready_gap_min,'分',v=>Number(v).toFixed(2))}
+      ${stkMetric('曝光 Gini',m.exposure_gini,'',v=>Number(v).toFixed(4))}</div>
+    <div class="stk-card stk-cust"><div class="stk-h">${c.icon||'🙋'} 顾客 <i>时效 & 体验</i></div>
+      ${stkMetric('平均 ETA',c.mean_eta_min,'分',v=>Number(v).toFixed(2))}
+      ${stkMetric('最大延误',c.max_lateness_min,'分',v=>Number(v).toFixed(2))}</div>
+    <div class="stk-card stk-plat"><div class="stk-h">${p.icon||'🏢'} 平台 <i>成本 & 履约</i></div>
+      ${stkMetric('期望成本',p.expected_cost,'',v=>Number(v).toFixed(3))}
+      ${stkMetric('履约率',p.fulfillment_rate,'',v=>(Number(v)*100).toFixed(2)+'%')}
+      ${stkMetric('覆盖/总任务',{value:(p.covered_tasks&&p.total_tasks)?`${Math.round(p.covered_tasks.value??p.covered_tasks)}/${Math.round(p.total_tasks.value??p.total_tasks)}`:null,real:true},'',null)}</div>`;
+
+  const tr=st.tradeoff||{};
+  const trBar=tr.cost_pct!=null?`<div class="stk-tradeoff">
+      <span class="stk-tt">α=${fmtNum(tr.alpha_from)}→${fmtNum(tr.alpha_to)} 真实 Pareto 口径（公平的真实代价）：</span>
+      <span class="stk-chip cost">成本 ${fmtPct(tr.cost_pct)}</span>
+      <span class="stk-chip gini">骑手 Gini ${fmtPct(tr.gini_pct)}</span>
+      <span class="stk-chip ful">履约率 ${fmtPct(tr.fulfillment_pct)}</span>
+      <span class="tiny muted">（成本/履约为官方真值口径；Gini 为合成层）</span></div>`:'';
+
+  body.innerHTML=`
+    <div class="stk-cards">${cards}</div>
+    ${trBar}
+    <div class="stk-pareto-wrap">
+      <div class="stk-pareto-h">效率(期望成本↓，真值) × 公平(骑手收入 Gini↓，合成层) Pareto 前沿
+        <span class="tiny muted">· 绿=非支配解 灰=被支配 · 拖动 α 在真实解间切换</span></div>
+      <div id="stk-pareto-svg"></div>
+      <div class="stk-slider-row">
+        <span class="stk-sl-lbl">公平权重 α</span>
+        <input type="range" id="stk-alpha" min="0" max="${Math.max(0,front.length-1)}" step="1" value="${STK_ALPHA_IDX}">
+        <span class="stk-sl-val" id="stk-alpha-val"></span>
+      </div>
+      <div class="stk-pick" id="stk-pick"></div>
+    </div>
+    <div class="stk-honesty">${safe(st.honesty||'')}</div>`;
+
+  const slider=$('stk-alpha');
+  if(slider) slider.oninput=()=>{ STK_ALPHA_IDX=+slider.value; paintPareto(); };
+  paintPareto();
+}
+function paintPareto(){
+  if(!STK) return;
+  const front=STK.pareto_front||[]; if(!front.length) return;
+  const idx=Math.min(STK_ALPHA_IDX,front.length-1);
+  const W=560,H=210,padL=58,padR=18,padT=14,padB=40;
+  const xs=front.map(p=>p.expected_cost), ys=front.map(p=>p.rider_income_gini);
+  const xmin=Math.min(...xs),xmax=Math.max(...xs),ymin=Math.min(...ys),ymax=Math.max(...ys);
+  const xr=(xmax-xmin)||1, yr=(ymax-ymin)||1;
+  const sx=v=>padL+(v-xmin)/xr*(W-padL-padR);
+  const sy=v=>H-padB-(v-ymin)/yr*(H-padT-padB);  // Gini↓ 在上方更好
+  // 连线（按成本排序）
+  const ordered=[...front].sort((a,b)=>a.expected_cost-b.expected_cost);
+  const path=ordered.map((p,i)=>`${i?'L':'M'}${sx(p.expected_cost).toFixed(1)},${sy(p.rider_income_gini).toFixed(1)}`).join(' ');
+  const pts=front.map((p,i)=>{
+    const cx=sx(p.expected_cost),cy=sy(p.rider_income_gini);
+    const sel=i===idx;
+    const col=p.efficient?'#46f0a8':'#5d8073';
+    return `<g>
+      ${sel?`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="11" fill="none" stroke="#43d5ff" stroke-width="2"/>`:''}
+      <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${sel?6:5}" fill="${col}" stroke="#0a1612" stroke-width="1.5"/>
+      <text x="${cx.toFixed(1)}" y="${(cy-10).toFixed(1)}" fill="${sel?'#43d5ff':'#7fa597'}" font-size="10" text-anchor="middle" font-weight="${sel?800:600}">α=${fmtNum(p.alpha)}</text>
+    </g>`;
+  }).join('');
+  const svg=`<svg viewBox="0 0 ${W} ${H}" class="stk-svg" preserveAspectRatio="xMidYMid meet">
+    <line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="rgba(97,255,211,.25)"/>
+    <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="rgba(97,255,211,.25)"/>
+    <text x="${(padL+(W-padR))/2}" y="${H-8}" fill="#7fa597" font-size="10.5" text-anchor="middle">期望成本 →（↓更好，真值）</text>
+    <text x="14" y="${(padT+(H-padB))/2}" fill="#7fa597" font-size="10.5" text-anchor="middle" transform="rotate(-90 14 ${(padT+(H-padB))/2})">骑手收入 Gini →（↓更好，合成层）</text>
+    <text x="${padL-6}" y="${sy(ymax).toFixed(1)}" fill="#5d8073" font-size="9" text-anchor="end">${ymax.toFixed(3)}</text>
+    <text x="${padL-6}" y="${sy(ymin).toFixed(1)}" fill="#5d8073" font-size="9" text-anchor="end">${ymin.toFixed(3)}</text>
+    <path d="${path}" fill="none" stroke="rgba(70,240,168,.45)" stroke-width="1.6" stroke-dasharray="4 3"/>
+    ${pts}
+  </svg>`;
+  const host=$('stk-pareto-svg'); if(host) host.innerHTML=svg;
+  const sel=front[idx];
+  const av=$('stk-alpha-val'); if(av) av.textContent=`α=${fmtNum(sel.alpha)} ${sel.efficient?'· 非支配解':'· 被支配'}`;
+  const pick=$('stk-pick');
+  if(pick) pick.innerHTML=`选中解 α=<b>${fmtNum(sel.alpha)}</b>：
+    期望成本 <b class="real">${fmtNum(sel.expected_cost,3)}</b><span class="real-dot"></span> ·
+    骑手 Gini <b class="syn">${fmtNum(sel.rider_income_gini,4)}</b><span class="stk-syn">合成</span> ·
+    最低时薪 <b class="syn">${fmtNum(sel.rider_worst_hourly,2)}¥/时</b> ·
+    履约率 <b class="real">${(Number(sel.fulfillment_rate)*100).toFixed(2)}%</b><span class="real-dot"></span> ·
+    最大延误 <b class="syn">${fmtNum(sel.customer_max_lateness,2)}分</b>`;
+}
+
 /* ---------- 数据边界（iter-7：诚实边界数据化，真实 vs 演示分色 token 化） ---------- */
 function renderBoundary(b){
   const strip=$('boundary-strip'); if(!strip||!b||typeof b!=='object') return;
@@ -977,6 +1093,7 @@ function applyStory(s){
   if(s.certificate) renderCert(s.certificate);
   if(s.baseline) renderBaseline(s.baseline);
   if(s.evolution) renderEvo(s.evolution);   // iter-2：真值自进化
+  if(s.stakeholders) renderStakeholders(s.stakeholders);  // iter-13：四方共赢
   if(s.solver_used) $('solverused').textContent=s.solver_used;
   // 收敛动画
   setTimeout(convergeEdges, 300);
@@ -1008,6 +1125,7 @@ async function loadSkeleton(){
   $('cert').innerHTML=skeletonPanel('solver_v4 求解后回填 gap·r1 证书');
   $('candidates').innerHTML=`<div style="grid-column:1/-1">${skeletonPanel('方案 A/B/C 自动评估')}</div>`;
   $('baseline').innerHTML=skeletonPanel('纯贪心真跑 vs AutoSolver 对比');
+  $('stkbody').innerHTML=skeletonPanel('求解后接入 report.stakeholders：平台成本真值 + 公平/体验合成层');
   try{
     const r=await(await fetch('/api/cockpit/case')).json();
     if(r.status==='ok'){
@@ -1084,6 +1202,7 @@ function replayDemo(){
   $('cert').innerHTML=skeletonPanel('solver_v4 求解后回填 gap·r1 证书');
   $('candidates').innerHTML=`<div style="grid-column:1/-1">${skeletonPanel('方案 A/B/C 自动评估')}</div>`;
   $('baseline').innerHTML=skeletonPanel('纯贪心真跑 vs AutoSolver 对比');
+  $('stkbody').innerHTML=skeletonPanel('求解后接入 report.stakeholders：平台成本真值 + 公平/体验合成层');
   // 3) 短暂停顿后重放整段
   $('phase').textContent='重新演示 · 重置整舱并重放 AI 自主求解动画…';
   setTimeout(runStream, 320);
