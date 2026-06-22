@@ -99,6 +99,19 @@
 
 完成记录：
 
+- 已完成。
+- 全量复读 `goal/goal-1/input.md`、`goal/goal-1/plan.md`、`goal/goal-1/tasks.md` 后执行检查，确认 Task 4-5 仍对齐原始目标：参考未来规划，完善 Web demo 内容，并将风格收敛为专业开发者工作台。
+- 桌面浏览器验证：本地启动 `python3 -m web_agent_demo.server --host 127.0.0.1 --port 8765`，打开 `http://127.0.0.1:8765/`；检查 `AutoSolver Agent Workbench`、场景摘要、风险标签、结果对比、事件流和候选表均存在；`documentElement.scrollWidth` 未超过 viewport；console error 为空。
+- 移动浏览器验证：设置 390x844 视口后重新加载；场景摘要、结果对比和事件流可见；`.summary-grid` 与 `.workbench` 均为单列布局；无横向溢出；console error 为空。
+- 响应式恢复：浏览器验证后已 reset viewport 并关闭验证标签。
+- 测试验证：`python3 -m unittest tests.test_web_agent_demo` 通过 7 个测试。
+- 语法验证：`python3 -m py_compile web_agent_demo/server.py web_agent_demo/sample_cases.py autosolver_agent/system.py tests/test_web_agent_demo.py` 通过。
+- 文案/视觉残留检查：`rg -n -- "radial-gradient|backdrop-filter|@keyframes pulse|transform: translate|Proxy score|local_cost|40/40|本地分数|本地评分|官方成绩|黑科技|炫酷大屏|降本增效神器" web_agent_demo/server.py web_agent_demo/sample_cases.py tests/test_web_agent_demo.py || true` 仅命中测试中的禁止项断言和 mock payload，页面实现未命中。
+- 验证副作用处理：浏览器日志显示一次 `/api/stream?case=large_seed301&budget=10` 请求触发 Evolution Memory/Registry 写入；已仅反向应用 `autosolver_agent/evolution_state/evolution_memory.jsonl` 与 `autosolver_agent/evolution_state/strategy_registry.json` 的验证副作用。
+- 服务清理：本地 demo 服务已通过 Ctrl-C 停止。
+- 清理后状态：`git status --short --branch` 显示工作区干净，分支为 `main...origin/main [ahead 2]`。
+- 结论：未发现需要修复的问题；对 Task 4-5 当前实现有充分信心，可以进入 Task 7 最终验证与 review。
+
 ## Task 7: 运行测试和最终 review
 
 验证标准：运行相关自动化测试或静态检查；从用户视角、代码质量、安全性、可维护性角度做最终审查。
