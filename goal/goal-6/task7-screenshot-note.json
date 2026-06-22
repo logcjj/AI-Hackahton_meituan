@@ -1,0 +1,37 @@
+{
+  "checked_at": "2026-06-23T00:31:00+08:00",
+  "status": "screenshot_unavailable_in_current_runtime",
+  "browser_screenshot_attempts": [
+    {
+      "target": "AutoSolver final map tab",
+      "method": "tab.screenshot({fullPage:false})",
+      "result": "Timed out running CDP command \"Page.captureScreenshot\""
+    },
+    {
+      "target": "AutoSolver map panel clip",
+      "method": "tab.screenshot({clip})",
+      "result": "Timed out running CDP command \"Page.captureScreenshot\""
+    },
+    {
+      "target": "about:blank capability test",
+      "method": "tab.screenshot({fullPage:false})",
+      "result": "Timed out running CDP command \"Page.captureScreenshot\""
+    }
+  ],
+  "fallback_attempts": [
+    {
+      "method": "macOS screencapture",
+      "result": "captured lock-screen/desktop image instead of the in-app browser; discarded"
+    },
+    {
+      "method": "Computer Use get_app_state(Codex)",
+      "result": "blocked by safety policy"
+    },
+    {
+      "method": "Computer Use get_app_state(Google Chrome)",
+      "result": "cgWindowNotFound"
+    }
+  ],
+  "functional_browser_audit": "goal/goal-6/task7-browser-audit.json",
+  "functional_audit_result": "passed with zero violations; DOM evidence verifies all scenario runs, final routes, strategy variation, rain layer and console errors"
+}

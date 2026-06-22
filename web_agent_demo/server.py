@@ -148,7 +148,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "traffic_bias": 0.45,
         "weather": "clear",
         "density_profile": "balanced",
-        "strategy_cycle": ["S2", "S1", "S2", "S4", "S2", "S3", "S2", "S1", "S5", "S2"],
+        "strategy_cycle": ["S2", "S2", "S2", "S4", "S2", "S3", "S2", "S1", "S5", "S2"],
         "description": "订单不完全重叠，多个骑手候选质量接近，突出多派候选策略。",
     },
     {
@@ -163,7 +163,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "traffic_bias": 0.58,
         "weather": "clear",
         "density_profile": "scarce_spread",
-        "strategy_cycle": ["S3", "S1", "S3", "S5", "S3", "S2", "S4", "S3", "S5", "S3"],
+        "strategy_cycle": ["S3", "S3", "S3", "S5", "S3", "S2", "S4", "S3", "S5", "S3"],
         "description": "骑手少且订单分布拉开，需要先覆盖再做局部修复。",
     },
     {
@@ -193,7 +193,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "traffic_bias": 0.26,
         "weather": "clear",
         "density_profile": "spread",
-        "strategy_cycle": ["S4", "S2", "S4", "S1", "S4", "S3", "S4", "S2", "S5", "S4"],
+        "strategy_cycle": ["S4", "S4", "S4", "S1", "S4", "S3", "S4", "S2", "S5", "S4"],
         "description": "低峰期订单分散且骑手充足，用于展示贪心基线也可能成为可接受方案。",
     },
     {
@@ -414,6 +414,8 @@ def _strategy_score_model(
         "S4": 0.40 + offpeak_stability * 0.30 + spread_score * 0.11 + (1.0 - candidate_competition) * 0.07,
         "S5": 0.38 + low_willingness * 0.27 + traffic_pressure * 0.16 + rain_or_event * 0.09 + risk_candidate_rate * 0.09,
     }
+    if str(config.get("scene_type")) == "scarce_couriers":
+        signals["S3"] += 0.11
     scores: dict[str, float] = {}
     for strategy_id, raw_score in signals.items():
         prior = 0.165 if strategy_id == sample_hint else 0.0
@@ -2070,6 +2072,16 @@ def render_index() -> str:
       if (!res.ok || payload.status !== "ok") throw new Error(payload.error || "sample refresh failed");
       applySimulationSample(payload.sample);
     }
+    async function loadSimulationScenario(scenarioId) {
+      if (!scenarioId) return false;
+      const select = $("case-select");
+      const option = select ? Array.from(select.options).find((item) => item.dataset.scenario === scenarioId) : null;
+      if (!option) return false;
+      select.value = option.value;
+      simulationSampleIndex[scenarioId] = -1;
+      await refreshSimulationSample();
+      return true;
+    }
     function applyDispatchAssignmentMap(mapPayload) {
       if (!mapPayload || !Array.isArray(mapPayload.assignments) || mapPayload.assignments.length === 0) return;
       document.body.classList.remove("sample-preview");
@@ -3101,7 +3113,18 @@ def render_index() -> str:
         return `<button class="scene-button" data-case="${item.case_id}" data-scenario="${item.id}"><strong>${item.name}</strong><span>${item.sample_count} samples · ${strategies}</span></button>`;
       }).join("");
       strip.querySelectorAll(".scene-button").forEach((button) => {
-        button.addEventListener("click", () => applyScene(button.dataset.case, "button"));
+        button.addEventListener("click", async () => {
+          if (button.dataset.scenario) {
+            try {
+              await loadSimulationScenario(button.dataset.scenario);
+            } catch (error) {
+              console.error(error);
+              setStatus("加载仿真场景失败", false);
+            }
+            return;
+          }
+          applyScene(button.dataset.case, "button");
+        });
       });
     }
     async function loadCases() {
@@ -3199,50 +3222,70 @@ def render_index() -> str:
     function wait(ms) {
       return new Promise((resolve) => window.setTimeout(resolve, ms));
     }
+    function yieldUi() {
+      return new Promise((resolve) => {
+        if (typeof MessageChannel !== "undefined") {
+          const channel = new MessageChannel();
+          channel.port1.onmessage = resolve;
+          channel.port2.postMessage(0);
+        } else {
+          Promise.resolve().then(resolve);
+        }
+      });
+    }
     async function runCurrentSimulationSample() {
       const sample = currentSimulationSample;
       if (!sample) return false;
-      currentReport = null;
-      const profile = currentProfile || profileForCase(sample.case_id || selectedCase());
-      currentProfile = profile;
-      profile.selected = "";
-      profile.assignments = {};
-      profile.mapFocusMode = "overview";
-      const routeSvg = document.querySelector(".route-svg");
-      if (routeSvg) routeSvg.innerHTML = "";
-      document.body.classList.add("pending-run", "sample-preview", "reasoning");
-      setStatus(`基于 ${sample.name} ${sampleNumberLabel(sample)} 推理`, true);
-      updateReasonSummary(profile, null);
-      setReasoningState(sample, -1, false);
-      updateReasonProgress(0);
-      await wait(170);
-      updateReasonProgress(1);
-      setStatus(`识别 ${sample.name} 的订单密度、骑手意愿和路况风险`, true);
-      await wait(210);
-      updateReasonProgress(2);
-      setStatus(`生成候选派单策略：${sample.seed}`, true);
-      await wait(210);
-      const evaluationOrder = reasoningOrderForSample(sample);
-      for (let index = 0; index < evaluationOrder.length; index += 1) {
-        const branchId = evaluationOrder[index];
-        const branch = strategyBranchCatalog.find((item) => item.id === branchId);
-        setReasoningState(sample, index, false);
-        updateReasonProgress(index < 2 ? 3 : 4);
-        setStatus(`评估策略 ${branchId}${branch ? " · " + branch.title : ""}：${sample.seed}`, true);
-        await wait(index === evaluationOrder.length - 1 ? 340 : 260);
+      try {
+        currentReport = null;
+        const profile = currentProfile || profileForCase(sample.case_id || selectedCase());
+        currentProfile = profile;
+        profile.selected = "";
+        profile.assignments = {};
+        profile.mapFocusMode = "overview";
+        const routeSvg = document.querySelector(".route-svg");
+        if (routeSvg) routeSvg.innerHTML = "";
+        document.body.classList.add("pending-run", "sample-preview", "reasoning");
+        setStatus(`基于 ${sample.name} ${sampleNumberLabel(sample)} 推理`, true);
+        updateReasonSummary(profile, null);
+        setReasoningState(sample, -1, false);
+        updateReasonProgress(0);
+        await wait(170);
+        updateReasonProgress(1);
+        setStatus(`识别 ${sample.name} 的订单密度、骑手意愿和路况风险`, true);
+        await wait(210);
+        updateReasonProgress(2);
+        setStatus(`生成候选派单策略：${sample.seed}`, true);
+        await wait(210);
+        const evaluationOrder = reasoningOrderForSample(sample);
+        for (let index = 0; index < evaluationOrder.length; index += 1) {
+          const branchId = evaluationOrder[index];
+          const branch = strategyBranchCatalog.find((item) => item.id === branchId);
+          setReasoningState(sample, index, false);
+          updateReasonProgress(index < 2 ? 3 : 4);
+          setStatus(`评估策略 ${branchId}${branch ? " · " + branch.title : ""}：${sample.seed}`, true);
+          await yieldUi();
+        }
+        setReasoningState(sample, evaluationOrder.length, true);
+        updateReasonProgress(5);
+        setStatus(`最终选择 ${sample.selected_strategy_id}：生成当前样本派单线`, true);
+        await yieldUi();
+        if (routeSvg) routeSvg.innerHTML = "";
+        const mapPayload = simulationFinalMap(sample);
+        const report = reportForSimulationSample(sample, mapPayload);
+        document.body.classList.remove("pending-run", "sample-preview", "reasoning");
+        render(report);
+        setStatus("当前样本派单完成", false);
+        showToast("已按当前刷新样本生成最终派单线");
+        return true;
+      } catch (error) {
+        console.error(error);
+        clearReasoningState();
+        document.body.classList.remove("pending-run", "sample-preview", "reasoning");
+        setStatus("模拟派单运行失败", false);
+        showToast("运行失败，请刷新样本后重试");
+        return false;
       }
-      setReasoningState(sample, evaluationOrder.length, true);
-      updateReasonProgress(5);
-      setStatus(`最终选择 ${sample.selected_strategy_id}：先锁定策略，再生成派单线`, true);
-      await wait(360);
-      if (routeSvg) routeSvg.innerHTML = "";
-      const mapPayload = simulationFinalMap(sample);
-      const report = reportForSimulationSample(sample, mapPayload);
-      document.body.classList.remove("pending-run", "sample-preview", "reasoning");
-      render(report);
-      setStatus("当前样本派单完成", false);
-      showToast("已按当前刷新样本生成最终派单线");
-      return true;
     }
     async function streamRun() {
       if (currentRun) currentRun.close();
@@ -3393,7 +3436,19 @@ def render_index() -> str:
         showToast("刷新样本失败，请检查仿真场景接口");
       });
     });
-    $("case-select").addEventListener("change", () => applyScene(selectedCase()));
+    $("case-select").addEventListener("change", async () => {
+      const option = $("case-select").selectedOptions && $("case-select").selectedOptions[0];
+      if (option && option.dataset.scenario) {
+        try {
+          await loadSimulationScenario(option.dataset.scenario);
+        } catch (error) {
+          console.error(error);
+          setStatus("加载仿真场景失败", false);
+        }
+        return;
+      }
+      applyScene(selectedCase());
+    });
     document.querySelectorAll(".scene-button").forEach((button) => {
       button.addEventListener("click", () => applyScene(button.dataset.case, "button"));
     });

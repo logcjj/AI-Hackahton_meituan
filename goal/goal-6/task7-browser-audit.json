@@ -1,0 +1,1221 @@
+{
+  "checkedAt": "2026-06-22T16:29:52.148Z",
+  "scenarios": [
+    {
+      "scenario": "commerce_peak",
+      "name": "商圈十字路口高峰",
+      "afterScene": {
+        "activeScenario": "commerce_peak",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 11,
+        "detailTitle": "样本 #01 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "commerce_peak:after-scene",
+        "merchantPins": 6,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #01，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.73 / 合单需求 1.5",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.73 / 合单需求 1.5-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.75 / 骑手池 11",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.75 / 骑手池 11-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.22 / 分散 0.26",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.22 / 分散 0.26-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.55-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.11 / 路况 0.69",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.11 / 路况 0.69-- Pending"
+          }
+        ]
+      },
+      "preview": {
+        "activeScenario": "commerce_peak",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 11,
+        "detailTitle": "样本 #02 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "commerce_peak:preview",
+        "merchantPins": 5,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #02，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.8 / 合单需求 1.6",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.8 / 合单需求 1.6-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.62 / 骑手池 11",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.62 / 骑手池 11-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.19",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.19-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.55-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.29 / 路况 0.67",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.29 / 路况 0.67-- Pending"
+          }
+        ]
+      },
+      "reasoning": {
+        "sampleCount": 9,
+        "maxLinksDuringReasoning": 0,
+        "sawReasoningClass": true,
+        "sawEvaluating": false,
+        "sawRejected": false
+      },
+      "final": {
+        "activeScenario": "commerce_peak",
+        "bodyClass": "",
+        "buildings": 24,
+        "courierPins": 11,
+        "detailTitle": "Selected Dispatch Assignment",
+        "dispatchArrows": 5,
+        "dispatchLinks": 5,
+        "label": "commerce_peak:final",
+        "merchantPins": 5,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "S2",
+        "statusText": "当前样本派单完成",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy rejected",
+            "evidence": "密度 0.8 / 合单需求 1.6",
+            "order": "",
+            "rank": "2",
+            "status": "rejected",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.8 / 合单需求 1.60.74 Rejected"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy best",
+            "evidence": "候选竞争 0.62 / 骑手池 11",
+            "order": "",
+            "rank": "1",
+            "status": "selected",
+            "text": "S2 ✓Multi-dispatch单任务多骑手候选扩展候选竞争 0.62 / 骑手池 110.89 Selected"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy rejected",
+            "evidence": "稀缺 0.0 / 分散 0.19",
+            "order": "",
+            "rank": "4",
+            "status": "rejected",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.190.50 Rejected"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy rejected",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "rejected",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.550.45 Rejected"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy rejected",
+            "evidence": "低意愿 0.29 / 路况 0.67",
+            "order": "",
+            "rank": "3",
+            "status": "rejected",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.29 / 路况 0.670.54 Rejected"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "medium_parallel",
+      "name": "中型并行派单",
+      "afterScene": {
+        "activeScenario": "medium_parallel",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 10,
+        "detailTitle": "样本 #01 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "medium_parallel:after-scene",
+        "merchantPins": 4,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #01，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.49 / 合单需求 1.5",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.49 / 合单需求 1.5-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.59 / 骑手池 10",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.59 / 骑手池 10-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.49",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.49-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.14",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.14-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.25 / 路况 0.46",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.25 / 路况 0.46-- Pending"
+          }
+        ]
+      },
+      "preview": {
+        "activeScenario": "medium_parallel",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 11,
+        "detailTitle": "样本 #02 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "medium_parallel:preview",
+        "merchantPins": 5,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #02，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.44 / 合单需求 1.6",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.44 / 合单需求 1.6-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.68 / 骑手池 11",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.68 / 骑手池 11-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.54",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.54-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.03 / 风险 0.11",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.03 / 风险 0.11-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.15 / 路况 0.48",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.15 / 路况 0.48-- Pending"
+          }
+        ]
+      },
+      "reasoning": {
+        "sampleCount": 9,
+        "maxLinksDuringReasoning": 0,
+        "sawReasoningClass": true,
+        "sawEvaluating": false,
+        "sawRejected": false
+      },
+      "final": {
+        "activeScenario": "medium_parallel",
+        "bodyClass": "",
+        "buildings": 24,
+        "courierPins": 11,
+        "detailTitle": "Selected Dispatch Assignment",
+        "dispatchArrows": 5,
+        "dispatchLinks": 5,
+        "label": "medium_parallel:final",
+        "merchantPins": 5,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "S2",
+        "statusText": "当前样本派单完成",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy rejected",
+            "evidence": "密度 0.44 / 合单需求 1.6",
+            "order": "",
+            "rank": "2",
+            "status": "rejected",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.44 / 合单需求 1.60.61 Rejected"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy best",
+            "evidence": "候选竞争 0.68 / 骑手池 11",
+            "order": "",
+            "rank": "1",
+            "status": "selected",
+            "text": "S2 ✓Multi-dispatch单任务多骑手候选扩展候选竞争 0.68 / 骑手池 110.92 Selected"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy rejected",
+            "evidence": "稀缺 0.0 / 分散 0.54",
+            "order": "",
+            "rank": "4",
+            "status": "rejected",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.540.50 Rejected"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy rejected",
+            "evidence": "低峰稳定 0.03 / 风险 0.11",
+            "order": "",
+            "rank": "3",
+            "status": "rejected",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.03 / 风险 0.110.51 Rejected"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy rejected",
+            "evidence": "低意愿 0.15 / 路况 0.48",
+            "order": "",
+            "rank": "5",
+            "status": "rejected",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.15 / 路况 0.480.49 Rejected"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "scarce_repair",
+      "name": "骑手稀缺修复",
+      "afterScene": {
+        "activeScenario": "scarce_repair",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 9,
+        "detailTitle": "样本 #01 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "scarce_repair:after-scene",
+        "merchantPins": 4,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #01，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.37 / 合单需求 1.5",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.37 / 合单需求 1.5-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.46 / 骑手池 9",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.46 / 骑手池 9-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.6",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.6-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.55-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.54 / 路况 0.62",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.54 / 路况 0.62-- Pending"
+          }
+        ]
+      },
+      "preview": {
+        "activeScenario": "scarce_repair",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 7,
+        "detailTitle": "样本 #02 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "scarce_repair:preview",
+        "merchantPins": 4,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #02，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.34 / 合单需求 1.5",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.34 / 合单需求 1.5-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.2 / 骑手池 7",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.2 / 骑手池 7-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.28 / 分散 0.63",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.28 / 分散 0.63-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.41",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.41-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.58 / 路况 0.55",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.58 / 路况 0.55-- Pending"
+          }
+        ]
+      },
+      "reasoning": {
+        "sampleCount": 9,
+        "maxLinksDuringReasoning": 0,
+        "sawReasoningClass": true,
+        "sawEvaluating": false,
+        "sawRejected": false
+      },
+      "final": {
+        "activeScenario": "scarce_repair",
+        "bodyClass": "",
+        "buildings": 24,
+        "courierPins": 7,
+        "detailTitle": "Selected Dispatch Assignment",
+        "dispatchArrows": 4,
+        "dispatchLinks": 4,
+        "label": "scarce_repair:final",
+        "merchantPins": 4,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "S3",
+        "statusText": "当前样本派单完成",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy rejected",
+            "evidence": "密度 0.34 / 合单需求 1.5",
+            "order": "",
+            "rank": "4",
+            "status": "rejected",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.34 / 合单需求 1.50.61 Rejected"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy rejected",
+            "evidence": "候选竞争 0.2 / 骑手池 7",
+            "order": "",
+            "rank": "2",
+            "status": "rejected",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.2 / 骑手池 70.63 Rejected"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy best",
+            "evidence": "稀缺 0.28 / 分散 0.63",
+            "order": "",
+            "rank": "1",
+            "status": "selected",
+            "text": "S3 ✓Repair search从基线方案做局部修复稀缺 0.28 / 分散 0.630.89 Selected"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy rejected",
+            "evidence": "低峰稳定 0.0 / 风险 0.41",
+            "order": "",
+            "rank": "5",
+            "status": "rejected",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.410.52 Rejected"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy rejected",
+            "evidence": "低意愿 0.58 / 路况 0.55",
+            "order": "",
+            "rank": "3",
+            "status": "rejected",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.58 / 路况 0.550.62 Rejected"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "rain_low_willingness",
+      "name": "雨天低接单意愿",
+      "afterScene": {
+        "activeScenario": "rain_low_willingness",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 10,
+        "detailTitle": "样本 #01 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "rain_low_willingness:after-scene",
+        "merchantPins": 6,
+        "rainStreaks": 76,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #01，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.72 / 合单需求 1.5",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.72 / 合单需求 1.5-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.54 / 骑手池 10",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.54 / 骑手池 10-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.33 / 分散 0.27",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.33 / 分散 0.27-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.55-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.72 / 路况 0.68",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.72 / 路况 0.68-- Pending"
+          }
+        ]
+      },
+      "preview": {
+        "activeScenario": "rain_low_willingness",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 13,
+        "detailTitle": "样本 #02 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "rain_low_willingness:preview",
+        "merchantPins": 6,
+        "rainStreaks": 76,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #02，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.57 / 合单需求 1.5",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.57 / 合单需求 1.5-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.44 / 骑手池 13",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.44 / 骑手池 13-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.41",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.41-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.55-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.97 / 路况 0.77",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.97 / 路况 0.77-- Pending"
+          }
+        ]
+      },
+      "reasoning": {
+        "sampleCount": 9,
+        "maxLinksDuringReasoning": 0,
+        "sawReasoningClass": true,
+        "sawEvaluating": false,
+        "sawRejected": false
+      },
+      "final": {
+        "activeScenario": "rain_low_willingness",
+        "bodyClass": "",
+        "buildings": 24,
+        "courierPins": 13,
+        "detailTitle": "Selected Dispatch Assignment",
+        "dispatchArrows": 6,
+        "dispatchLinks": 6,
+        "label": "rain_low_willingness:final",
+        "merchantPins": 6,
+        "rainStreaks": 76,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "S5",
+        "statusText": "当前样本派单完成",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy rejected",
+            "evidence": "密度 0.57 / 合单需求 1.5",
+            "order": "",
+            "rank": "4",
+            "status": "rejected",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.57 / 合单需求 1.50.68 Rejected"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy rejected",
+            "evidence": "候选竞争 0.44 / 骑手池 13",
+            "order": "",
+            "rank": "3",
+            "status": "rejected",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.44 / 骑手池 130.70 Rejected"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy rejected",
+            "evidence": "稀缺 0.0 / 分散 0.41",
+            "order": "",
+            "rank": "2",
+            "status": "rejected",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.410.74 Rejected"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy rejected",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "rejected",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.550.46 Rejected"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy best",
+            "evidence": "低意愿 0.97 / 路况 0.77",
+            "order": "",
+            "rank": "1",
+            "status": "selected",
+            "text": "S5 ✓Risk balancing低意愿与时间窗风险平衡低意愿 0.97 / 路况 0.770.83 Selected"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "offpeak_greedy",
+      "name": "低峰分散订单",
+      "afterScene": {
+        "activeScenario": "offpeak_greedy",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 8,
+        "detailTitle": "样本 #01 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "offpeak_greedy:after-scene",
+        "merchantPins": 3,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #01，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.37 / 合单需求 1.33",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.37 / 合单需求 1.33-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.15 / 骑手池 8",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.15 / 骑手池 8-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.6",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.6-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.55 / 风险 0.0",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.55 / 风险 0.0-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.0 / 路况 0.21",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.0 / 路况 0.21-- Pending"
+          }
+        ]
+      },
+      "preview": {
+        "activeScenario": "offpeak_greedy",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 11,
+        "detailTitle": "样本 #02 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "offpeak_greedy:preview",
+        "merchantPins": 3,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #02，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.29 / 合单需求 1.67",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.29 / 合单需求 1.67-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.19 / 骑手池 11",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.19 / 骑手池 11-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.67",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.67-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.21 / 风险 0.0",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.21 / 风险 0.0-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.0 / 路况 0.4",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.0 / 路况 0.4-- Pending"
+          }
+        ]
+      },
+      "reasoning": {
+        "sampleCount": 9,
+        "maxLinksDuringReasoning": 0,
+        "sawReasoningClass": true,
+        "sawEvaluating": false,
+        "sawRejected": false
+      },
+      "final": {
+        "activeScenario": "offpeak_greedy",
+        "bodyClass": "",
+        "buildings": 24,
+        "courierPins": 11,
+        "detailTitle": "Selected Dispatch Assignment",
+        "dispatchArrows": 3,
+        "dispatchLinks": 3,
+        "label": "offpeak_greedy:final",
+        "merchantPins": 3,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "S4",
+        "statusText": "当前样本派单完成",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy rejected",
+            "evidence": "密度 0.29 / 合单需求 1.67",
+            "order": "",
+            "rank": "3",
+            "status": "rejected",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.29 / 合单需求 1.670.59 Rejected"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy rejected",
+            "evidence": "候选竞争 0.19 / 骑手池 11",
+            "order": "",
+            "rank": "2",
+            "status": "rejected",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.19 / 骑手池 110.66 Rejected"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy rejected",
+            "evidence": "稀缺 0.0 / 分散 0.67",
+            "order": "",
+            "rank": "4",
+            "status": "rejected",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.670.50 Rejected"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy best",
+            "evidence": "低峰稳定 0.21 / 风险 0.0",
+            "order": "",
+            "rank": "1",
+            "status": "selected",
+            "text": "S4 ✓Greedy baseline最近/最低成本基线派单低峰稳定 0.21 / 风险 0.00.77 Selected"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy rejected",
+            "evidence": "低意愿 0.0 / 路况 0.4",
+            "order": "",
+            "rank": "5",
+            "status": "rejected",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.0 / 路况 0.40.46 Rejected"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "event_mixed_pressure",
+      "name": "活动混合压力",
+      "afterScene": {
+        "activeScenario": "event_mixed_pressure",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 15,
+        "detailTitle": "样本 #01 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "event_mixed_pressure:after-scene",
+        "merchantPins": 5,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #01，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.78 / 合单需求 1.4",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.78 / 合单需求 1.4-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.54 / 骑手池 15",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.54 / 骑手池 15-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.21",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.21-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 0.55",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 0.55-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.52 / 路况 0.77",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.52 / 路况 0.77-- Pending"
+          }
+        ]
+      },
+      "preview": {
+        "activeScenario": "event_mixed_pressure",
+        "bodyClass": "pending-run sample-preview",
+        "buildings": 24,
+        "courierPins": 15,
+        "detailTitle": "样本 #02 已刷新",
+        "dispatchArrows": 0,
+        "dispatchLinks": 0,
+        "label": "event_mixed_pressure:preview",
+        "merchantPins": 6,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "",
+        "statusText": "已刷新样本 #02，等待推理",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy pending",
+            "evidence": "密度 0.71 / 合单需求 1.5",
+            "order": "",
+            "rank": "3",
+            "status": "pending",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.71 / 合单需求 1.5-- Pending"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy pending",
+            "evidence": "候选竞争 0.48 / 骑手池 15",
+            "order": "",
+            "rank": "2",
+            "status": "pending",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.48 / 骑手池 15-- Pending"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy pending",
+            "evidence": "稀缺 0.0 / 分散 0.27",
+            "order": "",
+            "rank": "4",
+            "status": "pending",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.27-- Pending"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy pending",
+            "evidence": "低峰稳定 0.0 / 风险 1.0",
+            "order": "",
+            "rank": "5",
+            "status": "pending",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 1.0-- Pending"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy pending",
+            "evidence": "低意愿 0.39 / 路况 0.84",
+            "order": "",
+            "rank": "1",
+            "status": "pending",
+            "text": "S5Risk balancing低意愿与时间窗风险平衡低意愿 0.39 / 路况 0.84-- Pending"
+          }
+        ]
+      },
+      "reasoning": {
+        "sampleCount": 9,
+        "maxLinksDuringReasoning": 0,
+        "sawReasoningClass": true,
+        "sawEvaluating": false,
+        "sawRejected": false
+      },
+      "final": {
+        "activeScenario": "event_mixed_pressure",
+        "bodyClass": "",
+        "buildings": 24,
+        "courierPins": 15,
+        "detailTitle": "Selected Dispatch Assignment",
+        "dispatchArrows": 6,
+        "dispatchLinks": 6,
+        "label": "event_mixed_pressure:final",
+        "merchantPins": 6,
+        "rainStreaks": 0,
+        "roads": 8,
+        "runDisabled": false,
+        "selectedStrategy": "S5",
+        "statusText": "当前样本派单完成",
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "className": "strategy rejected",
+            "evidence": "密度 0.71 / 合单需求 1.5",
+            "order": "",
+            "rank": "3",
+            "status": "rejected",
+            "text": "S1Bundle-first高重叠订单组成合单候选密度 0.71 / 合单需求 1.50.69 Rejected"
+          },
+          {
+            "branch": "S2",
+            "className": "strategy rejected",
+            "evidence": "候选竞争 0.48 / 骑手池 15",
+            "order": "",
+            "rank": "2",
+            "status": "rejected",
+            "text": "S2Multi-dispatch单任务多骑手候选扩展候选竞争 0.48 / 骑手池 150.70 Rejected"
+          },
+          {
+            "branch": "S3",
+            "className": "strategy rejected",
+            "evidence": "稀缺 0.0 / 分散 0.27",
+            "order": "",
+            "rank": "4",
+            "status": "rejected",
+            "text": "S3Repair search从基线方案做局部修复稀缺 0.0 / 分散 0.270.59 Rejected"
+          },
+          {
+            "branch": "S4",
+            "className": "strategy rejected",
+            "evidence": "低峰稳定 0.0 / 风险 1.0",
+            "order": "",
+            "rank": "5",
+            "status": "rejected",
+            "text": "S4Greedy baseline最近/最低成本基线派单低峰稳定 0.0 / 风险 1.00.44 Rejected"
+          },
+          {
+            "branch": "S5",
+            "className": "strategy best",
+            "evidence": "低意愿 0.39 / 路况 0.84",
+            "order": "",
+            "rank": "1",
+            "status": "selected",
+            "text": "S5 ✓Risk balancing低意愿与时间窗风险平衡低意愿 0.39 / 路况 0.840.96 Selected"
+          }
+        ]
+      }
+    }
+  ],
+  "violations": [],
+  "selectedByScenario": {
+    "commerce_peak": "S2",
+    "medium_parallel": "S2",
+    "scarce_repair": "S3",
+    "rain_low_willingness": "S5",
+    "offpeak_greedy": "S4",
+    "event_mixed_pressure": "S5"
+  },
+  "distinctSelectedStrategies": [
+    "S2",
+    "S3",
+    "S4",
+    "S5"
+  ],
+  "consoleErrors": []
+}

@@ -100,6 +100,18 @@
 验证标准：跑全场景策略审计、浏览器点击运行、截图，确认策略路径真实变化且无 JS/单测回归。
 
 完成记录：
+- 已完成第二轮大型检查-debug循环，使用 in-app browser 真实点击 6 个场景按钮、刷新按钮和运行按钮，逐场景验证 preview、reasoning、final 三个状态。
+- 严格审计发现并修复 P1：仿真运行会卡在最后一个 `Evaluating`，按钮保持 disabled 且不渲染最终派单线。已将策略循环中的 timer 等待替换为 `yieldUi()`，不再依赖可能被后台节流的 `setTimeout`；同时增加运行失败兜底，避免卡死后无法恢复。
+- 严格审计发现并修复 P1：动态场景按钮仍调用旧 `applyScene(caseId)`，首次点击当前场景不会加载商家/骑手点位。已新增 `loadSimulationScenario()`，场景按钮和场景下拉切换都会加载对应 simulation sample。
+- 严格审计发现并修复 P2：真实演示路径“切场景 -> 刷新一次 -> 运行”只触发 S1/S2/S5，稀缺和低峰场景语义不足。已调整样本压力提示和稀缺场景 S3 先验，浏览器审计中骑手稀缺触发 S3，低峰分散触发 S4。
+- 浏览器审计产物：`goal/goal-6/task7-browser-audit.json`。审计结果 violations=[]，consoleErrors=0；6 个场景 preview 均为 0 条派单线，final 派单线数均等于商家/订单点数。
+- 浏览器审计选中策略：商圈高峰 S2、中型并行 S2、骑手稀缺 S3、雨天低意愿 S5、低峰分散 S4、活动压力 S5，覆盖 S2/S3/S4/S5，确认不同场景不会总走同一路径。
+- 雨天场景浏览器审计通过：`rain_low_willingness` final 状态包含 76 条 rain-streak，且 6 个订单点对应 6 条派单线。
+- 截图能力审计产物：`goal/goal-6/task7-screenshot-note.json`。当前 in-app browser 的 `Page.captureScreenshot` 对 AutoSolver 页面、裁剪区域和 `about:blank` 均超时；macOS/Computer Use 兜底也无法获取有效 Codex 浏览器截图。因此本轮截图项记录为环境能力不可用，功能验证以 DOM 审计 JSON 为准。
+- 已补单测覆盖：页面包含 `yieldUi()`、`loadSimulationScenario()`，动态场景按钮会调用 `await loadSimulationScenario(button.dataset.scenario)`，并防止旧的“先锁定策略，再生成派单线”卡住文案回归。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
 
 ## Task 8: 实现最终派单线与地图联动
 
