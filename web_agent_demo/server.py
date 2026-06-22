@@ -91,42 +91,35 @@ def render_index() -> str:
   <title>AutoSolver Agent System</title>
   <style>
     :root {
-      --ink: #16211e;
-      --muted: #66736e;
-      --leaf: #236a43;
-      --leaf-2: #123f2a;
-      --gold: #d8b14a;
-      --sand: #f4ead6;
-      --clay: #c9714a;
-      --blue: #2e5f73;
-      --paper: rgba(255, 253, 246, .82);
-      --card: rgba(255, 255, 255, .72);
-      --line: rgba(22, 33, 30, .14);
-      --shadow: 0 24px 80px rgba(31, 46, 38, .16);
-      --mono: "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+      --ink: #111827;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-2: #1d4ed8;
+      --success: #15803d;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --bg: #f6f8fb;
+      --paper: #ffffff;
+      --card: #f8fafc;
+      --line: #d8e0ea;
+      --line-strong: #b8c4d4;
+      --shadow: 0 1px 2px rgba(15, 23, 42, .08), 0 8px 28px rgba(15, 23, 42, .06);
+      --mono: "JetBrains Mono", "SFMono-Regular", "Cascadia Code", Consolas, monospace;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       color: var(--ink);
-      font-family: "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
-      background:
-        linear-gradient(90deg, rgba(22,33,30,.055) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(22,33,30,.045) 1px, transparent 1px),
-        radial-gradient(circle at 8% 12%, rgba(216,177,74,.34), transparent 22rem),
-        radial-gradient(circle at 88% 4%, rgba(46,95,115,.25), transparent 28rem),
-        radial-gradient(circle at 80% 92%, rgba(35,106,67,.22), transparent 24rem),
-        linear-gradient(135deg, #f8efd9 0%, #eef0df 44%, #d9e8df 100%);
-      background-size: 42px 42px, 42px 42px, auto, auto, auto, auto;
+      font-family: "Aptos", "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+      background: linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%);
       min-height: 100vh;
     }
-    main { width: min(1440px, calc(100vw - 32px)); margin: 0 auto; padding: 26px 0 46px; }
+    main { width: min(1440px, calc(100vw - 32px)); margin: 0 auto; padding: 24px 0 40px; }
     .panel {
       background: var(--paper);
       border: 1px solid var(--line);
-      border-radius: 26px;
+      border-radius: 14px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
     }
     .topbar {
       display: grid;
@@ -135,11 +128,11 @@ def render_index() -> str:
       align-items: stretch;
       margin-bottom: 18px;
     }
-    .hero { padding: 28px; position: relative; overflow: hidden; }
-    .eyebrow { color: var(--leaf); font-weight: 900; letter-spacing: .16em; text-transform: uppercase; font-size: 12px; }
-    h1 { font-size: clamp(32px, 4.3vw, 58px); line-height: .96; margin: 12px 0 14px; letter-spacing: -0.06em; max-width: 880px; }
-    h2 { margin: 0; font-size: 22px; letter-spacing: -0.035em; }
-    .lead { color: var(--muted); font-size: 17px; line-height: 1.75; max-width: 790px; position: relative; z-index: 1; }
+    .hero { padding: 24px; position: relative; overflow: hidden; }
+    .eyebrow { color: var(--accent); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 12px; }
+    h1 { font-size: clamp(28px, 3.2vw, 42px); line-height: 1.08; margin: 10px 0 12px; letter-spacing: -0.035em; max-width: 880px; }
+    h2 { margin: 0; font-size: 20px; letter-spacing: -0.025em; }
+    .lead { color: var(--muted); font-size: 16px; line-height: 1.7; max-width: 820px; position: relative; z-index: 1; }
     .controls { padding: 22px; display: grid; gap: 12px; }
     .control-row { display: grid; grid-template-columns: 1fr 130px; gap: 10px; }
     .summary-panel, .compare-panel { padding: 20px; margin-bottom: 18px; }
@@ -158,8 +151,8 @@ def render_index() -> str:
     }
     .summary-item, .result-item {
       padding: 13px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.68);
+      border-radius: 12px;
+      background: var(--card);
       border: 1px solid var(--line);
       min-height: 88px;
     }
@@ -190,8 +183,8 @@ def render_index() -> str:
     .tag {
       border-radius: 999px;
       padding: 5px 8px;
-      background: rgba(46,95,115,.12);
-      color: var(--blue);
+      background: #dbeafe;
+      color: var(--accent-2);
       font-size: 12px;
       font-weight: 900;
     }
@@ -200,21 +193,22 @@ def render_index() -> str:
     select, input, button {
       width: 100%;
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 10px;
       padding: 13px 14px;
       font-size: 16px;
-      background: rgba(255,255,255,.88);
+      background: #ffffff;
       color: var(--ink);
     }
     button {
       cursor: pointer;
-      border: none;
+      border: 1px solid transparent;
       color: white;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--leaf), var(--leaf-2));
-      box-shadow: 0 14px 34px rgba(35,106,67,.26);
+      font-weight: 800;
+      background: var(--accent);
     }
-    button.secondary { background: linear-gradient(135deg, var(--blue), #183247); }
+    button.secondary { color: var(--ink); background: #ffffff; border-color: var(--line-strong); }
+    button:hover { background: var(--accent-2); }
+    button.secondary:hover { background: var(--card); }
     button:disabled { cursor: wait; opacity: .6; }
     .status-pill {
       display: inline-flex;
@@ -223,14 +217,13 @@ def render_index() -> str:
       width: fit-content;
       border-radius: 999px;
       padding: 8px 11px;
-      background: rgba(255,255,255,.62);
+      background: var(--card);
       color: var(--muted);
       font-weight: 800;
       font-size: 12px;
     }
-    .status-pill:before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(216,177,74,.18); }
-    .status-pill.running:before { background: var(--leaf); animation: pulse 1.1s infinite; }
-    @keyframes pulse { 50% { transform: scale(1.4); opacity: .55; } }
+    .status-pill:before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--warning); }
+    .status-pill.running:before { background: var(--success); }
     .workbench {
       display: grid;
       grid-template-columns: 280px minmax(0, 1fr) 340px;
@@ -238,7 +231,7 @@ def render_index() -> str:
       align-items: start;
     }
     .rail, .timeline-panel, .inspector, .table-panel, .evolution-panel { padding: 20px; }
-    .rail, .timeline-panel, .inspector { min-height: 877px; }
+    .rail, .timeline-panel, .inspector { min-height: 720px; }
     .rail { position: sticky; top: 18px; display: flex; flex-direction: column; }
     .objective {
       margin: 14px 0 18px;
@@ -254,22 +247,22 @@ def render_index() -> str:
       align-items: center;
       flex: 1 0 auto;
       padding: 12px;
-      border-radius: 18px;
+      border-radius: 12px;
       background: var(--card);
       border: 1px solid var(--line);
-      transition: border-color .2s ease, transform .2s ease, background .2s ease;
+      transition: border-color .15s ease, background .15s ease;
     }
-    .stage.active { border-color: rgba(35,106,67,.62); background: rgba(239, 248, 228, .86); transform: translateX(4px); }
-    .stage.done { border-color: rgba(216,177,74,.45); }
+    .stage.active { border-color: var(--accent); background: #eff6ff; }
+    .stage.done { border-color: var(--line-strong); }
     .stage-index {
       width: 34px;
       height: 34px;
       display: grid;
       place-items: center;
-      border-radius: 12px;
-      background: rgba(22,33,30,.08);
+      border-radius: 10px;
+      background: #e2e8f0;
       font-weight: 900;
-      color: var(--leaf-2);
+      color: var(--ink);
     }
     .stage b { display: block; margin-bottom: 4px; }
     .stage span { display: block; color: var(--muted); font-size: 12px; line-height: 1.45; }
@@ -285,19 +278,19 @@ def render_index() -> str:
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 8px 10px;
-      background: rgba(255,255,255,.66);
+      background: #ffffff;
       color: var(--muted);
       font-size: 12px;
       font-weight: 900;
       cursor: pointer;
       user-select: none;
     }
-    .filter.active { color: white; background: var(--leaf); border-color: transparent; }
+    .filter.active { color: white; background: var(--accent); border-color: transparent; }
     .toggle {
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 8px 11px;
-      background: rgba(255,255,255,.66);
+      background: #ffffff;
       font-size: 12px;
       font-weight: 900;
       color: var(--muted);
@@ -305,9 +298,9 @@ def render_index() -> str:
       user-select: none;
       white-space: nowrap;
     }
-    .toggle.on { color: white; background: var(--blue); border-color: transparent; }
+    .toggle.on { color: white; background: var(--accent); border-color: transparent; }
     .timeline {
-      height: 620px;
+      height: 560px;
       overflow: auto;
       padding-right: 6px;
       display: grid;
@@ -319,14 +312,14 @@ def render_index() -> str:
       display: grid;
       grid-template-columns: 90px 1fr;
       gap: 12px;
-      min-height: 156px;
+      min-height: 112px;
       padding: 14px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.70);
+      border-radius: 12px;
+      background: #ffffff;
       border: 1px solid var(--line);
     }
-    .event.accepted { border-color: rgba(35,106,67,.55); background: rgba(239,248,228,.82); }
-    .event.rejected { border-color: rgba(201,113,74,.42); }
+    .event.accepted { border-color: rgba(21,128,61,.45); background: #f0fdf4; }
+    .event.rejected { border-color: rgba(185,28,28,.35); background: #fef2f2; }
     .time {
       font-family: var(--mono);
       font-size: 12px;
@@ -338,22 +331,22 @@ def render_index() -> str:
       border-radius: 999px;
       padding: 4px 8px;
       margin-bottom: 7px;
-      background: rgba(46,95,115,.12);
-      color: var(--blue);
+      background: #dbeafe;
+      color: var(--accent-2);
       font-size: 11px;
       font-weight: 900;
       letter-spacing: .06em;
       text-transform: uppercase;
     }
-    .event.accepted .event-type { background: rgba(35,106,67,.14); color: var(--leaf); }
-    .event.rejected .event-type { background: rgba(201,113,74,.14); color: var(--clay); }
+    .event.accepted .event-type { background: #dcfce7; color: var(--success); }
+    .event.rejected .event-type { background: #fee2e2; color: var(--danger); }
     .event-title { font-weight: 900; letter-spacing: -.02em; }
     .event-body { color: var(--muted); line-height: 1.55; margin-top: 5px; font-size: 14px; }
     .event-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
     .chip {
       border-radius: 999px;
       padding: 4px 8px;
-      background: rgba(22,33,30,.07);
+      background: #eef2f7;
       color: var(--muted);
       font-size: 11px;
       font-weight: 800;
@@ -361,7 +354,7 @@ def render_index() -> str:
     .inspector { position: sticky; top: 18px; display: grid; gap: 14px; }
     .inspect-card {
       padding: 15px;
-      border-radius: 18px;
+      border-radius: 12px;
       background: var(--card);
       border: 1px solid var(--line);
     }
@@ -370,8 +363,8 @@ def render_index() -> str:
     .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
     .metric {
       padding: 12px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.68);
+      border-radius: 12px;
+      background: var(--card);
       border: 1px solid var(--line);
     }
     .metric strong { display: block; font-size: 21px; letter-spacing: -.04em; }
@@ -393,8 +386,8 @@ def render_index() -> str:
     .loop-badge {
       border-radius: 999px;
       padding: 9px 12px;
-      background: rgba(35,106,67,.12);
-      color: var(--leaf);
+      background: #dbeafe;
+      color: var(--accent-2);
       font-weight: 900;
       font-size: 12px;
       white-space: nowrap;
@@ -409,24 +402,22 @@ def render_index() -> str:
       position: relative;
       min-height: 128px;
       padding: 14px;
-      border-radius: 19px;
+      border-radius: 12px;
       border: 1px solid var(--line);
-      background:
-        radial-gradient(circle at 12% 14%, rgba(216,177,74,.18), transparent 5.2rem),
-        rgba(255,255,255,.66);
-      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+      background: #ffffff;
+      transition: border-color .15s ease, background .15s ease;
     }
-    .loop-step.running { border-color: rgba(46,95,115,.58); background: rgba(232,244,248,.82); transform: translateY(-2px); }
-    .loop-step.pass { border-color: rgba(35,106,67,.58); background: rgba(239,248,228,.84); }
-    .loop-step.fail { border-color: rgba(201,113,74,.52); background: rgba(255,242,233,.82); }
-    .loop-step.muted { border-color: rgba(22,33,30,.12); background: rgba(255,255,255,.50); }
+    .loop-step.running { border-color: var(--accent); background: #eff6ff; }
+    .loop-step.pass { border-color: rgba(21,128,61,.45); background: #f0fdf4; }
+    .loop-step.fail { border-color: rgba(185,28,28,.35); background: #fef2f2; }
+    .loop-step.muted { border-color: var(--line); background: var(--card); }
     .loop-step.pending { border-color: var(--line); }
     .loop-step:after {
       content: ">";
       position: absolute;
       right: -10px;
       top: 45%;
-      color: rgba(22,33,30,.28);
+      color: #94a3b8;
       font-weight: 900;
     }
     .loop-step:last-child:after { content: ""; }
@@ -435,8 +426,8 @@ def render_index() -> str:
       border-radius: 999px;
       padding: 5px 8px;
       margin-bottom: 10px;
-      background: rgba(46,95,115,.12);
-      color: var(--blue);
+      background: #dbeafe;
+      color: var(--accent-2);
       font-weight: 900;
       font-size: 11px;
       letter-spacing: .04em;
@@ -456,9 +447,9 @@ def render_index() -> str:
       line-height: 1.45;
       font-size: 13px;
     }
-    .loop-step.pass .loop-status { color: var(--leaf); }
-    .loop-step.fail .loop-status { color: var(--clay); }
-    .loop-step.running .loop-status { color: var(--blue); }
+    .loop-step.pass .loop-status { color: var(--success); }
+    .loop-step.fail .loop-status { color: var(--danger); }
+    .loop-step.running .loop-status { color: var(--accent-2); }
     .table-panel { margin-top: 18px; }
     .attempt-grid { display: grid; gap: 10px; margin-top: 14px; }
     .attempt {
@@ -467,13 +458,14 @@ def render_index() -> str:
       gap: 12px;
       align-items: center;
       padding: 13px 14px;
-      border-radius: 17px;
-      background: rgba(255,255,255,.70);
+      border-radius: 12px;
+      background: #ffffff;
       border: 1px solid var(--line);
     }
-    .attempt.accepted { border-color: rgba(35,106,67,.55); background: rgba(239,248,228,.82); }
-    .attempt.rejected { border-color: rgba(201,113,74,.38); }
+    .attempt.accepted { border-color: rgba(21,128,61,.45); background: #f0fdf4; }
+    .attempt.rejected { border-color: rgba(185,28,28,.30); background: #fff7ed; }
     .attempt .name { font-weight: 900; }
+    .attempt .name code { display: block; margin-top: 5px; color: var(--muted); font-family: var(--mono); font-size: 11px; font-weight: 600; }
     .attempt .why { color: var(--muted); font-size: 13px; line-height: 1.45; }
     .verdict {
       border-radius: 999px;
@@ -481,11 +473,11 @@ def render_index() -> str:
       text-align: center;
       font-size: 12px;
       font-weight: 900;
-      background: rgba(22,33,30,.08);
+      background: #eef2f7;
       color: var(--muted);
     }
-    .attempt.accepted .verdict { color: white; background: var(--leaf); }
-    .attempt.rejected .verdict { color: white; background: var(--clay); }
+    .attempt.accepted .verdict { color: white; background: var(--success); }
+    .attempt.rejected .verdict { color: white; background: var(--danger); }
     .muted { color: var(--muted); }
     .empty {
       min-height: 170px;
@@ -494,8 +486,8 @@ def render_index() -> str:
       text-align: center;
       color: var(--muted);
       border: 1px dashed var(--line);
-      border-radius: 18px;
-      background: rgba(255,255,255,.42);
+      border-radius: 12px;
+      background: var(--card);
       line-height: 1.7;
     }
     @media (max-width: 1100px) {

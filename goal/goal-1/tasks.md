@@ -79,6 +79,20 @@
 
 完成记录：
 
+- 已完成。
+- 在 `web_agent_demo/server.py` 中收敛视觉系统：将配色改为中性 slate/blue 控制台风格，使用白底卡片、细边框和轻阴影。
+- 移除花哨背景：删除多层 radial gradient、装饰网格背景和强烈彩色氛围，仅保留低饱和度纵向背景。
+- 移除玻璃拟态和强动效：删除 `backdrop-filter: blur(...)`、pulse keyframes、状态点外发光、阶段/loop 的位移 transform。
+- 降低视觉夸张度：面板圆角从 26px 收敛到 14px，内部卡片多处收敛到 12px；按钮从强渐变和大阴影改为实色/描边按钮。
+- 提高开发者可读性：降低首页标题尺寸，减少字距夸张；事件卡片从 `min-height: 156px` 收敛到 `112px`，timeline 高度从 `620px` 收敛到 `560px`，整体信息密度更接近工作台。
+- 调整状态语义色：accepted/pass 使用绿色，rejected/fail 使用红色，running 使用蓝色，warning 使用琥珀色，避免装饰性颜色。
+- 更新 `tests/test_web_agent_demo.py`：断言新中性背景、紧凑高度、无 `radial-gradient`、无 `backdrop-filter`、无 `@keyframes pulse`、无 `transform: translate`。
+- 验证：`python3 -m unittest tests.test_web_agent_demo` 通过 7 个测试。
+- 验证：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py` 通过。
+- 验证：直接调用 `render_index()`，确认 Workbench、场景摘要、结果对比仍存在，且 `radial-gradient`、`backdrop-filter`、`@keyframes pulse`、`transform: translate` 均不存在。
+- 验证：`git diff --check -- web_agent_demo/server.py tests/test_web_agent_demo.py goal/goal-1/tasks.md` 通过。
+- 自信度检查：当前实现满足 Task 5 的克制、专业、开发者工具视觉目标；后续 Task 6 继续做 UI/文案一致性和响应式风险检查。
+
 ## Task 6: 第二轮全面检查-debug循环
 
 验证标准：检查任务 4-5 的 UI/文案一致性、可访问性、响应式风险和代码风险；发现问题立即修复。
