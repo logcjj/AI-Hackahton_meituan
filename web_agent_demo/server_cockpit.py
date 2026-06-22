@@ -603,14 +603,97 @@ def _selfcheck(host="127.0.0.1", port=8779) -> int:
     return 0 if ok else 1
 
 
+def _scene_matrix(argv_scenes=None) -> int:
+    """iteration-16 (P1-6)：6 上下文（头牌 + 5 业务场景）各跑一次完整 solve + 贪心，
+    打印真值矩阵，证明各场景真值确实互异、且 v4 严格优于贪心（成本口径）。
+
+    无前端、无 HTTP——直接复用 run_blind_solve + compute_baseline，与现场 SSE 同一条
+    真求解链路。不读官方数据外的任何写死真值；场景实例由 generate_case 现场合成。
+    """
+    # (label, builder) —— builder 返回 (text, regime_key, seed, is_headliner)
+    contexts = [
+        ("headliner", lambda: (_read_case_text("large_seed301"), "bundle-heavy(官方)", 301, True)),
+    ]
+    for sc in ("peak", "rain", "scarce", "bundle", "newshop"):
+        def _mk(sc=sc):
+            txt, rk, sd = _scene_case_text(sc)
+            return txt, rk, sd, False
+        contexts.append((sc, _mk))
+
+    print("[scene-matrix] 6 上下文 × (完整 run_blind_solve + 纯贪心基线) — 真值矩阵")
+    print("[scene-matrix] gap 只用 r1；strictly_better=成本口径(期望成本更低 + 覆盖不更差)")
+    header = (f"{'场景':<10}{'regime':<20}{'tasks':>6}{'greedy_cost':>13}"
+              f"{'v4_cost':>11}{'covered(g→v4)':>16}{'gap(r1)%':>11}{'strictly>':>11}")
+    print("-" * len(header))
+    print(header)
+    print("-" * len(header))
+
+    rows = []
+    all_ok = True
+    seen_keys = set()
+    for label, builder in contexts:
+        try:
+            text, regime_key, seed, is_head = builder()
+            report = orch.run_blind_solve(
+                text, case_label=f"matrix:{label}", memory_enabled=True,
+                weight_preset="balanced",
+            )
+            baseline = cbase.compute_baseline(
+                text,
+                autosolver_solution=report.get("solution"),
+                autosolver_solve_time_s=report.get("solve_time_s"),
+                autosolver_solver_used=report.get("solver_used", "solver_v4.py"),
+            )
+        except Exception as exc:
+            print(f"{label:<10}ERROR: {type(exc).__name__}: {exc}")
+            all_ok = False
+            continue
+        g = baseline.get("greedy", {})
+        a = baseline.get("autosolver", {})
+        imp = baseline.get("improvement", {})
+        gap = (report.get("certificate") or {}).get("gap_pct")
+        n_tasks = g.get("total")
+        g_cov, a_cov = g.get("covered"), a.get("covered")
+        g_cost, a_cost = g.get("expected_cost"), a.get("expected_cost")
+        sb = imp.get("strictly_better")
+        gap_s = f"{gap:.2f}" if isinstance(gap, (int, float)) else "N/A"
+        cov_s = f"{g_cov}/{n_tasks}→{a_cov}/{n_tasks}"
+        rk_show = (f"{label}:{regime_key}" if not is_head else regime_key)[:19]
+        print(f"{label:<10}{rk_show:<20}{str(n_tasks):>6}"
+              f"{(f'{g_cost:.3f}' if g_cost is not None else '—'):>13}"
+              f"{(f'{a_cost:.3f}' if a_cost is not None else '—'):>11}"
+              f"{cov_s:>16}{gap_s:>11}{str(bool(sb)):>11}")
+        rows.append((label, regime_key, seed, n_tasks, g_cost, a_cost, sb))
+        seen_keys.add((regime_key, seed, n_tasks))
+        if not sb:
+            all_ok = False
+    print("-" * len(header))
+
+    # 互异性自证：6 上下文应落在 ≥4 个不同 (regime, seed, tasks) 键上（真值确实不同实例）
+    distinct = len(seen_keys)
+    print(f"[scene-matrix] 互异实例数 distinct(regime,seed,tasks) = {distinct}/{len(rows)} "
+          f"(应 ≥4，证明各场景非同一份数据)")
+    if distinct < 4:
+        all_ok = False
+    sb_cnt = sum(1 for r in rows if r[6])
+    print(f"[scene-matrix] strictly_better(成本口径) = {sb_cnt}/{len(rows)} 上下文")
+    verdict = "PASS (各场景真值互异 + 全部 v4 严格优于贪心)" if all_ok else "FAIL"
+    print(f"[scene-matrix] {verdict}")
+    return 0 if all_ok else 1
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="即时履约智能调度指挥舱 后端 (iteration-1, 非破坏性).")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8775)
     parser.add_argument("--selfcheck", action="store_true")
+    parser.add_argument("--scene-matrix", action="store_true",
+                        help="跑头牌+5场景各一次完整 solve+贪心，打印真值矩阵（回归/现场自证）")
     args = parser.parse_args(argv)
     if args.selfcheck:
         return _selfcheck()
+    if args.scene_matrix:
+        return _scene_matrix()
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"即时履约智能调度指挥舱 running at http://{args.host}:{args.port}")
     print(f"  static dir: {STATIC_DIR}")

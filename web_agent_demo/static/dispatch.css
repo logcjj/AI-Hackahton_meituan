@@ -164,8 +164,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .kpi:hover .spark{opacity:1}
 .kpi .klbl{font-size:11px;color:var(--muted);font-weight:800;display:flex;align-items:center;gap:4px;
   letter-spacing:.01em}
-.kpi .kval{font-size:34px;font-weight:900;letter-spacing:-.04em;margin:6px 0 3px;font-family:var(--mono);
-  line-height:1;color:#f3fbf7;text-shadow:0 0 18px rgba(70,240,168,.12)}
+.kpi .kval{font-size:clamp(24px,2.4vw,34px);font-weight:900;letter-spacing:-.04em;margin:6px 0 3px;
+  font-family:var(--mono);line-height:1;color:#f3fbf7;text-shadow:0 0 18px rgba(70,240,168,.12);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
 .kpi .kval .unit{font-size:14px;color:var(--muted);font-weight:700;margin-left:2px;letter-spacing:0}
 /* 目标稿：↑↓彩色% 在大数字「下方」左对齐（非右上角） */
 .kpi .kdelta{display:flex;align-items:baseline;gap:6px;line-height:1.1;margin-bottom:2px}
@@ -219,8 +220,20 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .scene.active .st{color:var(--green2)}
 .scene .si{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:15px;
   background:rgba(63,210,224,.12);color:var(--cyan);transition:background .2s,box-shadow .2s}
+.scene .scene-tx{min-width:0;flex:1}
 .scene .st{font-size:13px;font-weight:800}
 .scene .sd{font-size:10.5px;color:var(--muted)}
+/* iter-16 P1-5：场景看点预告极小字（点击前知道演示什么）。低权重、不抢视觉，active 时点亮。 */
+.scene .shint{font-size:9.5px;line-height:1.4;color:var(--muted2);margin-top:2px;
+  display:flex;align-items:center;gap:4px}
+.scene .shint .shint-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan);
+  box-shadow:0 0 5px rgba(67,213,255,.7);flex:none}
+.scene.active .shint{color:var(--green2)}
+.scene.active .shint .shint-dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+/* iter-16 P0-3：求解异常兜底提示（不白屏） */
+.err-ph{color:#ffb4b4;line-height:1.55;border:1px dashed rgba(255,107,107,.4);
+  border-radius:8px;padding:9px 11px;background:rgba(255,107,107,.06)}
+.err-ph b{color:#ff8aa0}
 /* P1-5 诚实注脚（极小、不抢视觉）：真值随场景浮动 */
 .float-note{font-size:9.5px;color:var(--muted2);line-height:1.5;margin-top:8px;padding-top:7px;
   border-top:1px dashed var(--line)}
@@ -526,7 +539,8 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .roi-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(244,220,97,.3)}
 .roi-out{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
 .roi-card{padding:9px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);text-align:center}
-.roi-card .rv{font-size:17px;font-weight:900;font-family:var(--mono);color:var(--green2)}
+.roi-card .rv{font-size:17px;font-weight:900;font-family:var(--mono);color:var(--green2);
+  font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .roi-card .rl{font-size:9.5px;color:var(--muted)}
 /* P1-5：ROI 可追溯换算链 */
 .roi-chain{margin-top:9px;padding:8px 10px;border-radius:9px;background:rgba(7,16,13,.5);
@@ -677,6 +691,11 @@ circle.task-high,circle.task-mid,circle.task-low,circle.courier-node{transition:
 @media(prefers-reduced-motion:reduce){.panel{animation:none}}
 
 /* 响应式 */
+/* iter-16 P0-3：≤1400 收窄左右列、KPI 降一档列数，给中央地图留呼吸位、杜绝侧栏溢出 */
+@media(max-width:1400px){
+  .main3{grid-template-columns:242px 1fr 290px}
+  .stk-svg,.stk-caliber,.stk-collapse-hint,.stk-slider-row,.stk-pick{max-width:100%}
+}
 @media(max-width:1280px){
   .kpis{grid-template-columns:repeat(3,1fr)}
   .main3{grid-template-columns:1fr;}

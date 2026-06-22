@@ -19,12 +19,14 @@ function avatarHtml(id){
 }
 
 /* ---------- 静态：业务场景 5 样例（iteration-1：第2项 active，切换为占位） ---------- */
+/* iteration-16 P1-5：每场景一行极小字「看点预告」——评委点击前即知该场景演示什么，
+ * 点击后由现场合成脱敏样例真 solve 兑现（与 scene-matrix 真值一致，不写死输出）。 */
 const SCENES = [
-  {id:'peak',   ico:'📈', t:'午高峰爆单',   d:'订单量激增 156%'},
-  {id:'rain',   ico:'🌧️', t:'雨天低接单意愿', d:'骑手接单意愿下降'},
-  {id:'scarce', ico:'🧍', t:'骑手稀缺商圈', d:'可用骑手紧张'},
-  {id:'bundle', ico:'🗂️', t:'合单机会密集', d:'多订单同向集中'},
-  {id:'newshop',ico:'🏪', t:'新店突发订单', d:'新店订单突然增加'},
+  {id:'peak',   ico:'📈', t:'午高峰爆单',   d:'订单量激增 156%',     hint:'大规模高负载·v4 显著压成本'},
+  {id:'rain',   ico:'🌧️', t:'雨天低接单意愿', d:'骑手接单意愿下降',  hint:'低意愿·多骑手兜底防拒单'},
+  {id:'scarce', ico:'🧍', t:'骑手稀缺商圈', d:'可用骑手紧张',        hint:'骑手瓶颈·贪心欠覆盖(18/30)→v4 全覆盖'},
+  {id:'bundle', ico:'🗂️', t:'合单机会密集', d:'多订单同向集中',      hint:'合单密集·兜底择优降单位成本'},
+  {id:'newshop',ico:'🏪', t:'新店突发订单', d:'新店订单突然增加',    hint:'高噪声不确定·稳健择优'},
 ];
 /* iteration-15：当前选中的业务场景 id（用户点击场景后置位）。null=头牌默认态。
  * renderScenes 在每次感知/verdict 回填时会重绘场景列表——必须据此保住用户选中高亮，
@@ -36,9 +38,10 @@ function renderScenes(activeRegime){
     const act = SELECTED_SCENE!=null
       ? (s.id===SELECTED_SCENE)
       : ((activeRegime==='bundle-heavy' && s.id==='bundle') || (!activeRegime && i===3));
-    return `<div class="scene ${act?'active':''}" data-id="${s.id}">
+    return `<div class="scene ${act?'active':''}" data-id="${s.id}" title="${safe(s.hint||'')}">
       <div class="si">${s.ico}</div>
-      <div><div class="st">${i+1} ${safe(s.t)}</div><div class="sd">${safe(s.d)}</div></div>
+      <div class="scene-tx"><div class="st">${i+1} ${safe(s.t)}</div><div class="sd">${safe(s.d)}</div>
+        ${s.hint?`<div class="shint"><span class="shint-dot"></span>${safe(s.hint)}</div>`:''}</div>
     </div>`;
   }).join('');
 }
@@ -1078,7 +1081,29 @@ function renderRiskFromPerc(p){
 let CURRENT_CTX={kind:'headliner', body:{case:'large_seed301',memory_enabled:true}, label:'头牌官方案例 large_seed301（bundle-heavy）'};
 const SCENE_LABELS={peak:'午高峰爆单',rain:'雨天低接单意愿',scarce:'骑手稀缺商圈',bundle:'合单机会密集',newshop:'新店突发订单'};
 
+/* iteration-16 P0-2 并发保护：
+ *  - RUN_BUSY：同步内存锁，runStream 入口立即置位（不依赖 runbtn.disabled 这种异步 DOM 态），
+ *    杜绝「点击→setTimeout(runStream,220) 的 220ms 窗口里再点一次→两路并发 SSE 串数据」。
+ *  - RUN_GEN：每次 run 递增的代号；reader 循环每次回调都核对自身 gen 是否仍是当前 gen，
+ *    若已被新的 run 取代（理论上不该发生，但作为兜底）则丢弃该流的事件，绝不串面板。 */
+let RUN_BUSY=false;
+let RUN_PENDING=false;          // 已排程但尚未发起的求解（覆盖 setTimeout(runStream,…) 的窗口）
+let RUN_GEN=0;
+function isRunLocked(){ return RUN_BUSY||RUN_PENDING; }
+/* 排程一次求解：同步置 RUN_PENDING（立刻封住并发窗口），delay 后真正发起。
+ * 所有「切场景/回头牌/重新演示/点击开始」都经此排程，单一入口、单一锁。 */
+function scheduleRun(delay){
+  if(isRunLocked()) return false;
+  RUN_PENDING=true;
+  setTimeout(runStream, delay||0);
+  return true;
+}
 function runStream(){
+  RUN_PENDING=false;
+  if(RUN_BUSY) return;          // 已有求解在跑：直接忽略（并发保护，不开第二路）
+  RUN_BUSY=true;
+  RUN_ERRORED=false;
+  const myGen=++RUN_GEN;
   $('runbtn').disabled=true;
   // P0-1 运行中态：脉冲绿「● 调度运行中」+ 计时器走动（贴目标稿系统状态）
   const rl=$('runlight'); rl.classList.remove('idle','done'); rl.classList.add('running');
@@ -1091,19 +1116,25 @@ function runStream(){
 
   fetch('/api/cockpit/stream',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify(CURRENT_CTX.body||{case:'large_seed301',memory_enabled:true})}).then(async resp=>{
+    if(!resp.ok){ throw new Error('HTTP '+resp.status); }
+    if(!resp.body){ throw new Error('无响应流'); }
     const reader=resp.body.getReader(), dec=new TextDecoder(); let buf='';
     while(true){
       const {done,value}=await reader.read(); if(done) break;
+      if(myGen!==RUN_GEN){ try{await reader.cancel();}catch(_){} return; }  // 已被新 run 取代→弃流
       buf+=dec.decode(value,{stream:true});
       let idx;
       while((idx=buf.indexOf('\n\n'))>=0){
         const chunk=buf.slice(0,idx); buf=buf.slice(idx+2);
         const ev=/event: (.*)/.exec(chunk), da=/data: ([\s\S]*)/.exec(chunk);
-        if(ev&&da){ dispatchEvent2(ev[1].trim(), JSON.parse(da[1])); }
+        if(ev&&da){
+          let parsed; try{ parsed=JSON.parse(da[1]); }catch(_){ continue; }  // 半截/坏 JSON 不抛
+          if(myGen===RUN_GEN) dispatchEvent2(ev[1].trim(), parsed);
+        }
       }
     }
-    finishRun();
-  }).catch(e=>{ $('phase').textContent='出错：'+e.message; finishRun(); });
+    if(myGen===RUN_GEN) finishRun();
+  }).catch(e=>{ if(myGen===RUN_GEN){ $('phase').textContent='求解中断：'+(e&&e.message||e)+'（可点 ▶ 重新演示重试）'; finishRun(); } });
 }
 function dispatchEvent2(type,d){
   if(type==='meta'){ handleMeta(d); }
@@ -1111,7 +1142,19 @@ function dispatchEvent2(type,d){
   else if(type==='baseline'){ renderBaseline(d.baseline);
     const pct=d.baseline?.improvement?.cost_pct; if(pct!=null){ costImprovePct=Math.min(80,pct); costImproveIsReal=true; recomputeRoi(); } }
   else if(type==='result'){ applyStory(d.story); }
-  else if(type==='error'){ $('phase').textContent='出错：'+(d.message||''); }
+  else if(type==='error'){ RUN_ERRORED=true; handleSolveError(d&&d.message||''); }
+}
+/* iteration-16 P0-3：求解异常兜底——不白屏。把仍处「待推理」骨架的面板替换为
+ * 明确的「本次求解未完成」提示（含重试指引），并标记 RUN_ERRORED 让 finishRun 不误报完成。 */
+let RUN_ERRORED=false;
+function handleSolveError(msg){
+  const tip=`<div class="empty-ph err-ph"><b>本次求解未完成</b>${msg?(' · '+safe(msg)):''}<br>可点 <b>▶ 重新演示</b> 或切换其它场景重试（其余面板真值不受影响）。</div>`;
+  ['risk','strategy','decision','cert','baseline','stkbody'].forEach(id=>{
+    const n=$(id); if(n && /pend-badge|skel-ph|empty-ph/.test(n.innerHTML)) n.innerHTML=tip;
+  });
+  const cand=$('candidates');
+  if(cand && /pend-badge|skel-ph|empty-ph/.test(cand.innerHTML)) cand.innerHTML=`<div style="grid-column:1/-1">${tip}</div>`;
+  $('phase').textContent='求解异常：'+(msg||'内部错误')+'（已兜底，可重试，整舱未崩）';
 }
 /* iteration-15：meta 事件——服务端确认「正在求解哪个场景/案例」（脱敏标识/seed），
  * 立即更新状态条与场景角标，让加载态清晰可读。 */
@@ -1152,13 +1195,22 @@ function applyStory(s){
   recomputeRoi();
 }
 function finishRun(){
+  RUN_BUSY=false;               // 释放并发锁（允许下一次求解/切场景）
   $('runbtn').disabled=false;
-  // P0-1 终态：SSE 收敛后切「● 完成」（绿勾·停脉冲），计时器定格本次总耗时
-  const rl=$('runlight'); rl.classList.remove('running','idle'); rl.classList.add('done');
-  $('runtext').textContent='完成';
   stopTimer();
   const total=timerStart?fmtElapsed(Date.now()-timerStart):'';
   const ctxLbl=CURRENT_CTX.label||'';
+  const rl=$('runlight'); rl.classList.remove('running','idle','done');
+  if(RUN_ERRORED){
+    // 异常终态：标灰「中断」而非误报「完成」（兜底已在 handleSolveError 铺好提示）
+    rl.classList.add('idle'); $('runtext').textContent='已中断';
+    const rb=$('replaybtn'); if(rb) rb.style.display='inline-flex';
+    const hb=$('headlinerbtn'); if(hb) hb.style.display=(CURRENT_CTX.kind==='scene')?'inline-flex':'none';
+    return;
+  }
+  // P0-1 终态：SSE 收敛后切「● 完成」（绿勾·停脉冲），计时器定格本次总耗时
+  rl.classList.add('done');
+  $('runtext').textContent='完成';
   $('phase').textContent=`求解完成 · ${ctxLbl} · 全量真值已回填${total?`（本次求解总耗时 ${total}）`:''}`;
   // 重新演示按钮：求解完成后可见，便于答辩反复演示整段动画
   const rb=$('replaybtn'); if(rb) rb.style.display='inline-flex';
@@ -1191,7 +1243,7 @@ async function loadSkeleton(){
   }catch(e){ /* 骨架失败不阻塞 */ }
   recomputeRoi();
   // 加载即自动跑一次真实求解，使全部面板(KPI/Baseline/决策/候选/证书/自进化)无需点击即有真值。
-  if(!AUTORUN_DONE){ AUTORUN_DONE=true; setTimeout(runStream, 350); }
+  if(!AUTORUN_DONE){ AUTORUN_DONE=true; scheduleRun(350); }
 }
 let AUTORUN_DONE=false;
 
@@ -1212,8 +1264,8 @@ $('evotoggle').onclick=()=> $('evopanel').classList.toggle('collapsed');
 document.addEventListener('click',e=>{
   const sc=e.target.closest('.scene');
   if(sc){
-    if($('runbtn').disabled){
-      // 求解中：不切换高亮，避免误导（active 仍指向正在跑的场景）
+    if(isRunLocked()){
+      // 求解中（或已排程）：不切换高亮，避免误导（active 仍指向正在跑的场景）
       $('phase').textContent='当前正在求解，请等本次完成后再切换场景…';
       return;
     }
@@ -1225,18 +1277,18 @@ document.addEventListener('click',e=>{
  * 所有面板（KPI/Baseline/决策/候选/地图/证书/四方/自进化）回填为该场景真值，带流式动画。
  * 不再只重判感知；不写死任何场景真值——由服务端现场合成 regime 脱敏样例并真跑。 */
 function switchScene(sceneId){
-  if($('runbtn').disabled){
-    // 正在求解中：忽略点击，给提示（避免并发两路 SSE）
+  if(isRunLocked()){
+    // 正在求解中（或已排程）：忽略点击，给提示（避免并发两路 SSE）
     $('phase').textContent='当前正在求解，请等本次完成后再切换场景…';
-    // 还原 active 高亮到正在跑的上下文
     return;
   }
   SELECTED_SCENE=sceneId;
   CURRENT_CTX={kind:'scene', body:{scene:sceneId, memory_enabled:true}, label:`${SCENE_LABELS[sceneId]||sceneId}（脱敏样例·现场合成）`};
   // 1) 面板回求解中骨架（「求解中」加载态清晰，避免误读上一场景真值为本场景）
   resetPanelsToSolving(`正在合成「${SCENE_LABELS[sceneId]||sceneId}」脱敏样例并完整真 solve…`);
-  // 2) 启动完整 SSE 流式求解（与头牌同一条 runStream 链路，只是 body 指向该场景）
-  setTimeout(runStream, 220);
+  // 2) 启动完整 SSE 流式求解（与头牌同一条 runStream 链路，只是 body 指向该场景）。
+  //    scheduleRun 同步置 RUN_PENDING，封住 220ms 排程窗口内的并发再点击。
+  scheduleRun(220);
 }
 
 /* iteration-15：把全部面板重置为「求解中」骨架（与首屏 loadSkeleton/replay 同观感），
@@ -1259,19 +1311,19 @@ function resetPanelsToSolving(phaseTxt){
 
 /* iteration-15：一键回到头牌官方案例（large_seed301）并重跑完整求解。 */
 function backToHeadliner(){
-  if($('runbtn').disabled) return;
+  if(isRunLocked()) return;
   SELECTED_SCENE=null;
   CURRENT_CTX={kind:'headliner', body:{case:'large_seed301',memory_enabled:true}, label:'头牌官方案例 large_seed301（bundle-heavy）'};
   document.querySelectorAll('.scene').forEach(n=>n.classList.remove('active'));
   resetPanelsToSolving('回到头牌官方案例 large_seed301 · 重跑完整真实求解…');
-  setTimeout(runStream, 220);
+  scheduleRun(220);
 }
-$('runbtn').onclick=runStream;
+$('runbtn').onclick=()=>scheduleRun(0);
 
 /* P0-2：「▶ 重新演示」——一键把整舱重置回骨架态，再完整重放一段"AI 自主求解"动画。
  * 便于答辩反复演示：五环逐格点亮、KPI count-up、地图候选→采纳收敛、Baseline/证书末态弹入。 */
 function replayDemo(){
-  if($('runbtn').disabled) return;            // 正在跑则忽略
+  if(isRunLocked()) return;            // 正在跑/已排程则忽略
   const rb=$('replaybtn'); rb.style.display='none';
   // 1) 系统状态回待机 + 计时器归零
   const rl=$('runlight'); rl.classList.remove('running','done'); rl.classList.add('idle');
@@ -1289,14 +1341,14 @@ function replayDemo(){
   $('stkbody').innerHTML=skeletonPanel('求解后接入 report.stakeholders：平台成本真值 + 公平/体验合成层');
   // 3) 短暂停顿后重放整段
   $('phase').textContent='重新演示 · 重置整舱并重放 AI 自主求解动画…';
-  setTimeout(runStream, 320);
+  scheduleRun(320);
 }
 $('replaybtn').onclick=replayDemo;
 { const hb=$('headlinerbtn'); if(hb) hb.onclick=backToHeadliner; }
 
 /* 键盘：空格开始推理 */
 document.addEventListener('keydown',e=>{
-  if(e.code==='Space' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ e.preventDefault(); if(!$('runbtn').disabled) runStream(); }
+  if(e.code==='Space' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ e.preventDefault(); if(!isRunLocked()) scheduleRun(0); }
 });
 
 loadSkeleton();
