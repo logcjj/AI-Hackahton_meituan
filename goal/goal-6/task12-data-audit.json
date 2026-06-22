@@ -1,0 +1,253 @@
+{
+  "violations": [],
+  "scenario_count": 6,
+  "sample_count": 60,
+  "global_selected_strategy_counts": {
+    "S1": 12,
+    "S2": 21,
+    "S3": 6,
+    "S5": 15,
+    "S4": 6
+  },
+  "scenarios": [
+    {
+      "id": "commerce_peak",
+      "name": "商圈十字路口高峰",
+      "sample_count": 10,
+      "merchant_range": [
+        5,
+        6
+      ],
+      "courier_range": [
+        11,
+        14
+      ],
+      "selected_strategy_counts": {
+        "S1": 5,
+        "S2": 5
+      },
+      "top3_major_strategy_count": 5,
+      "weather_values": [
+        "clear"
+      ],
+      "rain_streak_range": [
+        0,
+        0
+      ],
+      "merchant_spread_range": [
+        9.1,
+        23.9
+      ],
+      "map_road_range": [
+        28,
+        28
+      ],
+      "building_block_range": [
+        24,
+        24
+      ]
+    },
+    {
+      "id": "medium_parallel",
+      "name": "中型并行派单",
+      "sample_count": 10,
+      "merchant_range": [
+        4,
+        5
+      ],
+      "courier_range": [
+        9,
+        12
+      ],
+      "selected_strategy_counts": {
+        "S2": 8,
+        "S1": 2
+      },
+      "top3_major_strategy_count": 5,
+      "weather_values": [
+        "clear"
+      ],
+      "rain_streak_range": [
+        0,
+        0
+      ],
+      "merchant_spread_range": [
+        17.4,
+        29.5
+      ],
+      "map_road_range": [
+        28,
+        28
+      ],
+      "building_block_range": [
+        24,
+        24
+      ]
+    },
+    {
+      "id": "scarce_repair",
+      "name": "骑手稀缺修复",
+      "sample_count": 10,
+      "merchant_range": [
+        4,
+        6
+      ],
+      "courier_range": [
+        7,
+        9
+      ],
+      "selected_strategy_counts": {
+        "S3": 6,
+        "S5": 2,
+        "S2": 2
+      },
+      "top3_major_strategy_count": 5,
+      "weather_values": [
+        "clear"
+      ],
+      "rain_streak_range": [
+        0,
+        0
+      ],
+      "merchant_spread_range": [
+        20.9,
+        51.3
+      ],
+      "map_road_range": [
+        28,
+        28
+      ],
+      "building_block_range": [
+        24,
+        24
+      ]
+    },
+    {
+      "id": "rain_low_willingness",
+      "name": "雨天低接单意愿",
+      "sample_count": 10,
+      "merchant_range": [
+        4,
+        6
+      ],
+      "courier_range": [
+        10,
+        13
+      ],
+      "selected_strategy_counts": {
+        "S5": 8,
+        "S1": 1,
+        "S2": 1
+      },
+      "top3_major_strategy_count": 4,
+      "weather_values": [
+        "rain"
+      ],
+      "rain_streak_range": [
+        76,
+        76
+      ],
+      "merchant_spread_range": [
+        9.7,
+        24.0
+      ],
+      "map_road_range": [
+        28,
+        28
+      ],
+      "building_block_range": [
+        24,
+        24
+      ]
+    },
+    {
+      "id": "offpeak_greedy",
+      "name": "低峰分散订单",
+      "sample_count": 10,
+      "merchant_range": [
+        3,
+        5
+      ],
+      "courier_range": [
+        9,
+        11
+      ],
+      "selected_strategy_counts": {
+        "S4": 6,
+        "S1": 1,
+        "S2": 3
+      },
+      "top3_major_strategy_count": 5,
+      "weather_values": [
+        "clear"
+      ],
+      "rain_streak_range": [
+        0,
+        0
+      ],
+      "merchant_spread_range": [
+        27.6,
+        36.3
+      ],
+      "map_road_range": [
+        28,
+        28
+      ],
+      "building_block_range": [
+        24,
+        24
+      ]
+    },
+    {
+      "id": "event_mixed_pressure",
+      "name": "活动混合压力",
+      "sample_count": 10,
+      "merchant_range": [
+        5,
+        6
+      ],
+      "courier_range": [
+        12,
+        15
+      ],
+      "selected_strategy_counts": {
+        "S1": 3,
+        "S5": 5,
+        "S2": 2
+      },
+      "top3_major_strategy_count": 4,
+      "weather_values": [
+        "event"
+      ],
+      "rain_streak_range": [
+        0,
+        0
+      ],
+      "merchant_spread_range": [
+        11.2,
+        29.3
+      ],
+      "map_road_range": [
+        28,
+        28
+      ],
+      "building_block_range": [
+        24,
+        24
+      ]
+    }
+  ],
+  "external_map_dependencies_removed": true,
+  "ui_markers_checked": [
+    "派单总览：全部商家已自动连线",
+    "renderAssignmentOverviewDetail",
+    "buildRoadGraph",
+    "shortestRoadGraphPath",
+    "hide-delivery-routes",
+    "renderEntityPreviewDetail",
+    "renderFinalEntityDetail",
+    "renderRouteDetail",
+    "renderStrategyDetail",
+    "renderTableRowDetail"
+  ]
+}

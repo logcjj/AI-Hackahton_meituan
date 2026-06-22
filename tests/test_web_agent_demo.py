@@ -68,13 +68,17 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("最终派单连线", html)
         self.assertIn("低噪展示线路", html)
         self.assertIn("骑手位置", html)
-        self.assertIn("leaflet.css", html)
-        self.assertIn("leaflet.js", html)
-        self.assertIn("id=\"real-map\"", html)
-        self.assertIn("basemaps.cartocdn.com/dark_nolabels", html)
-        self.assertIn("pointToLatLng", html)
-        self.assertIn("renderLeafletDispatchMap", html)
-        self.assertIn("return false;", html)
+        for external_map_dependency in [
+            "leaflet.css",
+            "leaflet.js",
+            "id=\"real-map\"",
+            "basemaps.cartocdn.com",
+            "unpkg.com/leaflet",
+            "pointToLatLng",
+            "renderLeafletDispatchMap",
+            "ensureLeafletMap",
+        ]:
+            self.assertNotIn(external_map_dependency, html)
         self.assertIn("map-entities", html)
         self.assertIn("pickup-leg", html)
         self.assertIn("dispatchArrowFor", html)

@@ -192,3 +192,15 @@
 验证标准：以严格评审 Agent 视角从 To B 视觉、业务逻辑、算法可信度、交互完整性、测试覆盖、演示稳定性审查；修完问题后标记 goal 完成并归档。
 
 完成记录：
+- 已完成最终严格评审，并按评审发现清理了未使用的 Leaflet/CARTO 外部地图依赖和已禁用的 Leaflet 死代码；当前页面只使用自研匿名 SVG 导航图层，符合“模拟百度地图式层级但不暴露真实路名/地址”的目标。
+- 已更新单测防回归：`tests/test_web_agent_demo.py` 明确断言不得出现 `leaflet.css`、`leaflet.js`、`unpkg.com/leaflet`、`basemaps.cartocdn.com`、`real-map`、`renderLeafletDispatchMap`、`ensureLeafletMap` 等外部/死代码依赖。
+- 已生成最终数据审计 `goal/goal-6/task12-data-audit.json`，结果 `violations=[]`；证明 6 个场景、60 个样本、全局 S1-S5 策略覆盖、匿名道路/建筑/商圈/路况层、雨天/集中/分散场景语义和外部地图依赖清理均通过。
+- 已生成最终浏览器审计 `goal/goal-6/task12-browser-audit.json`，结果 `violations=[]`；fresh run 覆盖 6 个场景、刷新、运行、图层 selected/all/candidates、点位弱化、配送线隐藏/恢复、适配、定位、缩放、全屏、策略卡、表格行、路线热区点击。
+- 已生成最终 console 审计 `goal/goal-6/task12-console-errors.json`，页面 console 错误数 0。
+- 已记录截图能力限制 `goal/goal-6/task12-screenshot-note.json`：当前 in-app browser `Page.captureScreenshot` 仍超时，因此最终视觉功能验收以 fresh DOM/浏览器交互审计为准。
+- 严格 verifier Agent 复审结论：`PASS_WITH_NOTES`，无 blocker/P1/P2；唯一备注是 Task 12 记录未写完，已在本条补齐。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 58 个测试通过。
+- Goal 已整理归档到 `goal/goal-6/status.md`，状态标记为 completed。

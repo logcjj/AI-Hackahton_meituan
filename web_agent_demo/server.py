@@ -1003,8 +1003,6 @@ def render_index() -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AutoSolver Agent - Real-time Dispatch Assignment Optimization</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
       --bg: #020911;
@@ -1238,81 +1236,6 @@ def render_index() -> str:
       box-shadow: 0 24px 80px rgba(0,0,0,.72), 0 0 0 1px rgba(39,230,208,.28);
     }
     .map-panel.active .map-frame { min-height: 0; flex: 1; }
-    .real-map { position: absolute; inset: 0; z-index: 0; display: none; background: #07111d; }
-    .map-frame.leaflet-ready .real-map { display: block; }
-    .leaflet-container { font-family: "Aptos", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
-    .leaflet-control-attribution { font-size: 9px; background: rgba(4,13,22,.48); color: rgba(196,214,229,.48); }
-    .leaflet-control-attribution a { color: rgba(122, 212, 255, .72); }
-    .leaflet-tile-pane {
-      opacity: .42;
-      filter: grayscale(1) saturate(.12) contrast(.72) brightness(.42);
-    }
-    .leaflet-overlay-pane:after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at 42% 36%, rgba(39,230,208,.13), transparent 23%),
-        linear-gradient(180deg, rgba(2,9,17,.38), rgba(2,9,17,.68));
-    }
-    .map-frame.leaflet-ready .map-bg, .map-frame.leaflet-ready .route-svg { display: none; }
-    .map-frame.leaflet-ready .map-entities { display: none; }
-    .map-frame.leaflet-ready .map-label {
-      position: relative;
-      min-width: 58px;
-      width: max-content !important;
-      transform: translate(-50%, -50%);
-    }
-    .dispatch-marker {
-      background: transparent;
-      border: 0;
-      width: auto !important;
-      height: auto !important;
-    }
-    .dispatch-marker .marker-dot {
-      display: grid;
-      place-items: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      box-shadow: 0 0 16px rgba(0,0,0,.58);
-      transform: translate(-50%, -50%);
-    }
-    .dispatch-marker.pickup .marker-dot { background: var(--orange); color: #1b0d00; border: 1px solid #ffd39a; }
-    .dispatch-marker.order .marker-dot { background: #76c94c; color: #061806; border: 1px solid #caff9b; }
-    .dispatch-marker.courier-node .marker-dot { background: rgba(2, 43, 51, .96); color: var(--cyan); border: 1px solid var(--cyan); }
-    .dispatch-marker .marker-card {
-      position: absolute;
-      left: 14px;
-      top: -22px;
-      min-width: 68px;
-      padding: 6px 8px;
-      border-radius: 5px;
-      background: rgba(5, 18, 30, .9);
-      border: 1px solid rgba(114, 146, 170, .62);
-      color: #dcecff;
-      font-family: var(--mono);
-      font-size: 12px;
-      line-height: 1.25;
-      box-shadow: 0 8px 22px rgba(0,0,0,.42);
-      display: none;
-      white-space: nowrap;
-    }
-    .dispatch-marker.selected .marker-card,
-    .dispatch-marker.show-label .marker-card { display: block; }
-    .dispatch-marker.pickup.selected .marker-card, .dispatch-marker.pickup.show-label .marker-card { border-color: var(--orange); color: #ffe0ba; }
-    .dispatch-marker.order.selected .marker-card, .dispatch-marker.order.show-label .marker-card { border-color: #76c94c; color: #dbffc7; }
-    .dispatch-marker.courier-node.selected .marker-card, .dispatch-marker.courier-node.show-label .marker-card { border-color: var(--cyan); color: #b9fff6; }
-    .dispatch-polyline-primary {
-      filter: drop-shadow(0 0 7px rgba(39,230,208,.95)) drop-shadow(0 0 14px rgba(39,230,208,.45));
-    }
-    .dispatch-polyline-secondary {
-      opacity: .34;
-      filter: drop-shadow(0 0 3px rgba(235,230,216,.45));
-    }
     .map-frame.topology {
       background:
         radial-gradient(circle at 52% 42%, rgba(22, 73, 88, .22), transparent 30%),
@@ -1694,7 +1617,6 @@ def render_index() -> str:
             <div><span class="mark depot">⌂</span>调度片区</div><div><span class="mark rest">♨</span>订单组</div><div><span class="mark dest">◎</span>订单</div><div><span class="mark courier">♞</span>骑手</div>
             <div><i class="line-key sel"></i>最终派单连线</div><div><i class="line-key rej"></i>低噪展示线路</div><div><span class="mark courier">♞</span>骑手位置</div>
           </div>
-          <div id="real-map" class="real-map" aria-label="真实地图派单图层"></div>
           <div class="map-entities" aria-live="polite"></div>
           <div class="zoom"><button id="zoom-in" type="button">+</button><button id="zoom-out" type="button">−</button><button id="recenter" type="button">⌾</button></div>
           <div class="weather"><div class="row"><strong>路况</strong><strong style="color:var(--yellow)">待刷新</strong></div><div class="bar"></div><div class="row"><span>天气</span><strong>等待场景样本</strong></div></div>
@@ -1758,10 +1680,6 @@ def render_index() -> str:
     const simulationSampleIndex = {};
     let simulationRefreshNonce = 0;
     const dynamicProfiles = {};
-    let leafletMap = null;
-    let leafletLayer = null;
-    let leafletLastBounds = null;
-    const dispatchMapCenter = [31.2304, 121.4737];
     const sceneProfiles = {
       large_seed301: {
         label: "官方大规模高峰", cost: "$657.10", bundleCost: "$61.8", eta: "12 min", improvement: "+68.7%", shift: [0, 0], missedRisk: "4.0%", utilization: "78%",
@@ -2182,7 +2100,6 @@ def render_index() -> str:
       if (mapPayload.stage === "preview") setStatus("已生成模拟派单地图", false);
     }
     function clearDispatchResult(profile) {
-      clearLeafletMap();
       const entityLayer = document.querySelector(".map-entities");
       if (entityLayer) entityLayer.innerHTML = "";
       const routeSvg = document.querySelector(".route-svg");
@@ -2421,115 +2338,12 @@ def render_index() -> str:
       }
       renderStrategyCards(profile, report);
     }
-    function pointToLatLng(point) {
-      const x = Number(point[0]);
-      const y = Number(point[1]);
-      const dx = (x - 50) / 100;
-      const dy = (50 - y) / 100;
-      return [
-        dispatchMapCenter[0] + dy * 0.13 + dx * 0.038,
-        dispatchMapCenter[1] + dx * 0.17 - dy * 0.052
-      ];
-    }
-    function ensureLeafletMap() {
-      return false;
-      if (!window.L) return false;
-      if (!leafletMap) {
-        leafletMap = L.map("real-map", {
-          zoomControl: false,
-          attributionControl: true
-        }).setView(dispatchMapCenter, 12);
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
-          maxZoom: 19,
-          attribution: "&copy; OpenStreetMap &copy; CARTO"
-        }).addTo(leafletMap);
-        leafletLayer = L.layerGroup().addTo(leafletMap);
-      }
-      document.querySelector(".map-frame").classList.add("leaflet-ready");
-      window.setTimeout(() => leafletMap.invalidateSize(), 0);
-      return true;
-    }
-    function clearLeafletMap() {
-      if (leafletLayer) leafletLayer.clearLayers();
-      leafletLastBounds = null;
-      document.querySelector(".map-frame").classList.remove("leaflet-ready");
-    }
-    function markerClassFor(kind, selected) {
-      const typeClass = kind === "pickup_cluster" || kind === "merchant_order" ? "pickup" : kind === "courier" ? "courier-node" : "order";
-      return `dispatch-marker ${typeClass}${selected ? " selected" : ""}`;
-    }
-    function markerSymbol(kind) {
-      if (kind === "pickup_cluster" || kind === "merchant_order") return "♨";
-      if (kind === "courier") return "♞";
-      return "◎";
-    }
-    function markerHtmlFor(item) {
-      return `<span class="marker-dot">${markerSymbol(item.kind)}</span><span class="marker-card">${item.html}</span>`;
-    }
     function labelOffsetFor(item, assignmentId, selectedAssignment) {
       if (assignmentId !== selectedAssignment) return [0, 0];
       const checksum = String(item.id || "").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
       if (item.kind === "pickup_cluster" || item.kind === "merchant_order") return [14, -42];
       if (item.kind === "courier") return [checksum % 2 === 0 ? -96 : -82, checksum % 2 === 0 ? -30 : 10];
       return [18, 18 + (checksum % 3) * 18];
-    }
-    function renderLeafletDispatchMap(profile, labels, entityPoints) {
-      if (!ensureLeafletMap()) return false;
-      leafletLayer.clearLayers();
-      const bounds = [];
-      const labeledEntityIds = new Set();
-      if (profile.dispatchMap && Array.isArray(profile.dispatchMap.assignments)) {
-        const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id);
-        profile.dispatchMap.assignments.forEach((assignment) => {
-          if (assignment.id === selectedAssignment) {
-            labeledEntityIds.add(assignment.pickup);
-            (assignment.map_couriers || courierTokens(assignment.courier)).forEach((courier) => labeledEntityIds.add(courier));
-            (assignment.map_orders || assignment.orders || []).forEach((order) => labeledEntityIds.add(order));
-          }
-        });
-      }
-      labels.forEach((item) => {
-        const assignmentId = assignmentForEntity(profile, item.id);
-        const selected = assignmentId === profile.selected;
-        const showLabel = selected || labeledEntityIds.has(item.id);
-        const latLng = pointToLatLng([item.x, item.y]);
-        bounds.push(latLng);
-        const marker = L.marker(latLng, {
-          icon: L.divIcon({
-            className: markerClassFor(item.kind, selected) + (showLabel ? " show-label" : ""),
-            html: markerHtmlFor(item),
-            iconSize: null
-          }),
-          keyboard: false
-        }).addTo(leafletLayer);
-        marker.on("click", () => renderAssignmentDetail(profile, assignmentId, item.id));
-      });
-      if (profile.dispatchMap && Array.isArray(profile.dispatchMap.assignments)) {
-        const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id);
-        profile.dispatchMap.assignments.forEach((assignment) => {
-          const couriers = assignment.map_couriers || courierTokens(assignment.courier);
-          const orders = assignment.map_orders || assignment.orders || [];
-          const points = [entityPoints[assignment.pickup], ...couriers.map((courier) => entityPoints[courier]), ...orders.map((order) => entityPoints[order])].filter(Boolean);
-          const latLngs = points.map(pointToLatLng);
-          if (latLngs.length < 2) return;
-          latLngs.forEach((latLng) => bounds.push(latLng));
-          const isActive = assignment.id === selectedAssignment;
-          L.polyline(latLngs, {
-            color: isActive ? "#14e6ce" : "#34d399",
-            weight: isActive ? 5.5 : 2.4,
-            opacity: isActive ? 0.95 : 0.22,
-            dashArray: isActive ? null : "8 8",
-            lineCap: "round",
-            lineJoin: "round",
-            className: isActive ? "dispatch-polyline-primary" : "dispatch-polyline-secondary"
-          }).on("click", () => renderAssignmentDetail(profile, assignment.id, assignment.pickup)).addTo(leafletLayer);
-        });
-      }
-      if (bounds.length) {
-        leafletLastBounds = L.latLngBounds(bounds);
-        leafletMap.fitBounds(leafletLastBounds, {padding: [52, 52], maxZoom: 13});
-      }
-      return true;
     }
     function mapX(value) {
       return Math.max(0, Math.min(980, safeNumber(value, 0) * 9.8));
@@ -2731,11 +2545,6 @@ def render_index() -> str:
       }
       const entityLayer = document.querySelector(".map-entities");
       entityLayer.innerHTML = "";
-      if (profile.dispatchMap && renderLeafletDispatchMap(profile, dynamicLabels, entityPoints)) {
-        const svg = document.querySelector(".route-svg");
-        if (svg) svg.innerHTML = "";
-        return;
-      }
       dynamicLabels.forEach((item) => {
         const assignmentId = assignmentForEntity(profile, item.id);
         const display = displayPositions[item.id] || {x: item.x, y: item.y, rawX: item.x, rawY: item.y, avoided: false};
@@ -3590,12 +3399,8 @@ def render_index() -> str:
       const assignment = assignments[resolvedAssignment];
       if (!assignment) return;
       setDetailContext("assignment", resolvedAssignment, "", "");
-      const changedSelection = profile.selected !== resolvedAssignment;
       profile.selected = resolvedAssignment;
       applyMapFocus(profile, resolvedAssignment, focusMap);
-      if (changedSelection && profile.dispatchMap && document.querySelector(".map-frame").classList.contains("leaflet-ready")) {
-        updateMapScene(profile);
-      }
       $("detail-title").textContent = sourceLabel ? "派单详情：" + sourceLabel : `派单详情：${assignment.pickup || assignment.merchant || resolvedAssignment} → ${assignment.courier}`;
       $("detail-courier").textContent = assignment.courier;
       const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
@@ -3984,7 +3789,6 @@ def render_index() -> str:
             $("zoom-in").classList.remove("active");
             const profile = currentProfile || profileForCase(selectedCase());
             if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
-            if (leafletMap && leafletLastBounds) leafletMap.fitBounds(leafletLastBounds, {padding: [52, 52], maxZoom: 13});
             showToast("视图已适配全部派单关系");
             return;
           }
@@ -3998,20 +3802,12 @@ def render_index() -> str:
         });
       });
       $("zoom-in").addEventListener("click", () => {
-        if (leafletMap && document.querySelector(".map-frame").classList.contains("leaflet-ready")) {
-          leafletMap.zoomIn();
-        } else {
-          document.querySelector(".map-frame").classList.add("zoomed");
-        }
+        document.querySelector(".map-frame").classList.add("zoomed");
         $("zoom-in").classList.add("active");
         showToast("地图已放大");
       });
       $("zoom-out").addEventListener("click", () => {
-        if (leafletMap && document.querySelector(".map-frame").classList.contains("leaflet-ready")) {
-          leafletMap.zoomOut();
-        } else {
-          document.querySelector(".map-frame").classList.remove("zoomed");
-        }
+        document.querySelector(".map-frame").classList.remove("zoomed");
         $("zoom-in").classList.remove("active");
         showToast("地图已缩小");
       });
@@ -4019,7 +3815,6 @@ def render_index() -> str:
         document.querySelector(".map-frame").classList.add("locating");
         const profile = currentProfile || profileForCase(selectedCase());
         if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
-        if (leafletMap && leafletLastBounds) leafletMap.fitBounds(leafletLastBounds, {padding: [52, 52], maxZoom: 13});
         showToast("已回到当前派单关系中心");
       });
       document.querySelector(".map-frame").addEventListener("click", (event) => {

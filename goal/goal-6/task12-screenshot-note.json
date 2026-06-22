@@ -1,0 +1,5 @@
+{
+  "status": "unavailable",
+  "reason": "Timed out running CDP command \"Page.captureScreenshot\" for tab 12",
+  "basis": "Browser functional verification used DOM audit because screenshot capture is unavailable in this environment."
+}
