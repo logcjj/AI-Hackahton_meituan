@@ -112,11 +112,11 @@ _DISPATCH_ROADS = [
 
 
 _SIMULATION_STRATEGIES = {
-    "S1": {"name": "Bundle-first", "label": "合单优先", "reason": "商圈订单密集，优先把同路订单组成派单包"},
-    "S2": {"name": "Multi-dispatch", "label": "多派候选", "reason": "多个骑手距离接近，需要扩展候选后再筛选"},
-    "S3": {"name": "Repair search", "label": "局部修复", "reason": "先得到可行派单，再修复高成本或绕行订单"},
-    "S4": {"name": "Greedy baseline", "label": "贪心基线", "reason": "低峰期订单分散，最近可用骑手已足够稳定"},
-    "S5": {"name": "Risk balancing", "label": "风险平衡", "reason": "低接单意愿或天气风险较高，优先控制无人接单概率"},
+    "S1": {"name": "合单优先", "label": "合单优先", "reason": "商圈订单密集，优先把同路订单组成派单包"},
+    "S2": {"name": "多派候选", "label": "多派候选", "reason": "多个骑手距离接近，需要扩展候选后再筛选"},
+    "S3": {"name": "局部修复", "label": "局部修复", "reason": "先得到可行派单，再修复高成本或绕行订单"},
+    "S4": {"name": "贪心基线", "label": "贪心基线", "reason": "低峰期订单分散，最近可用骑手已足够稳定"},
+    "S5": {"name": "风险平衡", "label": "风险平衡", "reason": "低接单意愿或天气风险较高，优先控制无人接单概率"},
 }
 
 
@@ -1493,6 +1493,9 @@ def render_index() -> str:
     .map-entities { position: absolute; inset: 0; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
     .pin { position: absolute; z-index: 3; width: 22px; height: 22px; transform: translate(-50%, -50%); cursor: pointer; }
+    .pin.rest { z-index: 6; }
+    .pin.courier { z-index: 5; }
+    .pin.dest { z-index: 4; }
     .pin .mark { width: 22px; height: 22px; box-shadow: 0 0 12px rgba(0,0,0,.45); }
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
     .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; }
@@ -1611,58 +1614,58 @@ def render_index() -> str:
 
     <section class="main-grid">
       <aside class="panel left-panel" aria-label="AI Reasoning Graph">
-        <div class="panel-head"><span class="dot">✣</span> AI Reasoning Graph <span class="spacer"></span><button id="expand-graph">Expand All</button></div>
+        <div class="panel-head"><span class="dot">✣</span> ReasonGraph 推理链路 <span class="spacer"></span><button id="expand-graph">展开全部</button></div>
         <div class="reason-wrap">
           <article class="node current">
             <div class="step-index">1</div><div class="icon">▣</div>
-            <div><h3>Input Orders</h3><p>38 orders · 6 depots · 18 couriers<br>Time window: 11:00 - 14:00</p></div>
-            <div class="metric"><span>Confidence</span><strong>1.00</strong></div>
+            <div><h3>输入订单与骑手</h3><p>等待当前场景样本<br>刷新后生成商家、订单与骑手点位</p></div>
+            <div class="metric"><span>可信度</span><strong>1.00</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node selected">
             <div class="step-index">2</div><div class="icon">♙</div>
-            <div><h3>Scene Diagnosis</h3><p>High demand concentration in downtown<br>Traffic moderate, rain risk low</p></div>
-            <div class="metric"><span>Confidence</span><strong>0.96</strong></div>
+            <div><h3>场景识别</h3><p>识别订单密度、骑手意愿、路况与天气<br>不同场景触发不同策略路径</p></div>
+            <div class="metric"><span>可信度</span><strong>0.96</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">3</div><div class="icon">↯</div>
-            <div><h3>Candidate Strategy Generation</h3><p>Generated 5 candidate strategies<br>Exploring diverse search directions</p></div>
-            <div class="metric"><span>Candidates</span><strong>5</strong></div>
+            <div><h3>候选策略生成</h3><p>生成 5 类候选派单策略<br>比较合单、多派、修复、贪心与风险平衡</p></div>
+            <div class="metric"><span>候选策略</span><strong>5</strong></div>
           </article>
           <div class="branch-grid">
-            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>Bundle-first</b><br>Focus on high-overlap bundles</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>S2</h4><p><b>Multi-dispatch</b><br>Many small bundles parallel delivery</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>S3</h4><p><b>Repair search</b><br>Iterative improvement from greedy</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>S4</h4><p><b>Greedy baseline</b><br>Nearest-first per order</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S5" data-reasoning-status="pending"><h4>S5</h4><p><b>Time-window balancing</b><br>Prioritize tight windows</p><strong>-- <span class="badge pending">Pending</span></strong></article>
+            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>合单优先</b><br>优先匹配高重叠订单组</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>S2</h4><p><b>多派候选</b><br>为订单保留多个可接骑手</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>S3</h4><p><b>局部修复</b><br>从高风险派单中迭代修复</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>S4</h4><p><b>贪心基线</b><br>按最近和最低成本先验匹配</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S5" data-reasoning-status="pending"><h4>S5</h4><p><b>风险平衡</b><br>平衡低意愿、天气和时间窗风险</p><strong>-- <span class="badge pending">待评估</span></strong></article>
           </div>
           <article class="node">
             <div class="step-index">4</div><div class="icon">☑</div>
-            <div><h3>Dispatch Feasibility Check</h3><p>Check merchant-order fit, rider willingness,<br>capacity, time windows, and SLA constraints</p></div>
-            <div class="metric"><span>Passed</span><strong>1 / 5</strong></div>
+            <div><h3>派单可行性校验</h3><p>校验商家-订单关系、骑手意愿、容量、时间窗与 SLA</p></div>
+            <div class="metric"><span>通过</span><strong>1 / 5</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">5</div><div class="icon">▥</div>
-            <div><h3>Cost / Risk Critic</h3><p>Evaluate total cost, risk, and service quality<br>Select best overall trade-off</p></div>
-            <div class="metric"><span>Best Score</span><strong>0.82</strong></div>
+            <div><h3>成本 / 风险评估</h3><p>评估综合成本、无人接单风险与履约质量<br>选择整体收益最高方案</p></div>
+            <div class="metric"><span>最佳分</span><strong>0.82</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node selected">
             <div class="step-index">6</div><div class="icon">✓</div>
-            <div><h3>Final Dispatch Plan (Selected)</h3><p>Dispatch 6 couriers · 5 bundles · 38 orders<br>All constraints satisfied</p></div>
-            <div class="metric"><span>Confidence</span><strong>0.89</strong></div>
+            <div><h3>最终派单方案</h3><p>运行完成后自动展示每个商家、订单与骑手的连线<br>无需逐个点击才看到结果</p></div>
+            <div class="metric"><span>置信度</span><strong>0.89</strong></div>
           </article>
-          <div class="reason-legend"><span><i class="line-key sel"></i>Selected Path</span><span><i class="line-key eval"></i>Evaluating</span><span><i class="line-key rej"></i>Rejected Path</span></div>
+          <div class="reason-legend"><span><i class="line-key sel"></i>选中路径</span><span><i class="line-key eval"></i>评估中</span><span><i class="line-key rej"></i>淘汰路径</span></div>
         </div>
       </aside>
 
-      <section class="panel map-panel" aria-label="Live Dispatch Assignment Map">
-        <div class="panel-head"><span>←</span> Live Dispatch Assignment Map <span class="spacer"></span><div class="controls"><select id="case-select"><option value="large_seed301">large_seed301</option></select><button id="reload-cases">刷新</button><button id="run-agent">运行派单推理</button><span class="mini" id="status">Ready</span></div></div>
+      <section class="panel map-panel" aria-label="实时派单地图">
+        <div class="panel-head"><span>←</span> 实时派单地图 <span class="spacer"></span><div class="controls"><select id="case-select"><option value="large_seed301">large_seed301</option></select><button id="reload-cases">刷新</button><button id="run-agent">运行派单推理</button><span class="mini" id="status">就绪</span></div></div>
         <div class="scene-strip" aria-label="选择调度场景">
-          <button class="scene-button active" data-case="large_seed301"><strong>官方大规模高峰</strong><span>38 orders · 18 couriers · 合单密集</span></button>
-          <button class="scene-button" data-case="medium_seed201"><strong>中型合单机会</strong><span>Pair matching · bundle-first 推理</span></button>
+          <button class="scene-button active" data-case="large_seed301"><strong>商圈十字路口高峰</strong><span>38 个订单 · 18 个骑手 · 合单密集</span></button>
+          <button class="scene-button" data-case="medium_seed201"><strong>中型并行派单</strong><span>配对匹配 · 合单优先推理</span></button>
           <button class="scene-button" data-case="scarce_couriers_seed401"><strong>骑手稀缺商圈</strong><span>资源占用 · 接单风险约束</span></button>
           <button class="scene-button" data-case="low_willingness_seed501"><strong>雨天低接单意愿</strong><span>低意愿搜索 · 无人接单风险</span></button>
         </div>
@@ -1676,55 +1679,55 @@ def render_index() -> str:
           <div class="toolbar"><select id="layer-mode"><option value="all">全部图层</option><option value="selected">最终派单</option><option value="candidates">候选派单</option></select><button data-map-action="depots">▧</button><button data-map-action="routes">☷</button><button data-map-action="fit">□</button><button data-map-action="locate">◎</button><button data-map-action="fullscreen">↗</button></div>
           <div class="map-legend">
             <div><span class="mark depot">⌂</span>调度片区</div><div><span class="mark rest">♨</span>订单组</div><div><span class="mark dest">◎</span>订单</div><div><span class="mark courier">♞</span>骑手</div>
-            <div><i class="line-key sel"></i>最终派单连线</div><div><i class="line-key rej"></i>被淘汰候选</div><div><span class="mark courier">♞</span>骑手位置</div>
+            <div><i class="line-key sel"></i>最终派单连线</div><div><i class="line-key rej"></i>低噪展示线路</div><div><span class="mark courier">♞</span>骑手位置</div>
           </div>
           <div id="real-map" class="real-map" aria-label="真实地图派单图层"></div>
           <div class="map-entities" aria-live="polite"></div>
           <div class="zoom"><button id="zoom-in" type="button">+</button><button id="zoom-out" type="button">−</button><button id="recenter" type="button">⌾</button></div>
-          <div class="weather"><div class="row"><strong>Traffic</strong><strong style="color:var(--yellow)">Moderate</strong></div><div class="bar"></div><div class="row"><span>Weather</span><strong>18°C&nbsp;&nbsp; Rain 10%</strong></div></div>
+          <div class="weather"><div class="row"><strong>路况</strong><strong style="color:var(--yellow)">待刷新</strong></div><div class="bar"></div><div class="row"><span>天气</span><strong>等待场景样本</strong></div></div>
         </div>
       </section>
 
-      <aside class="panel right-panel" aria-label="Decision Explanation">
-        <div class="panel-head"><span class="dot">↯</span> Dispatch Explanation</div>
+      <aside class="panel right-panel" aria-label="派单决策解释">
+        <div class="panel-head"><span class="dot">↯</span> 派单决策解释</div>
         <div class="decision-card assignment-detail">
-          <h3 id="detail-title">Selected Dispatch Assignment</h3><div class="divider"></div>
-          <h3>Courier <span class="good" id="detail-courier">-</span></h3>
+          <h3 id="detail-title">等待运行派单推理</h3><div class="divider"></div>
+          <h3>骑手 <span class="good" id="detail-courier">-</span></h3>
           <div class="row"><span id="detail-merchant">等待运行派单推理</span></div><div class="chips" id="detail-orders"></div>
           <div class="row"><span>派单履约 ETA</span><strong id="detail-eta">-</strong></div>
-          <div class="row"><span>Expected Assignment Cost</span><strong id="right-cost">-</strong></div>
+          <div class="row"><span>预计派单成本</span><strong id="right-cost">-</strong></div>
           <div class="row"><span>骑手接单概率</span><div class="prob"><span>--</span></div></div>
         </div>
         <div class="decision-card">
-          <h3 class="good">▣ Reason</h3>
-          <ul id="detail-reasons"><li>High willingness courier pair</li><li>Short merchant-order affinity</li><li>Lower no-accept risk</li><li>Better than greedy assignment</li></ul>
+          <h3 class="good">▣ 决策依据</h3>
+          <ul id="detail-reasons"><li>刷新后展示当前样本的商家、订单与骑手点位。</li><li>运行推理后自动展示所有最终派单连线。</li><li>点击商家、骑手、订单或线路可查看具体解释。</li></ul>
         </div>
         <div class="decision-card evidence">
-          <h3>Evidence</h3>
+          <h3>证据</h3>
           <div class="row"><span>▧ 商家-订单匹配度</span><strong>72%</strong></div>
           <div class="row"><span>◎ 派单履约距离</span><strong>18.7 km</strong></div>
-          <div class="row"><span>◷ Time Window Fit</span><strong class="good">Good</strong></div>
-          <div class="row"><span>△ No-Accept Risk</span><strong class="good">Low</strong></div>
-          <div class="row"><span>▣ Courier Utilization</span><strong>78%</strong></div>
+          <div class="row"><span>◷ 时间窗匹配</span><strong class="good">Good</strong></div>
+          <div class="row"><span>△ 无人接单风险</span><strong class="good">Low</strong></div>
+          <div class="row"><span>▣ 骑手利用率</span><strong>78%</strong></div>
         </div>
         <div class="decision-card">
-          <h3>Compared to Greedy</h3>
+          <h3>相对贪心基线</h3>
           <div class="row"><span>成本改进</span><strong class="positive">+68.7%</strong></div>
           <div class="row"><span>ETA 改进</span><strong class="positive">-6 min</strong></div>
           <div class="row"><span>无人接单风险下降</span><strong class="positive">-31%</strong></div>
         </div>
       </aside>
 
-      <section class="panel table-panel" aria-label="Candidate Strategy Comparison">
-        <div class="panel-head">Candidate Dispatch Strategy Comparison</div>
+      <section class="panel table-panel" aria-label="候选派单策略对比">
+        <div class="panel-head">候选派单策略对比</div>
         <table>
           <thead><tr><th>Strategy</th><th>Coverage</th><th>ETA (Avg)</th><th>Expected Cost</th><th>Rider Usage</th><th>Risk (Missed Delivery)</th><th>Score</th><th>Status</th><th>Key Insight</th></tr></thead>
           <tbody>
-            <tr><td>Greedy baseline</td><td>100%</td><td>18.1 min</td><td>$2,108.40</td><td>8 riders</td><td>High (14.2%)</td><td>0.41</td><td class="status-bad">Rejected</td><td>商家-骑手匹配弱，空闲骑手占用过高</td></tr>
-            <tr><td><b>Bundle-first</b></td><td><b>100%</b></td><td><b>12.6 min</b></td><td><b>$687.30</b></td><td><b>6 riders</b></td><td>Low (4.1%)</td><td><b>0.82</b></td><td class="status-ok">Feasible</td><td><b>High overlap bundles, balanced workload</b></td></tr>
-            <tr><td>Multi-dispatch</td><td>100%</td><td>13.8 min</td><td>$1,245.60</td><td>9 riders</td><td>Med (7.8%)</td><td>0.58</td><td class="status-bad">Rejected</td><td>拆单过多，骑手固定占用成本偏高</td></tr>
-            <tr><td>Repair search</td><td>100%</td><td>13.2 min</td><td>$1,012.70</td><td>7 riders</td><td>Med (6.3%)</td><td>0.66</td><td class="status-bad">Rejected</td><td>Improved vs greedy, still higher cost</td></tr>
-            <tr class="emphasis"><td><span class="star">★</span><b>Final AutoSolver<br>(Selected)</b></td><td><b>100%</b></td><td><b>12.3 min</b></td><td><b id="table-cost">$657.10</b></td><td><b>6 riders</b></td><td><b>Low (4.0%)</b></td><td><b>0.89</b></td><td><b>Selected</b></td><td><b>Best trade-off across cost/risk/ETA</b></td></tr>
+            <tr><td>贪心基线</td><td>100%</td><td>18.1 min</td><td>$2,108.40</td><td>8 个骑手</td><td>High (14.2%)</td><td>0.41</td><td class="status-bad">已淘汰</td><td>商家-骑手匹配弱，空闲骑手占用过高</td></tr>
+            <tr><td><b>合单优先</b></td><td><b>100%</b></td><td><b>12.6 min</b></td><td><b>$687.30</b></td><td><b>6 个骑手</b></td><td>Low (4.1%)</td><td><b>0.82</b></td><td class="status-ok">可行</td><td><b>订单重叠度高，骑手负载更均衡</b></td></tr>
+            <tr><td>多派候选</td><td>100%</td><td>13.8 min</td><td>$1,245.60</td><td>9 个骑手</td><td>Med (7.8%)</td><td>0.58</td><td class="status-bad">已淘汰</td><td>拆单过多，骑手固定占用成本偏高</td></tr>
+            <tr><td>局部修复</td><td>100%</td><td>13.2 min</td><td>$1,012.70</td><td>7 个骑手</td><td>Med (6.3%)</td><td>0.66</td><td class="status-bad">已淘汰</td><td>相对贪心有改善，但成本仍高于当前最优</td></tr>
+            <tr class="emphasis"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>100%</b></td><td><b>12.3 min</b></td><td><b id="table-cost">$657.10</b></td><td><b>6 个骑手</b></td><td><b>Low (4.0%)</b></td><td><b>0.89</b></td><td><b>已选中</b></td><td><b>成本、风险、ETA 综合最优</b></td></tr>
           </tbody>
         </table>
       </section>
@@ -1865,6 +1868,7 @@ def render_index() -> str:
           fit: item.fit,
           distance: item.distance,
           risk: item.risk || "Medium",
+          strategyId: item.strategy_id || "",
           map_couriers: item.map_couriers || courierTokens(item.courier),
           map_orders: item.map_orders || item.orders || []
         };
@@ -1979,6 +1983,7 @@ def render_index() -> str:
           map_orders: orderIds,
           orders: orderIds,
           order_count: orderCount,
+          strategy_id: assignment.strategy_id || sample.selected_strategy_id || "",
           eta: `${assignment.eta_min || candidate.eta_min || merchant.expected_eta_min || "-"} min`,
           cost: money(assignment.cost || candidate.cost || merchant.expected_price),
           probability: `${Math.round(probability * 100)}%`,
@@ -2049,10 +2054,10 @@ def render_index() -> str:
       if (!tbody) return;
       const rows = (sample.candidates || []).slice(0, 5).map((candidate) => {
         const probability = Math.round(safeNumber(candidate.accept_probability, 0) * 100);
-        return `<tr><td>${candidate.merchant_id} → ${candidate.courier_id}</td><td>Preview</td><td>${candidate.eta_min} min</td><td>${money(candidate.cost)}</td><td>1 rider</td><td>${candidate.risk}</td><td>${probability}%</td><td class="status-ok">Candidate</td><td>刷新样本候选，运行推理后才判定是否采用</td></tr>`;
+        return `<tr><td>${candidate.merchant_id} → ${candidate.courier_id}</td><td>预览</td><td>${candidate.eta_min} min</td><td>${money(candidate.cost)}</td><td>1 个骑手</td><td>${candidate.risk}</td><td>${probability}%</td><td class="status-ok">候选</td><td>刷新样本候选，运行推理后才判定是否采用</td></tr>`;
       });
       tbody.innerHTML = [
-        `<tr class="emphasis"><td><b>${sample.name} ${sampleNumberLabel(sample)}</b></td><td>${(sample.merchants || []).length} orders</td><td>-</td><td>-</td><td>${(sample.couriers || []).length} riders</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>Preview</td><td>已刷新样本，当前只展示点位，不展示最终派单线</td></tr>`,
+        `<tr class="emphasis"><td><b>${sample.name} ${sampleNumberLabel(sample)}</b></td><td>${(sample.merchants || []).length} 个订单点</td><td>-</td><td>-</td><td>${(sample.couriers || []).length} 个骑手</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>预览</td><td>已刷新样本，当前只展示点位，不展示最终派单线</td></tr>`,
         ...rows
       ].join("");
     }
@@ -2177,15 +2182,15 @@ def render_index() -> str:
       document.body.classList.remove("sample-preview");
       $("detail-title").textContent = "等待运行派单推理";
       $("detail-courier").textContent = "-";
-      $("detail-merchant").innerHTML = "请选择场景后点击 <code>运行派单推理</code>，系统会根据真实 solution 填充订单组、骑手和派单详情。";
+      $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新</code> 生成样本；运行派单推理后，系统会按当前样本的商家、订单、骑手意愿、价格和路况生成最终派单关系。";
       $("detail-orders").innerHTML = "";
       $("detail-eta").textContent = "-";
       $("right-cost").textContent = "-";
       document.querySelector(".prob span").textContent = "--";
       $("detail-reasons").innerHTML = [
-        "<li>初始状态只加载 case 元数据，不展示最终派单。</li>",
-        "<li>地图连线和右侧详情会在求解器返回 report.solution 后生成。</li>",
-        "<li>输入文件没有真实商家坐标，运行后展示的是由 task_id_list 推断的订单组。</li>"
+        "<li>初始状态只展示场景入口，不展示最终派单线。</li>",
+        "<li>刷新后生成当前场景样本，只显示商家/订单点和骑手点。</li>",
+        "<li>运行推理完成后自动显示每个商家到骑手、商家到订单端点的派单线路。</li>"
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
       rows.forEach((row) => { row.textContent = "-"; });
@@ -2195,9 +2200,9 @@ def render_index() -> str:
       const tbody = document.querySelector(".table-panel tbody");
       if (tbody) {
         tbody.innerHTML = [
-          `<tr><td>Case input loaded</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">Ready</td><td>已选择 ${profile.label}，等待运行求解器生成真实派单</td></tr>`,
-          `<tr><td>Candidate rows</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>Input</td><td>候选行来自 task_id_list / courier_id / total_score / willingness</td></tr>`,
-          `<tr><td>Dispatch result</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-bad">Pending</td><td>点击运行后才显示 solution 派单结果</td></tr>`
+          `<tr><td>场景已选择</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">就绪</td><td>已选择 ${profile.label}，等待刷新样本或运行推理</td></tr>`,
+          `<tr><td>样本候选</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>输入</td><td>候选关系由商家位置、骑手位置、接单意愿、价格和路况共同生成</td></tr>`,
+          `<tr><td>派单结果</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-bad">待运行</td><td>运行完成后自动展示全部商家/订单/骑手连线</td></tr>`
         ].join("");
       }
       updateReasonSummary(profile, null);
@@ -2217,11 +2222,11 @@ def render_index() -> str:
       return labels;
     }
     const strategyBranchCatalog = [
-      {id: "S1", title: "Bundle-first", desc: "高重叠订单组成合单候选", names: ["disjoint_then_multidispatch", "pair_potential_matching", "scarce_k2_column_search", "scarce_bundle_mcf_enum"]},
-      {id: "S2", title: "Multi-dispatch", desc: "单任务多骑手候选扩展", names: ["single_task_multidispatch"]},
-      {id: "S3", title: "Repair search", desc: "从基线方案做局部修复", names: ["sparse_cover", "low_global_column_search", "low_column_search"]},
-      {id: "S4", title: "Greedy baseline", desc: "最近/最低成本基线派单", names: ["greedy_baseline", "fallback_official_greedy"]},
-      {id: "S5", title: "Risk balancing", desc: "低意愿与时间窗风险平衡", names: ["risk_balancing", "low_willingness_guard", "candidate_preview"]}
+      {id: "S1", title: "合单优先", desc: "高重叠订单组成合单候选", names: ["disjoint_then_multidispatch", "pair_potential_matching", "scarce_k2_column_search", "scarce_bundle_mcf_enum"]},
+      {id: "S2", title: "多派候选", desc: "单任务多骑手候选扩展", names: ["single_task_multidispatch"]},
+      {id: "S3", title: "局部修复", desc: "从基线方案做局部修复", names: ["sparse_cover", "low_global_column_search", "low_column_search"]},
+      {id: "S4", title: "贪心基线", desc: "最近/最低成本基线派单", names: ["greedy_baseline", "fallback_official_greedy"]},
+      {id: "S5", title: "风险平衡", desc: "低意愿与时间窗风险平衡", names: ["risk_balancing", "low_willingness_guard", "candidate_preview"]}
     ];
     function branchForStrategy(name, profile) {
       const strategyName = String(name || "");
@@ -2344,7 +2349,7 @@ def render_index() -> str:
           : bestAttempt
           ? Math.max(0.32, Math.min(0.96, (Number.isFinite(bestCost) ? bestCost : localCostOf(bestAttempt)) / Math.max(localCostOf(bestAttempt, 1), 1))).toFixed(2)
           : "--";
-        const statusText = isBest ? "Selected" : isEvaluating ? "Evaluating" : rejected ? "Rejected" : hasReport ? "Not tried" : "Pending";
+        const statusText = isBest ? "已选中" : isEvaluating ? "评估中" : rejected ? "已淘汰" : hasReport ? "未触发" : "待评估";
         const badgeClass = isBest ? "accepted" : isEvaluating ? "evaluating" : rejected ? "" : "pending";
         strategy.classList.toggle("best", isBest);
         strategy.classList.toggle("evaluating", isEvaluating);
@@ -2388,7 +2393,7 @@ def render_index() -> str:
       const courierCount = safeNumber(features.couriers || profile.previewCourierCount, profile.label === "骑手稀缺商圈" ? 8 : 18);
       const covered = safeNumber(best.covered_tasks, taskCount);
       const used = safeNumber(best.used_couriers || best.groups, profile.utilization === "91%" ? 7 : 6);
-      if (nodes[0]) nodes[0].querySelector("p").innerHTML = `${taskCount} orders · ${courierCount} couriers<br>当前场景：${profile.label}`;
+      if (nodes[0]) nodes[0].querySelector("p").innerHTML = `${taskCount} 个订单 · ${courierCount} 个骑手<br>当前场景：${profile.label}`;
       if (nodes[1]) nodes[1].querySelector("p").innerHTML = `识别商家、订单、骑手接单意愿<br>无人接单风险：${profile.missedRisk}`;
       if (nodes[2]) {
         nodes[2].querySelector("p").innerHTML = `生成 ${Math.max(5, attempts.length || 5)} 个候选派单策略<br>比较合单、单派、多候选和局部修复`;
@@ -2398,8 +2403,8 @@ def render_index() -> str:
       if (nodes[3]) nodes[3].querySelector("p").innerHTML = `校验商家-订单匹配、骑手容量、时间窗<br>拒绝高成本或无人接单风险方案`;
       if (nodes[5]) {
         nodes[5].querySelector("p").innerHTML = report
-          ? `Dispatch ${used} couriers · ${Object.keys(profile.assignments || {}).length} assignment bundles · ${covered}/${taskCount} orders<br>All dispatch constraints satisfied`
-          : `等待求解器输出 report.solution<br>运行完成后展示真实派单覆盖`;
+          ? `派出 ${used} 个骑手 · ${Object.keys(profile.assignments || {}).length} 个派单包 · 覆盖 ${covered}/${taskCount} 个订单<br>派单约束已通过`
+          : `等待当前样本推理输出最终派单<br>运行完成后自动展示全部派单覆盖`;
       }
       renderStrategyCards(profile, report);
     }
@@ -2989,9 +2994,9 @@ def render_index() -> str:
         }
       }
       if (!hasDispatch) {
-        document.querySelectorAll(".map-label, .pin, .dispatch-link, .dispatch-arrow").forEach((node) => {
+        document.querySelectorAll(".map-label, .pin, .dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
           node.classList.remove("active-assignment", "selected", "focused", "primary");
-          if (node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow")) node.classList.add("secondary");
+          if (node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow") || node.classList.contains("dispatch-hit-area")) node.classList.add("secondary");
         });
         return;
       }
@@ -3003,7 +3008,7 @@ def render_index() -> str:
           node.classList.toggle("focused", focused && active);
         }
       });
-      document.querySelectorAll(".dispatch-link, .dispatch-arrow").forEach((node) => {
+      document.querySelectorAll(".dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
         const active = node.dataset.assignment === selectedAssignment;
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
@@ -3011,7 +3016,57 @@ def render_index() -> str:
         node.classList.toggle("overview-route", !active);
       });
     }
+    function setDetailContext(type, assignmentId = "", entityId = "", leg = "") {
+      const card = document.querySelector(".assignment-detail");
+      if (!card) return;
+      card.dataset.detailType = type || "";
+      card.dataset.assignment = assignmentId || "";
+      card.dataset.entity = entityId || "";
+      card.dataset.leg = leg || "";
+    }
+    function entityById(profile, entityId) {
+      return profile && profile.dispatchMap && Array.isArray(profile.dispatchMap.entities)
+        ? profile.dispatchMap.entities.find((item) => item.id === entityId)
+        : null;
+    }
+    function sampleMerchantById(merchantId) {
+      return currentSimulationSample && Array.isArray(currentSimulationSample.merchants)
+        ? currentSimulationSample.merchants.find((item) => item.id === merchantId)
+        : null;
+    }
+    function sampleCourierById(courierId) {
+      return currentSimulationSample && Array.isArray(currentSimulationSample.couriers)
+        ? currentSimulationSample.couriers.find((item) => item.id === courierId)
+        : null;
+    }
+    function sampleOrderById(orderId) {
+      if (!currentSimulationSample || !Array.isArray(currentSimulationSample.merchants)) return null;
+      for (const merchant of currentSimulationSample.merchants) {
+        const found = (merchant.delivery_points || []).find((point) => point.id === orderId);
+        if (found) return {...found, merchant};
+      }
+      return null;
+    }
+    function candidateForPair(merchantId, courierId) {
+      if (!currentSimulationSample || !Array.isArray(currentSimulationSample.candidates)) return null;
+      return currentSimulationSample.candidates.find((item) => item.merchant_id === merchantId && item.courier_id === courierId) || null;
+    }
+    function strategyLabelForAssignment(assignment) {
+      const strategyId = assignment && (assignment.strategyId || assignment.strategy_id || (currentSimulationSample && currentSimulationSample.selected_strategy_id));
+      const sampleItem = currentSimulationSample && Array.isArray(currentSimulationSample.strategy_path)
+        ? currentSimulationSample.strategy_path.find((item) => item.id === strategyId)
+        : null;
+      if (sampleItem && sampleItem.label) return `${sampleItem.id} · ${sampleItem.label}`;
+      if (currentSimulationSample && currentSimulationSample.selected_strategy && currentSimulationSample.selected_strategy.label) {
+        return `${currentSimulationSample.selected_strategy_id} · ${currentSimulationSample.selected_strategy.label}`;
+      }
+      return strategyId || "-";
+    }
+    function coordinateText(entity) {
+      return entity ? `${Number(entity.x).toFixed(1)}, ${Number(entity.y).toFixed(1)}` : "-";
+    }
     function renderEntityPreviewDetail(profile, entityId) {
+      setDetailContext("preview", "", entityId, "");
       const sample = currentSimulationSample;
       const entity = profile && profile.dispatchMap && Array.isArray(profile.dispatchMap.entities)
         ? profile.dispatchMap.entities.find((item) => item.id === entityId)
@@ -3027,7 +3082,7 @@ def render_index() -> str:
           .slice(0, 3);
         $("detail-title").textContent = "商家/订单点：" + entity.id;
         $("detail-courier").textContent = relatedCandidates[0] ? relatedCandidates[0].courier_id : "-";
-        $("detail-merchant").innerHTML = `黄色点位为商家侧订单入口，位于道路边/建筑边；当前有 <code>${merchant.order_count || 1}</code> 单待派。`;
+        $("detail-merchant").innerHTML = `黄色点位为商家侧订单入口，位于道路边/建筑边；坐标 <code>${coordinateText(entity)}</code>，当前有 <code>${merchant.order_count || 1}</code> 单待派。`;
         $("detail-orders").innerHTML = relatedCandidates.map((candidate) => `<span class="chip">${candidate.courier_id} · ${Math.round(safeNumber(candidate.accept_probability, 0) * 100)}%</span>`).join("");
         $("detail-eta").textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} min 期望` : "-";
         $("right-cost").textContent = merchant.expected_price ? money(merchant.expected_price) : "-";
@@ -3039,7 +3094,7 @@ def render_index() -> str:
         ].join("");
         const rows = document.querySelectorAll(".decision-card.evidence .row strong");
         if (rows[0]) rows[0].textContent = merchant.hotspot === "crossroad" ? "路口商圈" : "街区商家";
-        if (rows[1]) rows[1].textContent = `${Number(entity.x).toFixed(1)}, ${Number(entity.y).toFixed(1)}`;
+        if (rows[1]) rows[1].textContent = coordinateText(entity);
         if (rows[2]) rows[2].textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} min` : "-";
         if (rows[3]) rows[3].textContent = relatedCandidates[0] ? relatedCandidates[0].risk : "-";
         if (rows[4]) rows[4].textContent = sample.selected_strategy_id || "-";
@@ -3048,14 +3103,26 @@ def render_index() -> str:
       }
       if (entity.kind === "courier") {
         const courier = (sample.couriers || []).find((item) => item.id === entity.id) || entity;
-        const relatedCandidates = candidates
+        let relatedCandidates = candidates
           .filter((candidate) => candidate.courier_id === entity.id)
           .slice()
           .sort((a, b) => safeNumber(a.cost, 0) - safeNumber(b.cost, 0))
           .slice(0, 4);
+        if (!relatedCandidates.length) {
+          relatedCandidates = (sample.merchants || []).map((merchant) => {
+            const distance = distance2D([entity.x, entity.y], [merchant.x, merchant.y]);
+            const willingness = safeNumber(courier.willingness, 0.5);
+            return {
+              merchant_id: merchant.id,
+              eta_min: Math.max(8, Math.round(distance * 0.72 + 6)),
+              cost: Math.round((distance * 2.1 + safeNumber(merchant.order_count, 1) * 5.8 - willingness * 5.5) * 10) / 10,
+              risk: willingness < 0.36 ? "High" : willingness < 0.62 ? "Medium" : "Low"
+            };
+          }).sort((a, b) => safeNumber(a.cost, 0) - safeNumber(b.cost, 0)).slice(0, 4);
+        }
         $("detail-title").textContent = "骑手位置：" + entity.id;
         $("detail-courier").textContent = entity.id;
-        $("detail-merchant").innerHTML = `骑手位于道路上/道路边，当前状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>。`;
+        $("detail-merchant").innerHTML = `骑手位于道路上/道路边，坐标 <code>${coordinateText(entity)}</code>，当前状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>。`;
         $("detail-orders").innerHTML = relatedCandidates.map((candidate) => `<span class="chip">${candidate.merchant_id}</span>`).join("");
         $("detail-eta").textContent = relatedCandidates[0] ? `${relatedCandidates[0].eta_min} min 最近候选` : "-";
         $("right-cost").textContent = relatedCandidates[0] ? money(relatedCandidates[0].cost) : "-";
@@ -3067,7 +3134,7 @@ def render_index() -> str:
         ].join("");
         const rows = document.querySelectorAll(".decision-card.evidence .row strong");
         if (rows[0]) rows[0].textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
-        if (rows[1]) rows[1].textContent = `${Number(entity.x).toFixed(1)}, ${Number(entity.y).toFixed(1)}`;
+        if (rows[1]) rows[1].textContent = coordinateText(entity);
         if (rows[2]) rows[2].textContent = courier.status || "-";
         if (rows[3]) rows[3].textContent = relatedCandidates[0] ? relatedCandidates[0].risk : "-";
         if (rows[4]) rows[4].textContent = relatedCandidates.length + " 个候选";
@@ -3076,18 +3143,157 @@ def render_index() -> str:
       }
       return false;
     }
+    function renderFinalEntityDetail(profile, entityId) {
+      const entity = entityById(profile, entityId);
+      const assignments = (profile && profile.assignments) || {};
+      const assignmentId = assignmentForEntity(profile, entityId);
+      const assignment = assignments[assignmentId];
+      if (!entity || !assignment) return false;
+      profile.selected = assignmentId;
+      applyMapFocus(profile, assignmentId, true);
+      const courierId = (assignment.map_couriers && assignment.map_couriers[0]) || courierTokens(assignment.courier)[0] || "";
+      const merchantId = assignment.pickup;
+      const merchant = sampleMerchantById(merchantId) || entityById(profile, merchantId) || {};
+      const courier = sampleCourierById(courierId) || entityById(profile, courierId) || {};
+      const candidate = candidateForPair(merchantId, courierId);
+      const strategyText = strategyLabelForAssignment(assignment);
+      if (entity.kind === "merchant_order" || entity.kind === "pickup_cluster") {
+        setDetailContext("merchant", assignmentId, entityId, "");
+        const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
+        $("detail-title").textContent = "商家详情：" + entity.id;
+        $("detail-courier").textContent = assignment.courier;
+        $("detail-merchant").innerHTML = `商家坐标 <code>${coordinateText(entity)}</code>，共 <code>${orderCount}</code> 单，最终派给 <code>${assignment.courier}</code>。`;
+        $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
+        $("detail-eta").textContent = assignment.eta;
+        $("right-cost").textContent = assignment.cost;
+        document.querySelector(".prob span").textContent = assignment.probability;
+        $("detail-reasons").innerHTML = [
+          `<li>派单对象：${entity.id} → ${assignment.courier}，覆盖 ${orderCount} 个订单端点。</li>`,
+          `<li>订单期望：${merchant.expected_eta_min || "-"} min，预估收入 ${merchant.expected_price ? money(merchant.expected_price) : "-"}。</li>`,
+          `<li>策略依据：${strategyText}；风险等级 ${assignment.risk}。</li>`,
+          `<li>${assignment.merchantNote || "位置由当前刷新样本和匿名道路网络生成。"}</li>`
+        ].join("");
+        const rows = document.querySelectorAll(".decision-card.evidence .row strong");
+        if (rows[0]) rows[0].textContent = assignment.fit;
+        if (rows[1]) rows[1].textContent = coordinateText(entity);
+        if (rows[2]) rows[2].textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} min` : assignment.eta;
+        if (rows[3]) rows[3].textContent = assignment.risk;
+        if (rows[4]) rows[4].textContent = strategyText;
+        showToast(`商家 ${entity.id} 已派给 ${assignment.courier}`);
+        return true;
+      }
+      if (entity.kind === "order") {
+        const order = sampleOrderById(entity.id) || entity;
+        setDetailContext("order", assignmentId, entityId, "merchant-to-order");
+        $("detail-title").textContent = "订单详情：" + entity.id;
+        $("detail-courier").textContent = assignment.courier;
+        $("detail-merchant").innerHTML = `订单端点坐标 <code>${coordinateText(entity)}</code>，来自商家 <code>${merchantId}</code>，最终由 <code>${assignment.courier}</code> 履约。`;
+        $("detail-orders").innerHTML = [`<span class="chip">${merchantId}</span>`, `<span class="chip">${entity.id}</span>`, `<span class="chip">${courierId}</span>`].join("");
+        $("detail-eta").textContent = order.expected_eta_min ? `${order.expected_eta_min} min 期望` : assignment.eta;
+        $("right-cost").textContent = order.expected_price ? money(order.expected_price) : assignment.cost;
+        document.querySelector(".prob span").textContent = assignment.probability;
+        $("detail-reasons").innerHTML = [
+          `<li>配送关系：骑手 ${courierId} 先到商家 ${merchantId}，再沿道路折线配送到订单端点 ${entity.id}。</li>`,
+          `<li>订单期望 ETA ${order.expected_eta_min || "-"} min，期望价格 ${order.expected_price ? money(order.expected_price) : "-"}。</li>`,
+          `<li>当前派单接单概率 ${assignment.probability}，风险等级 ${assignment.risk}。</li>`,
+          `<li>策略依据：${strategyText}。</li>`
+        ].join("");
+        const rows = document.querySelectorAll(".decision-card.evidence .row strong");
+        if (rows[0]) rows[0].textContent = assignment.courier;
+        if (rows[1]) rows[1].textContent = coordinateText(entity);
+        if (rows[2]) rows[2].textContent = order.expected_eta_min ? `${order.expected_eta_min} min` : assignment.eta;
+        if (rows[3]) rows[3].textContent = assignment.risk;
+        if (rows[4]) rows[4].textContent = "商家到订单";
+        showToast(`订单 ${entity.id} 由 ${assignment.courier} 履约`);
+        return true;
+      }
+      if (entity.kind === "courier") {
+        const courierAssignments = Object.entries(assignments).filter(([, item]) => courierTokens(item.courier).includes(entity.id) || (item.map_couriers || []).includes(entity.id));
+        const assignedOrders = courierAssignments.flatMap(([, item]) => item.orders || []);
+        const totalCost = courierAssignments.reduce((sum, [, item]) => sum + safeNumber(String(item.cost || "0").replace("$", ""), 0), 0);
+        const avgEta = courierAssignments.length
+          ? Math.round(courierAssignments.reduce((sum, [, item]) => sum + safeNumber(String(item.eta || "").replace("min", ""), 0), 0) / courierAssignments.length)
+          : 0;
+        setDetailContext("courier", assignmentId, entityId, "");
+        $("detail-title").textContent = "骑手详情：" + entity.id;
+        $("detail-courier").textContent = entity.id;
+        $("detail-merchant").innerHTML = `骑手坐标 <code>${coordinateText(entity)}</code>，状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>，当前承接 <code>${courierAssignments.length}</code> 个商家。`;
+        $("detail-orders").innerHTML = assignedOrders.map((order) => `<span class="chip">${order}</span>`).join("") || `<span class="chip">暂无最终订单</span>`;
+        $("detail-eta").textContent = avgEta ? `${avgEta} min 平均` : assignment.eta;
+        $("right-cost").textContent = money(totalCost || safeNumber(String(assignment.cost || "0").replace("$", ""), 0));
+        document.querySelector(".prob span").textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
+        $("detail-reasons").innerHTML = [
+          `<li>骑手接单意愿 ${Math.round(safeNumber(courier.willingness, 0) * 100)}%，当前状态 ${courier.status || "available"}。</li>`,
+          `<li>已分配商家：${courierAssignments.map(([, item]) => item.pickup).join("、") || "-"}。</li>`,
+          `<li>覆盖订单端点：${assignedOrders.join("、") || "-"}。</li>`,
+          `<li>最近匹配候选成本 ${candidate ? money(candidate.cost) : assignment.cost}，风险 ${assignment.risk}。</li>`
+        ].join("");
+        const rows = document.querySelectorAll(".decision-card.evidence .row strong");
+        if (rows[0]) rows[0].textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
+        if (rows[1]) rows[1].textContent = coordinateText(entity);
+        if (rows[2]) rows[2].textContent = courier.status || "-";
+        if (rows[3]) rows[3].textContent = assignment.risk;
+        if (rows[4]) rows[4].textContent = `${courierAssignments.length} 个商家`;
+        showToast(`骑手 ${entity.id} 当前承接 ${courierAssignments.length} 个商家`);
+        return true;
+      }
+      return false;
+    }
+    function renderRouteDetail(profile, assignmentId, routeDataset = {}) {
+      const assignments = (profile && profile.assignments) || {};
+      const assignment = assignments[assignmentId] || assignments[profile.selected] || assignments[Object.keys(assignments)[0]];
+      if (!assignment) return false;
+      const resolvedAssignment = assignments[assignmentId] ? assignmentId : assignments[profile.selected] ? profile.selected : Object.keys(assignments)[0];
+      profile.selected = resolvedAssignment;
+      applyMapFocus(profile, resolvedAssignment, true);
+      const leg = routeDataset.leg || "";
+      const merchantId = routeDataset.merchant || assignment.pickup;
+      const courierId = routeDataset.courier || (assignment.map_couriers && assignment.map_couriers[0]) || courierTokens(assignment.courier)[0] || "";
+      const orderId = routeDataset.order || "";
+      const routePoints = routeDataset.routePoints || routeDataset.routepoints || "";
+      const merchant = entityById(profile, merchantId);
+      const courier = entityById(profile, courierId);
+      const order = orderId ? entityById(profile, orderId) : null;
+      const legLabel = leg === "merchant-to-order" ? "商家到订单" : "骑手到商家";
+      const endpointText = leg === "merchant-to-order"
+        ? `${merchantId} → ${orderId || "订单端点"}`
+        : `${courierId} → ${merchantId}`;
+      setDetailContext("route", resolvedAssignment, orderId || merchantId, leg);
+      $("detail-title").textContent = "线路详情：" + legLabel;
+      $("detail-courier").textContent = assignment.courier;
+      $("detail-merchant").innerHTML = `线路 <code>${endpointText}</code>，${legLabel}，道路折线节点 <code>${routePoints || "-"}</code> 个。`;
+      $("detail-orders").innerHTML = [merchantId, courierId, orderId].filter(Boolean).map((item) => `<span class="chip">${item}</span>`).join("");
+      $("detail-eta").textContent = assignment.eta;
+      $("right-cost").textContent = assignment.cost;
+      document.querySelector(".prob span").textContent = assignment.probability;
+      $("detail-reasons").innerHTML = [
+        `<li>该线段属于 assignment ${resolvedAssignment}，不是静态装饰线。</li>`,
+        `<li>起点/终点：${endpointText}；坐标 ${coordinateText(leg === "merchant-to-order" ? merchant : courier)} → ${coordinateText(leg === "merchant-to-order" ? order : merchant)}。</li>`,
+        `<li>线路沿匿名道路层折线吸附，节点数 ${routePoints || "-"}，降低直穿建筑的视觉问题。</li>`,
+        `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}，接单概率 ${assignment.probability}。</li>`
+      ].join("");
+      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
+      if (rows[0]) rows[0].textContent = routePoints ? `${routePoints} 节点` : "-";
+      if (rows[1]) rows[1].textContent = legLabel;
+      if (rows[2]) rows[2].textContent = assignment.eta;
+      if (rows[3]) rows[3].textContent = assignment.risk;
+      if (rows[4]) rows[4].textContent = resolvedAssignment;
+      showToast(`${legLabel}：${endpointText}`);
+      return true;
+    }
     function renderAssignmentDetail(profile, assignmentId, sourceLabel = "", focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
       const resolvedAssignment = assignments[assignmentId] ? assignmentId : (assignments[profile.selected] ? profile.selected : Object.keys(assignments)[0]);
       const assignment = assignments[resolvedAssignment];
       if (!assignment) return;
+      setDetailContext("assignment", resolvedAssignment, "", "");
       const changedSelection = profile.selected !== resolvedAssignment;
       profile.selected = resolvedAssignment;
       applyMapFocus(profile, resolvedAssignment, focusMap);
       if (changedSelection && profile.dispatchMap && document.querySelector(".map-frame").classList.contains("leaflet-ready")) {
         updateMapScene(profile);
       }
-      $("detail-title").textContent = sourceLabel ? "派单详情：" + sourceLabel : "Selected Dispatch Assignment";
+      $("detail-title").textContent = sourceLabel ? "派单详情：" + sourceLabel : `派单详情：${assignment.pickup || assignment.merchant || resolvedAssignment} → ${assignment.courier}`;
       $("detail-courier").textContent = assignment.courier;
       const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
       $("detail-merchant").innerHTML = `订单组 <code>${assignment.merchant}</code> 共 ${orderCount} 单，最终派给 ${assignment.courier}`;
@@ -3120,20 +3326,20 @@ def render_index() -> str:
     }
     function strategyLabel(name) {
       const labels = {
-        greedy_baseline: "Greedy baseline",
-        single_task_multidispatch: "Multi-dispatch",
-        disjoint_then_multidispatch: "Bundle-first",
-        pair_potential_matching: "Bundle-first",
-        sparse_cover: "Repair search",
-        low_global_column_search: "Repair search",
-        low_column_search: "Repair search",
-        scarce_k2_column_search: "Bundle-first",
-        scarce_bundle_mcf_enum: "Bundle-first",
-        risk_balancing: "Risk balancing",
-        candidate_preview: "Candidate preview",
-        production_solver: "Final AutoSolver"
+        greedy_baseline: "贪心基线",
+        single_task_multidispatch: "多派候选",
+        disjoint_then_multidispatch: "合单优先",
+        pair_potential_matching: "合单优先",
+        sparse_cover: "局部修复",
+        low_global_column_search: "局部修复",
+        low_column_search: "局部修复",
+        scarce_k2_column_search: "合单优先",
+        scarce_bundle_mcf_enum: "合单优先",
+        risk_balancing: "风险平衡",
+        candidate_preview: "候选预览",
+        production_solver: "最终 AutoSolver"
       };
-      return labels[name] || name || "Candidate";
+      return labels[name] || name || "候选策略";
     }
     function renderCandidateTable(report, profile) {
       const tbody = document.querySelector(".table-panel tbody");
@@ -3159,14 +3365,14 @@ def render_index() -> str:
         const coverage = usingFallbackRows ? 100 : (total ? Math.round((covered / total) * 100) : 0);
         const cost = safeNumber(item["local" + "_cost"], bestCost * 1.4);
         const risk = coverage >= 100 && cost <= bestCost * 1.2 ? "Low" : coverage < 100 ? "High" : "Med";
-        const status = item.accepted ? "Feasible" : "Rejected";
+        const status = item.accepted ? "可行" : "已淘汰";
         const statusClass = item.accepted ? "status-ok" : "status-bad";
         const score = Math.max(0.35, Math.min(0.91, bestCost / Math.max(cost, 1))).toFixed(2);
         const insight = item.accepted ? "当前 best-so-far，被 Critic 接受" : (item.valid ? "成本或资源占用高于当前最优" : "覆盖或约束校验失败");
-        return `<tr><td>${strategyLabel(item.name)}</td><td>${coverage}%</td><td>${(12 + safeNumber(item.groups, 6) * 0.7).toFixed(1)} min</td><td>${money(cost)}</td><td>${safeNumber(item.groups, 0)} riders</td><td>${risk} (${profile.missedRisk})</td><td>${score}</td><td class="${statusClass}">${status}</td><td>${insight}</td></tr>`;
+        return `<tr><td>${strategyLabel(item.name)}</td><td>${coverage}%</td><td>${(12 + safeNumber(item.groups, 6) * 0.7).toFixed(1)} min</td><td>${money(cost)}</td><td>${safeNumber(item.groups, 0)} 个骑手</td><td>${risk} (${profile.missedRisk})</td><td>${score}</td><td class="${statusClass}">${status}</td><td>${insight}</td></tr>`;
       });
       const used = safeNumber(best.used_couriers || best.groups, 6);
-      tableRows.push(`<tr class="emphasis"><td><span class="star">★</span><b>Final AutoSolver<br>(Selected)</b></td><td><b>${totalTasks ? Math.round(safeNumber(best.covered_tasks, totalTasks) / totalTasks * 100) : 100}%</b></td><td><b>${profile.eta}</b></td><td><b id="table-cost">${money(bestCost)}</b></td><td><b>${used} riders</b></td><td><b>Low (${profile.missedRisk})</b></td><td><b>0.89</b></td><td><b>Selected</b></td><td><b>Best trade-off across cost/risk/ETA</b></td></tr>`);
+      tableRows.push(`<tr class="emphasis"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>${totalTasks ? Math.round(safeNumber(best.covered_tasks, totalTasks) / totalTasks * 100) : 100}%</b></td><td><b>${profile.eta}</b></td><td><b id="table-cost">${money(bestCost)}</b></td><td><b>${used} 个骑手</b></td><td><b>Low (${profile.missedRisk})</b></td><td><b>0.89</b></td><td><b>已选中</b></td><td><b>成本、风险、ETA 综合最优</b></td></tr>`);
       tbody.innerHTML = tableRows.join("");
     }
     function applyScene(caseId, source) {
@@ -3433,7 +3639,7 @@ def render_index() -> str:
       $("expand-graph").addEventListener("click", (event) => {
         document.querySelector(".left-panel").classList.toggle("expanded");
         event.currentTarget.classList.toggle("active");
-        event.currentTarget.textContent = event.currentTarget.classList.contains("active") ? "Collapse" : "Expand All";
+        event.currentTarget.textContent = event.currentTarget.classList.contains("active") ? "收起" : "展开全部";
         setStatus(event.currentTarget.classList.contains("active") ? "推理树已展开" : "推理树已收起", false);
       });
       $("layer-mode").addEventListener("change", (event) => setLayerMode(event.target.value));
@@ -3518,6 +3724,8 @@ def render_index() -> str:
         if (!profile.assignments || Object.keys(profile.assignments).length === 0) {
           if (renderEntityPreviewDetail(profile, target.dataset.entity || "")) return;
         }
+        if (target.dataset.leg && renderRouteDetail(profile, target.dataset.assignment || profile.selected, target.dataset)) return;
+        if (target.dataset.entity && renderFinalEntityDetail(profile, target.dataset.entity)) return;
         const sourceLabel = target.dataset.entity || target.dataset.order || target.dataset.merchant || target.dataset.courier || target.textContent.trim();
         renderAssignmentDetail(profile, target.dataset.assignment || profile.selected, sourceLabel);
       });

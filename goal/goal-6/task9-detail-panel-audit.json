@@ -1,0 +1,729 @@
+{
+  "generatedAt": "2026-06-22T17:25:02.361Z",
+  "url": "http://127.0.0.1:8765/",
+  "violations": [],
+  "consoleErrors": [],
+  "ignoredExternalErrors": 0,
+  "results": [
+    {
+      "scenario": "commerce_peak",
+      "preview": {
+        "couriers": 11,
+        "detailTitle": "样本 #02 已刷新",
+        "merchants": 5,
+        "ok": true,
+        "rainStreaks": 0,
+        "routes": 0
+      },
+      "previewMerchantClick": {
+        "h": 22,
+        "w": 22,
+        "x": 888.890625,
+        "y": 453.234375
+      },
+      "previewMerchantDetail": {
+        "assignment": "",
+        "cost": "$36.10",
+        "courier": "R0201",
+        "entity": "O0201",
+        "eta": "41 min 期望",
+        "leg": "",
+        "merchant": "黄色点位为商家侧订单入口，位于道路边/建筑边；坐标 52.7, 44.6，当前有 2 单待派。",
+        "probability": "46%",
+        "reasons": "商家点不会压在道路中心线，坐标按最近道路边缘和商圈热区生成。候选骑手来自当前刷新样本，不是写死数据。点击运行后才会把该商家最终派给一个骑手并显示连线。",
+        "selectedAssignment": "",
+        "title": "商家/订单点：O0201",
+        "type": "preview"
+      },
+      "previewCourierClick": {
+        "h": 22,
+        "w": 22,
+        "x": 1005.0703125,
+        "y": 487.5546875
+      },
+      "previewCourierDetail": {
+        "assignment": "",
+        "cost": "$55.60",
+        "courier": "R0201",
+        "entity": "R0201",
+        "eta": "24 min 最近候选",
+        "leg": "",
+        "merchant": "骑手位于道路上/道路边，坐标 66.4, 52.4，当前状态 available，容量 2。",
+        "probability": "46%",
+        "reasons": "骑手位置按当前道路网络吸附生成，不放到建筑块内部。接单意愿会影响候选排序、风险和最终策略选择。该骑手当前可接候选：O0201、O0205。",
+        "selectedAssignment": "",
+        "title": "骑手位置：R0201",
+        "type": "preview"
+      },
+      "final": {
+        "arrows": 8,
+        "deliveries": 8,
+        "deliveryCovered": 5,
+        "detailTitle": "派单详情：O0201 → R0201",
+        "hitAreas": 13,
+        "maxRoutePoints": 7,
+        "merchants": 5,
+        "minRoutePoints": 3,
+        "ok": true,
+        "overview": true,
+        "pickupCovered": 5,
+        "pickups": 5,
+        "routes": 13,
+        "status": "当前样本派单完成"
+      },
+      "finalSummary": {
+        "detailTitle": "派单详情：O0201 → R0201",
+        "hasOldEnglish": false,
+        "merchantSpread": {
+          "count": 5,
+          "height": 12.8,
+          "width": 10.2
+        },
+        "rainStreaks": 0,
+        "routeCount": 13,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "d": "M650.7 335.4 L578.2 326.4 L425.1 297.8 L540.4 233.3 L545.2 284.3 L516.5 285.4",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "routePoints": 6
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "d": "M516.5 285.4 L545.2 284.3 L550.8 342.4 L563.7 342.8 L560.8 380.6 L528.0 382.3 L526.3 368.0",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "routePoints": 7
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "d": "M516.5 285.4 L545.2 284.3 L549.9 333.2",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "routePoints": 3
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0203",
+            "d": "M425.3 410.2 L548.8 403.2 L730.5 427.6 L749.6 456.1 L472.8 319.5 L459.6 330.9",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "routePoints": 6
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0203",
+            "d": "M459.6 330.9 L472.8 319.5 L426.8 296.9 L362.6 332.8 L290.9 400.3 L356.5 390.4 L353.8 382.7",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "routePoints": 7
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "d": "M285.2 281.0 L343.3 257.8 L432.9 260.6 L432.2 270.1",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "routePoints": 4
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "d": "M432.2 270.1 L432.9 260.6 L221.2 253.9 L240.1 255.4 L280.3 253.2",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "routePoints": 5
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "d": "M432.2 270.1 L432.9 260.6 L488.5 262.4 L394.5 315.0 L401.8 262.4 L395.0 196.1 L372.4 197.1",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "routePoints": 7
+          }
+        ],
+        "strategyText": [
+          "S1\n\n合单优先\n高重叠订单组成合单候选\n密度 0.73 / 合单需求 1.6\n\n0.70 已淘汰",
+          "S2 ✓\n\n多派候选\n单任务多骑手候选扩展\n候选竞争 0.79 / 骑手池 11\n\n0.95 已选中",
+          "S3\n\n局部修复\n从基线方案做局部修复\n稀缺 0.0 / 分散 0.26\n\n0.53 已淘汰",
+          "S4\n\n贪心基线\n最近/最低成本基线派单\n低峰稳定 0.0 / 风险 0.55\n\n0.44 已淘汰",
+          "S5\n\n风险平衡\n低意愿与时间窗风险平衡\n低意愿 0.33 / 路况 0.76\n\n0.61 已淘汰"
+        ],
+        "weatherText": "路况\n拥堵\n天气\n晴朗 · 正常履约"
+      },
+      "finalMerchantClick": {
+        "h": 22,
+        "w": 22,
+        "x": 888.890625,
+        "y": 453.234375
+      },
+      "finalMerchantDetail": {
+        "assignment": "A0201",
+        "cost": "$55.60",
+        "courier": "R0201",
+        "entity": "O0201",
+        "eta": "24 min",
+        "leg": "",
+        "merchant": "商家坐标 52.7, 44.6，共 2 单，最终派给 R0201。",
+        "probability": "46%",
+        "reasons": "派单对象：O0201 → R0201，覆盖 2 个订单端点。订单期望：41 min，预估收入 $36.10。策略依据：S2 · 多派候选；风险等级 Medium。商家点位位于道路边/建筑边；最终派给 R0201。",
+        "selectedAssignment": "A0201",
+        "title": "商家详情：O0201",
+        "type": "merchant"
+      },
+      "finalOrderClick": {
+        "h": 22,
+        "w": 22,
+        "x": 897.375,
+        "y": 510
+      },
+      "finalOrderDetail": {
+        "assignment": "A0201",
+        "cost": "$36.10",
+        "courier": "R0201",
+        "entity": "O0201-D01",
+        "eta": "41 min 期望",
+        "leg": "merchant-to-order",
+        "merchant": "订单端点坐标 53.7, 57.5，来自商家 O0201，最终由 R0201 履约。",
+        "probability": "46%",
+        "reasons": "配送关系：骑手 R0201 先到商家 O0201，再沿道路折线配送到订单端点 O0201-D01。订单期望 ETA 41 min，期望价格 $36.10。当前派单接单概率 46%，风险等级 Medium。策略依据：S2 · 多派候选。",
+        "selectedAssignment": "A0201",
+        "title": "订单详情：O0201-D01",
+        "type": "order"
+      },
+      "finalCourierClick": {
+        "h": 22,
+        "w": 22,
+        "x": 1005.0703125,
+        "y": 487.5546875
+      },
+      "finalCourierDetail": {
+        "assignment": "A0201",
+        "cost": "$55.60",
+        "courier": "R0201",
+        "entity": "R0201",
+        "eta": "24 min 平均",
+        "leg": "",
+        "merchant": "骑手坐标 66.4, 52.4，状态 available，容量 2，当前承接 1 个商家。",
+        "probability": "46%",
+        "reasons": "骑手接单意愿 46%，当前状态 available。已分配商家：O0201。覆盖订单端点：O0201-D01、O0201-D02。最近匹配候选成本 $55.60，风险 Medium。",
+        "selectedAssignment": "A0201",
+        "title": "骑手详情：R0201",
+        "type": "courier"
+      },
+      "routeClick": {
+        "h": 70.19375610351562,
+        "w": 195.2130126953125,
+        "x": 907.4481811523438,
+        "y": 452.49061584472656
+      },
+      "routeDetail": {
+        "assignment": "A0205",
+        "cost": "$53.40",
+        "courier": "R0209",
+        "entity": "O0205-D02",
+        "eta": "24 min",
+        "leg": "merchant-to-order",
+        "merchant": "线路 O0205 → O0205-D02，商家到订单，道路折线节点 5 个。",
+        "probability": "74%",
+        "reasons": "该线段属于 assignment A0205，不是静态装饰线。起点/终点：O0205 → O0205-D02；坐标 54.3, 41.7 → 72.8, 45.0。线路沿匿名道路层折线吸附，节点数 5，降低直穿建筑的视觉问题。派单策略：S2 · 多派候选；风险 Medium，接单概率 74%。",
+        "selectedAssignment": "A0205",
+        "title": "线路详情：商家到订单",
+        "type": "route"
+      }
+    },
+    {
+      "scenario": "rain_low_willingness",
+      "preview": {
+        "couriers": 10,
+        "detailTitle": "样本 #02 已刷新",
+        "merchants": 5,
+        "ok": true,
+        "rainStreaks": 76,
+        "routes": 0
+      },
+      "previewMerchantClick": {
+        "h": 22,
+        "w": 22,
+        "x": 969.453125,
+        "y": 470.3984375
+      },
+      "previewMerchantDetail": {
+        "assignment": "",
+        "cost": "$39.70",
+        "courier": "R0210",
+        "entity": "O0201",
+        "eta": "45 min 期望",
+        "leg": "",
+        "merchant": "黄色点位为商家侧订单入口，位于道路边/建筑边；坐标 62.2, 48.5，当前有 2 单待派。",
+        "probability": "47%",
+        "reasons": "商家点不会压在道路中心线，坐标按最近道路边缘和商圈热区生成。候选骑手来自当前刷新样本，不是写死数据。点击运行后才会把该商家最终派给一个骑手并显示连线。",
+        "selectedAssignment": "",
+        "title": "商家/订单点：O0201",
+        "type": "preview"
+      },
+      "previewCourierClick": {
+        "h": 22,
+        "w": 22,
+        "x": 1064.4296875,
+        "y": 491.953125
+      },
+      "previewCourierDetail": {
+        "assignment": "",
+        "cost": "$48.30",
+        "courier": "R0201",
+        "entity": "R0201",
+        "eta": "22 min 最近候选",
+        "leg": "",
+        "merchant": "骑手位于道路上/道路边，坐标 73.4, 53.4，当前状态 available，容量 2。",
+        "probability": "39%",
+        "reasons": "骑手位置按当前道路网络吸附生成，不放到建筑块内部。接单意愿会影响候选排序、风险和最终策略选择。该骑手当前可接候选：O0201、O0205、O0204、O0202。",
+        "selectedAssignment": "",
+        "title": "骑手位置：R0201",
+        "type": "preview"
+      },
+      "final": {
+        "arrows": 8,
+        "deliveries": 8,
+        "deliveryCovered": 5,
+        "detailTitle": "派单详情：O0201 → R0210",
+        "hitAreas": 13,
+        "maxRoutePoints": 9,
+        "merchants": 5,
+        "minRoutePoints": 3,
+        "ok": true,
+        "overview": true,
+        "pickupCovered": 5,
+        "pickups": 5,
+        "routes": 13,
+        "status": "当前样本派单完成"
+      },
+      "finalSummary": {
+        "detailTitle": "派单详情：O0201 → R0210",
+        "hasOldEnglish": false,
+        "merchantSpread": {
+          "count": 5,
+          "height": 12.3,
+          "width": 22.1
+        },
+        "rainStreaks": 76,
+        "routeCount": 13,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0210",
+            "d": "M675.2 266.2 L693.9 338.6 L604.9 329.2 L609.6 310.4",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "routePoints": 4
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0210",
+            "d": "M609.6 310.4 L604.9 329.2 L693.9 338.6 L702.3 376.0 L639.0 372.7 L638.0 380.8",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "routePoints": 6
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0210",
+            "d": "M609.6 310.4 L604.9 329.2 L693.9 338.6 L702.3 376.0 L621.9 371.9",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "routePoints": 5
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0210",
+            "d": "M675.2 266.2 L693.9 338.6 L578.2 326.4 L485.8 309.2 L468.4 348.8",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "routePoints": 5
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0210",
+            "d": "M468.4 348.8 L466.6 363.9 L323.1 370.0 L310.4 381.9 L410.6 394.3 L413.6 384.0",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "routePoints": 6
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0204",
+            "d": "M198.9 414.1 L211.1 286.0 L303.8 275.2 L397.6 292.7 L399.1 282.0",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "routePoints": 5
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0204",
+            "d": "M393.0 281.6 L431.0 298.9 L303.8 275.2 L274.4 278.6 L282.1 242.9",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "routePoints": 5
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0204",
+            "d": "M393.0 281.6 L426.8 296.9 L528.8 239.7 L462.6 237.4 L270.7 249.0",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "routePoints": 5
+          }
+        ],
+        "strategyText": [
+          "S1\n\n合单优先\n高重叠订单组成合单候选\n密度 0.59 / 合单需求 1.6\n\n0.70 已淘汰",
+          "S2\n\n多派候选\n单任务多骑手候选扩展\n候选竞争 0.26 / 骑手池 10\n\n0.64 已淘汰",
+          "S3\n\n局部修复\n从基线方案做局部修复\n稀缺 0.1 / 分散 0.39\n\n0.73 已淘汰",
+          "S4\n\n贪心基线\n最近/最低成本基线派单\n低峰稳定 0.0 / 风险 0.55\n\n0.47 已淘汰",
+          "S5 ✓\n\n风险平衡\n低意愿与时间窗风险平衡\n低意愿 0.81 / 路况 0.74\n\n0.80 已选中"
+        ],
+        "weatherText": "路况\n缓行\n天气\n雨天 · 路面湿滑"
+      },
+      "finalMerchantClick": {
+        "h": 22,
+        "w": 22,
+        "x": 969.453125,
+        "y": 470.3984375
+      },
+      "finalMerchantDetail": {
+        "assignment": "A0201",
+        "cost": "$42.10",
+        "courier": "R0210",
+        "entity": "O0201",
+        "eta": "20 min",
+        "leg": "",
+        "merchant": "商家坐标 62.2, 48.5，共 2 单，最终派给 R0210。",
+        "probability": "47%",
+        "reasons": "派单对象：O0201 → R0210，覆盖 2 个订单端点。订单期望：45 min，预估收入 $39.70。策略依据：S5 · 风险平衡；风险等级 Medium。商家点位位于道路边/建筑边；最终派给 R0210。",
+        "selectedAssignment": "A0201",
+        "title": "商家详情：O0201",
+        "type": "merchant"
+      },
+      "finalOrderClick": {
+        "h": 22,
+        "w": 22,
+        "x": 994.046875,
+        "y": 518.796875
+      },
+      "finalOrderDetail": {
+        "assignment": "A0201",
+        "cost": "$39.70",
+        "courier": "R0210",
+        "entity": "O0201-D01",
+        "eta": "45 min 期望",
+        "leg": "merchant-to-order",
+        "merchant": "订单端点坐标 65.1, 59.5，来自商家 O0201，最终由 R0210 履约。",
+        "probability": "47%",
+        "reasons": "配送关系：骑手 R0210 先到商家 O0201，再沿道路折线配送到订单端点 O0201-D01。订单期望 ETA 45 min，期望价格 $39.70。当前派单接单概率 47%，风险等级 Medium。策略依据：S5 · 风险平衡。",
+        "selectedAssignment": "A0201",
+        "title": "订单详情：O0201-D01",
+        "type": "order"
+      },
+      "finalCourierClick": {
+        "h": 22,
+        "w": 22,
+        "x": 1064.4296875,
+        "y": 491.953125
+      },
+      "finalCourierDetail": {
+        "assignment": "A0201",
+        "cost": "$42.10",
+        "courier": "R0201",
+        "entity": "R0201",
+        "eta": "20 min",
+        "leg": "",
+        "merchant": "骑手坐标 73.4, 53.4，状态 available，容量 2，当前承接 0 个商家。",
+        "probability": "47%",
+        "reasons": "骑手接单意愿 47%，当前状态 available。已分配商家：-。覆盖订单端点：-。最近匹配候选成本 $42.10，风险 Medium。",
+        "selectedAssignment": "A0201",
+        "title": "骑手详情：R0201",
+        "type": "courier"
+      },
+      "routeClick": {
+        "h": 49.774993896484375,
+        "w": 77.01220703125,
+        "x": 1003.9298095703125,
+        "y": 464.90000915527344
+      },
+      "routeDetail": {
+        "assignment": "A0202",
+        "cost": "$68.10",
+        "courier": "R0210",
+        "entity": "O0202",
+        "eta": "31 min",
+        "leg": "courier-to-merchant",
+        "merchant": "线路 R0210 → O0202，骑手到商家，道路折线节点 5 个。",
+        "probability": "47%",
+        "reasons": "该线段属于 assignment A0202，不是静态装饰线。起点/终点：R0210 → O0202；坐标 68.9, 41.6 → 47.8, 54.5。线路沿匿名道路层折线吸附，节点数 5，降低直穿建筑的视觉问题。派单策略：S5 · 风险平衡；风险 Medium，接单概率 47%。",
+        "selectedAssignment": "A0202",
+        "title": "线路详情：骑手到商家",
+        "type": "route"
+      }
+    },
+    {
+      "scenario": "offpeak_greedy",
+      "preview": {
+        "couriers": 8,
+        "detailTitle": "样本 #02 已刷新",
+        "merchants": 3,
+        "ok": true,
+        "rainStreaks": 0,
+        "routes": 0
+      },
+      "previewMerchantClick": {
+        "h": 22,
+        "w": 22,
+        "x": 926.203125,
+        "y": 524.953125
+      },
+      "previewMerchantDetail": {
+        "assignment": "",
+        "cost": "$34.30",
+        "courier": "R0201",
+        "entity": "O0201",
+        "eta": "38 min 期望",
+        "leg": "",
+        "merchant": "黄色点位为商家侧订单入口，位于道路边/建筑边；坐标 57.1, 60.9，当前有 2 单待派。",
+        "probability": "79%",
+        "reasons": "商家点不会压在道路中心线，坐标按最近道路边缘和商圈热区生成。候选骑手来自当前刷新样本，不是写死数据。点击运行后才会把该商家最终派给一个骑手并显示连线。",
+        "selectedAssignment": "",
+        "title": "商家/订单点：O0201",
+        "type": "preview"
+      },
+      "previewCourierClick": {
+        "h": 22,
+        "w": 22,
+        "x": 1037.2890625,
+        "y": 548.71875
+      },
+      "previewCourierDetail": {
+        "assignment": "",
+        "cost": "$41.50",
+        "courier": "R0201",
+        "entity": "R0201",
+        "eta": "17 min 最近候选",
+        "leg": "",
+        "merchant": "骑手位于道路上/道路边，坐标 70.2, 66.3，当前状态 available，容量 1。",
+        "probability": "79%",
+        "reasons": "骑手位置按当前道路网络吸附生成，不放到建筑块内部。接单意愿会影响候选排序、风险和最终策略选择。该骑手当前可接候选：O0201。",
+        "selectedAssignment": "",
+        "title": "骑手位置：R0201",
+        "type": "preview"
+      },
+      "final": {
+        "arrows": 5,
+        "deliveries": 5,
+        "deliveryCovered": 3,
+        "detailTitle": "派单详情：O0201 → R0201",
+        "hitAreas": 8,
+        "maxRoutePoints": 8,
+        "merchants": 3,
+        "minRoutePoints": 3,
+        "ok": true,
+        "overview": true,
+        "pickupCovered": 3,
+        "pickups": 3,
+        "routes": 8,
+        "status": "当前样本派单完成"
+      },
+      "finalSummary": {
+        "detailTitle": "派单详情：O0201 → R0201",
+        "hasOldEnglish": false,
+        "merchantSpread": {
+          "count": 3,
+          "height": 32,
+          "width": 27
+        },
+        "rainStreaks": 0,
+        "routeCount": 8,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "d": "M688.0 424.3 L431.0 298.9 L565.2 324.0 L560.1 389.8",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "routePoints": 4
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "d": "M559.6 389.8 L568.4 281.6 L568.4 157.5 L607.6 153.6 L676.5 182.1 L666.4 217.6 L705.6 390.4 L726.3 421.3",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "routePoints": 8
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "d": "M559.6 389.8 L553.3 479.0 L525.3 478.1",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "routePoints": 3
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0205",
+            "d": "M213.6 257.9 L211.1 286.0 L283.7 277.5 L291.1 344.3 L287.4 364.2",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "routePoints": 5
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0205",
+            "d": "M295.0 364.8 L291.1 344.3 L283.7 277.5 L147.7 293.4 L152.9 312.3",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "routePoints": 5
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0207",
+            "d": "M569.4 179.2 L568.4 217.6 L637.6 166.0 L607.6 153.6 L447.2 169.7 L450.8 185.0",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "routePoints": 6
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0207",
+            "d": "M450.8 185.0 L447.2 169.7 L352.8 179.2 L151.6 91.6 L366.5 79.4 L593.7 99.5",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "routePoints": 6
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0207",
+            "d": "M450.8 185.0 L447.2 169.7 L607.6 153.6 L676.5 182.1 L692.7 124.8 L648.0 158.2 L639.0 153.0",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "routePoints": 7
+          }
+        ],
+        "strategyText": [
+          "S1\n\n合单优先\n高重叠订单组成合单候选\n密度 0.3 / 合单需求 1.67\n\n0.55 已淘汰",
+          "S2\n\n多派候选\n单任务多骑手候选扩展\n候选竞争 0.66 / 骑手池 8\n\n0.75 已淘汰",
+          "S3\n\n局部修复\n从基线方案做局部修复\n稀缺 0.0 / 分散 0.67\n\n0.51 已淘汰",
+          "S4 ✓\n\n贪心基线\n最近/最低成本基线派单\n低峰稳定 0.46 / 风险 0.0\n\n0.82 已选中",
+          "S5\n\n风险平衡\n低意愿与时间窗风险平衡\n低意愿 0.0 / 路况 0.25\n\n0.39 已淘汰"
+        ],
+        "weatherText": "路况\n畅通\n天气\n晴朗 · 正常履约"
+      },
+      "finalMerchantClick": {
+        "h": 22,
+        "w": 22,
+        "x": 926.203125,
+        "y": 524.953125
+      },
+      "finalMerchantDetail": {
+        "assignment": "A0201",
+        "cost": "$41.50",
+        "courier": "R0201",
+        "entity": "O0201",
+        "eta": "17 min",
+        "leg": "",
+        "merchant": "商家坐标 57.1, 60.9，共 2 单，最终派给 R0201。",
+        "probability": "79%",
+        "reasons": "派单对象：O0201 → R0201，覆盖 2 个订单端点。订单期望：38 min，预估收入 $34.30。策略依据：S4 · 贪心基线；风险等级 Low。商家点位位于道路边/建筑边；最终派给 R0201。",
+        "selectedAssignment": "A0201",
+        "title": "商家详情：O0201",
+        "type": "merchant"
+      },
+      "finalOrderClick": {
+        "h": 22,
+        "w": 22,
+        "x": 1066.96875,
+        "y": 547.3984375
+      },
+      "finalOrderDetail": {
+        "assignment": "A0201",
+        "cost": "$34.30",
+        "courier": "R0201",
+        "entity": "O0201-D01",
+        "eta": "38 min 期望",
+        "leg": "merchant-to-order",
+        "merchant": "订单端点坐标 73.7, 66.0，来自商家 O0201，最终由 R0201 履约。",
+        "probability": "79%",
+        "reasons": "配送关系：骑手 R0201 先到商家 O0201，再沿道路折线配送到订单端点 O0201-D01。订单期望 ETA 38 min，期望价格 $34.30。当前派单接单概率 79%，风险等级 Low。策略依据：S4 · 贪心基线。",
+        "selectedAssignment": "A0201",
+        "title": "订单详情：O0201-D01",
+        "type": "order"
+      },
+      "finalCourierClick": {
+        "h": 22,
+        "w": 22,
+        "x": 1037.2890625,
+        "y": 548.71875
+      },
+      "finalCourierDetail": {
+        "assignment": "A0201",
+        "cost": "$41.50",
+        "courier": "R0201",
+        "entity": "R0201",
+        "eta": "17 min 平均",
+        "leg": "",
+        "merchant": "骑手坐标 70.2, 66.3，状态 available，容量 1，当前承接 1 个商家。",
+        "probability": "79%",
+        "reasons": "骑手接单意愿 79%，当前状态 available。已分配商家：O0201。覆盖订单端点：O0201-D01、O0201-D02。最近匹配候选成本 $41.50，风险 Low。",
+        "selectedAssignment": "A0201",
+        "title": "骑手详情：R0201",
+        "type": "courier"
+      },
+      "routeClick": {
+        "h": 86.21249389648438,
+        "w": 222.3836669921875,
+        "x": 926.1387329101562,
+        "y": 505.59999084472656
+      },
+      "routeDetail": {
+        "assignment": "A0201",
+        "cost": "$41.50",
+        "courier": "R0201",
+        "entity": "O0201-D01",
+        "eta": "17 min",
+        "leg": "merchant-to-order",
+        "merchant": "线路 O0201 → O0201-D01，商家到订单，道路折线节点 8 个。",
+        "probability": "79%",
+        "reasons": "该线段属于 assignment A0201，不是静态装饰线。起点/终点：O0201 → O0201-D01；坐标 57.1, 60.9 → 73.7, 66.0。线路沿匿名道路层折线吸附，节点数 8，降低直穿建筑的视觉问题。派单策略：S4 · 贪心基线；风险 Low，接单概率 79%。",
+        "selectedAssignment": "A0201",
+        "title": "线路详情：商家到订单",
+        "type": "route"
+      }
+    }
+  ]
+}
