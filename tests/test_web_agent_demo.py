@@ -79,6 +79,7 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("pickup-leg", html)
         self.assertIn("dispatchArrowFor", html)
         self.assertIn("dispatch-arrow", html)
+        self.assertIn("dispatch-hit-area", html)
         self.assertIn("等待运行派单推理", html)
         for fake_value in ["C017 + C035", "Merchant R02", "<span class=\"chip\">T0012</span>", "T0018<small>", "T0023<small>"]:
             self.assertNotIn(fake_value, html)
@@ -125,8 +126,8 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("focus-selected", html)
         self.assertIn("data-selected-assignment", html)
         self.assertIn('pin.classList.toggle("active-assignment"', html)
-        self.assertIn('dispatchArrowFor(orderPoints.length ? deliveryRoute : pickupRoute, arrowCls, assignment.id, isActive, routeStyle)', html)
-        self.assertIn('event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow")', html)
+        self.assertIn("dispatchArrowFor(deliveryRoute, arrowCls, assignment.id, isActive, routeStyle, deliveryMeta)", html)
+        self.assertIn('event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow, .dispatch-hit-area")', html)
         self.assertIn("const isActive = assignment.id === selectedAssignment;", html)
         self.assertIn("assignment-overview", html)
         self.assertIn("overview-route", html)
@@ -134,6 +135,18 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn(".map-panel.active", html)
         self.assertIn("roadFollowingRoute", html)
         self.assertIn("closestRoadTransfer", html)
+        self.assertIn("function routeMetaAttributes", html)
+        self.assertIn("function dispatchHitAreaFor", html)
+        self.assertIn('"route-points": pickupRoute.length', html)
+        self.assertIn('leg: "courier-to-merchant"', html)
+        self.assertIn("const deliveryRoutes = orderPoints.map", html)
+        self.assertIn('class="${cls} delivery-leg"', html)
+        self.assertIn('order: orders[orderIndex] || ""', html)
+        self.assertIn('merchant: assignment.pickup', html)
+        self.assertIn("entities: [...preview.entities, ...orderEntities]", html)
+        self.assertIn("map_orders: orderIds", html)
+        self.assertIn("profile.dispatchMap.assignments.map((assignment", html)
+        self.assertNotIn("profile.dispatchMap.assignments.slice(0, 8).map", html)
         self.assertIn("rain-streak", html)
         self.assertIn("rain-sheen", html)
         self.assertIn("density_profile", html)
@@ -235,6 +248,14 @@ class WebAgentDemoTest(unittest.TestCase):
                 courier_points = [(float(item["x"]), float(item["y"])) for item in sample["couriers"]]
                 self.assertGreater(len(set(merchant_points)), 2)
                 self.assertGreater(len(set(courier_points)), 5)
+                for merchant in sample["merchants"]:
+                    delivery_points = merchant["delivery_points"]
+                    self.assertEqual(len(delivery_points), int(merchant["order_count"]))
+                    self.assertGreaterEqual(len(delivery_points), 1)
+                    for point in delivery_points:
+                        self.assertEqual(point["kind"], "order")
+                        self.assertEqual(point["parent_merchant_id"], merchant["id"])
+                        self.assertNotEqual((point["x"], point["y"]), (merchant["x"], merchant["y"]))
 
         rain_sample = build_simulated_scenario_sample("rain_low_willingness", 0)
         self.assertEqual(rain_sample["summary"]["weather"], "rain")

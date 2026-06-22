@@ -1,0 +1,1633 @@
+{
+  "generatedAt": "2026-06-22T16:59:13.502Z",
+  "url": "http://127.0.0.1:8765/",
+  "violations": [],
+  "consoleErrors": [],
+  "results": [
+    {
+      "scenario": "commerce_peak",
+      "preview": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 12,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "clustered",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 6,
+        "restSpread": {
+          "x": 14.799999999999997,
+          "y": 13.399999999999999
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #01，等待推理"
+      },
+      "refreshed": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 13,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "clustered",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 13.800000000000004,
+          "y": 11.100000000000001
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #02，等待推理"
+      },
+      "final": {
+        "arrowCount": 8,
+        "assignmentIds": [
+          "A0201",
+          "A0202",
+          "A0203",
+          "A0204",
+          "A0205"
+        ],
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 13,
+        "deliveryByAssignment": {
+          "A0201": 2,
+          "A0202": 1,
+          "A0203": 2,
+          "A0204": 1,
+          "A0205": 2
+        },
+        "deliveryLegs": 8,
+        "densityProfile": "clustered",
+        "focusSelected": false,
+        "hitAreaCount": 13,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 8,
+        "orderSpread": {
+          "x": 42.5,
+          "y": 30.6
+        },
+        "overviewRoutes": 10,
+        "pendingRun": false,
+        "pickupByAssignment": {
+          "A0201": 1,
+          "A0202": 1,
+          "A0203": 1,
+          "A0204": 1,
+          "A0205": 1
+        },
+        "pickupLegs": 5,
+        "primaryRoutes": 3,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 13.800000000000004,
+          "y": 11.100000000000001
+        },
+        "routeCount": 13,
+        "routeMetaComplete": true,
+        "routePointAvg": 5.384615384615385,
+        "routePointCounts": [
+          6,
+          6,
+          6,
+          4,
+          4,
+          4,
+          6,
+          6,
+          5,
+          7,
+          6,
+          6,
+          4
+        ],
+        "routePointMin": 4,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0209",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "primary": true,
+            "routePoints": 6,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0209",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "primary": true,
+            "routePoints": 6,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0209",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "primary": true,
+            "routePoints": 6,
+            "secondary": false
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0205",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0209",
+            "leg": "courier-to-merchant",
+            "merchant": "O0204",
+            "order": "",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0209",
+            "leg": "merchant-to-order",
+            "merchant": "O0204",
+            "order": "O0204-D01",
+            "primary": false,
+            "routePoints": 7,
+            "secondary": true
+          }
+        ],
+        "samplePreview": false,
+        "secondaryRoutes": 10,
+        "selectedAssignment": "A0201",
+        "status": "当前样本派单完成"
+      },
+      "clickCheck": {
+        "ok": true,
+        "expected": "A0204",
+        "selected": "A0204",
+        "target": {
+          "assignment": "A0204",
+          "topAssignment": "A0204",
+          "x": 901.2256154466802,
+          "y": 465.98509246060473
+        },
+        "error": ""
+      }
+    },
+    {
+      "scenario": "medium_parallel",
+      "preview": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 11,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "balanced",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 23.599999999999998,
+          "y": 16.200000000000003
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #01，等待推理"
+      },
+      "refreshed": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 9,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "balanced",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 19.500000000000004,
+          "y": 20.5
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #02，等待推理"
+      },
+      "final": {
+        "arrowCount": 8,
+        "assignmentIds": [
+          "A0201",
+          "A0202",
+          "A0203",
+          "A0204",
+          "A0205"
+        ],
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 9,
+        "deliveryByAssignment": {
+          "A0201": 2,
+          "A0202": 1,
+          "A0203": 2,
+          "A0204": 1,
+          "A0205": 2
+        },
+        "deliveryLegs": 8,
+        "densityProfile": "balanced",
+        "focusSelected": false,
+        "hitAreaCount": 13,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 8,
+        "orderSpread": {
+          "x": 56.3,
+          "y": 40.5
+        },
+        "overviewRoutes": 10,
+        "pendingRun": false,
+        "pickupByAssignment": {
+          "A0201": 1,
+          "A0202": 1,
+          "A0203": 1,
+          "A0204": 1,
+          "A0205": 1
+        },
+        "pickupLegs": 5,
+        "primaryRoutes": 3,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 19.500000000000004,
+          "y": 20.5
+        },
+        "routeCount": 13,
+        "routeMetaComplete": true,
+        "routePointAvg": 5.923076923076923,
+        "routePointCounts": [
+          7,
+          4,
+          8,
+          6,
+          8,
+          4,
+          4,
+          8,
+          3,
+          5,
+          4,
+          8,
+          8
+        ],
+        "routePointMin": 3,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "primary": true,
+            "routePoints": 7,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "primary": true,
+            "routePoints": 4,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0201",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "primary": true,
+            "routePoints": 8,
+            "secondary": false
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0203",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0203",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "primary": false,
+            "routePoints": 8,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "primary": false,
+            "routePoints": 8,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0207",
+            "leg": "courier-to-merchant",
+            "merchant": "O0204",
+            "order": "",
+            "primary": false,
+            "routePoints": 3,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0207",
+            "leg": "merchant-to-order",
+            "merchant": "O0204",
+            "order": "O0204-D01",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          }
+        ],
+        "samplePreview": false,
+        "secondaryRoutes": 10,
+        "selectedAssignment": "A0201",
+        "status": "当前样本派单完成"
+      },
+      "clickCheck": {
+        "ok": true,
+        "expected": "A0203",
+        "selected": "A0203",
+        "target": {
+          "assignment": "A0203",
+          "topAssignment": "A0203",
+          "x": 790.3610286781573,
+          "y": 449.7558933424991
+        },
+        "error": ""
+      }
+    },
+    {
+      "scenario": "scarce_repair",
+      "preview": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 8,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "scarce_spread",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 30.5,
+          "y": 27.300000000000004
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #01，等待推理"
+      },
+      "refreshed": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 9,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "scarce_spread",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 31.400000000000006,
+          "y": 20.5
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #02，等待推理"
+      },
+      "final": {
+        "arrowCount": 8,
+        "assignmentIds": [
+          "A0201",
+          "A0202",
+          "A0203",
+          "A0204",
+          "A0205"
+        ],
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 9,
+        "deliveryByAssignment": {
+          "A0201": 2,
+          "A0202": 1,
+          "A0203": 2,
+          "A0204": 1,
+          "A0205": 2
+        },
+        "deliveryLegs": 8,
+        "densityProfile": "scarce_spread",
+        "focusSelected": false,
+        "hitAreaCount": 13,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 8,
+        "orderSpread": {
+          "x": 69,
+          "y": 49.4
+        },
+        "overviewRoutes": 10,
+        "pendingRun": false,
+        "pickupByAssignment": {
+          "A0201": 1,
+          "A0202": 1,
+          "A0203": 1,
+          "A0204": 1,
+          "A0205": 1
+        },
+        "pickupLegs": 5,
+        "primaryRoutes": 3,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 31.400000000000006,
+          "y": 20.5
+        },
+        "routeCount": 13,
+        "routeMetaComplete": true,
+        "routePointAvg": 5.384615384615385,
+        "routePointCounts": [
+          6,
+          5,
+          5,
+          5,
+          5,
+          3,
+          7,
+          5,
+          7,
+          6,
+          4,
+          7,
+          5
+        ],
+        "routePointMin": 3,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0202",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "primary": true,
+            "routePoints": 6,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0202",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "primary": true,
+            "routePoints": 5,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0202",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "primary": true,
+            "routePoints": 5,
+            "secondary": false
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0203",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0203",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "primary": false,
+            "routePoints": 3,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "primary": false,
+            "routePoints": 7,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0206",
+            "leg": "courier-to-merchant",
+            "merchant": "O0204",
+            "order": "",
+            "primary": false,
+            "routePoints": 7,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0206",
+            "leg": "merchant-to-order",
+            "merchant": "O0204",
+            "order": "O0204-D01",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          }
+        ],
+        "samplePreview": false,
+        "secondaryRoutes": 10,
+        "selectedAssignment": "A0201",
+        "status": "当前样本派单完成"
+      },
+      "clickCheck": {
+        "ok": true,
+        "expected": "A0202",
+        "selected": "A0202",
+        "target": {
+          "assignment": "A0202",
+          "topAssignment": "A0202",
+          "x": 1028.4257171495278,
+          "y": 563.1268772322829
+        },
+        "error": ""
+      }
+    },
+    {
+      "scenario": "rain_low_willingness",
+      "preview": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 13,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "rain_clustered",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "rain",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 76,
+        "reasoning": false,
+        "restPins": 6,
+        "restSpread": {
+          "x": 8.699999999999996,
+          "y": 13.699999999999996
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #01，等待推理"
+      },
+      "refreshed": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 11,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "rain_clustered",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "rain",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 76,
+        "reasoning": false,
+        "restPins": 6,
+        "restSpread": {
+          "x": 18.699999999999996,
+          "y": 17
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #02，等待推理"
+      },
+      "final": {
+        "arrowCount": 9,
+        "assignmentIds": [
+          "A0201",
+          "A0202",
+          "A0203",
+          "A0204",
+          "A0205",
+          "A0206"
+        ],
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 11,
+        "deliveryByAssignment": {
+          "A0201": 2,
+          "A0202": 1,
+          "A0203": 2,
+          "A0204": 1,
+          "A0205": 2,
+          "A0206": 1
+        },
+        "deliveryLegs": 9,
+        "densityProfile": "rain_clustered",
+        "focusSelected": false,
+        "hitAreaCount": 15,
+        "hitMetaComplete": true,
+        "mapWeather": "rain",
+        "orderPins": 9,
+        "orderSpread": {
+          "x": 49,
+          "y": 31.900000000000002
+        },
+        "overviewRoutes": 12,
+        "pendingRun": false,
+        "pickupByAssignment": {
+          "A0201": 1,
+          "A0202": 1,
+          "A0203": 1,
+          "A0204": 1,
+          "A0205": 1,
+          "A0206": 1
+        },
+        "pickupLegs": 6,
+        "primaryRoutes": 3,
+        "rainStreaks": 76,
+        "reasoning": false,
+        "restPins": 6,
+        "restSpread": {
+          "x": 18.699999999999996,
+          "y": 17
+        },
+        "routeCount": 15,
+        "routeMetaComplete": true,
+        "routePointAvg": 5.4,
+        "routePointCounts": [
+          6,
+          7,
+          4,
+          9,
+          4,
+          5,
+          5,
+          4,
+          5,
+          7,
+          4,
+          5,
+          7,
+          5,
+          4
+        ],
+        "routePointMin": 4,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0211",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "primary": true,
+            "routePoints": 6,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0211",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "primary": true,
+            "routePoints": 7,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0211",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "primary": true,
+            "routePoints": 4,
+            "secondary": false
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0204",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "primary": false,
+            "routePoints": 9,
+            "secondary": true
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0204",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0204",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0204",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0204",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0209",
+            "leg": "courier-to-merchant",
+            "merchant": "O0204",
+            "order": "",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0209",
+            "leg": "merchant-to-order",
+            "merchant": "O0204",
+            "order": "O0204-D01",
+            "primary": false,
+            "routePoints": 7,
+            "secondary": true
+          }
+        ],
+        "samplePreview": false,
+        "secondaryRoutes": 12,
+        "selectedAssignment": "A0201",
+        "status": "当前样本派单完成"
+      },
+      "clickCheck": {
+        "ok": true,
+        "expected": "A0202",
+        "selected": "A0202",
+        "target": {
+          "assignment": "A0202",
+          "topAssignment": "A0202",
+          "x": 1123.1190725811857,
+          "y": 544.689343250443
+        },
+        "error": ""
+      }
+    },
+    {
+      "scenario": "offpeak_greedy",
+      "preview": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 10,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "spread",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 4,
+        "restSpread": {
+          "x": 44.5,
+          "y": 28.500000000000007
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #01，等待推理"
+      },
+      "refreshed": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 11,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "spread",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 4,
+        "restSpread": {
+          "x": 40,
+          "y": 23.6
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #02，等待推理"
+      },
+      "final": {
+        "arrowCount": 6,
+        "assignmentIds": [
+          "A0201",
+          "A0202",
+          "A0203",
+          "A0204"
+        ],
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 11,
+        "deliveryByAssignment": {
+          "A0201": 2,
+          "A0202": 1,
+          "A0203": 2,
+          "A0204": 1
+        },
+        "deliveryLegs": 6,
+        "densityProfile": "spread",
+        "focusSelected": false,
+        "hitAreaCount": 10,
+        "hitMetaComplete": true,
+        "mapWeather": "clear",
+        "orderPins": 6,
+        "orderSpread": {
+          "x": 60.199999999999996,
+          "y": 43.699999999999996
+        },
+        "overviewRoutes": 7,
+        "pendingRun": false,
+        "pickupByAssignment": {
+          "A0201": 1,
+          "A0202": 1,
+          "A0203": 1,
+          "A0204": 1
+        },
+        "pickupLegs": 4,
+        "primaryRoutes": 3,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 4,
+        "restSpread": {
+          "x": 40,
+          "y": 23.6
+        },
+        "routeCount": 10,
+        "routeMetaComplete": true,
+        "routePointAvg": 5.8,
+        "routePointCounts": [
+          8,
+          7,
+          8,
+          5,
+          5,
+          3,
+          5,
+          3,
+          6,
+          8
+        ],
+        "routePointMin": 3,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0202",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "primary": true,
+            "routePoints": 8,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0202",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "primary": true,
+            "routePoints": 7,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0202",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "primary": true,
+            "routePoints": 8,
+            "secondary": false
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0205",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0205",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0206",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "primary": false,
+            "routePoints": 3,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0206",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0206",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "primary": false,
+            "routePoints": 3,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0209",
+            "leg": "courier-to-merchant",
+            "merchant": "O0204",
+            "order": "",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0209",
+            "leg": "merchant-to-order",
+            "merchant": "O0204",
+            "order": "O0204-D01",
+            "primary": false,
+            "routePoints": 8,
+            "secondary": true
+          }
+        ],
+        "samplePreview": false,
+        "secondaryRoutes": 7,
+        "selectedAssignment": "A0201",
+        "status": "当前样本派单完成"
+      },
+      "clickCheck": {
+        "ok": true,
+        "expected": "A0202",
+        "selected": "A0202",
+        "target": {
+          "assignment": "A0202",
+          "topAssignment": "A0202",
+          "x": 833.3190832926123,
+          "y": 542.0731099230227
+        },
+        "error": ""
+      }
+    },
+    {
+      "scenario": "event_mixed_pressure",
+      "preview": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 12,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "event_clustered",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "event",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 16.6,
+          "y": 11.299999999999997
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #01，等待推理"
+      },
+      "refreshed": {
+        "arrowCount": 0,
+        "assignmentIds": [],
+        "assignmentOverview": false,
+        "bodyClass": "pending-run sample-preview",
+        "courierPins": 15,
+        "deliveryByAssignment": {},
+        "deliveryLegs": 0,
+        "densityProfile": "event_clustered",
+        "focusSelected": false,
+        "hitAreaCount": 0,
+        "hitMetaComplete": true,
+        "mapWeather": "event",
+        "orderPins": 0,
+        "orderSpread": {
+          "x": 0,
+          "y": 0
+        },
+        "overviewRoutes": 0,
+        "pendingRun": true,
+        "pickupByAssignment": {},
+        "pickupLegs": 0,
+        "primaryRoutes": 0,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 17,
+          "y": 12.399999999999999
+        },
+        "routeCount": 0,
+        "routeMetaComplete": true,
+        "routePointAvg": 0,
+        "routePointCounts": [],
+        "routePointMin": 0,
+        "routeSamples": [],
+        "samplePreview": true,
+        "secondaryRoutes": 0,
+        "selectedAssignment": "",
+        "status": "已刷新样本 #02，等待推理"
+      },
+      "final": {
+        "arrowCount": 8,
+        "assignmentIds": [
+          "A0201",
+          "A0202",
+          "A0203",
+          "A0204",
+          "A0205"
+        ],
+        "assignmentOverview": true,
+        "bodyClass": "",
+        "courierPins": 15,
+        "deliveryByAssignment": {
+          "A0201": 2,
+          "A0202": 1,
+          "A0203": 2,
+          "A0204": 1,
+          "A0205": 2
+        },
+        "deliveryLegs": 8,
+        "densityProfile": "event_clustered",
+        "focusSelected": false,
+        "hitAreaCount": 13,
+        "hitMetaComplete": true,
+        "mapWeather": "event",
+        "orderPins": 8,
+        "orderSpread": {
+          "x": 45.9,
+          "y": 25
+        },
+        "overviewRoutes": 10,
+        "pendingRun": false,
+        "pickupByAssignment": {
+          "A0201": 1,
+          "A0202": 1,
+          "A0203": 1,
+          "A0204": 1,
+          "A0205": 1
+        },
+        "pickupLegs": 5,
+        "primaryRoutes": 3,
+        "rainStreaks": 0,
+        "reasoning": false,
+        "restPins": 5,
+        "restSpread": {
+          "x": 17,
+          "y": 12.399999999999999
+        },
+        "routeCount": 13,
+        "routeMetaComplete": true,
+        "routePointAvg": 5.769230769230769,
+        "routePointCounts": [
+          5,
+          7,
+          6,
+          6,
+          5,
+          6,
+          6,
+          4,
+          5,
+          7,
+          5,
+          5,
+          8
+        ],
+        "routePointMin": 4,
+        "routeSamples": [
+          {
+            "assignment": "A0201",
+            "courier": "R0214",
+            "leg": "courier-to-merchant",
+            "merchant": "O0201",
+            "order": "",
+            "primary": true,
+            "routePoints": 5,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0214",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D01",
+            "primary": true,
+            "routePoints": 7,
+            "secondary": false
+          },
+          {
+            "assignment": "A0201",
+            "courier": "R0214",
+            "leg": "merchant-to-order",
+            "merchant": "O0201",
+            "order": "O0201-D02",
+            "primary": true,
+            "routePoints": 6,
+            "secondary": false
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0214",
+            "leg": "courier-to-merchant",
+            "merchant": "O0202",
+            "order": "",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0214",
+            "leg": "merchant-to-order",
+            "merchant": "O0202",
+            "order": "O0202-D01",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0206",
+            "leg": "courier-to-merchant",
+            "merchant": "O0203",
+            "order": "",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0206",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D01",
+            "primary": false,
+            "routePoints": 6,
+            "secondary": true
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0206",
+            "leg": "merchant-to-order",
+            "merchant": "O0203",
+            "order": "O0203-D02",
+            "primary": false,
+            "routePoints": 4,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0202",
+            "leg": "courier-to-merchant",
+            "merchant": "O0204",
+            "order": "",
+            "primary": false,
+            "routePoints": 5,
+            "secondary": true
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0202",
+            "leg": "merchant-to-order",
+            "merchant": "O0204",
+            "order": "O0204-D01",
+            "primary": false,
+            "routePoints": 7,
+            "secondary": true
+          }
+        ],
+        "samplePreview": false,
+        "secondaryRoutes": 10,
+        "selectedAssignment": "A0201",
+        "status": "当前样本派单完成"
+      },
+      "clickCheck": {
+        "ok": true,
+        "expected": "A0203",
+        "selected": "A0203",
+        "target": {
+          "assignment": "A0203",
+          "topAssignment": "A0203",
+          "x": 889.2689891088605,
+          "y": 430.71837188119196
+        },
+        "error": ""
+      }
+    }
+  ]
+}

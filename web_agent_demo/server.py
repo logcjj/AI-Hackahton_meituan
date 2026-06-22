@@ -649,9 +649,35 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
         x, y = _snap_to_dispatch_road(_clamp_point(*raw_point), f"{config['id']}:{sample_key}:merchant:{index}", 3.6, min_curb=2.8)
         order_count = 1 + ((sample_index + index) % 2)
         demand = 0.48 + _unit_hash(config["id"], sample_key, index, salt="merchant-demand") * 0.47
+        merchant_id = f"O{sample_index + 1:02d}{index + 1:02d}"
+        delivery_points = []
+        delivery_radius_scale = 0.78 if "clustered" in density_profile else 1.22 if density_profile in {"spread", "scarce_spread"} else 1.0
+        for order_index in range(order_count):
+            spoke = order_index - (order_count - 1) / 2
+            delivery_angle = angle + 0.82 + spoke * 0.58 + (_unit_hash(config["id"], sample_key, index, order_index, salt="delivery-angle") - 0.5) * 0.48
+            delivery_radius = (9.2 + traffic_level * 5.4 + abs(spoke) * 4.8 + _unit_hash(config["id"], sample_key, index, order_index, salt="delivery-radius") * 5.2) * delivery_radius_scale
+            raw_delivery = (x + math.cos(delivery_angle) * delivery_radius, y + math.sin(delivery_angle) * delivery_radius * 0.86)
+            delivery_x, delivery_y = _snap_to_dispatch_road(
+                _clamp_point(*raw_delivery),
+                f"{config['id']}:{sample_key}:delivery:{merchant_id}:{order_index}",
+                3.0,
+                min_curb=2.2,
+            )
+            delivery_points.append(
+                {
+                    "id": f"{merchant_id}-D{order_index + 1:02d}",
+                    "kind": "order",
+                    "label": f"订单 {index + 1}-{order_index + 1}",
+                    "x": delivery_x,
+                    "y": delivery_y,
+                    "expected_eta_min": int(22 + demand * 18 + traffic_level * 10 + order_index * 3),
+                    "expected_price": round(18 + demand * 18 + traffic_level * 8 + order_index * 2.4, 1),
+                    "parent_merchant_id": merchant_id,
+                }
+            )
         merchants.append(
             {
-                "id": f"O{sample_index + 1:02d}{index + 1:02d}",
+                "id": merchant_id,
                 "kind": "merchant_order",
                 "label": f"订单 {index + 1}",
                 "x": x,
@@ -661,6 +687,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
                 "expected_price": round(18 + demand * 18 + traffic_level * 8, 1),
                 "demand_level": round(demand, 2),
                 "hotspot": "crossroad" if index < 3 else "nearby_block",
+                "delivery_points": delivery_points,
             }
         )
 
@@ -1360,11 +1387,23 @@ def render_index() -> str:
     .dispatch-link.overview-route { stroke: var(--route-color, rgba(43, 222, 205, .76)); stroke-width: 3.55; opacity: .96; filter: drop-shadow(0 0 5px rgba(32,212,199,.24)); }
     .dispatch-link.pickup-leg { stroke: rgba(32, 212, 199, .72); stroke-width: 3.6; filter: drop-shadow(0 0 5px rgba(32,212,199,.18)); }
     .dispatch-link.pickup-leg.overview-route { stroke: var(--route-color, rgba(32,212,199,.82)); stroke-width: 3.7; }
+    .dispatch-link.delivery-leg { stroke: var(--route-color, rgba(118, 201, 76, .88)); stroke-width: 3.25; opacity: .92; }
+    .dispatch-link.delivery-leg.active-assignment { stroke-width: 4.8; opacity: 1; }
+    .dispatch-link.delivery-leg.overview-route { stroke: var(--route-color, rgba(118, 201, 76, .78)); stroke-width: 3.35; opacity: .88; }
     .dispatch-link.active-assignment { stroke-width: 5.2; opacity: 1; filter: drop-shadow(0 0 8px rgba(32,212,199,.48)); stroke-dasharray: 980; }
     .dispatch-link.pickup-leg.active-assignment { stroke-width: 4.1; filter: drop-shadow(0 0 7px rgba(230,152,74,.38)); }
     .dispatch-arrow { fill: #20d4c7; opacity: .9; filter: drop-shadow(0 0 4px rgba(32,212,199,.45)); pointer-events: auto; cursor: pointer; }
     .dispatch-arrow.overview-route { fill: var(--route-color, #20d4c7); opacity: .94; }
     .dispatch-arrow.active-assignment { opacity: 1; }
+    .dispatch-hit-area {
+      fill: none;
+      stroke: transparent;
+      stroke-width: 18;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: bounding-box;
+      cursor: pointer;
+    }
     .arrow { fill: var(--cyan); filter: drop-shadow(0 0 6px rgba(39,230,208,.75)); }
     @keyframes draw { to { stroke-dashoffset: 0; } }
     .map-legend {
@@ -1899,13 +1938,35 @@ def render_index() -> str:
       (sample.candidates || []).forEach((candidate) => {
         candidateByPair[`${candidate.merchant_id}:${candidate.courier_id}`] = candidate;
       });
+      const orderEntities = [];
       const assignments = (sample.assignments || []).map((assignment, index) => {
         const merchant = merchantById[assignment.merchant_id] || {};
         const courier = courierById[assignment.courier_id] || {};
         const candidate = candidateByPair[`${assignment.merchant_id}:${assignment.courier_id}`] || assignment;
         const probability = safeNumber(candidate.accept_probability, safeNumber(assignment.accept_probability, 0));
         const orderCount = Math.max(1, Math.round(safeNumber(merchant.order_count, 1)));
-        const orderIds = Array.from({length: orderCount}, (_, orderIndex) => `${assignment.merchant_id}-${String(orderIndex + 1).padStart(2, "0")}`);
+        const deliveryPoints = Array.isArray(merchant.delivery_points) && merchant.delivery_points.length
+          ? merchant.delivery_points.slice(0, orderCount)
+          : Array.from({length: orderCount}, (_, orderIndex) => ({
+              id: `${assignment.merchant_id}-D${String(orderIndex + 1).padStart(2, "0")}`,
+              label: `订单 ${orderIndex + 1}`,
+              x: safeNumber(merchant.x, 50) + 3 + orderIndex * 3,
+              y: safeNumber(merchant.y, 50) + 3 + orderIndex * 2
+            }));
+        deliveryPoints.forEach((point) => {
+          orderEntities.push({
+            id: point.id,
+            kind: "order",
+            label: point.label || "订单",
+            x: point.x,
+            y: point.y,
+            expected_eta_min: point.expected_eta_min,
+            expected_price: point.expected_price,
+            parent_merchant_id: assignment.merchant_id,
+            hideLabel: true
+          });
+        });
+        const orderIds = deliveryPoints.map((point) => point.id);
         return {
           id: assignment.id || `A${index + 1}`,
           task_key: assignment.merchant_id,
@@ -1915,7 +1976,7 @@ def render_index() -> str:
           merchant_note: `商家点位位于道路边/建筑边；最终派给 ${assignment.courier_id}。`,
           courier: assignment.courier_id,
           map_couriers: [assignment.courier_id],
-          map_orders: [],
+          map_orders: orderIds,
           orders: orderIds,
           order_count: orderCount,
           eta: `${assignment.eta_min || candidate.eta_min || merchant.expected_eta_min || "-"} min`,
@@ -1935,6 +1996,7 @@ def render_index() -> str:
         ...preview,
         stage: "simulation_final",
         assignments,
+        entities: [...preview.entities, ...orderEntities],
         total_tasks: (sample.merchants || []).length,
         total_couriers: (sample.couriers || []).length,
         summary: sample.summary,
@@ -2400,7 +2462,7 @@ def render_index() -> str:
       const labeledEntityIds = new Set();
       if (profile.dispatchMap && Array.isArray(profile.dispatchMap.assignments)) {
         const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id);
-        profile.dispatchMap.assignments.slice(0, 8).forEach((assignment) => {
+        profile.dispatchMap.assignments.forEach((assignment) => {
           if (assignment.id === selectedAssignment) {
             labeledEntityIds.add(assignment.pickup);
             (assignment.map_couriers || courierTokens(assignment.courier)).forEach((courier) => labeledEntityIds.add(courier));
@@ -2426,7 +2488,7 @@ def render_index() -> str:
       });
       if (profile.dispatchMap && Array.isArray(profile.dispatchMap.assignments)) {
         const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id);
-        profile.dispatchMap.assignments.slice(0, 8).forEach((assignment) => {
+        profile.dispatchMap.assignments.forEach((assignment) => {
           const couriers = assignment.map_couriers || courierTokens(assignment.courier);
           const orders = assignment.map_orders || assignment.orders || [];
           const points = [entityPoints[assignment.pickup], ...couriers.map((courier) => entityPoints[courier]), ...orders.map((order) => entityPoints[order])].filter(Boolean);
@@ -2644,7 +2706,7 @@ def render_index() -> str:
         entityLayer.appendChild(label);
       });
       renderDispatchLinks(profile, entityPoints);
-      applyMapFocus(profile, profile.selected);
+      applyMapFocus(profile, profile.selected, profile.mapFocusMode === "focus");
     }
     function svgPoint(point) {
       return [Number(point[0]) * 9.8, Number(point[1]) * 6.4];
@@ -2826,7 +2888,17 @@ def render_index() -> str:
       });
       return segments.join(" ");
     }
-    function dispatchArrowFor(points, cls, assignmentId = "", active = false, style = "") {
+    function dispatchHitAreaFor(d, cls, assignmentId = "", meta = {}) {
+      if (!d) return "";
+      return `<path class="dispatch-hit-area ${cls}" data-assignment="${assignmentId}"${routeMetaAttributes(meta)} d="${d}"></path>`;
+    }
+    function routeMetaAttributes(meta = {}) {
+      return Object.entries(meta)
+        .filter(([, value]) => value !== undefined && value !== null && value !== "")
+        .map(([key, value]) => ` data-${key}="${escapeAttr(value)}"`)
+        .join("");
+    }
+    function dispatchArrowFor(points, cls, assignmentId = "", active = false, style = "", meta = {}) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
       const [x1, y1] = svgPoint(usable[usable.length - 2]);
@@ -2840,7 +2912,7 @@ def render_index() -> str:
       const rightX = tipX - Math.cos(angle + 0.52) * size;
       const rightY = tipY - Math.sin(angle + 0.52) * size;
       const styleAttr = style ? ` style="${style}"` : "";
-      return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}"${styleAttr} points="${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
+      return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}"${routeMetaAttributes(meta)}${styleAttr} points="${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
     }
     function renderDispatchLinks(profile, entityPoints) {
       const svg = document.querySelector(".route-svg");
@@ -2850,29 +2922,50 @@ def render_index() -> str:
         return;
       }
       const focusMode = profile.mapFocusMode === "focus";
-      const selectedAssignment = focusMode ? (profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id)) : "";
+      const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
       const routePalette = ["#26dccd", "#55d68a", "#ffcf4a", "#5fb8ff", "#ff9d57", "#c3e56d", "#7de3ff", "#f2b76a"];
-      const pathHtml = profile.dispatchMap.assignments.slice(0, 8).map((assignment, index) => {
+      const pathHtml = profile.dispatchMap.assignments.map((assignment, index) => {
         const couriers = assignment.map_couriers || courierTokens(assignment.courier);
         const orders = assignment.map_orders || assignment.orders || [];
         const courierPoints = couriers.map((courier) => entityPoints[courier]).filter(Boolean);
         const pickupPoint = entityPoints[assignment.pickup];
         const orderPoints = orders.map((order) => entityPoints[order]).filter(Boolean);
         if (!pickupPoint || courierPoints.length === 0) return "";
-        const isActive = focusMode && assignment.id === selectedAssignment;
+        const isActive = assignment.id === selectedAssignment;
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
         const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
-        const deliveryRoute = orderPoints.length ? roadFollowingRoute(pickupPoint, orderPoints[0], mapLayers) : [];
+        const deliveryRoutes = orderPoints.map((orderPoint) => roadFollowingRoute(pickupPoint, orderPoint, mapLayers));
         const pickupRoute = roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers);
         const pickupD = dispatchPathFor(pickupRoute);
-        const deliveryD = dispatchPathFor(deliveryRoute);
+        const pickupMeta = {
+          merchant: assignment.pickup,
+          courier: couriers[0],
+          leg: "courier-to-merchant",
+          "route-points": pickupRoute.length
+        };
         const arrowCls = isActive ? "primary" : "secondary overview-route";
         const routeParts = [
-          `<path class="${cls} pickup-leg" data-assignment="${assignment.id}" style="${routeStyle}" d="${pickupD}"></path>`,
-          dispatchArrowFor(orderPoints.length ? deliveryRoute : pickupRoute, arrowCls, assignment.id, isActive, routeStyle)
+          `<path class="${cls} pickup-leg" data-assignment="${assignment.id}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
+          dispatchHitAreaFor(pickupD, "pickup-leg", assignment.id, pickupMeta)
         ];
-        if (deliveryD) routeParts.splice(1, 0, `<path class="${cls}" data-assignment="${assignment.id}" style="${routeStyle}" d="${deliveryD}"></path>`);
+        if (!deliveryRoutes.length) {
+          routeParts.push(dispatchArrowFor(pickupRoute, arrowCls, assignment.id, isActive, routeStyle, pickupMeta));
+        }
+        deliveryRoutes.forEach((deliveryRoute, orderIndex) => {
+          const deliveryD = dispatchPathFor(deliveryRoute);
+          if (!deliveryD) return;
+          const deliveryMeta = {
+            merchant: assignment.pickup,
+            courier: couriers[0],
+            order: orders[orderIndex] || "",
+            leg: "merchant-to-order",
+            "route-points": deliveryRoute.length
+          };
+          routeParts.push(`<path class="${cls} delivery-leg" data-assignment="${assignment.id}"${routeMetaAttributes(deliveryMeta)} style="${routeStyle}" d="${deliveryD}"></path>`);
+          routeParts.push(dispatchHitAreaFor(deliveryD, "delivery-leg", assignment.id, deliveryMeta));
+          routeParts.push(dispatchArrowFor(deliveryRoute, arrowCls, assignment.id, isActive, routeStyle, deliveryMeta));
+        });
         return routeParts.join("");
       }).join("");
       svg.innerHTML = pathHtml;
@@ -2889,7 +2982,7 @@ def render_index() -> str:
       if (frame) {
         frame.classList.toggle("focus-selected", focused);
         frame.classList.toggle("assignment-overview", Boolean(hasDispatch && !focused));
-        if (hasDispatch && focused) {
+        if (hasDispatch) {
           frame.dataset.selectedAssignment = selectedAssignment;
         } else {
           frame.removeAttribute("data-selected-assignment");
@@ -2903,19 +2996,19 @@ def render_index() -> str:
         return;
       }
       document.querySelectorAll(".map-label, .pin").forEach((node) => {
-        const active = focused && node.dataset.assignment === selectedAssignment;
+        const active = node.dataset.assignment === selectedAssignment;
         node.classList.toggle("active-assignment", active);
         if (node.classList.contains("map-label")) {
           node.classList.toggle("selected", active);
-          node.classList.toggle("focused", active);
+          node.classList.toggle("focused", focused && active);
         }
       });
       document.querySelectorAll(".dispatch-link, .dispatch-arrow").forEach((node) => {
-        const active = focused && node.dataset.assignment === selectedAssignment;
+        const active = node.dataset.assignment === selectedAssignment;
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
         node.classList.toggle("secondary", !active);
-        node.classList.toggle("overview-route", !focused);
+        node.classList.toggle("overview-route", !active);
       });
     }
     function renderEntityPreviewDetail(profile, entityId) {
@@ -3419,13 +3512,14 @@ def render_index() -> str:
         showToast("已回到当前派单关系中心");
       });
       document.querySelector(".map-frame").addEventListener("click", (event) => {
-        const target = event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow");
+        const target = event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow, .dispatch-hit-area");
         if (!target) return;
         const profile = currentProfile || profileForCase(selectedCase());
         if (!profile.assignments || Object.keys(profile.assignments).length === 0) {
           if (renderEntityPreviewDetail(profile, target.dataset.entity || "")) return;
         }
-        renderAssignmentDetail(profile, target.dataset.assignment || profile.selected, target.dataset.entity || target.textContent.trim());
+        const sourceLabel = target.dataset.entity || target.dataset.order || target.dataset.merchant || target.dataset.courier || target.textContent.trim();
+        renderAssignmentDetail(profile, target.dataset.assignment || profile.selected, sourceLabel);
       });
     }
     $("run-agent").addEventListener("click", streamRun);

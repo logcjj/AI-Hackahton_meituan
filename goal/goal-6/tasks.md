@@ -118,6 +118,19 @@
 验证标准：推理完成后每个商家/订单点都有 1-2 条派单线连接到骑手；线沿道路感折线或清晰直线，不乱、不遮挡；当前选中高亮，其它低噪可见。
 
 完成记录：
+- 已给仿真样本中的每个商家生成 1-2 个订单端点 `delivery_points`，订单端点由当前场景、sample seed、路况和商家位置推导，不再是固定假点。
+- 已修复最终地图实体层：运行完成后会把商家、骑手和订单端点全部放入地图；刷新/预览态仍只显示商家与骑手，保持 0 条最终派单线。
+- 已重构最终派单线：每个 assignment 默认渲染一条 `courier-to-merchant` 取餐段，并按订单端点渲染一条或多条 `merchant-to-order` 配送段，所有商家/订单自动连到对应骑手，不需要点击后才显示。
+- 已补全线路元数据：每条可视线和透明点击热区都包含 `data-assignment`、`data-merchant`、`data-courier`、`data-leg`、`data-route-points`，配送段额外包含 `data-order`。
+- 已新增透明 `dispatch-hit-area`，不改变视觉效果，但扩大路线点击热区；点击路线中点可切换当前 assignment 并联动右侧详情/地图高亮。
+- 已调整线路样式：最终态所有派单线低噪可见，当前选中 assignment 只做强调，不再只显示一条有效线。
+- 浏览器审计产物：`goal/goal-6/task8-route-linkage-audit.json`。真实跑 6 个场景，violations=[]，consoleErrors=0。
+- 浏览器审计通过：每个场景刷新后 routeCount=0、hitAreaCount=0；运行后 assignments 数等于商家数，pickupLegs 等于商家数，deliveryLegs 等于订单端点数，routeCount=pickupLegs+deliveryLegs，hitAreaCount=routeCount。
+- 浏览器审计通过：雨天低接单意愿场景 `weather=rain` 且 rainStreaks=76；商圈高峰场景 merchant spread 保持集中；稀缺/低峰场景保持分散特征。
+- 浏览器审计通过：6 个场景路线中点点击均能更新 `data-selected-assignment`，证明路线热区可用。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
 
 ## Task 9: 完善骑手/订单/线路详情面板
 
