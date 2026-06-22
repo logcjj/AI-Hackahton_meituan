@@ -162,7 +162,7 @@ _SCENE_TO_REGIME = {
 
 # iteration-15：每场景默认脱敏种子。选「已验证 v4 严格优于贪心(成本口径)」且各场景
 # 真值自洽、彼此不同的 seed（peak/bundle/rain/newshop 覆盖不更差，scarce 体现骑手瓶颈：
-# 贪心仅覆盖 21/30、v4 覆盖 30/30）。不 cherry-pick：若运行结果未严格优于，前端如实显示。
+# 贪心仅覆盖约 20/30（现场真跑微动 20~21）、v4 覆盖 30/30）。不 cherry-pick：若运行结果未严格优于，前端如实显示。
 # 这些 seed 仅决定「现场合成哪一份随机脱敏实例」，求解全程真跑，不写死任何输出真值。
 _SCENE_DEFAULT_SEED = {
     "peak": 301,
@@ -259,6 +259,13 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802
         parsed = urlparse(self.path)
         try:
+            if parsed.path == "/favicon.ico":
+                # iter-17 P1-9：无 favicon，返回 204 No Content，消除日志里的 404 噪声。
+                self.send_response(204)
+                self.send_header("Cache-Control", "max-age=86400")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
             if parsed.path == "/":
                 self._send_file(STATIC_DIR / "dispatch.html")
                 return
@@ -382,19 +389,25 @@ class Handler(BaseHTTPRequestHandler):
             except (BrokenPipeError, ConnectionResetError, OSError) as exc:
                 raise ClientGone(str(exc))
 
-        # iteration-15：先推一条 meta，让前端立即知道「在求解哪个场景/案例」（脱敏标识/seed）。
+        def emit(kind, payload):
+            try:
+                self.wfile.write(_sse(kind, payload))
+                self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError, OSError) as exc:
+                raise ClientGone(str(exc))
+
         is_scene = bool(scene) and not body.get("text")
-        self.wfile.write(_sse("meta", {
-            "case": case,
-            "scene": scene if is_scene else None,
-            "regime_key": regime_key,
-            "seed": seed,
-            "is_synthetic_sample": is_scene,
-            "is_headliner": (case == "large_seed301"),
-        }))
-        self.wfile.flush()
 
         try:
+            # iteration-15：先推一条 meta，让前端立即知道「在求解哪个场景/案例」（脱敏标识/seed）。
+            emit("meta", {
+                "case": case,
+                "scene": scene if is_scene else None,
+                "regime_key": regime_key,
+                "seed": seed,
+                "is_synthetic_sample": is_scene,
+                "is_headliner": (case == "large_seed301"),
+            })
             report = orch.run_blind_solve(
                 text, case_label=f"cockpit:{case}", memory_enabled=memory_enabled,
                 weight_preset=preset, observer=observer,
@@ -410,8 +423,7 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 print(f"[cockpit] baseline error: {traceback.format_exc()}", file=sys.stderr)
                 baseline = {"greedy": {}, "autosolver": {}, "improvement": {"strictly_better": False}}
-            self.wfile.write(_sse("baseline", {"baseline": baseline}))
-            self.wfile.flush()
+            emit("baseline", {"baseline": baseline})
 
             story = cstory.build_story(text, report, baseline)
             story["case_meta"] = {
@@ -420,9 +432,8 @@ class Handler(BaseHTTPRequestHandler):
                 "is_synthetic_sample": is_scene,
                 "is_headliner": (case == "large_seed301"),
             }
-            self.wfile.write(_sse("result", {"story": story}))
-            self.wfile.write(_sse("done", {"message": "complete"}))
-            self.wfile.flush()
+            emit("result", {"story": story})
+            emit("done", {"message": "complete"})
         except ClientGone:
             print("[cockpit] SSE client disconnected; aborting.", file=sys.stderr)
         except Exception:

@@ -121,7 +121,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 /* iteration-15：当前求解上下文角标（头牌官方案例 vs 场景脱敏样例），让评委一眼知道在解哪个场景 */
 .case-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;
   font-size:11.5px;font-weight:800;color:#d7e7e0;background:rgba(67,213,255,.07);
-  border:1px solid rgba(67,213,255,.26);white-space:nowrap}
+  border:1px solid rgba(67,213,255,.26);white-space:nowrap;
+  /* iter-17 P1-8：限宽 + 省略号，消除极窄视口（~400px）横向溢出 */
+  max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis}
+/* iter-17 P1-8：极窄屏（<500px）改为可换行，整条角标可读不被截断、亦不撑破布局 */
+@media (max-width:500px){
+  .case-tag{white-space:normal;overflow:visible;text-overflow:clip}
+}
 .case-tag b{color:#fff}
 .case-tag .ct-dot{display:inline-block;width:7px;height:7px;border-radius:50%}
 .case-tag .ct-dot.real{background:var(--green);box-shadow:0 0 8px var(--green)}
