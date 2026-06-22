@@ -1,0 +1,1017 @@
+{
+  "generatedAt": "2026-06-22T17:47:33.161Z",
+  "url": "http://127.0.0.1:8765/",
+  "phases": [
+    {
+      "name": "initial",
+      "state": {
+        "activeRoutes": 0,
+        "arrows": 0,
+        "assignments": 0,
+        "avoidedPins": 0,
+        "closestPair": null,
+        "couriers": 0,
+        "detailTitle": "等待运行派单推理",
+        "detailType": "",
+        "expandActive": false,
+        "expandText": "展开全部",
+        "frameClass": "map-frame",
+        "hitAreas": 0,
+        "layerMode": "all",
+        "mapActions": [
+          {
+            "action": "depots",
+            "active": false,
+            "text": "▧"
+          },
+          {
+            "action": "routes",
+            "active": false,
+            "text": "☷"
+          },
+          {
+            "action": "fit",
+            "active": false,
+            "text": "□"
+          },
+          {
+            "action": "locate",
+            "active": false,
+            "text": "◎"
+          },
+          {
+            "action": "fullscreen",
+            "active": false,
+            "text": "↗"
+          }
+        ],
+        "merchants": 0,
+        "minPinDistance": 9999,
+        "oldEnglish": false,
+        "orders": 0,
+        "panelClass": "panel map-panel",
+        "rain": 0,
+        "routes": 0,
+        "selectedAssignment": "",
+        "status": "就绪",
+        "strategies": [
+          {
+            "branch": "S1",
+            "inspected": false,
+            "status": "pending",
+            "text": "S1\n\n合单优先\n高重叠订单组成合单候选\n\n--"
+          },
+          {
+            "branch": "S2",
+            "inspected": false,
+            "status": "pending",
+            "text": "S2\n\n多派候选\n单任务多骑手候选扩展\n\n--"
+          },
+          {
+            "branch": "S3",
+            "inspected": false,
+            "status": "pending",
+            "text": "S3\n\n局部修复\n从基线方案做局部修复\n\n--"
+          },
+          {
+            "branch": "S4",
+            "inspected": false,
+            "status": "pending",
+            "text": "S4\n\n贪心基线\n最近/最低成本基线派单\n\n--"
+          },
+          {
+            "branch": "S5",
+            "inspected": false,
+            "status": "pending",
+            "text": "S5\n\n风险平衡\n低意愿与时间窗风险平衡\n\n--"
+          }
+        ],
+        "tableRows": [
+          {
+            "branch": "",
+            "cls": "",
+            "i": 0,
+            "inspected": false,
+            "rowType": "empty-state",
+            "text": "场景已选择\t-\t-\t-\t-\t-\t-\t就绪\t已选择 官方大规模高峰，等待刷新样本或运行推理"
+          },
+          {
+            "branch": "",
+            "cls": "",
+            "i": 1,
+            "inspected": false,
+            "rowType": "empty-state",
+            "text": "样本候选\t-\t-\t-\t-\t-\t-\t输入\t候选关系由商家位置、骑手位置、接单意愿、价格和路况共同生成"
+          },
+          {
+            "branch": "",
+            "cls": "",
+            "i": 2,
+            "inspected": false,
+            "rowType": "empty-state",
+            "text": "派单结果\t-\t-\t-\t-\t-\t-\t待运行\t运行完成后自动展示全部商家/订单/骑手连线"
+          }
+        ],
+        "toast": "地图图层已更新",
+        "weather": "路况\n待刷新\n天气\n等待场景样本",
+        "zoomInActive": false
+      }
+    },
+    {
+      "name": "scarce-final",
+      "state": {
+        "activeRoutes": 3,
+        "arrows": 8,
+        "assignments": 5,
+        "avoidedPins": 1,
+        "closestPair": [
+          {
+            "cls": "pin courier active-assignment",
+            "id": "R0201",
+            "visible": true,
+            "x": 1101.7421875,
+            "y": 495.0390625
+          },
+          {
+            "cls": "pin dest active-assignment",
+            "id": "O0201-D01",
+            "visible": true,
+            "x": 1092.4140625,
+            "y": 538.15625
+          }
+        ],
+        "couriers": 8,
+        "detailTitle": "派单详情：O0201 → R0201",
+        "detailType": "assignment",
+        "expandActive": false,
+        "expandText": "展开全部",
+        "frameClass": "map-frame topology assignment-overview",
+        "hitAreas": 13,
+        "layerMode": "all",
+        "mapActions": [
+          {
+            "action": "depots",
+            "active": false,
+            "text": "▧"
+          },
+          {
+            "action": "routes",
+            "active": false,
+            "text": "☷"
+          },
+          {
+            "action": "fit",
+            "active": false,
+            "text": "□"
+          },
+          {
+            "action": "locate",
+            "active": false,
+            "text": "◎"
+          },
+          {
+            "action": "fullscreen",
+            "active": false,
+            "text": "↗"
+          }
+        ],
+        "merchants": 5,
+        "minPinDistance": 44.1,
+        "oldEnglish": false,
+        "orders": 8,
+        "panelClass": "panel map-panel",
+        "rain": 0,
+        "routes": 13,
+        "selectedAssignment": "A0201",
+        "status": "当前样本派单完成",
+        "strategies": [
+          {
+            "branch": "S1",
+            "inspected": false,
+            "status": "rejected",
+            "text": "S1\n\n合单优先\n高重叠订单组成合单候选\n密度 0.37 / 合单需求 1.6\n\n0.60 已淘汰"
+          },
+          {
+            "branch": "S2",
+            "inspected": false,
+            "status": "rejected",
+            "text": "S2\n\n多派候选\n单任务多骑手候选扩展\n候选竞争 0.22 / 骑手池 8\n\n0.63 已淘汰"
+          },
+          {
+            "branch": "S3",
+            "inspected": false,
+            "status": "selected",
+            "text": "S3 ✓\n\n局部修复\n从基线方案做局部修复\n稀缺 0.38 / 分散 0.61\n\n0.92 已选中"
+          },
+          {
+            "branch": "S4",
+            "inspected": false,
+            "status": "rejected",
+            "text": "S4\n\n贪心基线\n最近/最低成本基线派单\n低峰稳定 0.0 / 风险 0.55\n\n0.51 已淘汰"
+          },
+          {
+            "branch": "S5",
+            "inspected": false,
+            "status": "rejected",
+            "text": "S5\n\n风险平衡\n低意愿与时间窗风险平衡\n低意愿 0.6 / 路况 0.62\n\n0.62 已淘汰"
+          }
+        ],
+        "tableRows": [
+          {
+            "branch": "",
+            "cls": "",
+            "i": 0,
+            "inspected": false,
+            "rowType": "strategy-candidate",
+            "text": "局部修复\t100%\t15.5 min\t$297.39\t5 个骑手\tLow (中)\t0.91\t可行\t当前 best-so-far，被 Critic 接受"
+          },
+          {
+            "branch": "",
+            "cls": "",
+            "i": 1,
+            "inspected": false,
+            "rowType": "strategy-candidate",
+            "text": "多派候选\t100%\t15.5 min\t$434.29\t5 个骑手\tMed (中)\t0.63\t已淘汰\t成本或资源占用高于当前最优"
+          },
+          {
+            "branch": "",
+            "cls": "",
+            "i": 2,
+            "inspected": false,
+            "rowType": "strategy-candidate",
+            "text": "风险平衡\t100%\t15.5 min\t$441.29\t5 个骑手\tMed (中)\t0.62\t已淘汰\t成本或资源占用高于当前最优"
+          },
+          {
+            "branch": "",
+            "cls": "",
+            "i": 3,
+            "inspected": false,
+            "rowType": "strategy-candidate",
+            "text": "合单优先\t100%\t15.5 min\t$456.00\t5 个骑手\tMed (中)\t0.60\t已淘汰\t成本或资源占用高于当前最优"
+          },
+          {
+            "branch": "S3",
+            "cls": "emphasis",
+            "i": 4,
+            "inspected": false,
+            "rowType": "final-strategy",
+            "text": "★最终 AutoSolver\n选中方案\t100%\t16 min\t$273.60\t5 个骑手\tLow (中)\t0.89\t已选中\t成本、风险、ETA 综合最优"
+          }
+        ],
+        "toast": "已按当前刷新样本生成最终派单线",
+        "weather": "路况\n缓行\n天气\n晴朗 · 正常履约",
+        "zoomInActive": false
+      }
+    },
+    {
+      "name": "semantic-all-scenarios",
+      "semantic": [
+        {
+          "scenario": "commerce_peak",
+          "state": {
+            "avoidedPins": 7,
+            "closestPair": [
+              {
+                "id": "R0201",
+                "visible": true,
+                "x": 1026.09375,
+                "y": 473.4765625
+              },
+              {
+                "id": "R0214",
+                "visible": true,
+                "x": 1019.3125,
+                "y": 447.515625
+              }
+            ],
+            "delivery": 5,
+            "merchants": 5,
+            "minPinDistance": 26.8,
+            "ok": true,
+            "oldEnglish": false,
+            "pickup": 5,
+            "rain": 0,
+            "routes": 13,
+            "selectedStrategy": "S2",
+            "spread": {
+              "count": 5,
+              "height": 11,
+              "width": 20.2
+            },
+            "weather": "路况\n缓行\n天气\n晴朗 · 正常履约"
+          }
+        },
+        {
+          "scenario": "medium_parallel",
+          "state": {
+            "avoidedPins": 2,
+            "closestPair": [
+              {
+                "id": "R0209",
+                "visible": true,
+                "x": 925.1875,
+                "y": 421.5546875
+              },
+              {
+                "id": "O0204-D01",
+                "visible": true,
+                "x": 898.046875,
+                "y": 442.234375
+              }
+            ],
+            "delivery": 4,
+            "merchants": 4,
+            "minPinDistance": 34.1,
+            "ok": true,
+            "oldEnglish": false,
+            "pickup": 4,
+            "rain": 0,
+            "routes": 10,
+            "selectedStrategy": "S2",
+            "spread": {
+              "count": 4,
+              "height": 10.8,
+              "width": 23.5
+            },
+            "weather": "路况\n缓行\n天气\n晴朗 · 正常履约"
+          }
+        },
+        {
+          "scenario": "scarce_repair",
+          "state": {
+            "avoidedPins": 3,
+            "closestPair": [
+              {
+                "id": "O0201",
+                "visible": true,
+                "x": 1062.5625,
+                "y": 502.515625
+              },
+              {
+                "id": "R0201",
+                "visible": true,
+                "x": 1047.296875,
+                "y": 531.1171875
+              }
+            ],
+            "delivery": 4,
+            "merchants": 4,
+            "minPinDistance": 32.4,
+            "ok": true,
+            "oldEnglish": false,
+            "pickup": 4,
+            "rain": 0,
+            "routes": 10,
+            "selectedStrategy": "S3",
+            "spread": {
+              "count": 4,
+              "height": 28.1,
+              "width": 33.1
+            },
+            "weather": "路况\n缓行\n天气\n晴朗 · 正常履约"
+          }
+        },
+        {
+          "scenario": "rain_low_willingness",
+          "state": {
+            "avoidedPins": 2,
+            "closestPair": [
+              {
+                "id": "R0209",
+                "visible": true,
+                "x": 889.5703125,
+                "y": 381.515625
+              },
+              {
+                "id": "O0205-D01",
+                "visible": true,
+                "x": 905.6796875,
+                "y": 356
+              }
+            ],
+            "delivery": 6,
+            "merchants": 6,
+            "minPinDistance": 30.2,
+            "ok": true,
+            "oldEnglish": false,
+            "pickup": 6,
+            "rain": 76,
+            "routes": 15,
+            "selectedStrategy": "S5",
+            "spread": {
+              "count": 6,
+              "height": 19.4,
+              "width": 15.5
+            },
+            "weather": "路况\n缓行\n天气\n雨天 · 路面湿滑"
+          }
+        },
+        {
+          "scenario": "offpeak_greedy",
+          "state": {
+            "avoidedPins": 2,
+            "closestPair": [
+              {
+                "id": "R0206",
+                "visible": true,
+                "x": 619.0546875,
+                "y": 407.0390625
+              },
+              {
+                "id": "O0203-D01",
+                "visible": true,
+                "x": 588.53125,
+                "y": 419.359375
+              }
+            ],
+            "delivery": 4,
+            "merchants": 4,
+            "minPinDistance": 32.9,
+            "ok": true,
+            "oldEnglish": false,
+            "pickup": 4,
+            "rain": 0,
+            "routes": 10,
+            "selectedStrategy": "S4",
+            "spread": {
+              "count": 4,
+              "height": 23,
+              "width": 27.5
+            },
+            "weather": "路况\n畅通\n天气\n晴朗 · 正常履约"
+          }
+        },
+        {
+          "scenario": "event_mixed_pressure",
+          "state": {
+            "avoidedPins": 8,
+            "closestPair": [
+              {
+                "id": "O0204-D01",
+                "visible": true,
+                "x": 1021.859375,
+                "y": 395.59375
+              },
+              {
+                "id": "O0205-D02",
+                "visible": true,
+                "x": 1022.703125,
+                "y": 425.953125
+              }
+            ],
+            "delivery": 5,
+            "merchants": 5,
+            "minPinDistance": 30.4,
+            "ok": true,
+            "oldEnglish": false,
+            "pickup": 5,
+            "rain": 0,
+            "routes": 13,
+            "selectedStrategy": "S5",
+            "spread": {
+              "count": 5,
+              "height": 7.9,
+              "width": 22.3
+            },
+            "weather": "路况\n拥堵\n天气\n活动 · 局部管制"
+          }
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "name": "expand-graph",
+      "ok": true,
+      "before": {
+        "text": "展开全部",
+        "active": false
+      },
+      "after": {
+        "text": "收起",
+        "active": true
+      },
+      "extra": {}
+    },
+    {
+      "name": "scenario:commerce_peak",
+      "ok": true,
+      "after": {
+        "active": "commerce_peak",
+        "couriers": 13,
+        "merchants": 5,
+        "ok": true,
+        "routes": 0,
+        "title": "样本 #01 已刷新"
+      }
+    },
+    {
+      "name": "scenario:medium_parallel",
+      "ok": true,
+      "after": {
+        "active": "medium_parallel",
+        "couriers": 10,
+        "merchants": 5,
+        "ok": true,
+        "routes": 0,
+        "title": "样本 #01 已刷新"
+      }
+    },
+    {
+      "name": "scenario:scarce_repair",
+      "ok": true,
+      "after": {
+        "active": "scarce_repair",
+        "couriers": 8,
+        "merchants": 5,
+        "ok": true,
+        "routes": 0,
+        "title": "样本 #01 已刷新"
+      }
+    },
+    {
+      "name": "scenario:rain_low_willingness",
+      "ok": true,
+      "after": {
+        "active": "rain_low_willingness",
+        "couriers": 10,
+        "merchants": 6,
+        "ok": true,
+        "routes": 0,
+        "title": "样本 #01 已刷新"
+      }
+    },
+    {
+      "name": "scenario:offpeak_greedy",
+      "ok": true,
+      "after": {
+        "active": "offpeak_greedy",
+        "couriers": 11,
+        "merchants": 3,
+        "ok": true,
+        "routes": 0,
+        "title": "样本 #01 已刷新"
+      }
+    },
+    {
+      "name": "scenario:event_mixed_pressure",
+      "ok": true,
+      "after": {
+        "active": "event_mixed_pressure",
+        "couriers": 15,
+        "merchants": 6,
+        "ok": true,
+        "routes": 0,
+        "title": "样本 #01 已刷新"
+      }
+    },
+    {
+      "name": "refresh",
+      "ok": true,
+      "before": {
+        "title": "样本 #01 已刷新"
+      },
+      "after": {
+        "ok": true,
+        "routes": 0,
+        "title": "样本 #02 已刷新"
+      },
+      "extra": {}
+    },
+    {
+      "name": "preview-merchant-click",
+      "ok": true,
+      "before": {},
+      "after": {
+        "detailType": "preview",
+        "title": "商家/订单点：O0201"
+      },
+      "extra": {}
+    },
+    {
+      "name": "preview-courier-click",
+      "ok": true,
+      "before": {},
+      "after": {
+        "detailType": "preview",
+        "title": "骑手位置：R0201"
+      },
+      "extra": {}
+    },
+    {
+      "name": "run",
+      "ok": true,
+      "before": {
+        "routes": 0
+      },
+      "after": {
+        "deliveries": 5,
+        "detailTitle": "派单详情：O0201 → R0201",
+        "merchants": 5,
+        "ok": true,
+        "overview": true,
+        "pickups": 5,
+        "routes": 13
+      },
+      "extra": {}
+    },
+    {
+      "name": "layer-mode:selected",
+      "ok": true,
+      "before": {
+        "mode": "all",
+        "frame": "map-frame topology assignment-overview"
+      },
+      "after": {
+        "mode": "selected",
+        "frame": "map-frame topology focus-selected hide-candidates",
+        "toast": "仅显示最终派单"
+      },
+      "extra": {}
+    },
+    {
+      "name": "layer-mode:candidates",
+      "ok": true,
+      "before": {
+        "mode": "selected",
+        "frame": "map-frame topology focus-selected hide-candidates"
+      },
+      "after": {
+        "mode": "candidates",
+        "frame": "map-frame topology focus-selected",
+        "toast": "突出显示候选派单"
+      },
+      "extra": {}
+    },
+    {
+      "name": "layer-mode:all",
+      "ok": true,
+      "before": {
+        "mode": "candidates",
+        "frame": "map-frame topology focus-selected"
+      },
+      "after": {
+        "mode": "all",
+        "frame": "map-frame topology assignment-overview",
+        "toast": "显示全部派单图层"
+      },
+      "extra": {}
+    },
+    {
+      "name": "map-action:depots",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology assignment-overview",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "depots",
+          "active": false,
+          "text": "▧"
+        }
+      },
+      "after": {
+        "frame": "map-frame topology assignment-overview hide-entities",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "depots",
+          "active": true,
+          "text": "▧"
+        },
+        "toast": "点位图层已弱化，仅保留派单关系"
+      },
+      "extra": {}
+    },
+    {
+      "name": "map-action:routes",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology assignment-overview",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "routes",
+          "active": false,
+          "text": "☷"
+        }
+      },
+      "after": {
+        "frame": "map-frame topology assignment-overview hide-candidates",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "routes",
+          "active": true,
+          "text": "☷"
+        },
+        "toast": "候选派单连线已隐藏"
+      },
+      "extra": {}
+    },
+    {
+      "name": "map-action:fit",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology assignment-overview",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "fit",
+          "active": false,
+          "text": "□"
+        }
+      },
+      "after": {
+        "frame": "map-frame topology assignment-overview",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "fit",
+          "active": true,
+          "text": "□"
+        },
+        "toast": "视图已适配全部派单关系"
+      },
+      "extra": {}
+    },
+    {
+      "name": "map-action:locate",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology assignment-overview",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "locate",
+          "active": false,
+          "text": "◎"
+        }
+      },
+      "after": {
+        "frame": "map-frame topology locating focus-selected",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "locate",
+          "active": true,
+          "text": "◎"
+        },
+        "toast": "已定位到 R0201 当前派单包"
+      },
+      "extra": {}
+    },
+    {
+      "name": "map-action:fullscreen",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology locating focus-selected",
+        "panel": "panel map-panel",
+        "action": {
+          "action": "fullscreen",
+          "active": false,
+          "text": "↗"
+        }
+      },
+      "after": {
+        "frame": "map-frame topology locating focus-selected",
+        "panel": "panel map-panel active",
+        "action": {
+          "action": "fullscreen",
+          "active": true,
+          "text": "↙"
+        },
+        "toast": "演示视图已进入地图聚焦模式"
+      },
+      "extra": {}
+    },
+    {
+      "name": "zoom:#zoom-in",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology locating assignment-overview",
+        "zoom": false,
+        "toast": "显示全部派单图层"
+      },
+      "after": {
+        "frame": "map-frame topology locating assignment-overview zoomed",
+        "zoom": true,
+        "toast": "地图已放大"
+      },
+      "extra": {}
+    },
+    {
+      "name": "zoom:#zoom-out",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology locating assignment-overview zoomed",
+        "zoom": true,
+        "toast": "地图已放大"
+      },
+      "after": {
+        "frame": "map-frame topology locating assignment-overview",
+        "zoom": false,
+        "toast": "地图已缩小"
+      },
+      "extra": {}
+    },
+    {
+      "name": "zoom:#recenter",
+      "ok": true,
+      "before": {
+        "frame": "map-frame topology locating assignment-overview",
+        "zoom": false,
+        "toast": "地图已缩小"
+      },
+      "after": {
+        "frame": "map-frame topology assignment-overview",
+        "zoom": false,
+        "toast": "已回到当前派单关系中心"
+      },
+      "extra": {}
+    },
+    {
+      "name": "final-merchant-click",
+      "ok": true,
+      "before": {},
+      "after": {
+        "detailType": "merchant",
+        "title": "商家详情：O0201",
+        "selected": "A0201"
+      },
+      "extra": {}
+    },
+    {
+      "name": "final-order-click",
+      "ok": true,
+      "before": {},
+      "after": {
+        "detailType": "order",
+        "title": "订单详情：O0201-D01",
+        "selected": "A0201"
+      },
+      "extra": {}
+    },
+    {
+      "name": "final-courier-click",
+      "ok": true,
+      "before": {},
+      "after": {
+        "detailType": "courier",
+        "title": "骑手详情：R0201",
+        "selected": "A0201"
+      },
+      "extra": {}
+    },
+    {
+      "name": "route-click",
+      "ok": true,
+      "before": {},
+      "after": {
+        "detailType": "route",
+        "title": "线路详情：商家到订单",
+        "selected": "A0205"
+      },
+      "extra": {}
+    },
+    {
+      "name": "strategy-card:S1",
+      "ok": true,
+      "before": {
+        "detailType": "route",
+        "title": "线路详情：商家到订单"
+      },
+      "after": {
+        "detailType": "strategy",
+        "title": "策略详情：S1 · 合单优先",
+        "status": "当前样本派单完成"
+      },
+      "extra": {}
+    },
+    {
+      "name": "strategy-card:S2",
+      "ok": true,
+      "before": {
+        "detailType": "strategy",
+        "title": "策略详情：S1 · 合单优先"
+      },
+      "after": {
+        "detailType": "strategy",
+        "title": "策略详情：S2 · 多派候选",
+        "status": "当前样本派单完成"
+      },
+      "extra": {}
+    },
+    {
+      "name": "strategy-card:S3",
+      "ok": true,
+      "before": {
+        "detailType": "strategy",
+        "title": "策略详情：S2 · 多派候选"
+      },
+      "after": {
+        "detailType": "strategy",
+        "title": "策略详情：S3 · 局部修复",
+        "status": "当前样本派单完成"
+      },
+      "extra": {}
+    },
+    {
+      "name": "strategy-card:S4",
+      "ok": true,
+      "before": {
+        "detailType": "strategy",
+        "title": "策略详情：S3 · 局部修复"
+      },
+      "after": {
+        "detailType": "strategy",
+        "title": "策略详情：S4 · 贪心基线",
+        "status": "当前样本派单完成"
+      },
+      "extra": {}
+    },
+    {
+      "name": "strategy-card:S5",
+      "ok": true,
+      "before": {
+        "detailType": "strategy",
+        "title": "策略详情：S4 · 贪心基线"
+      },
+      "after": {
+        "detailType": "strategy",
+        "title": "策略详情：S5 · 风险平衡",
+        "status": "当前样本派单完成"
+      },
+      "extra": {}
+    },
+    {
+      "name": "table-row:1",
+      "ok": true,
+      "before": {
+        "detailType": "strategy",
+        "title": "策略详情：S5 · 风险平衡"
+      },
+      "after": {
+        "detailType": "table-row",
+        "title": "策略对比：局部修复"
+      },
+      "extra": {}
+    },
+    {
+      "name": "table-row:2",
+      "ok": true,
+      "before": {
+        "detailType": "table-row",
+        "title": "策略对比：局部修复"
+      },
+      "after": {
+        "detailType": "table-row",
+        "title": "策略对比：多派候选"
+      },
+      "extra": {}
+    },
+    {
+      "name": "table-row:3",
+      "ok": true,
+      "before": {
+        "detailType": "table-row",
+        "title": "策略对比：多派候选"
+      },
+      "after": {
+        "detailType": "table-row",
+        "title": "策略对比：风险平衡"
+      },
+      "extra": {}
+    },
+    {
+      "name": "table-row:4",
+      "ok": true,
+      "before": {
+        "detailType": "table-row",
+        "title": "策略对比：风险平衡"
+      },
+      "after": {
+        "detailType": "table-row",
+        "title": "策略对比：合单优先"
+      },
+      "extra": {}
+    },
+    {
+      "name": "table-row:5",
+      "ok": true,
+      "before": {
+        "detailType": "table-row",
+        "title": "策略对比：合单优先"
+      },
+      "after": {
+        "detailType": "table-row",
+        "title": "策略对比：★最终 AutoSolver选中方案"
+      },
+      "extra": {}
+    }
+  ],
+  "violations": [],
+  "screenshot": {
+    "ok": false,
+    "error": "Timed out running CDP command \"Page.captureScreenshot\" for tab 34",
+    "fallback": {
+      "ok": true,
+      "path": "goal/goal-6/task10-system-screenshot.png",
+      "method": "macOS screencapture",
+      "size": "2940x1912"
+    }
+  },
+  "consoleErrors": []
+}

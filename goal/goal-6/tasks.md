@@ -155,6 +155,19 @@
 验证标准：全按钮点击审计、DOM 状态审计、截图检查、语法/单测/JS 全通过；修复地图联动和详情面板回归问题。
 
 完成记录：
+- 已完成第三轮大型全面检查-debug循环，并引入严格 verifier 子 Agent 只读评审。评审指出两个 P2：策略卡片/候选表格行是被动展示、稀缺/密集场景仍可能出现 pin 视觉碰撞。
+- 已修复策略卡片交互：点击 S1-S5 任一卡片会打开 `strategy` 详情，显示当前状态、样本评分、证据、策略说明和是否选中；被点击策略卡会高亮 inspected。
+- 已修复表格行交互：预览候选行、样本概览行、最终策略对比行均可点击打开 `table-row` 详情，显示覆盖率、ETA、成本、风险、状态和业务解释；动态渲染表格通过事件委托保持可用。
+- 已修复 pin 拥挤遮挡：新增 `displayPositionsForLabels()` 渲染层避让逻辑，保持算法原始坐标用于路线/详情，同时在 DOM 上记录 `data-raw-x/y` 和 `data-display-x/y`；被避让点标记 `.pin.avoided`。
+- 浏览器审计产物：`goal/goal-6/task10-browser-audit.json`。审计结果 violations=[]，controlsFailed=[]，consoleErrors=[]。
+- 截图检查：in-app browser CDP `Page.captureScreenshot` 仍超时；已使用 macOS `screencapture` 兜底成功生成 `goal/goal-6/task10-system-screenshot.png`，分辨率 2940x1912。
+- 浏览器审计通过：刷新、运行、6 个场景切换、左侧展开、图层下拉、depots/routes/fit/locate/fullscreen、zoom-in/zoom-out/recenter、预览商家/骑手、最终商家/订单/骑手/路线、策略卡片、表格行均有可验证状态变化或详情输出。
+- 浏览器审计通过：6 个场景运行后均自动生成全部派单线，路线数分别为商圈高峰 13、中型并行 10、骑手稀缺 10、雨天低意愿 15、低峰分散 10、活动压力 13；每个商家均有取餐和配送覆盖。
+- 浏览器审计通过：策略路径按场景变化，商圈高峰 S2、中型并行 S2、骑手稀缺 S3、雨天低意愿 S5、低峰分散 S4、活动压力 S5；雨天场景 rainStreaks=76。
+- 浏览器审计通过：pin 最小可视中心距均大于 23px，商圈高峰 26.8px、中型并行 34.1px、骑手稀缺 32.4px、雨天低意愿 30.2px、低峰分散 32.9px、活动压力 30.4px。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
 
 ## Task 11: 修复所有按钮的真实可用性
 
