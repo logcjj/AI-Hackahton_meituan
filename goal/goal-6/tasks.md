@@ -70,6 +70,16 @@
 验证标准：点击开始推理后进入 reasoning 状态，左侧策略节点按样本特征依次 evaluating/rejected/selected；运行完成前地图不显示最终派单线。
 
 完成记录：
+- 已新增前端推理状态机：`currentReasoningState`、`reasoningOrderForSample()`、`buildReasoningState()`、`setReasoningState()`、`clearReasoningState()`。
+- 点击 `运行派单推理` 后页面进入 `pending-run sample-preview reasoning`，保留当前样本 preview 地图和 0 条最终派单线。
+- 策略卡片新增 `data-reasoning-status` 和 `data-reasoning-order`，运行中按当前样本评分顺序依次展示 `Evaluating`，已评估策略保留为 `Rejected`，最终样本策略展示为 `Selected`。
+- 已调整运行链路：最终策略被选中后先停留在 reasoning 阶段，此时仍无 `.dispatch-link` 和 `.dispatch-arrow`；随后才调用 `simulationFinalMap()`/`render(report)` 渲染最终派单线。
+- 浏览器验证产物：`goal/goal-6/task5-reasoning-timeline.json`、`goal/goal-6/task5-final.png`、`goal/goal-6/task5-console-errors.json`。
+- 浏览器时间线审计通过：雨天低接单意愿样本运行中采样 18 次，`maxRoutesDuringReasoning=0`，捕获到 `Evaluating`、`Rejected`、`Selected`，且 selected 出现时路线/箭头仍为 0；最终退出 reasoning 后渲染 4 条派单线覆盖 4 个商家点。
+- 浏览器 console 审计通过：页面错误数为 0。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联前端脚本 `node --check`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，共 12 个测试通过。
 
 ## Task 6: 实现多策略场景覆盖
 

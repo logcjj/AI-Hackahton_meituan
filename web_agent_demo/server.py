@@ -1492,11 +1492,11 @@ def render_index() -> str:
             <div class="metric"><span>Candidates</span><strong>5</strong></div>
           </article>
           <div class="branch-grid">
-            <article class="strategy pending" data-branch="S1"><h4>S1</h4><p><b>Bundle-first</b><br>Focus on high-overlap bundles</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S2"><h4>S2</h4><p><b>Multi-dispatch</b><br>Many small bundles parallel delivery</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S3"><h4>S3</h4><p><b>Repair search</b><br>Iterative improvement from greedy</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S4"><h4>S4</h4><p><b>Greedy baseline</b><br>Nearest-first per order</p><strong>-- <span class="badge pending">Pending</span></strong></article>
-            <article class="strategy pending" data-branch="S5"><h4>S5</h4><p><b>Time-window balancing</b><br>Prioritize tight windows</p><strong>-- <span class="badge pending">Pending</span></strong></article>
+            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>Bundle-first</b><br>Focus on high-overlap bundles</p><strong>-- <span class="badge pending">Pending</span></strong></article>
+            <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>S2</h4><p><b>Multi-dispatch</b><br>Many small bundles parallel delivery</p><strong>-- <span class="badge pending">Pending</span></strong></article>
+            <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>S3</h4><p><b>Repair search</b><br>Iterative improvement from greedy</p><strong>-- <span class="badge pending">Pending</span></strong></article>
+            <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>S4</h4><p><b>Greedy baseline</b><br>Nearest-first per order</p><strong>-- <span class="badge pending">Pending</span></strong></article>
+            <article class="strategy pending" data-branch="S5" data-reasoning-status="pending"><h4>S5</h4><p><b>Time-window balancing</b><br>Prioritize tight windows</p><strong>-- <span class="badge pending">Pending</span></strong></article>
           </div>
           <article class="node">
             <div class="step-index">4</div><div class="icon">☑</div>
@@ -1596,6 +1596,7 @@ def render_index() -> str:
     let currentRun = null;
     let currentProfile = null;
     let currentReport = null;
+    let currentReasoningState = null;
     let caseCatalog = {};
     let simulationCatalog = {};
     let currentSimulationSample = null;
@@ -1919,6 +1920,7 @@ def render_index() -> str:
       if (!sample || !Array.isArray(sample.merchants) || !Array.isArray(sample.couriers)) return;
       currentSimulationSample = sample;
       currentReport = null;
+      clearReasoningState();
       const select = $("case-select");
       if (select) {
         const option = Array.from(select.options).find((item) => item.dataset.scenario === sample.scenario_id);
@@ -2087,21 +2089,84 @@ def render_index() -> str:
       if (ranked[0] && strategyNameOf(ranked[0])) return branchForStrategy(strategyNameOf(ranked[0]), profile);
       return branchForStrategy(best.strategy, profile);
     }
+    function sampleStrategyItems(sample) {
+      const raw = sample && Array.isArray(sample.strategy_path) ? sample.strategy_path : [];
+      const byId = {};
+      raw.forEach((item) => {
+        if (item && item.id) byId[item.id] = item;
+      });
+      strategyBranchCatalog.forEach((branch, index) => {
+        if (!byId[branch.id]) byId[branch.id] = {id: branch.id, score: 0.58 - index * 0.02, status: "pending"};
+      });
+      return strategyBranchCatalog.map((branch) => byId[branch.id]);
+    }
+    function reasoningOrderForSample(sample) {
+      const selected = sample && sample.selected_strategy_id ? sample.selected_strategy_id : "";
+      const items = sampleStrategyItems(sample);
+      const rejected = items
+        .filter((item) => item.id !== selected)
+        .sort((left, right) => safeNumber(left.score, 0) - safeNumber(right.score, 0))
+        .map((item) => item.id);
+      return selected ? [...rejected, selected] : rejected;
+    }
+    function buildReasoningState(sample, activeIndex = -1, complete = false) {
+      const selected = sample && sample.selected_strategy_id ? sample.selected_strategy_id : "";
+      const items = sampleStrategyItems(sample);
+      const scoreById = Object.fromEntries(items.map((item) => [item.id, safeNumber(item.score, 0)]));
+      const order = reasoningOrderForSample(sample);
+      const statuses = {};
+      strategyBranchCatalog.forEach((branch) => {
+        const orderIndex = order.indexOf(branch.id);
+        let status = "pending";
+        if (complete) {
+          status = branch.id === selected ? "selected" : "rejected";
+        } else if (orderIndex >= 0 && orderIndex < activeIndex) {
+          status = "rejected";
+        } else if (orderIndex === activeIndex) {
+          status = "evaluating";
+        }
+        statuses[branch.id] = status;
+      });
+      return {
+        phase: complete ? "selected" : "reasoning",
+        activeBranch: complete ? "" : order[activeIndex] || "",
+        selectedBranch: selected,
+        order,
+        statuses,
+        scores: scoreById,
+      };
+    }
+    function setReasoningState(sample, activeIndex = -1, complete = false) {
+      currentReasoningState = buildReasoningState(sample, activeIndex, complete);
+      document.body.classList.add("reasoning");
+      renderStrategyCards(currentProfile || profileForCase(selectedCase()), null);
+      return currentReasoningState;
+    }
+    function clearReasoningState() {
+      currentReasoningState = null;
+      document.body.classList.remove("reasoning");
+    }
     function renderStrategyCards(profile, report, evaluatingBranch = "") {
       const strategies = Array.from(document.querySelectorAll(".branch-grid .strategy"));
       const attempts = attemptsFromReport(report);
       const bestCost = report && report.best ? safeNumber(report.best["local" + "_cost"], Infinity) : Infinity;
       const selectedBranch = selectedBranchForReport(report, profile);
+      const reasoningState = !report ? currentReasoningState : null;
       strategies.forEach((strategy, index) => {
         const branch = strategyBranchCatalog[index];
         if (!branch) return;
         const branchAttempts = attempts.filter((item) => strategyMatchesBranch(item, branch, profile));
         const bestAttempt = branchAttempts.slice().sort((a, b) => localCostOf(a) - localCostOf(b))[0];
         const hasReport = Boolean(report);
-        const isBest = hasReport && branch.id === selectedBranch;
-        const isEvaluating = !hasReport && evaluatingBranch === branch.id;
-        const rejected = hasReport && !isBest && branchAttempts.length > 0;
-        const score = bestAttempt
+        const reasoningStatus = reasoningState && reasoningState.statuses ? reasoningState.statuses[branch.id] : "";
+        const isBest = hasReport ? branch.id === selectedBranch : reasoningStatus === "selected";
+        const isEvaluating = !hasReport && (reasoningStatus === "evaluating" || (!reasoningState && evaluatingBranch === branch.id));
+        const rejected = hasReport ? (!isBest && branchAttempts.length > 0) : reasoningStatus === "rejected";
+        const pending = !hasReport && !isBest && !isEvaluating && !rejected;
+        const reasoningScore = reasoningState && reasoningState.scores ? reasoningState.scores[branch.id] : NaN;
+        const score = Number.isFinite(reasoningScore)
+          ? Math.max(0.32, Math.min(0.99, reasoningScore)).toFixed(2)
+          : bestAttempt
           ? Math.max(0.32, Math.min(0.96, (Number.isFinite(bestCost) ? bestCost : localCostOf(bestAttempt)) / Math.max(localCostOf(bestAttempt, 1), 1))).toFixed(2)
           : "--";
         const statusText = isBest ? "Selected" : isEvaluating ? "Evaluating" : rejected ? "Rejected" : hasReport ? "Not tried" : "Pending";
@@ -2109,7 +2174,9 @@ def render_index() -> str:
         strategy.classList.toggle("best", isBest);
         strategy.classList.toggle("evaluating", isEvaluating);
         strategy.classList.toggle("rejected", rejected);
-        strategy.classList.toggle("pending", !hasReport && !isEvaluating);
+        strategy.classList.toggle("pending", pending);
+        strategy.dataset.reasoningStatus = hasReport ? (isBest ? "selected" : rejected ? "rejected" : "not-tried") : (reasoningStatus || (isEvaluating ? "evaluating" : "pending"));
+        strategy.dataset.reasoningOrder = reasoningState && Array.isArray(reasoningState.order) ? String(reasoningState.order.indexOf(branch.id) + 1 || "") : "";
         strategy.querySelector("h4").textContent = branch.id + (isBest ? " ✓" : "");
         strategy.querySelector("p").innerHTML = `<b>${branch.title}</b><br>${branch.desc}`;
         strategy.querySelector("strong").innerHTML = `${score} <span class="badge ${badgeClass}">${statusText}</span>`;
@@ -2123,6 +2190,10 @@ def render_index() -> str:
       });
       if (currentReport) {
         renderStrategyCards(currentProfile || profileForCase(selectedCase()), currentReport);
+        return;
+      }
+      if (currentReasoningState) {
+        renderStrategyCards(currentProfile || profileForCase(selectedCase()), null);
         return;
       }
       const samplePath = currentSimulationSample && Array.isArray(currentSimulationSample.strategy_path) ? currentSimulationSample.strategy_path : [];
@@ -2899,6 +2970,7 @@ def render_index() -> str:
       const profile = profileForCase(activeCase);
       currentProfile = profile;
       currentReport = null;
+      clearReasoningState();
       profile.dispatchMap = null;
       profile.assignments = {};
       profile.selected = "";
@@ -2988,6 +3060,7 @@ def render_index() -> str:
     }
     function render(report) {
       currentReport = report || null;
+      clearReasoningState();
       const profile = currentProfile || profileForCase(selectedCase());
       currentProfile = profile;
       const best = report && report.best ? report.best : {};
@@ -3030,17 +3103,38 @@ def render_index() -> str:
       currentProfile = profile;
       profile.selected = "";
       profile.assignments = {};
+      profile.mapFocusMode = "overview";
+      const routeSvg = document.querySelector(".route-svg");
+      if (routeSvg) routeSvg.innerHTML = "";
+      document.body.classList.add("pending-run", "sample-preview", "reasoning");
       setStatus(`基于 ${sample.name} ${sampleNumberLabel(sample)} 推理`, true);
       updateReasonSummary(profile, null);
-      const path = Array.isArray(sample.strategy_path) ? sample.strategy_path.map((item) => item.id) : [];
-      for (let step = 0; step <= 5; step += 1) {
-        updateReasonProgress(step);
-        if (step >= 2 && path[step - 2]) setStatus(`评估策略 ${path[step - 2]}：${sample.seed}`, true);
-        await wait(step < 2 ? 160 : 260);
+      setReasoningState(sample, -1, false);
+      updateReasonProgress(0);
+      await wait(170);
+      updateReasonProgress(1);
+      setStatus(`识别 ${sample.name} 的订单密度、骑手意愿和路况风险`, true);
+      await wait(210);
+      updateReasonProgress(2);
+      setStatus(`生成候选派单策略：${sample.seed}`, true);
+      await wait(210);
+      const evaluationOrder = reasoningOrderForSample(sample);
+      for (let index = 0; index < evaluationOrder.length; index += 1) {
+        const branchId = evaluationOrder[index];
+        const branch = strategyBranchCatalog.find((item) => item.id === branchId);
+        setReasoningState(sample, index, false);
+        updateReasonProgress(index < 2 ? 3 : 4);
+        setStatus(`评估策略 ${branchId}${branch ? " · " + branch.title : ""}：${sample.seed}`, true);
+        await wait(index === evaluationOrder.length - 1 ? 340 : 260);
       }
+      setReasoningState(sample, evaluationOrder.length, true);
+      updateReasonProgress(5);
+      setStatus(`最终选择 ${sample.selected_strategy_id}：先锁定策略，再生成派单线`, true);
+      await wait(360);
+      if (routeSvg) routeSvg.innerHTML = "";
       const mapPayload = simulationFinalMap(sample);
       const report = reportForSimulationSample(sample, mapPayload);
-      document.body.classList.remove("pending-run", "sample-preview");
+      document.body.classList.remove("pending-run", "sample-preview", "reasoning");
       render(report);
       setStatus("当前样本派单完成", false);
       showToast("已按当前刷新样本生成最终派单线");

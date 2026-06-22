@@ -1,0 +1,1058 @@
+{
+  "checkedAt": "2026-06-22T16:01:22.885Z",
+  "scenario": "rain_low_willingness",
+  "before": {
+    "arrowCount": 0,
+    "bodyClass": "pending-run sample-preview",
+    "counts": {
+      "pending": 5
+    },
+    "currentNodes": 1,
+    "elapsedMs": 0,
+    "label": "before-run",
+    "merchantPins": 4,
+    "routeCount": 0,
+    "selectedNodes": 0,
+    "statusText": "已刷新样本 #01，等待推理",
+    "strategyStates": [
+      {
+        "branch": "S1",
+        "className": "strategy pending",
+        "order": "",
+        "status": "pending",
+        "text": "S1 Bundle-first 高重叠订单组成合单候选 --"
+      },
+      {
+        "branch": "S2",
+        "className": "strategy pending",
+        "order": "",
+        "status": "pending",
+        "text": "S2 Multi-dispatch 单任务多骑手候选扩展 --"
+      },
+      {
+        "branch": "S3",
+        "className": "strategy pending",
+        "order": "",
+        "status": "pending",
+        "text": "S3 Repair search 从基线方案做局部修复 --"
+      },
+      {
+        "branch": "S4",
+        "className": "strategy pending",
+        "order": "",
+        "status": "pending",
+        "text": "S4 Greedy baseline 最近/最低成本基线派单 --"
+      },
+      {
+        "branch": "S5",
+        "className": "strategy pending",
+        "order": "",
+        "status": "pending",
+        "text": "S5 Risk balancing 低意愿与时间窗风险平衡 --"
+      }
+    ]
+  },
+  "timeline": [
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "pending": 5
+      },
+      "currentNodes": 1,
+      "elapsedMs": 0,
+      "label": "poll-0",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 1,
+      "statusText": "识别 雨天低接单意愿 的订单密度、骑手意愿和路况风险",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy pending",
+          "order": "2",
+          "status": "pending",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy pending",
+          "order": "1",
+          "status": "pending",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "pending": 5
+      },
+      "currentNodes": 1,
+      "elapsedMs": 118,
+      "label": "poll-1",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 1,
+      "statusText": "识别 雨天低接单意愿 的订单密度、骑手意愿和路况风险",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy pending",
+          "order": "2",
+          "status": "pending",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy pending",
+          "order": "1",
+          "status": "pending",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "pending": 5
+      },
+      "currentNodes": 1,
+      "elapsedMs": 238,
+      "label": "poll-2",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 2,
+      "statusText": "生成候选派单策略：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy pending",
+          "order": "2",
+          "status": "pending",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy pending",
+          "order": "1",
+          "status": "pending",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "pending": 5
+      },
+      "currentNodes": 1,
+      "elapsedMs": 357,
+      "label": "poll-3",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 2,
+      "statusText": "生成候选派单策略：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy pending",
+          "order": "2",
+          "status": "pending",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy pending",
+          "order": "1",
+          "status": "pending",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 4
+      },
+      "currentNodes": 1,
+      "elapsedMs": 475,
+      "label": "poll-4",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 3,
+      "statusText": "评估策略 S4 · Greedy baseline：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy pending",
+          "order": "2",
+          "status": "pending",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy evaluating",
+          "order": "1",
+          "status": "evaluating",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 4
+      },
+      "currentNodes": 1,
+      "elapsedMs": 595,
+      "label": "poll-5",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 3,
+      "statusText": "评估策略 S4 · Greedy baseline：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy pending",
+          "order": "2",
+          "status": "pending",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy evaluating",
+          "order": "1",
+          "status": "evaluating",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 3,
+        "rejected": 1
+      },
+      "currentNodes": 1,
+      "elapsedMs": 714,
+      "label": "poll-6",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 3,
+      "statusText": "评估策略 S3 · Repair search：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy evaluating",
+          "order": "2",
+          "status": "evaluating",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 3,
+        "rejected": 1
+      },
+      "currentNodes": 1,
+      "elapsedMs": 834,
+      "label": "poll-7",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 3,
+      "statusText": "评估策略 S3 · Repair search：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy pending",
+          "order": "3",
+          "status": "pending",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy evaluating",
+          "order": "2",
+          "status": "evaluating",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 2,
+        "rejected": 2
+      },
+      "currentNodes": 1,
+      "elapsedMs": 953,
+      "label": "poll-8",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 4,
+      "statusText": "评估策略 S2 · Multi-dispatch：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy evaluating",
+          "order": "3",
+          "status": "evaluating",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 2,
+        "rejected": 2
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1071,
+      "label": "poll-9",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 4,
+      "statusText": "评估策略 S2 · Multi-dispatch：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy pending",
+          "order": "4",
+          "status": "pending",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy evaluating",
+          "order": "3",
+          "status": "evaluating",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 1,
+        "rejected": 3
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1187,
+      "label": "poll-10",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 4,
+      "statusText": "评估策略 S1 · Bundle-first：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy evaluating",
+          "order": "4",
+          "status": "evaluating",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "pending": 1,
+        "rejected": 3
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1304,
+      "label": "poll-11",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 4,
+      "statusText": "评估策略 S1 · Bundle-first：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy evaluating",
+          "order": "4",
+          "status": "evaluating",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy pending",
+          "order": "5",
+          "status": "pending",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "rejected": 4
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1421,
+      "label": "poll-12",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 4,
+      "statusText": "评估策略 S5 · Risk balancing：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy rejected",
+          "order": "4",
+          "status": "rejected",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy evaluating",
+          "order": "5",
+          "status": "evaluating",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "rejected": 4
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1538,
+      "label": "poll-13",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 4,
+      "statusText": "评估策略 S5 · Risk balancing：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy rejected",
+          "order": "4",
+          "status": "rejected",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy evaluating",
+          "order": "5",
+          "status": "evaluating",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "evaluating": 1,
+        "rejected": 4
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1655,
+      "label": "poll-14",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 4,
+      "statusText": "评估策略 S5 · Risk balancing：rain_low_willingness-mqpekksd-1",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy rejected",
+          "order": "4",
+          "status": "rejected",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy evaluating",
+          "order": "5",
+          "status": "evaluating",
+          "text": "S5 Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "rejected": 4,
+        "selected": 1
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1771,
+      "label": "poll-15",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 5,
+      "statusText": "最终选择 S5：先锁定策略，再生成派单线",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy rejected",
+          "order": "4",
+          "status": "rejected",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy best",
+          "order": "5",
+          "status": "selected",
+          "text": "S5 ✓ Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "rejected": 4,
+        "selected": 1
+      },
+      "currentNodes": 1,
+      "elapsedMs": 1888,
+      "label": "poll-16",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 5,
+      "statusText": "最终选择 S5：先锁定策略，再生成派单线",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy rejected",
+          "order": "4",
+          "status": "rejected",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy best",
+          "order": "5",
+          "status": "selected",
+          "text": "S5 ✓ Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 0,
+      "bodyClass": "pending-run sample-preview reasoning",
+      "counts": {
+        "rejected": 4,
+        "selected": 1
+      },
+      "currentNodes": 1,
+      "elapsedMs": 2004,
+      "label": "poll-17",
+      "merchantPins": 4,
+      "routeCount": 0,
+      "selectedNodes": 5,
+      "statusText": "最终选择 S5：先锁定策略，再生成派单线",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy rejected",
+          "order": "4",
+          "status": "rejected",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "3",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "2",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "1",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy best",
+          "order": "5",
+          "status": "selected",
+          "text": "S5 ✓ Risk balancing 低意愿与时间窗风险平衡 0.95"
+        }
+      ]
+    },
+    {
+      "arrowCount": 4,
+      "bodyClass": "",
+      "counts": {
+        "rejected": 4,
+        "selected": 1
+      },
+      "currentNodes": 0,
+      "elapsedMs": 2121,
+      "label": "poll-18",
+      "merchantPins": 4,
+      "routeCount": 4,
+      "selectedNodes": 6,
+      "statusText": "当前样本派单完成",
+      "strategyStates": [
+        {
+          "branch": "S1",
+          "className": "strategy rejected",
+          "order": "",
+          "status": "rejected",
+          "text": "S1 Bundle-first 高重叠订单组成合单候选 0.83 Rejected"
+        },
+        {
+          "branch": "S2",
+          "className": "strategy rejected",
+          "order": "",
+          "status": "rejected",
+          "text": "S2 Multi-dispatch 单任务多骑手候选扩展 0.67 Rejected"
+        },
+        {
+          "branch": "S3",
+          "className": "strategy rejected",
+          "order": "",
+          "status": "rejected",
+          "text": "S3 Repair search 从基线方案做局部修复 0.61 Rejected"
+        },
+        {
+          "branch": "S4",
+          "className": "strategy rejected",
+          "order": "",
+          "status": "rejected",
+          "text": "S4 Greedy baseline 最近/最低成本基线派单 0.58 Rejected"
+        },
+        {
+          "branch": "S5",
+          "className": "strategy best",
+          "order": "",
+          "status": "selected",
+          "text": "S5 ✓ Risk balancing 低意愿与时间窗风险平衡 0.95 Selected"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "polls": 19,
+    "reasoningPolls": 18,
+    "maxRoutesDuringReasoning": 0,
+    "capturedEvaluating": true,
+    "capturedRejected": true,
+    "capturedSelectedBeforeRoutes": true,
+    "finalRoutes": 4,
+    "finalMerchantPins": 4
+  },
+  "violations": []
+}
