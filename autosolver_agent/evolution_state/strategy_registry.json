@@ -42,6 +42,138 @@
     "status": "rejected",
     "target_regime": "large"
   },
+  "gen_large_v002": {
+    "accepted": 0,
+    "attempts": 1,
+    "case_profile_history": [
+      {
+        "accepted": false,
+        "avg_willingness": 0.9,
+        "couriers": 1,
+        "decision": "reject",
+        "has_bundles": false,
+        "regime": "large",
+        "rows": 1,
+        "tasks": 1
+      }
+    ],
+    "file": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/autosolver_agent/evolution_state/generated_strategies/gen_large_v002.py",
+    "last_case_profile": {
+      "avg_willingness": 0.9,
+      "couriers": 1,
+      "has_bundles": false,
+      "regime": "large",
+      "rows": 1,
+      "tasks": 1
+    },
+    "last_cost": 1.0,
+    "last_decision": "reject",
+    "last_reason": "quality regression",
+    "last_seen": "2026-06-21T16:23:42",
+    "origin_case_profile": {
+      "avg_willingness": 0.9,
+      "couriers": 1,
+      "has_bundles": false,
+      "regime": "large",
+      "rows": 1,
+      "tasks": 1
+    },
+    "rejected": 1,
+    "rollback_action": "removed_from_active_pool",
+    "safety_passed": true,
+    "safety_reason": "passed",
+    "source": "run_agent:custom:best-so-far experiment",
+    "status": "rejected",
+    "target_regime": "large"
+  },
+  "gen_large_v003": {
+    "accepted": 0,
+    "attempts": 1,
+    "case_profile_history": [
+      {
+        "accepted": false,
+        "avg_willingness": 0.299973,
+        "couriers": 80,
+        "decision": "reject",
+        "has_bundles": true,
+        "regime": "large",
+        "rows": 33780,
+        "tasks": 40
+      }
+    ],
+    "file": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/autosolver_agent/evolution_state/generated_strategies/gen_large_v003.py",
+    "last_case_profile": {
+      "avg_willingness": 0.299973,
+      "couriers": 80,
+      "has_bundles": true,
+      "regime": "large",
+      "rows": 33780,
+      "tasks": 40
+    },
+    "last_cost": 1151.0957585,
+    "last_decision": "reject",
+    "last_reason": "quality regression",
+    "last_seen": "2026-06-21T16:36:37",
+    "origin_case_profile": {
+      "avg_willingness": 0.299973,
+      "couriers": 80,
+      "has_bundles": true,
+      "regime": "large",
+      "rows": 33780,
+      "tasks": 40
+    },
+    "rejected": 1,
+    "rollback_action": "removed_from_active_pool",
+    "safety_passed": true,
+    "safety_reason": "passed",
+    "source": "run_agent:large_seed301:best-so-far experiment",
+    "status": "rejected",
+    "target_regime": "large"
+  },
+  "gen_large_v004": {
+    "accepted": 0,
+    "attempts": 1,
+    "case_profile_history": [
+      {
+        "accepted": false,
+        "avg_willingness": 0.299973,
+        "couriers": 80,
+        "decision": "reject",
+        "has_bundles": true,
+        "regime": "large",
+        "rows": 33780,
+        "tasks": 40
+      }
+    ],
+    "file": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/autosolver_agent/evolution_state/generated_strategies/gen_large_v004.py",
+    "last_case_profile": {
+      "avg_willingness": 0.299973,
+      "couriers": 80,
+      "has_bundles": true,
+      "regime": "large",
+      "rows": 33780,
+      "tasks": 40
+    },
+    "last_cost": 1151.0957585,
+    "last_decision": "reject",
+    "last_reason": "quality regression",
+    "last_seen": "2026-06-21T16:53:26",
+    "origin_case_profile": {
+      "avg_willingness": 0.299973,
+      "couriers": 80,
+      "has_bundles": true,
+      "regime": "large",
+      "rows": 33780,
+      "tasks": 40
+    },
+    "rejected": 1,
+    "rollback_action": "removed_from_active_pool",
+    "safety_passed": true,
+    "safety_reason": "passed",
+    "source": "run_agent:large_seed301:best-so-far experiment",
+    "status": "rejected",
+    "target_regime": "large"
+  },
   "gen_small_v001": {
     "accepted": 0,
     "attempts": 1,
