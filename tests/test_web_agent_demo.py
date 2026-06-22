@@ -12,91 +12,226 @@ class WebAgentDemoTest(unittest.TestCase):
 
         html = render_index()
 
-        self.assertIn("AutoSolver Agent System", html)
-        self.assertIn(">AutoSolver Agent Workbench</h1>", html)
-        self.assertNotIn("看见 Agent 如何一步步求解", html)
-        self.assertNotIn("AGENT LOOP", html)
+        self.assertIn("AutoSolver Agent", html)
+        self.assertIn("Real-time Dispatch Assignment Optimization", html)
+        self.assertIn("Relative Improvement vs Greedy", html)
+        self.assertIn("large_seed301", html)
+        self.assertIn("00:00:08", html)
+        self.assertIn("$657.10", html)
+        self.assertIn("+68.7%", html)
         self.assertIn("id=\"run-agent\"", html)
-        self.assertIn("Developer Workbench", html)
-        self.assertIn("AI Explainable Dispatch Platform", html)
-        self.assertIn("AI 可解释调度决策平台", html)
-        self.assertIn("场景摘要", html)
-        self.assertIn("id=\"scenario-name\"", html)
-        self.assertIn("id=\"scenario-risk-tags\"", html)
-        self.assertIn("Baseline vs AutoSolver", html)
-        self.assertIn("id=\"result-comparison\"", html)
-        self.assertIn("运行调度分析", html)
-        self.assertIn("调度场景", html)
-        self.assertIn("三问摘要", html)
-        self.assertIn("AI 是如何思考的？", html)
-        self.assertIn("调度方案如何落地执行？", html)
-        self.assertIn("这个方案能为业务节约多少钱？", html)
-        self.assertIn("ReasonGraph 推理流", html)
-        self.assertIn("中文流式推理链", html)
-        self.assertIn("初始骨架", html)
-        self.assertIn("ReasonGraph 正在构建中", html)
-        self.assertIn("不展开底层策略日志", html)
-        self.assertIn("完整推理树会在运行完成后一次性落图", html)
-        self.assertIn("输入订单与骑手状态", html)
-        self.assertIn("路线可行性校验", html)
-        self.assertIn("实时物流路径工作台", html)
-        self.assertIn("推理完成后再显示候选路线、合单路径和最终线路", html)
-        self.assertIn("正在推理", html)
-        self.assertIn("商家位置", html)
-        self.assertIn("订单配送点", html)
-        self.assertIn("骑手当前位置", html)
-        self.assertIn("合单路径", html)
-        self.assertIn("候选履约路线", html)
-        self.assertIn("最终选中的派单路线", html)
+        self.assertIn("运行派单推理", html)
+        self.assertIn("选择调度场景", html)
+        self.assertIn("data-case=\"large_seed301\"", html)
+        self.assertIn("data-case=\"medium_seed201\"", html)
+        self.assertIn("data-case=\"scarce_couriers_seed401\"", html)
+        self.assertIn("data-case=\"low_willingness_seed501\"", html)
+        self.assertIn("data-map-action=\"routes\"", html)
+        self.assertIn("data-map-action=\"locate\"", html)
+        self.assertIn("data-map-action=\"fit\"", html)
+        self.assertIn("id=\"zoom-in\"", html)
+        self.assertIn("id=\"expand-graph\"", html)
+        self.assertIn("AI Reasoning Graph", html)
+        self.assertIn("Input Orders", html)
+        self.assertIn("Scene Diagnosis", html)
+        self.assertIn("Candidate Strategy Generation", html)
+        self.assertIn("Dispatch Feasibility Check", html)
+        self.assertIn("Cost / Risk Critic", html)
+        self.assertIn("Final Dispatch Plan (Selected)", html)
+        self.assertIn("Bundle-first", html)
+        self.assertIn("Multi-dispatch", html)
+        self.assertIn("Repair search", html)
+        self.assertIn("Greedy baseline", html)
+        self.assertIn("Time-window balancing", html)
+        self.assertIn('data-branch="S1"', html)
+        self.assertIn("selectedBranchForReport", html)
+        self.assertIn("renderStrategyCards", html)
+        self.assertNotIn('class="strategy best"', html)
+        self.assertNotIn("S1 ✓</h4>", html)
+        self.assertIn("Live Dispatch Assignment Map", html)
+        self.assertIn("调度片区", html)
+        self.assertIn("订单组", html)
+        self.assertIn("订单", html)
+        self.assertIn("骑手", html)
+        self.assertIn("最终派单连线", html)
+        self.assertIn("被淘汰候选", html)
+        self.assertIn("骑手位置", html)
+        self.assertIn("leaflet.css", html)
+        self.assertIn("leaflet.js", html)
+        self.assertIn("id=\"real-map\"", html)
+        self.assertIn("basemaps.cartocdn.com/dark_nolabels", html)
+        self.assertIn("pointToLatLng", html)
+        self.assertIn("renderLeafletDispatchMap", html)
+        self.assertIn("return false;", html)
+        self.assertIn("map-entities", html)
+        self.assertIn("pickup-leg", html)
+        self.assertIn("dispatchArrowFor", html)
+        self.assertIn("dispatch-arrow", html)
+        self.assertIn("等待运行派单推理", html)
+        for fake_value in ["C017 + C035", "Merchant R02", "<span class=\"chip\">T0012</span>", "T0018<small>", "T0023<small>"]:
+            self.assertNotIn(fake_value, html)
+        self.assertNotIn("selected-route", html)
+        self.assertNotIn("candidate-route", html)
         self.assertIn("Decision Explanation", html)
-        self.assertIn("候选方案对比与淘汰机制", html)
-        self.assertIn("Candidate Elimination", html)
-        self.assertIn("贪心基线", html)
-        self.assertIn("合单优先策略", html)
-        self.assertIn("多派候选策略", html)
-        self.assertIn("局部修复策略", html)
-        self.assertIn("最终 AutoSolver 方案", html)
-        self.assertIn("骑手接单意愿不足", html)
-        self.assertIn("路线绕行过长", html)
-        self.assertIn("占用骑手过多", html)
-        self.assertIn("合单收益不明显", html)
-        self.assertIn("无人接单风险偏高", html)
-        self.assertIn("商业价值量化", html)
-        self.assertIn("日均 10 万单", html)
-        self.assertIn("0.5-1 元", html)
-        self.assertIn("150 万到 300 万元", html)
-        self.assertIn("Agent 阶段", html)
-        self.assertIn("Planner", html)
-        self.assertIn("Executor", html)
-        self.assertIn("Critic", html)
-        self.assertIn("Controller", html)
-        self.assertIn("Memory", html)
-        self.assertIn("Evolution", html)
-        self.assertIn("Evolution Memory", html)
-        self.assertIn("Self-Evolving Code Loop", html)
-        self.assertIn("Generate", html)
-        self.assertIn("Safety Gate", html)
-        self.assertIn("Sandbox Execute", html)
-        self.assertIn("Rollback", html)
-        self.assertIn("Evolution Memory", html)
-        self.assertIn("background: linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%);", html)
-        self.assertIn(".timeline-panel, .inspector { min-height: 720px; }", html)
-        self.assertIn(".timeline-panel, .inspector { min-height: 0; }", html)
-        self.assertIn("min-height: 112px", html)
-        self.assertIn("\n      height: 560px;", html)
-        self.assertIn(".timeline { height: 460px; }", html)
-        self.assertNotIn("radial-gradient", html)
-        self.assertNotIn("backdrop-filter", html)
-        self.assertNotIn("@keyframes pulse", html)
-        self.assertNotIn("transform: translate", html)
-        self.assertNotIn("grid-template-rows: auto auto minmax(0, 1fr)", html)
-        self.assertIn("生成策略变体", html)
-        self.assertIn("case 画像", html)
-        self.assertIn("相似样例检索", html)
-        self.assertIn("审计与候选池", html)
-        self.assertIn("只有 accepted/candidate/trusted/promoted 策略才会被后续相似样例 replay", html)
+        self.assertIn("Selected Dispatch Assignment", html)
+        self.assertIn("骑手接单概率", html)
+        self.assertIn("Compared to Greedy", html)
+        self.assertIn("Candidate Dispatch Strategy Comparison", html)
+        self.assertIn("Final AutoSolver", html)
+        self.assertIn("(Selected)", html)
+        self.assertIn("Best trade-off across cost/risk/ETA", html)
+        self.assertIn("map-bg", html)
+        self.assertIn("district", html)
+        self.assertIn("anonymous-navigation-layer", html)
+        self.assertIn("simulated-map-layer", html)
+        self.assertIn("renderSimulatedBaseMap", html)
+        self.assertIn("building-block", html)
+        self.assertIn("traffic-band", html)
+        self.assertIn("commerce-hotspot", html)
+        self.assertIn("assignments:", html)
+        self.assertIn("assignmentForEntity", html)
+        self.assertIn("sceneLabels", html)
+        self.assertIn("caseCatalog", html)
+        self.assertIn("profileForCase", html)
+        self.assertIn("renderAssignmentDetail", html)
+        self.assertIn("updateReasonSummary", html)
+        self.assertIn("label.dataset.assignment", html)
+        self.assertIn("dispatch-link", html)
+        self.assertIn("courier-node", html)
+        self.assertIn("function applyMapFocus", html)
+        self.assertIn("function labelOffsetFor", html)
+        self.assertIn("function simulationPreviewMap", html)
+        self.assertIn("function simulationFinalMap", html)
+        self.assertIn("function renderEntityPreviewDetail", html)
+        self.assertIn("function runCurrentSimulationSample", html)
+        self.assertIn("function applySimulationSample", html)
+        self.assertIn("function refreshSimulationSample", html)
+        self.assertIn("/api/simulation-sample?", html)
+        self.assertIn("sample-preview", html)
+        self.assertIn("hideLabel: true", html)
+        self.assertIn('assignments: []', html)
+        self.assertIn("focus-selected", html)
+        self.assertIn("data-selected-assignment", html)
+        self.assertIn('pin.classList.toggle("active-assignment"', html)
+        self.assertIn('dispatchArrowFor(orderPoints.length ? deliveryRoute : pickupRoute, arrowCls, assignment.id, isActive)', html)
+        self.assertIn('event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow")', html)
+        self.assertIn("const isActive = assignment.id === selectedAssignment;", html)
+        self.assertIn("stroke: rgba(156, 177, 192, .44)", html)
+        self.assertIn("L${midX.toFixed(1)}", html)
+        self.assertNotIn('const cls = index === 0 ? "dispatch-link primary"', html)
         for forbidden in ["Proxy score", "local_cost", "40/40", "本地分数", "本地评分", "官方成绩"]:
             self.assertNotIn(forbidden, html)
+
+    def test_dispatch_map_uses_case_candidate_data(self):
+        from web_agent_demo.server import build_dispatch_assignment_map
+
+        payload = build_dispatch_assignment_map("scarce_couriers_seed401")
+
+        self.assertEqual(payload["stage"], "preview")
+        self.assertGreater(len(payload["assignments"]), 0)
+        self.assertGreater(len(payload["entities"]), 0)
+        first = payload["assignments"][0]
+        self.assertRegex(first["task_key"], r"^T\d+")
+        self.assertRegex(first["courier"], r"^C\d+")
+        self.assertTrue(str(first["pickup"]).startswith("G"))
+        entity_by_id = {item["id"]: item for item in payload["entities"]}
+        self.assertGreaterEqual(entity_by_id[first["pickup"]]["x"], 7.5)
+        self.assertLessEqual(entity_by_id[first["pickup"]]["x"], 92.5)
+        self.assertIn(str(first["courier"]).split(" + ")[0], entity_by_id)
+        self.assertTrue(all(order in entity_by_id for order in first["map_orders"]))
+
+    def test_all_listed_cases_have_dispatch_maps(self):
+        from web_agent_demo.server import build_dispatch_assignment_map, list_cases
+
+        seen_first_assignments = set()
+        for case in list_cases():
+            payload = build_dispatch_assignment_map(case["id"])
+            self.assertEqual(payload["case_id"], case["id"])
+            self.assertGreater(len(payload["assignments"]), 0, case["id"])
+            self.assertGreater(len(payload["entities"]), 0, case["id"])
+            first = payload["assignments"][0]
+            seen_first_assignments.add((first["task_key"], first["courier"]))
+            entity_by_id = {item["id"]: item for item in payload["entities"]}
+            self.assertIn(first["pickup"], entity_by_id)
+            for courier in str(first["courier"]).split(" + "):
+                self.assertIn(courier, entity_by_id)
+            for order in first["map_orders"]:
+                self.assertIn(order, entity_by_id)
+
+        self.assertGreater(len(seen_first_assignments), 5)
+
+    def test_dispatch_map_uses_network_clusters_not_lanes(self):
+        from web_agent_demo.server import build_dispatch_assignment_map
+
+        payload = build_dispatch_assignment_map("large_seed301", limit=8)
+        pickups = [
+            entity
+            for entity in payload["entities"]
+            if entity["kind"] == "pickup_cluster"
+        ]
+        xs = [entity["x"] for entity in pickups]
+        ys = [entity["y"] for entity in pickups]
+
+        self.assertGreaterEqual(len(pickups), 6)
+        self.assertGreater(max(xs) - min(xs), 25)
+        self.assertGreater(max(ys) - min(ys), 18)
+        rounded_y_steps = {
+            round(ys[index + 1] - ys[index], 1)
+            for index in range(len(ys) - 1)
+        }
+        self.assertGreater(len(rounded_y_steps), 3)
+
+    def test_simulated_scenarios_generate_ten_samples_each(self):
+        from web_agent_demo.server import build_simulated_scenario_sample, list_simulated_scenarios
+
+        scenarios = list_simulated_scenarios()
+
+        self.assertGreaterEqual(len(scenarios), 5)
+        self.assertTrue(all(item["sample_count"] == 10 for item in scenarios))
+        self.assertTrue(all(item["map_style"] == "baidu_like_simulated" for item in scenarios))
+        for scenario in scenarios:
+            for sample_index in range(10):
+                sample = build_simulated_scenario_sample(str(scenario["id"]), sample_index)
+                self.assertEqual(sample["stage"], "preview")
+                self.assertEqual(sample["sample_index"], sample_index)
+                self.assertGreaterEqual(len(sample["merchants"]), 3)
+                self.assertLessEqual(len(sample["merchants"]), 6)
+                self.assertGreaterEqual(len(sample["couriers"]), 7)
+                self.assertGreaterEqual(len(sample["candidates"]), len(sample["merchants"]) * 2)
+                self.assertEqual(len(sample["assignments"]), len(sample["merchants"]))
+                self.assertTrue(sample["map_layers"]["hide_road_names"])
+                self.assertEqual(sample["map_layers"]["road_name_labels"], [])
+                self.assertGreaterEqual(len(sample["map_layers"]["roads"]), 8)
+                self.assertGreaterEqual(len(sample["map_layers"]["districts"]), 12)
+                self.assertGreaterEqual(len(sample["map_layers"]["roads"]), 20)
+                self.assertGreaterEqual(len(sample["map_layers"]["building_blocks"]), 20)
+                self.assertGreaterEqual(len(sample["map_layers"]["commerce_hotspots"]), 3)
+                self.assertGreaterEqual(len(sample["map_layers"]["intersections"]), 6)
+                self.assertTrue(all(not road["name_visible"] for road in sample["map_layers"]["roads"]))
+                merchant_points = [(float(item["x"]), float(item["y"])) for item in sample["merchants"]]
+                courier_points = [(float(item["x"]), float(item["y"])) for item in sample["couriers"]]
+                self.assertGreater(len(set(merchant_points)), 2)
+                self.assertGreater(len(set(courier_points)), 5)
+
+    def test_simulated_samples_cover_all_strategy_paths(self):
+        from web_agent_demo.server import build_simulated_scenario_samples
+
+        samples = build_simulated_scenario_samples()
+        selected = {sample["selected_strategy_id"] for sample in samples}
+
+        self.assertEqual(len(samples), 60)
+        self.assertTrue({"S1", "S2", "S3", "S4", "S5"}.issubset(selected))
+        for sample in samples:
+            path = sample["strategy_path"]
+            self.assertEqual(len(path), 5)
+            self.assertEqual(sum(1 for item in path if item["status"] == "selected"), 1)
+            for assignment in sample["assignments"]:
+                self.assertIn("merchant_id", assignment)
+                self.assertIn("courier_id", assignment)
+                self.assertIn("backup_courier_id", assignment)
+                self.assertGreater(float(assignment["cost"]), 0)
+                self.assertGreaterEqual(int(assignment["eta_min"]), 6)
+                self.assertIn(assignment["risk"], {"Low", "Medium", "High"})
 
     def test_home_page_keeps_review_alignment_out_of_frontend_layout(self):
         from web_agent_demo.server import render_index
@@ -117,25 +252,13 @@ class WebAgentDemoTest(unittest.TestCase):
 
         html = render_index()
 
-        for step_id in [
-            "evolution-step-generate",
-            "evolution-step-recall",
-            "evolution-step-safety",
-            "evolution-step-sandbox",
-            "evolution-step-decision",
-            "evolution-step-memory",
-        ]:
-            self.assertIn(f'id="{step_id}"', html)
-        self.assertIn("data-evolution-step", html)
-        self.assertIn("pending", html)
-        self.assertIn("let evolutionState", html)
-        self.assertIn("function paintEvolutionPanel()", html)
-        self.assertIn("未命中相似候选，本轮仅生成新策略变体", html)
-        self.assertIn("仅写入审计日志，不进入候选池", html)
-        self.assertIn("失败原因", html)
-        self.assertIn("系统动作", html)
-        self.assertIn("试跑超时", html)
-        self.assertIn("质量门未通过", html)
+        self.assertNotIn("evolution-step-generate", html)
+        self.assertNotIn("data-evolution-step", html)
+        self.assertNotIn("function paintEvolutionPanel()", html)
+        self.assertIn("evolution_generate", html)
+        self.assertIn("evolution_validate", html)
+        self.assertIn("evolution_trial", html)
+        self.assertIn("handleProgressEvent", html)
 
     def test_case_listing_exposes_large_seed301_without_local_paths(self):
         from web_agent_demo.server import list_cases

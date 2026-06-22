@@ -1,0 +1,76 @@
+{
+  "afterRefresh": {
+    "buildings": 24,
+    "caseId": "商圈十字路口高峰 #01",
+    "courierPins": 11,
+    "labels": 0,
+    "merchantPins": 5,
+    "roads": 28,
+    "routes": 0,
+    "samplePreview": true,
+    "seedStatus": "已刷新样本 #01，等待推理",
+    "trafficBands": 8
+  },
+  "merchantDetail": {
+    "chips": [
+      "R0102 · 71%",
+      "R0101 · 62%",
+      "R0111 · 74%"
+    ],
+    "text": "黄色点位为商家侧订单入口，位于道路边/建筑边；当前有 1 单待派。",
+    "title": "商家/订单点：O0101"
+  },
+  "afterRun": {
+    "activeRoutes": 1,
+    "arrows": 5,
+    "caseId": "商圈十字路口高峰 #01",
+    "courierPins": 11,
+    "detailMerchant": "订单组 O0101 最终派给 R0102",
+    "detailTitle": "Selected Dispatch Assignment",
+    "labels": 0,
+    "merchantPins": 5,
+    "pendingRun": false,
+    "rejectedStrategies": 4,
+    "routeAssignments": [
+      "A0101",
+      "A0102",
+      "A0103",
+      "A0104",
+      "A0105"
+    ],
+    "routes": 5,
+    "samplePreview": false,
+    "selectedAssignment": "A0101",
+    "selectedStrategies": [
+      "S3 ✓"
+    ],
+    "status": "当前样本派单完成"
+  },
+  "errors": [
+    {
+      "level": "error",
+      "message": "TypeError: Cannot set properties of null (setting 'textContent')\n    at render (http://127.0.0.1:8765/:1896:35)\n    at runCurrentSimulationSample (http://127.0.0.1:8765/:1934:7)\n    at async HTMLButtonElement.streamRun (http://127.0.0.1:8765/:1941:11)",
+      "timestamp": "2026-06-22T15:18:57.968Z",
+      "url": "http://127.0.0.1:8765/"
+    }
+  ],
+  "finalNoNewErrors": {
+    "marker": "2026-06-22T15:21:17.285Z",
+    "finalState": {
+      "activeRoutes": 1,
+      "arrows": 5,
+      "courierPins": 13,
+      "labels": 0,
+      "merchantPins": 5,
+      "pendingRun": false,
+      "rejectedStrategies": 4,
+      "routes": 5,
+      "samplePreview": false,
+      "selectedStrategies": [
+        "S1 ✓"
+      ],
+      "status": "当前样本派单完成"
+    },
+    "newErrors": []
+  }
+}
