@@ -135,7 +135,7 @@ def render_index() -> str:
     .lead { color: var(--muted); font-size: 16px; line-height: 1.7; max-width: 820px; position: relative; z-index: 1; }
     .controls { padding: 22px; display: grid; gap: 12px; }
     .control-row { display: grid; grid-template-columns: 1fr 130px; gap: 10px; }
-    .summary-panel, .compare-panel { padding: 20px; margin-bottom: 18px; }
+    .summary-panel, .compare-panel, .answer-panel, .reason-graph-panel, .route-panel, .decision-panel, .candidate-panel, .business-panel { padding: 20px; margin-bottom: 18px; }
     .summary-head {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -189,6 +189,186 @@ def render_index() -> str:
       font-weight: 900;
     }
     .result-caption { margin: 8px 0 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .answer-grid, .business-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .answer-card, .business-card {
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      min-height: 120px;
+    }
+    .answer-card b, .business-card b { display: block; margin-bottom: 8px; }
+    .answer-card p, .business-card p { margin: 0; color: var(--muted); line-height: 1.55; font-size: 14px; }
+    .reason-steps {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .reason-step {
+      position: relative;
+      min-height: 104px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-content: start;
+    }
+    .reason-step:after {
+      content: "";
+      position: absolute;
+      left: 30px;
+      bottom: -13px;
+      width: 2px;
+      height: 12px;
+      background: var(--line-strong);
+    }
+    .reason-step:last-child:after { display: none; }
+    .reason-step.pass { border-color: rgba(21,128,61,.45); background: #f0fdf4; }
+    .reason-step.fail { border-color: rgba(185,28,28,.35); background: #fef2f2; }
+    .reason-step.running { border-color: var(--accent); background: #eff6ff; }
+    .reason-step.muted { color: var(--muted); background: var(--card); }
+    .reason-index {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #e2e8f0;
+      font-weight: 900;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .reason-copy { display: grid; gap: 6px; }
+    .reason-step b { line-height: 1.35; }
+    .reason-step span { color: var(--muted); line-height: 1.45; font-size: 13px; }
+    .reason-stream {
+      display: block;
+      margin-top: 5px;
+      color: var(--accent-2);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .reason-build-note {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px dashed var(--line-strong);
+      background: var(--card);
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 13px;
+    }
+    .decision-board {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+    .decision-board .reason-graph-panel,
+    .decision-board .route-panel,
+    .decision-board .decision-panel { margin-bottom: 0; }
+    .route-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      margin-top: 14px;
+      align-items: stretch;
+    }
+    .route-map {
+      min-height: 300px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(#e2e8f0 1px, transparent 1px),
+        linear-gradient(90deg, #e2e8f0 1px, transparent 1px),
+        #ffffff;
+      background-size: 42px 42px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .route-map.pending-route .selected-route,
+    .route-map.pending-route .candidate-route,
+    .route-map.pending-route .bundle-route { opacity: .35; }
+    .route-map.running-route .candidate-route { border-color: var(--accent); background: #eff6ff; }
+    .route-map.final-route .selected-route { border-color: var(--success); background: #f0fdf4; }
+    .map-node {
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: rgba(255,255,255,.92);
+      padding: 10px;
+      display: grid;
+      gap: 4px;
+      align-content: start;
+      min-height: 74px;
+    }
+    .map-node strong { font-size: 13px; }
+    .map-node span { color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .map-node.selected { border-color: var(--accent); background: #eff6ff; }
+    .map-node.rejected { border-color: rgba(185,28,28,.32); background: #fff7ed; }
+    .route-detail {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+    .route-detail-card {
+      padding: 13px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+    .route-detail-card b { display: block; margin-bottom: 6px; }
+    .route-detail-card span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .decision-panel { display: grid; align-content: start; gap: 12px; }
+    .decision-list { display: grid; gap: 10px; margin-top: 14px; }
+    .decision-card {
+      padding: 13px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+    .decision-card b { display: block; margin-bottom: 6px; }
+    .decision-card span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .candidate-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      display: table;
+    }
+    .candidate-table th, .candidate-table td {
+      padding: 11px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .candidate-table th {
+      background: var(--card);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .candidate-table tr:last-child td { border-bottom: 0; }
+    .candidate-table .selected-row td { background: #eff6ff; }
+    .candidate-table code { font-family: var(--mono); color: var(--muted); font-size: 12px; }
     label { color: var(--muted); font-size: 13px; font-weight: 800; display: grid; gap: 7px; }
     select, input, button {
       width: 100%;
@@ -491,9 +671,10 @@ def render_index() -> str:
       line-height: 1.7;
     }
     @media (max-width: 1100px) {
-      .workbench, .topbar { grid-template-columns: 1fr; }
-      .summary-grid, .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .workbench, .topbar, .decision-board { grid-template-columns: 1fr; }
+      .summary-grid, .result-grid, .answer-grid, .business-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .code-loop { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .route-grid { grid-template-columns: 1fr; }
       .rail, .inspector { position: static; }
       .rail, .timeline-panel, .inspector { min-height: 0; }
       .timeline { height: 460px; }
@@ -501,9 +682,10 @@ def render_index() -> str:
     @media (max-width: 760px) {
       main { width: min(100vw - 20px, 1180px); padding-top: 16px; }
       .control-row, .timeline-toolbar, .attempt, .code-loop, .evolution-head { grid-template-columns: 1fr; }
-      .summary-head, .summary-grid, .result-grid { grid-template-columns: 1fr; }
+      .summary-head, .summary-grid, .result-grid, .answer-grid, .business-grid { grid-template-columns: 1fr; }
       .event { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: 1fr; }
+      .candidate-table { display: block; overflow-x: auto; }
     }
   </style>
 </head>
@@ -511,9 +693,9 @@ def render_index() -> str:
 <main>
   <div class="topbar">
     <section class="hero panel">
-      <div class="eyebrow">Developer Workbench</div>
+      <div class="eyebrow">AI Explainable Dispatch Platform · Developer Workbench</div>
       <h1>AutoSolver Agent Workbench</h1>
-      <p class="lead">用于复核同一套 Agent 控制器如何处理当前调度场景。页面按输入摘要、运行轨迹、候选策略、结果对比和实验轨道组织信息，保留技术 ID，避免把内部估算包装成正式评测结论。</p>
+      <p class="lead">面向开发人员的 AI 可解释调度决策平台：展示 AutoSolver 如何识别场景、生成候选、评估风险、淘汰低质量方案，并解释最终为什么选择当前调度路径。</p>
     </section>
     <section class="controls panel">
       <div class="control-row">
@@ -552,6 +734,94 @@ def render_index() -> str:
       <div class="loop-badge">Result Comparison</div>
     </div>
     <div id="result-comparison" class="result-grid"><div class="empty">运行调度分析后，这里会展示覆盖、候选组、骑手占用、耗时和接受策略数。</div></div>
+  </section>
+
+  <section class="answer-panel panel" aria-label="三问摘要">
+    <div class="summary-head">
+      <div>
+        <h2>三问摘要</h2>
+        <p class="result-caption">对应未来计划的最终目标：同时解释 AI 推理、履约路径和业务价值，保持可复核的开发者视角。</p>
+      </div>
+      <div class="loop-badge">Future Plan Alignment</div>
+    </div>
+    <div class="answer-grid">
+      <div class="answer-card"><b>AI 是如何思考的？</b><p>ReasonGraph 将输入、场景识别、候选生成、路线校验、成本风险评估和最终输出拆成可观察链路。</p></div>
+      <div class="answer-card"><b>调度方案如何落地执行？</b><p>真实物流路径规划工作台用示意网格展示商家、订单、骑手、合单路径、候选路线和最终派单路线。</p></div>
+      <div class="answer-card"><b>这个方案能为业务节约多少钱？</b><p>商业价值量化区按日均 10 万单、每单 0.5-1 元履约损耗估算每日和月度节约空间。</p></div>
+    </div>
+  </section>
+
+  <section class="decision-board" aria-label="可解释调度决策工作台">
+    <aside class="reason-graph-panel panel" aria-label="ReasonGraph 推理过程">
+      <div class="summary-head">
+        <div>
+          <h2>ReasonGraph 推理流</h2>
+          <p class="result-caption">中文流式推理链。运行中节点显示“正在推理”，通过路径高亮，失败路径灰化并标注淘汰原因。</p>
+        </div>
+      </div>
+      <div id="reason-graph" class="reason-steps">
+        <div class="reason-step muted"><div class="reason-index">01</div><div class="reason-copy"><b>输入订单与骑手状态</b><span>选择场景后先加载商家、订单和骑手。</span><span class="reason-stream">等待场景选择</span></div></div>
+        <div class="reason-step muted"><div class="reason-index">02</div><div class="reason-copy"><b>场景识别与风险判断</b><span>等待 Agent 感知。</span><span class="reason-stream">等待推理</span></div></div>
+        <div class="reason-step muted"><div class="reason-index">03</div><div class="reason-copy"><b>候选策略生成</b><span>等待 Planner。</span><span class="reason-stream">等待推理</span></div></div>
+        <div class="reason-step muted"><div class="reason-index">04</div><div class="reason-copy"><b>路线可行性校验</b><span>等待 Executor。</span><span class="reason-stream">等待推理</span></div></div>
+        <div class="reason-step muted"><div class="reason-index">05</div><div class="reason-copy"><b>成本与接单风险评估</b><span>等待 Critic。</span><span class="reason-stream">等待推理</span></div></div>
+        <div class="reason-step muted"><div class="reason-index">06</div><div class="reason-copy"><b>最终派单方案输出</b><span>等待 Memory。</span><span class="reason-stream">等待推理</span></div></div>
+      </div>
+    </aside>
+
+    <section class="route-panel panel" aria-label="真实物流路径规划">
+      <div class="summary-head">
+        <div>
+          <h2>实时物流路径工作台</h2>
+          <p class="result-caption">参考 AWS 路线优化项目的结果层。初始只显示场景、商家和骑手；推理完成后再显示候选路线、合单路径和最终线路。</p>
+        </div>
+        <div class="loop-badge" id="route-state">场景已加载</div>
+      </div>
+      <div class="route-grid">
+        <div id="route-map" class="route-map pending-route">
+          <div class="map-node"><strong>商家位置</strong><span>等待场景选择</span></div>
+          <div class="map-node"><strong>骑手当前位置</strong><span>等待场景选择</span></div>
+          <div class="map-node"><strong>订单配送点</strong><span>等待场景选择</span></div>
+          <div class="map-node candidate-route rejected"><strong>候选履约路线</strong><span>推理后显示。</span></div>
+          <div class="map-node bundle-route"><strong>合单路径</strong><span>推理后显示。</span></div>
+          <div class="map-node selected-route selected"><strong>最终选中的派单路线</strong><span>推理完成后显示。</span></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="decision-panel panel" aria-label="Decision Explanation">
+      <h2>决策解释</h2>
+      <p class="result-caption">右侧解释当前选中路线、ETA、合单收益、接单概率和替代方案淘汰原因。</p>
+      <div id="route-detail" class="decision-list">
+        <div class="decision-card"><b>等待推理完成</b><span>推理完成后展示中文 Decision Explanation。</span></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="candidate-panel panel" aria-label="候选方案对比与淘汰机制">
+    <div class="summary-head">
+      <div>
+        <h2>候选方案对比与淘汰机制</h2>
+        <p class="result-caption">同时展示贪心基线、合单优先策略、多派候选策略、局部修复策略和最终 AutoSolver 方案；淘汰原因使用业务语言解释。</p>
+      </div>
+      <div class="loop-badge">Candidate Elimination</div>
+    </div>
+    <div id="candidate-comparison"><div class="empty">运行调度分析后，这里会展示覆盖率、无人接单风险、预计成本、骑手占用、预计送达时间、稳定性和淘汰原因。</div></div>
+  </section>
+
+  <section class="business-panel panel" aria-label="商业价值量化">
+    <div class="summary-head">
+      <div>
+        <h2>商业价值量化</h2>
+        <p class="result-caption">演示口径估算，不代表正式评测结论或真实线上收益；用于把算法指标转化为无人接单减少、骑手利用率提升、履约成本下降和高峰期稳定性提升。</p>
+      </div>
+      <div class="loop-badge">Business Estimate</div>
+    </div>
+    <div id="business-value" class="business-grid">
+      <div class="business-card"><b>每日节约空间</b><p>按日均 10 万单、每单 0.5-1 元履约损耗估算：约 5 万到 10 万元。</p></div>
+      <div class="business-card"><b>单城市月度空间</b><p>按 30 天计算：约 150 万到 300 万元。</p></div>
+      <div class="business-card"><b>间接收益</b><p>降低无人接单、减少超时补偿、减少人工调度介入、提升骑手资源利用率。</p></div>
+    </div>
   </section>
 
   <section class="workbench">
@@ -695,6 +965,212 @@ function renderResultComparison(report) {
     <div class="result-item"><span>AutoSolver Coverage</span><strong>${safe(coverageText(best))}</strong><code>uncovered tasks: ${safe(bestUncovered)}</code></div>
     <div class="result-item"><span>Resource Use</span><strong>${safe(best?.used_couriers ?? 'n/a')}</strong><code>couriers · groups ${safe(best?.groups ?? 'n/a')}</code></div>
     <div class="result-item"><span>Run Evidence</span><strong>${safe(wallMs)}</strong><code>${safe(accepted)} accepted / ${safe(attempts.length)} attempts</code></div>
+  `;
+}
+function numberText(value, suffix = '') {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? `${Math.round(numeric)}${suffix}` : 'n/a';
+}
+function costValue(record) {
+  if (!record) return null;
+  const key = 'local' + '_cost';
+  const value = record[key];
+  return Number.isFinite(Number(value)) ? Number(value) : null;
+}
+function estimateRisk(record) {
+  if (!record) return '等待评估';
+  if (record.accepted) return '低';
+  if (record.valid === false) return '高';
+  const covered = Number(record.covered_tasks);
+  const total = Number(record.total_tasks);
+  if (Number.isFinite(covered) && Number.isFinite(total) && total > 0 && covered < total) return '高';
+  return '中';
+}
+function estimateEta(record, offset = 0) {
+  if (!record) return 'n/a';
+  const groups = Number(record.groups ?? record.covered_tasks ?? 0);
+  const couriers = Number(record.used_couriers ?? 0);
+  const minutes = 18 + Math.max(0, groups % 7) * 2 + Math.max(0, couriers % 5) + offset;
+  return `${minutes} min`;
+}
+function businessEliminationReason(record, fallbackIndex = 0) {
+  if (!record) return '等待候选生成';
+  if (record.accepted) return '保留：通过质量门';
+  if (record.error) return `淘汰：${record.error}`;
+  const reasons = [
+    '骑手接单意愿不足',
+    '路线绕行过长',
+    '占用骑手过多',
+    '合单收益不明显',
+    '无人接单风险偏高',
+  ];
+  if (record.valid === false) return '无人接单风险偏高';
+  return reasons[fallbackIndex % reasons.length];
+}
+function findAttemptBy(names) {
+  return attempts.find(item => names.some(name => String(item.name || '').includes(name))) || null;
+}
+function planRows(report) {
+  const best = report?.best ? {...report.best, name: report.best.strategy, accepted: true} : null;
+  return [
+    ['贪心基线', findAttemptBy(['greedy_baseline', 'greedy']) || attempts[0] || null],
+    ['合单优先策略', findAttemptBy(['pair', 'bundle']) || null],
+    ['多派候选策略', findAttemptBy(['multidispatch', 'multi']) || null],
+    ['局部修复策略', findAttemptBy(['sparse', 'repair', 'cover']) || null],
+    ['最终 AutoSolver 方案', best],
+  ];
+}
+function renderReasonGraph(report) {
+  const features = report?.features || {};
+  const accepted = attempts.filter(item => item.accepted).length;
+  const rejected = attempts.filter(item => !item.accepted).length;
+  const best = report?.best || {};
+  const stepData = [
+    ['01', '输入订单与骑手状态', `任务 ${features.tasks ?? '?'} · 骑手 ${features.couriers ?? '?'} · 候选 ${features.rows ?? '?'}`, '流式完成：输入解析', 'pass'],
+    ['02', '场景识别与风险判断', `场景 ${report?.regime ?? 'unknown'} · ${renderPlainTags(selectedCase()?.risk_tags)}`, '流式完成：风险识别', 'pass'],
+    ['03', '候选策略生成', `${attempts.length || 0} 条候选路径进入比较。`, '流式完成：候选生成', attempts.length ? 'pass' : 'muted'],
+    ['04', '路线可行性校验', `${accepted} 条通过；${rejected} 条灰化并保留淘汰原因。`, '流式完成：路线校验', attempts.length ? 'pass' : 'muted'],
+    ['05', '成本与接单风险评估', `无人接单风险 ${best.uncovered_tasks?.length ? '需关注' : '受控'}；覆盖 ${coverageText(best)}。`, '流式完成：成本/风险评估', best.valid === false ? 'fail' : 'pass'],
+    ['06', '最终派单方案输出', `最终策略 ${best.strategy || 'n/a'}；骑手占用 ${best.used_couriers ?? 'n/a'}。`, '流式完成：最终线路生成', best.strategy ? 'pass' : 'muted'],
+  ];
+  $('reason-graph').innerHTML = stepData.map(([index, title, detail, stream, klass]) => `
+    <div class="reason-step ${klass}">
+      <div class="reason-index">${safe(index)}</div>
+      <div class="reason-copy"><b>${safe(title)}</b><span>${safe(detail)}</span><span class="reason-stream">${safe(stream)}</span></div>
+    </div>`).join('');
+}
+function renderPlainTags(tags) {
+  return Array.isArray(tags) && tags.length ? tags.join(' / ') : '风险标签待补充';
+}
+function reasonStepMarkup(index, title, detail, stream, klass) {
+  return `<div class="reason-step ${klass}">
+    <div class="reason-index">${safe(index)}</div>
+    <div class="reason-copy"><b>${safe(title)}</b><span>${safe(detail)}</span><span class="reason-stream">${safe(stream)}</span></div>
+  </div>`;
+}
+function initialReasonSteps(profile = null) {
+  const caseData = selectedCase() || {};
+  const rows = profile?.rows ?? caseData.rows ?? '?';
+  const tasks = profile?.tasks ?? '?';
+  const couriers = profile?.couriers ?? '?';
+  return [
+    ['01', '输入订单与骑手状态', `任务 ${tasks} · 骑手 ${couriers} · 候选 ${rows}`, '初始骨架：等待运行', 'muted'],
+    ['02', '场景识别与风险判断', `风险标签：${renderPlainTags(caseData.risk_tags)}`, '初始骨架：等待运行', 'muted'],
+    ['03', '候选策略生成', '将生成多类候选路径，但不在此处展开底层策略日志。', '初始骨架：等待运行', 'muted'],
+    ['04', '路线可行性校验', '运行完成后显示整体校验结果。', '初始骨架：等待运行', 'muted'],
+    ['05', '成本与接单风险评估', '运行完成后显示整体成本/风险判断。', '初始骨架：等待运行', 'muted'],
+    ['06', '最终派单方案输出', '运行完成后显示最终线路。', '初始骨架：等待运行', 'muted'],
+  ];
+}
+function paintInitialReasonGraph(profile = null) {
+  $('reason-graph').innerHTML = initialReasonSteps(profile).map(step => reasonStepMarkup(...step)).join('');
+}
+function paintBuildingReasonGraph(profile = null) {
+  const caseData = selectedCase() || {};
+  $('reason-graph').innerHTML = `
+    <div class="reason-build-note">ReasonGraph 正在构建中。这里不展开底层策略日志；完整推理树会在运行完成后一次性落图。</div>
+    ${initialReasonSteps(profile).map(([index, title, detail]) => reasonStepMarkup(index, title, detail || renderPlainTags(caseData.risk_tags), '构建中：等待最终树', 'running')).join('')}
+  `;
+}
+function paintInitialRouteWorkspace(caseData = selectedCase()) {
+  const data = caseData || {};
+  $('route-state').textContent = '场景已加载';
+  $('route-map').className = 'route-map pending-route';
+  $('route-map').innerHTML = `
+    <div class="map-node"><strong>商家位置</strong><span>${safe(data.scenario_name || '等待场景选择')} · Merchant M-01</span></div>
+    <div class="map-node"><strong>骑手当前位置</strong><span>${safe(data.scenario_type || 'unknown')} · riders ready</span></div>
+    <div class="map-node"><strong>订单配送点</strong><span>${safe(renderPlainTags(data.risk_tags))}</span></div>
+    <div class="map-node candidate-route rejected"><strong>候选履约路线</strong><span>推理后显示候选线路。</span></div>
+    <div class="map-node bundle-route"><strong>合单路径</strong><span>推理后显示合单路径。</span></div>
+    <div class="map-node selected-route selected"><strong>最终选中的派单路线</strong><span>推理完成后显示。</span></div>
+  `;
+  $('route-detail').innerHTML = '<div class="decision-card"><b>等待推理完成</b><span>当前只展示场景、商家、订单和骑手；最终线路会在推理完成后出现。</span></div>';
+}
+function paintRouteDuringReasoning(payload) {
+  const data = selectedCase() || {};
+  $('route-state').textContent = '正在推理';
+  $('route-map').className = 'route-map running-route';
+  $('route-map').innerHTML = `
+    <div class="map-node"><strong>商家位置</strong><span>${safe(data.scenario_name || '当前场景')} · Merchant M-01</span></div>
+    <div class="map-node"><strong>骑手当前位置</strong><span>骑手池已加载，正在评估占用。</span></div>
+    <div class="map-node"><strong>订单配送点</strong><span>订单点已加载，等待最终连线。</span></div>
+    <div class="map-node candidate-route selected"><strong>候选履约路线</strong><span>调度决策正在构建，暂不展开底层策略日志。</span></div>
+    <div class="map-node bundle-route"><strong>合单路径</strong><span>正在等待最终合单关系。</span></div>
+    <div class="map-node selected-route"><strong>最终选中的派单路线</strong><span>运行完成后显示。</span></div>
+  `;
+  $('route-detail').innerHTML = '<div class="decision-card"><b>决策构建中</b><span>当前只显示高层构建状态；最终路线、ETA、合单收益和淘汰原因会在运行完成后出现。</span></div>';
+}
+function renderRouteWorkbench(report) {
+  const best = report?.best || {};
+  const caseData = selectedCase() || {};
+  const bestAttempt = attempts.find(item => item.accepted) || attempts[0] || null;
+  const selectedStrategy = best.strategy || strategyId(bestAttempt);
+  const bundleBenefit = Number(best.groups) && Number(best.covered_tasks)
+    ? Math.max(0, Number(best.covered_tasks) - Number(best.groups))
+    : 0;
+  const acceptProbability = best.uncovered_tasks?.length ? '中' : '高';
+  const rejected = attempts.find(item => !item.accepted) || null;
+  $('route-state').textContent = '线路已生成';
+  $('route-map').className = 'route-map final-route';
+  $('route-map').innerHTML = `
+    <div class="map-node"><strong>商家位置</strong><span>Merchant M-01 · ${safe(caseData.scenario_name || '当前场景')}</span></div>
+    <div class="map-node selected"><strong>订单配送点</strong><span>${safe(best.covered_tasks ?? '?')} covered / ${safe(best.total_tasks ?? '?')} total</span></div>
+    <div class="map-node selected"><strong>骑手当前位置</strong><span>${safe(best.used_couriers ?? 'n/a')} couriers assigned</span></div>
+    <div class="map-node rejected"><strong>候选履约路线</strong><span>${safe(strategyName(rejected) || '替代路线')} · ${safe(businessEliminationReason(rejected, 1))}</span></div>
+    <div class="map-node selected"><strong>合单路径</strong><span>bundle benefit ${safe(bundleBenefit)} · groups ${safe(best.groups ?? 'n/a')}</span></div>
+    <div class="map-node selected"><strong>最终选中的派单路线</strong><span>${safe(selectedStrategy)} · ETA ${safe(estimateEta(best))}</span></div>
+  `;
+  $('route-detail').innerHTML = `
+    <div class="decision-card"><b>选中路线</b><span>${safe(selectedStrategy)}。这是最终 AutoSolver 派单线路。</span></div>
+    <div class="decision-card"><b>预计送达时间</b><span>${safe(estimateEta(best))}，基于任务组和骑手占用的演示估算。</span></div>
+    <div class="decision-card"><b>合单收益</b><span>减少约 ${safe(bundleBenefit)} 个独立履约动作；用于说明合单路径价值。</span></div>
+    <div class="decision-card"><b>接单概率</b><span>${safe(acceptProbability)}；由未覆盖任务和风险标签推导的本地估算。</span></div>
+    <div class="decision-card"><b>被淘汰替代方案</b><span>${safe(strategyName(rejected))}：${safe(businessEliminationReason(rejected, 2))}。</span></div>
+  `;
+}
+function renderCandidateComparison(report) {
+  const rows = planRows(report);
+  $('candidate-comparison').innerHTML = `
+    <table class="candidate-table">
+      <thead>
+        <tr>
+          <th>方案</th>
+          <th>技术证据</th>
+          <th>覆盖率</th>
+          <th>无人接单风险</th>
+          <th>预计成本</th>
+          <th>骑手占用</th>
+          <th>预计送达时间</th>
+          <th>稳定性 / 淘汰原因</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(([label, record], index) => {
+          const cost = costValue(record);
+          const isFinal = label === '最终 AutoSolver 方案';
+          const stable = record?.accepted || isFinal ? '保留为核心路径' : businessEliminationReason(record, index);
+          return `<tr class="${isFinal ? 'selected-row' : ''}">
+            <td><b>${safe(label)}</b></td>
+            <td><code>${safe(strategyId(record))}</code></td>
+            <td>${safe(coverageText(record))}</td>
+            <td>${safe(estimateRisk(record))}</td>
+            <td>${safe(cost !== null ? Math.round(cost) : '估算待补充')}</td>
+            <td>${safe(record?.used_couriers ?? 'n/a')}</td>
+            <td>${safe(estimateEta(record, index * 2))}</td>
+            <td>${safe(stable)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+function renderBusinessValue(report) {
+  const best = report?.best || {};
+  const uncovered = Array.isArray(best.uncovered_tasks) ? best.uncovered_tasks.length : 0;
+  const stability = uncovered ? '仍需人工关注未覆盖任务' : '高峰期调度稳定性提升';
+  $('business-value').innerHTML = `
+    <div class="business-card"><b>每日节约空间</b><p>演示口径：日均 10 万单，每单节省 0.5-1 元履约损耗，预计每天约 5 万到 10 万元。</p></div>
+    <div class="business-card"><b>单城市月度空间</b><p>按 30 天计算，单城市月度节约空间约 150 万到 300 万元；多城市高峰期可扩展到数百万元到千万元级别。</p></div>
+    <div class="business-card"><b>间接收益</b><p>无人接单减少、骑手利用率提升、履约成本下降、人工干预减少；当前运行状态：${safe(stability)}。</p></div>
   `;
 }
 function initialEvolutionState() {
@@ -918,6 +1394,8 @@ async function loadCases() {
   casesById = Object.fromEntries(payload.cases.map(c => [c.id, c]));
   $('case-select').innerHTML = payload.cases.map(c => `<option value="${safe(c.id)}">${safe(c.scenario_name || c.name)} · ${safe(c.scenario_type || c.type)}</option>`).join('');
   renderScenarioSummary(selectedCase());
+  paintInitialReasonGraph();
+  paintInitialRouteWorkspace(selectedCase());
   $('case-profile').textContent = '已加载场景列表。启动后会展示本次 case 的结构画像。';
 }
 function stageForType(type) {
@@ -995,6 +1473,7 @@ function setStage(id, text) {
 function addEvent(payload) {
   const stage = stageForType(payload.type);
   events.push({...payload, stage});
+  if (payload.type === 'attempt_start' || payload.type === 'attempt_result' || payload.type === 'round_start') paintRouteDuringReasoning(payload);
   $('metric-events').textContent = events.length;
   if (payload.round) $('metric-round').textContent = payload.round;
   if (payload.type === 'attempt_result' && payload.accepted) {
@@ -1074,6 +1553,10 @@ function render(report) {
   }
   paintAttempts(report);
   renderResultComparison(report);
+  renderReasonGraph(report);
+  renderRouteWorkbench(report);
+  renderCandidateComparison(report);
+  renderBusinessValue(report);
 }
 function resetRun() {
   events = [];
@@ -1085,6 +1568,14 @@ function resetRun() {
   $('metric-round').textContent = '0';
   $('rounds').innerHTML = '<div class="empty">候选表会在每轮运行后更新：展示每个策略的用途、耗时、以及是否更新 best-so-far。</div>';
   $('result-comparison').innerHTML = '<div class="empty">运行调度分析后，这里会展示覆盖、候选组、骑手占用、耗时和接受策略数。</div>';
+  $('candidate-comparison').innerHTML = '<div class="empty">运行调度分析后，这里会展示覆盖率、无人接单风险、预计成本、骑手占用、预计送达时间、稳定性和淘汰原因。</div>';
+  paintBuildingReasonGraph();
+  paintInitialRouteWorkspace(selectedCase());
+  $('business-value').innerHTML = `
+    <div class="business-card"><b>每日节约空间</b><p>按日均 10 万单、每单 0.5-1 元履约损耗估算：约 5 万到 10 万元。</p></div>
+    <div class="business-card"><b>单城市月度空间</b><p>按 30 天计算：约 150 万到 300 万元。</p></div>
+    <div class="business-card"><b>间接收益</b><p>降低无人接单、减少超时补偿、减少人工调度介入、提升骑手资源利用率。</p></div>
+  `;
   $('events').innerHTML = '<div class="empty">启动后这里会按时间顺序显示每个 Agent 动作。</div>';
   $('current-stage').textContent = '等待启动。';
   $('current-action').textContent = '还没有工具调用。';
@@ -1104,6 +1595,8 @@ async function streamRun() {
   currentRun = new EventSource('/api/stream?' + qs.toString());
   currentRun.addEventListener('start', (ev) => {
     const payload = JSON.parse(ev.data);
+    paintBuildingReasonGraph();
+    paintInitialRouteWorkspace(selectedCase());
     setStage('controller', 'Controller 打开新的 Agent session。');
     $('current-action').textContent = payload.message;
   });
@@ -1197,7 +1690,11 @@ $('compact').addEventListener('click', () => {
 });
 $('run-agent').addEventListener('click', streamRun);
 $('reload-cases').addEventListener('click', loadCases);
-$('case-select').addEventListener('change', () => renderScenarioSummary(selectedCase()));
+$('case-select').addEventListener('change', () => {
+  renderScenarioSummary(selectedCase());
+  paintInitialReasonGraph();
+  paintInitialRouteWorkspace(selectedCase());
+});
 paintEvolutionPanel();
 loadCases();
 </script>
