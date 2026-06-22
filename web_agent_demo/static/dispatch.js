@@ -830,7 +830,8 @@ function renderEvo(evo){
       <div><div class="evo-sub">② 策略注册表（真实条数 + directive 直方图）</div>${regHtml||'<div class="empty-ph">注册表不可读</div>'}</div>
     </div>
     <div class="evo-honesty">${safe(evo.honesty||'')}
-      <b>机制可验证 · 对最终派单成绩零贡献 · stub 无 live LLM。</b></div>`;
+      <b>机制可验证 · 对最终派单成绩零贡献 · stub 无 live LLM。</b>
+      <a class="evo-mem-link" href="/memory" target="_blank" rel="noopener">🧬 打开记忆库：全部历史策略 / 谱系 / 搜索筛选 ↗</a></div>`;
 }
 
 /* ---------- ROI（P1-5：可追溯换算链） ---------- */
@@ -867,6 +868,7 @@ $('roi-calc').onclick=recomputeRoi;
  * 公平有真实代价：α↑ → Gini↓ 但 成本↑/履约↓，如实并列。 */
 let STK=null;            // 缓存真值
 let STK_ALPHA_IDX=0;     // 当前 α 选中点下标
+let STK_FRONT=[];        // 缓存当前 pareto 点序（供塌缩判定）
 function fmtPct(x){ return x==null?'—':(x>=0?'+':'')+x+'%'; }
 function fmtNum(x,d){ return x==null?'—':(d!=null?Number(x).toFixed(d):x); }
 function realDot(real){ return real?'<span class="real-dot" title="官方成本口径真值"></span>'
@@ -916,18 +918,21 @@ function renderStakeholders(st){
     <div class="stk-pareto-wrap">
       <div class="stk-pareto-h">效率(期望成本↓，真值) × 公平(骑手收入 Gini↓，合成层) Pareto 前沿
         <span class="tiny muted">· 绿=非支配解 灰=被支配 · 拖动 α 在真实解间切换</span></div>
+      <div class="stk-caliber">⚠️ 口径注：此处 α 折衷解基于<b>透明 demo greedy</b> 重算的四方 Pareto 前沿，与头条 <b>AutoSolver v4(期望成本 657.104)</b> 解口径不同，两者不可直接混读。</div>
       <div id="stk-pareto-svg"></div>
       <div class="stk-slider-row">
         <span class="stk-sl-lbl">公平权重 α</span>
         <input type="range" id="stk-alpha" min="0" max="${Math.max(0,front.length-1)}" step="1" value="${STK_ALPHA_IDX}">
         <span class="stk-sl-val" id="stk-alpha-val"></span>
       </div>
+      <div class="stk-collapse-hint" id="stk-collapse-hint"></div>
       <div class="stk-pick" id="stk-pick"></div>
     </div>
     <div class="stk-honesty">${safe(st.honesty||'')}</div>`;
 
   const slider=$('stk-alpha');
   if(slider) slider.oninput=()=>{ STK_ALPHA_IDX=+slider.value; paintPareto(); };
+  STK_FRONT=front;
   paintPareto();
 }
 function paintPareto(){
@@ -965,7 +970,23 @@ function paintPareto(){
   </svg>`;
   const host=$('stk-pareto-svg'); if(host) host.innerHTML=svg;
   const sel=front[idx];
-  const av=$('stk-alpha-val'); if(av) av.textContent=`α=${fmtNum(sel.alpha)} ${sel.efficient?'· 非支配解':'· 被支配'}`;
+  // iter-14 P1-7：中段 α 塌缩（多个 α 落在同一解点）会让滑块「无响应」。
+  // 用 (expected_cost, rider_income_gini) 量化键找出与选中点同坐标的 α 簇，
+  // 显式提示「该区间解相同」，消除手感歧义（不改后端，纯前端去重提示）。
+  const sameKey=p=>`${(p.expected_cost??0).toFixed(4)}|${(p.rider_income_gini??0).toFixed(6)}`;
+  const selKey=sameKey(sel);
+  const cluster=front.filter(p=>sameKey(p)===selKey);
+  const collapsed=cluster.length>1;
+  const av=$('stk-alpha-val');
+  if(av) av.textContent=`α=${fmtNum(sel.alpha)} ${sel.efficient?'· 非支配解':'· 被支配'}`
+    +(collapsed?` · 与 α∈{${cluster.map(p=>fmtNum(p.alpha)).join(',')}} 同解`:'');
+  const hint=$('stk-collapse-hint');
+  if(hint){
+    hint.innerHTML=collapsed
+      ? `<span class="stk-ch-dot"></span>该 α 区间 {${cluster.map(p=>fmtNum(p.alpha)).join(', ')}} <b>解相同</b>（坐标重合）——滑块在此段不变属真实塌缩，非卡顿。`
+      : '';
+    hint.style.display=collapsed?'block':'none';
+  }
   const pick=$('stk-pick');
   if(pick) pick.innerHTML=`选中解 α=<b>${fmtNum(sel.alpha)}</b>：
     期望成本 <b class="real">${fmtNum(sel.expected_cost,3)}</b><span class="real-dot"></span> ·

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutoSolver Agent · 进化记忆库 / 历史策略</title>
+<link rel="stylesheet" href="/static/dispatch.css">
+<style>
+/* memory.html 专属样式（复用 dispatch.css 调色令牌：--bg/--panel/--green/--red/--muted/--blue/--line） */
+.mem-wrap{max-width:1240px;margin:0 auto;padding:18px 20px 60px}
+.mem-top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:14px}
+.mem-brand{display:flex;align-items:center;gap:13px}
+.mem-logo{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;background:linear-gradient(135deg,var(--green),var(--green-d));box-shadow:0 0 18px rgba(70,240,168,.32)}
+.mem-brand .name{font-size:12.5px;font-weight:900;letter-spacing:.06em;color:var(--green2)}
+.mem-brand h1{margin:1px 0 0;font-size:19px;font-weight:900;letter-spacing:.01em;color:var(--ink)}
+.mem-brand .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+.mem-back{font-size:12.5px;font-weight:800;color:var(--green2);text-decoration:none;
+  border:1px solid var(--line2);border-radius:9px;padding:9px 15px;background:var(--panel2);
+  display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.mem-back:hover{border-color:var(--green);box-shadow:0 0 14px rgba(70,240,168,.18)}
+
+/* 概览条 */
+.mem-ov{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-bottom:14px}
+.ov-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.ov-card .k{font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.ov-card .v{font-size:25px;font-weight:900;color:var(--ink);margin-top:3px;line-height:1.1}
+.ov-card .v small{font-size:12px;color:var(--muted);font-weight:700}
+.ov-card.promo{border-color:rgba(70,240,168,.5);background:linear-gradient(135deg,rgba(70,240,168,.10),var(--panel))}
+.ov-card.promo .v{color:var(--green2)}
+.ov-card.rej{border-color:rgba(255,107,107,.34)}
+.ov-card.rej .v{color:var(--red)}
+
+/* directive 直方图 */
+.dir-hist{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:14px}
+.dir-hist .dh-h{font-size:11.5px;font-weight:800;color:var(--green2);margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.dir-row{display:flex;align-items:center;gap:10px;margin:5px 0}
+.dir-name{font-size:11.5px;font-weight:700;color:var(--ink);min-width:120px}
+.dir-bar{flex:1;height:14px;background:rgba(97,255,211,.07);border-radius:7px;overflow:hidden}
+.dir-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green-d),var(--green));border-radius:7px}
+.dir-n{font-size:11.5px;font-weight:900;color:var(--green2);min-width:30px;text-align:right}
+
+/* 诚实声明常驻条 */
+.mem-honesty{background:rgba(67,213,255,.06);border:1px solid rgba(67,213,255,.28);border-radius:12px;
+  padding:12px 15px;margin-bottom:16px;font-size:11.5px;line-height:1.65;color:var(--muted)}
+.mem-honesty b{color:#9fe6ff}
+.mem-honesty .zero{color:#f4b14a;font-weight:800}
+
+/* 搜索 / 筛选条 */
+.mem-controls{position:sticky;top:0;z-index:5;background:var(--bg);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 0;margin-bottom:6px;
+  border-bottom:1px solid var(--line)}
+.mem-search{flex:1;min-width:220px;background:var(--panel2);border:1px solid var(--line2);border-radius:9px;
+  color:var(--ink);font-size:13px;padding:10px 13px;outline:none}
+.mem-search:focus{border-color:var(--green);box-shadow:0 0 12px rgba(70,240,168,.16)}
+.mem-search::placeholder{color:var(--muted2)}
+.mem-sel{background:var(--panel2);border:1px solid var(--line2);border-radius:9px;color:var(--ink);
+  font-size:12px;font-weight:700;padding:9px 11px;outline:none;cursor:pointer}
+.mem-sel:focus{border-color:var(--green)}
+.mem-count{font-size:11.5px;font-weight:800;color:var(--muted);white-space:nowrap}
+.mem-count b{color:var(--green2)}
+
+/* 时间线 / 策略卡 */
+.mem-timeline{margin-top:14px}
+.gen-group{margin-bottom:20px}
+.gen-label{font-size:11px;font-weight:900;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;
+  margin:0 0 9px;display:flex;align-items:center;gap:9px}
+.gen-label::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green)}
+.gen-label .gl-line{flex:1;height:1px;background:var(--line)}
+.mem-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+
+.mcard{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 15px;
+  position:relative;overflow:hidden;transition:transform .14s,border-color .14s,box-shadow .14s}
+.mcard:hover{transform:translateY(-2px);border-color:var(--line2);box-shadow:0 10px 26px rgba(0,0,0,.36)}
+.mcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--muted2)}
+.mcard.s-promoted::before{background:var(--green);box-shadow:0 0 12px var(--green)}
+.mcard.s-candidate::before{background:var(--blue)}
+.mcard.s-rejected::before{background:var(--red)}
+.mcard.promoted-hero{grid-column:1/-1;border-color:rgba(70,240,168,.55);
+  background:linear-gradient(135deg,rgba(70,240,168,.09),var(--panel))}
+.mcard.promoted-hero::before{width:5px}
+
+.mc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.mc-id{font-size:13.5px;font-weight:900;color:var(--ink);letter-spacing:.01em;font-family:ui-monospace,Menlo,monospace}
+.mc-badge{font-size:10px;font-weight:900;letter-spacing:.04em;padding:3px 8px;border-radius:999px;text-transform:uppercase}
+.badge-promoted{color:#04221a;background:var(--green)}
+.badge-candidate{color:#9fe6ff;background:rgba(67,213,255,.16);border:1px solid rgba(67,213,255,.4)}
+.badge-rejected{color:#ffd2d2;background:rgba(255,107,107,.16);border:1px solid rgba(255,107,107,.42)}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;color:var(--green2);
+  margin-bottom:8px;padding:3px 9px;border:1px solid rgba(70,240,168,.4);border-radius:999px;
+  background:rgba(70,240,168,.08)}
+
+.mc-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.mc-tag{font-size:10.5px;font-weight:700;color:var(--muted);background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;padding:3px 8px}
+.mc-tag b{color:var(--ink);font-weight:800}
+.mc-tag.dir b{color:#9fe6ff}
+.mc-tag.par b{color:#f4b14a;font-family:ui-monospace,Menlo,monospace}
+
+.mc-perf{display:flex;align-items:baseline;gap:10px;margin:8px 0;padding:8px 10px;
+  background:rgba(10,22,18,.5);border:1px solid var(--line);border-radius:9px;flex-wrap:wrap}
+.mc-perf .pf-l{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase}
+.mc-perf .pf-v{font-size:15px;font-weight:900;color:var(--ink)}
+.mc-perf .pf-base{font-size:11px;color:var(--muted)}
+.mc-perf .pf-d{font-size:11.5px;font-weight:900}
+.pf-d.good{color:var(--green2)}
+.pf-d.bad{color:var(--red)}
+.pf-d.flat{color:var(--muted)}
+
+.mc-thought{font-size:11px;line-height:1.6;color:var(--muted);margin-top:8px;
+  border-top:1px dashed rgba(97,255,211,.12);padding-top:8px}
+.mc-thought .lesson{color:#9fe6ff;font-weight:700}
+.mc-decision{font-size:10.5px;color:var(--muted2);margin-top:7px}
+.mc-decision .dc-ok{color:var(--green2);font-weight:800}
+.mc-decision .dc-no{color:var(--red);font-weight:800}
+
+.mem-foot{margin-top:26px;font-size:10.5px;color:var(--muted2);line-height:1.7;
+  border-top:1px solid var(--line);padding-top:14px}
+.empty-ph{color:var(--muted2);font-size:12.5px;padding:30px;text-align:center}
+</style>
+</head>
+<body>
+<div class="mem-wrap">
+
+  <div class="mem-top">
+    <div class="mem-brand">
+      <div class="mem-logo">🧬</div>
+      <div>
+        <div class="name">AutoSolver Agent</div>
+        <h1>进化记忆库 · 历史策略时间线</h1>
+        <div class="sub">ReEvo 自进化注册表全量 · lesson→代码 因果环 · 谱系/留出表现/晋级决策可追溯</div>
+      </div>
+    </div>
+    <a class="mem-back" href="/">← 返回调度指挥舱</a>
+  </div>
+
+  <section class="mem-ov" id="mem-ov"></section>
+  <div class="dir-hist" id="dir-hist"></div>
+  <div class="mem-honesty" id="mem-honesty"></div>
+
+  <div class="mem-controls">
+    <input class="mem-search" id="q" type="text"
+      placeholder="🔍 搜索 strategy_id / operator / directive / thought / parent / regime …">
+    <select class="mem-sel" id="f-status"><option value="">全部状态</option></select>
+    <select class="mem-sel" id="f-operator"><option value="">全部算子</option></select>
+    <select class="mem-sel" id="f-directive"><option value="">全部 directive</option></select>
+    <select class="mem-sel" id="f-regime"><option value="">全部 regime</option></select>
+    <span class="mem-count" id="count"></span>
+  </div>
+
+  <div class="mem-timeline" id="timeline"><div class="empty-ph">加载真实进化注册表…</div></div>
+
+  <div class="mem-foot" id="foot"></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function num(x,d){return x==null?'—':(d!=null?Number(x).toFixed(d):x);}
+let DATA=null, ALL=[];
+
+const STATUS_CN={promoted:'已晋级',candidate:'候选',rejected:'已拒绝'};
+const PROMOTED_HERO='gen01_M1_003';
+
+function renderOverview(ov){
+  const acc=ov.accepted_or_better, total=ov.total_strategies;
+  $('mem-ov').innerHTML=`
+    <div class="ov-card"><div class="k">总策略</div><div class="v">${num(total)}<small> 条</small></div></div>
+    <div class="ov-card"><div class="k">已采纳 (accept_or_better)</div><div class="v">${num(acc)}<small> 条</small></div></div>
+    <div class="ov-card promo"><div class="k">已晋级 (promoted)</div><div class="v">${num(ov.promoted)}<small> ${esc((ov.promoted_ids||[]).join(', '))}</small></div></div>
+    <div class="ov-card"><div class="k">候选 (candidate)</div><div class="v">${num(ov.candidate)}<small> 条</small></div></div>
+    <div class="ov-card rej"><div class="k">已拒绝 (rejected)</div><div class="v">${num(ov.rejected)}<small> 条</small></div></div>
+    <div class="ov-card"><div class="k">字节级克隆对</div><div class="v">${num(ov.byte_identical_clone_pairs)}<small> 对 · 0=五算子无克隆</small></div></div>
+    <div class="ov-card"><div class="k">distinct rank 代码体</div><div class="v">${num(ov.distinct_rank_bodies)}<small> / ${num(ov.strategies_with_code)} 带码</small></div></div>`;
+
+  const hist=ov.directive_histogram||{};
+  const entries=Object.entries(hist).sort((a,b)=>b[1]-a[1]);
+  const max=Math.max(1,...entries.map(e=>e[1]));
+  $('dir-hist').innerHTML=`<div class="dh-h">📚 ReEvo directive 直方图（lesson 信号分布·驱动各策略代码）</div>`+
+    entries.map(([k,v])=>`<div class="dir-row">
+      <span class="dir-name">${esc(k)}</span>
+      <span class="dir-bar"><i style="width:${(v/max*100).toFixed(1)}%"></i></span>
+      <span class="dir-n">${v}</span></div>`).join('');
+}
+
+function fillSelects(){
+  const uniq=(k)=>[...new Set(ALL.map(s=>s[k]).filter(v=>v!=null&&v!==''))];
+  const opt=(arr,cn)=>arr.map(v=>`<option value="${esc(v)}">${esc(cn?cn[v]||v:v)}</option>`).join('');
+  $('f-status').insertAdjacentHTML('beforeend',opt(['promoted','candidate','rejected'].filter(s=>uniq('status').includes(s)),STATUS_CN));
+  $('f-operator').insertAdjacentHTML('beforeend',opt(uniq('operator').sort()));
+  $('f-directive').insertAdjacentHTML('beforeend',opt(uniq('directive').sort()));
+  $('f-regime').insertAdjacentHTML('beforeend',opt(uniq('target_regime').sort()));
+}
+
+function deltaHtml(s){
+  const d=s.heldout_delta;
+  let cls='flat',sign='';
+  if(d!=null){ if(d>0.001){cls='good';sign='+';} else if(d<-0.001){cls='bad';} }
+  const dtxt=d==null?'—':`${sign}${num(d,3)}`;
+  return `<div class="mc-perf">
+    <span class="pf-l">held-out 均值</span>
+    <span class="pf-v">${num(s.heldout_mean,2)}</span>
+    <span class="pf-base">vs 基线 ${num(s.baseline_heldout_mean,2)}</span>
+    <span class="pf-d ${cls}">Δ=${dtxt}${d!=null?'（↓成本=改进，机制内部口径·非派单成绩）':''}</span>
+  </div>`;
+}
+
+function cardHtml(s,hero){
+  const st=s.status||'';
+  const lessonM=/Lesson<([^>]*)>|CAUSAL[^.]*/i.exec(s.thought||'');
+  const th=esc(s.thought||'').replace(/(Lesson&lt;[^&]*&gt;|CAUSAL[^.]*)/g,'<span class="lesson">$1</span>');
+  const dec=s.last_decision==='accept'
+    ? `<span class="dc-ok">✓ accept</span>`
+    : s.last_decision==='reject' ? `<span class="dc-no">✗ reject</span>` : esc(s.last_decision);
+  return `<div class="mcard s-${esc(st)}${hero?' promoted-hero':''}" data-id="${esc(s.strategy_id)}">
+    ${hero?`<div class="hero-tag">★ 唯一晋级策略（held-out ${num(s.heldout_mean,2)} vs 基线 ${num(s.baseline_heldout_mean,2)}，Δ=${num(s.heldout_delta,2)}）</div>`:''}
+    <div class="mc-head">
+      <span class="mc-id">${esc(s.strategy_id)}</span>
+      <span class="mc-badge badge-${esc(st)}">${esc(STATUS_CN[st]||st)}</span>
+    </div>
+    <div class="mc-meta">
+      <span class="mc-tag">算子 <b>${esc(s.operator)}</b></span>
+      <span class="mc-tag">gen <b>${esc(s.generation)}</b></span>
+      <span class="mc-tag par">parent <b>${esc(s.parent)}</b></span>
+      <span class="mc-tag dir">directive <b>${esc(s.directive)}</b></span>
+      <span class="mc-tag">regime <b>${esc(s.target_regime)}</b></span>
+      <span class="mc-tag">安全门 <b>${s.safety_passed?'✓ passed':'—'}</b></span>
+    </div>
+    ${deltaHtml(s)}
+    <div class="mc-thought">${th||'<i>—</i>'}</div>
+    <div class="mc-decision">决策：${dec} · ${esc(s.last_reason||'')} · 来源 ${esc(s.source||'')}</div>
+  </div>`;
+}
+
+function render(){
+  const q=$('q').value.trim().toLowerCase();
+  const fs=$('f-status').value, fo=$('f-operator').value, fd=$('f-directive').value, fr=$('f-regime').value;
+  let list=ALL.filter(s=>{
+    if(fs&&s.status!==fs)return false;
+    if(fo&&s.operator!==fo)return false;
+    if(fd&&s.directive!==fd)return false;
+    if(fr&&s.target_regime!==fr)return false;
+    if(q){
+      const hay=[s.strategy_id,s.operator,s.directive,s.target_regime,s.parent,s.status,s.thought,s.rank_body,s.source]
+        .join(' ').toLowerCase();
+      if(!hay.includes(q))return false;
+    }
+    return true;
+  });
+  $('count').innerHTML=`显示 <b>${list.length}</b> / ${ALL.length} 条`;
+
+  // 晋级 hero 置顶（仅当无筛选/搜索把它过滤掉时）
+  const hero=list.find(s=>s.strategy_id===PROMOTED_HERO);
+  const rest=list.filter(s=>s.strategy_id!==PROMOTED_HERO);
+
+  // 按 generation 分组成时间线
+  const byGen={};
+  rest.forEach(s=>{(byGen[s.generation]=byGen[s.generation]||[]).push(s);});
+  const gens=Object.keys(byGen).map(Number).sort((a,b)=>a-b);
+
+  let html=hero?`<div class="gen-group"><div class="mem-cards">${cardHtml(hero,true)}</div></div>`:'';
+  if(!list.length){ $('timeline').innerHTML='<div class="empty-ph">无匹配策略，请调整搜索/筛选条件。</div>'; return; }
+  gens.forEach(g=>{
+    html+=`<div class="gen-group">
+      <div class="gen-label">第 ${g} 代 (generation ${g})<span class="gl-line"></span><span style="font-weight:700;color:var(--muted2);letter-spacing:0;text-transform:none">${byGen[g].length} 条</span></div>
+      <div class="mem-cards">${byGen[g].map(s=>cardHtml(s,false)).join('')}</div>
+    </div>`;
+  });
+  $('timeline').innerHTML=html;
+}
+
+async function boot(){
+  try{
+    const r=await fetch('/api/memory'); DATA=await r.json();
+  }catch(e){ $('timeline').innerHTML='<div class="empty-ph">加载 /api/memory 失败：'+esc(e)+'</div>'; return; }
+  if(DATA.status!=='ok'){ $('timeline').innerHTML='<div class="empty-ph">注册表不可用：'+esc(DATA.error||'')+'</div>'; return; }
+  ALL=DATA.strategies||[];
+  renderOverview(DATA.overview||{});
+  $('mem-honesty').innerHTML=`<b>诚实声明（常驻）</b>：`+esc(DATA.honesty||'')
+    +` <span class="zero">对最终派单成绩零贡献</span>。`;
+  $('foot').innerHTML=`快照来源：<b>${esc(DATA.generated_by||'')}</b><br>${esc(DATA.note||'')}`;
+  fillSelects();
+  ['q','f-status','f-operator','f-directive','f-regime'].forEach(id=>{
+    const el=$(id); el.addEventListener(id==='q'?'input':'change',render);
+  });
+  render();
+}
+boot();
+</script>
+</body>
+</html>

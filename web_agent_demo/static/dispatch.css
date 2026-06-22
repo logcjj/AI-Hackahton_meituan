@@ -84,6 +84,16 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .statblock{text-align:center}
 .statblock .lbl{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .statblock .val{font-size:16px;font-weight:900;font-family:var(--mono)}
+/* iter-14：记忆库导航入口（顶栏） */
+.mem-nav{display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  background:linear-gradient(135deg,rgba(70,240,168,.12),var(--panel2));
+  border:1px solid rgba(70,240,168,.4);border-radius:11px;padding:7px 13px;white-space:nowrap;
+  transition:transform .14s,border-color .14s,box-shadow .14s}
+.mem-nav:hover{transform:translateY(-2px);border-color:var(--green);box-shadow:0 0 16px rgba(70,240,168,.24)}
+.mem-nav .mn-ico{font-size:18px;filter:drop-shadow(0 0 6px rgba(70,240,168,.5))}
+.mem-nav .mn-txt{display:flex;flex-direction:column;line-height:1.15}
+.mem-nav .mn-txt b{font-size:12.5px;font-weight:900;color:var(--green2)}
+.mem-nav .mn-txt small{font-size:9.5px;color:var(--muted);font-weight:700}
 .runlight{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:800;color:var(--green);
   transition:color .3s var(--ease)}
 .runlight .dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
@@ -483,6 +493,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .evo-honesty{font-size:10.5px;color:var(--muted);margin-top:9px;line-height:1.5;padding:7px 9px;
   border-radius:8px;background:rgba(244,220,97,.05);border:1px solid rgba(244,220,97,.18)}
 .evo-honesty b{color:var(--gold)}
+.evo-mem-link{display:inline-block;margin-top:6px;font-size:11px;font-weight:800;color:var(--green2);
+  text-decoration:none;border:1px solid rgba(70,240,168,.34);border-radius:8px;padding:5px 11px;
+  background:rgba(70,240,168,.07)}
+.evo-mem-link:hover{border-color:var(--green);box-shadow:0 0 12px rgba(70,240,168,.2)}
 .shield{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--green2);
   background:rgba(70,240,168,.07);border:1px solid rgba(70,240,168,.25);border-radius:9px;padding:6px 10px}
 .shield .si{font-size:15px}
@@ -707,6 +721,16 @@ circle.task-high,circle.task-mid,circle.task-low,circle.courier-node{transition:
 .stk-chip.ful{color:#ff8aa0;background:rgba(255,107,107,.13)}
 .stk-pareto-wrap{margin-top:2px}
 .stk-pareto-h{font-size:11.5px;font-weight:800;color:var(--green2);margin-bottom:6px}
+.stk-caliber{font-size:10.5px;line-height:1.55;color:#f4b14a;margin:0 0 8px;max-width:620px;
+  padding:7px 10px;border:1px solid rgba(244,177,74,.32);border-radius:8px;
+  background:rgba(244,177,74,.07)}
+.stk-caliber b{color:#ffce7a}
+.stk-collapse-hint{font-size:10.5px;line-height:1.55;color:var(--blue);margin:6px 0 2px;max-width:620px;
+  padding:6px 9px;border:1px solid rgba(67,213,255,.30);border-radius:7px;
+  background:rgba(67,213,255,.07);display:none}
+.stk-collapse-hint b{color:#9fe6ff}
+.stk-ch-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#43d5ff;
+  box-shadow:0 0 7px #43d5ff;margin-right:6px;vertical-align:middle}
 .stk-svg{width:100%;max-width:620px;height:auto;display:block;
   background:rgba(10,22,18,.5);border:1px solid var(--line);border-radius:10px}
 .stk-slider-row{display:flex;align-items:center;gap:11px;margin:11px 0 6px;max-width:620px}
