@@ -20,6 +20,8 @@ class SampleCase:
     kind: str
     description: str
     relative_path: str
+    scenario_type: str = "generic"
+    risk_tags: tuple[str, ...] = ()
     rows_hint: int | None = None
 
 
@@ -51,73 +53,93 @@ SYNTHETIC_SPECS: tuple[SyntheticSpec, ...] = (
 SAMPLE_CASES: dict[str, SampleCase] = {
     "large_seed301": SampleCase(
         case_id="large_seed301",
-        name="large_seed301",
+        name="官方大规模候选调度",
         kind="real",
-        description="Existing real benchmark-style input retained for the web demo.",
+        description="官方提供的大规模候选输入，用于观察 portfolio routing、当前最优维护和安全回退。",
         relative_path=f"{DATA_DIR_NAME}/large_seed301.txt",
+        scenario_type="large_peak",
+        risk_tags=("候选行多", "合单密集", "预算压力"),
     ),
     "tiny_seed42": SampleCase(
         case_id="tiny_seed42",
-        name="tiny_seed42",
+        name="Tiny 回归调试样例",
         kind="synthetic demo",
-        description="Tiny explainable case with a small set of single and bundle choices.",
+        description="小样例便于逐条检查策略接受、拒绝和任务组解释。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/tiny_seed42.txt",
+        scenario_type="tiny_debug",
+        risk_tags=("可解释", "回归测试"),
     ),
     "small_seed100": SampleCase(
         case_id="small_seed100",
-        name="small_seed100",
+        name="小规模密集候选调度",
         kind="synthetic demo",
-        description="Small dense case with ordinary rider availability and many alternatives.",
+        description="普通供给下的小规模密集候选，用于验证快速基线和候选表展示。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/small_seed100.txt",
+        scenario_type="small_dense",
+        risk_tags=("候选较密", "基线对比"),
     ),
     "medium_seed201": SampleCase(
         case_id="medium_seed201",
-        name="medium_seed201",
+        name="中型合单机会评估",
         kind="synthetic demo",
-        description="Medium case emphasizing bundle and combination tradeoffs.",
+        description="中型合单结构明显，用于观察 pair matching、bundle 取舍和最终方案来源。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/medium_seed201.txt",
+        scenario_type="medium_bundle",
+        risk_tags=("合单机会", "组合取舍"),
     ),
     "medium_seed202": SampleCase(
         case_id="medium_seed202",
-        name="medium_seed202",
+        name="中型稀疏候选覆盖",
         kind="synthetic demo",
-        description="Medium sparse-willingness case with fewer viable alternatives per task.",
+        description="可行候选较少，用于验证 sparse cover 和覆盖不足时的控制器决策。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/medium_seed202.txt",
+        scenario_type="medium_sparse",
+        risk_tags=("候选稀疏", "覆盖风险"),
     ),
     "medium_seed203": SampleCase(
         case_id="medium_seed203",
-        name="medium_seed203",
+        name="骑手冲突风险样例",
         kind="synthetic demo",
-        description="Medium case where repeated high-quality couriers create conflict risk.",
+        description="高质量骑手重复出现，适合检查骑手冲突、拒绝原因和 best-so-far 更新。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/medium_seed203.txt",
+        scenario_type="medium_conflict",
+        risk_tags=("骑手冲突", "重复高质量候选"),
     ),
     "large_seed302": SampleCase(
         case_id="large_seed302",
-        name="large_seed302",
+        name="大规模压力测试样例",
         kind="synthetic demo",
-        description="Large synthetic pressure case for web-agent stress demonstrations.",
+        description="大规模合成压力样例，用于检查运行预算、事件流和综合求解链稳定性。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/large_seed302.txt",
+        scenario_type="large_pressure",
+        risk_tags=("候选行多", "预算压力"),
     ),
     "scarce_couriers_seed401": SampleCase(
         case_id="scarce_couriers_seed401",
-        name="scarce_couriers_seed401",
+        name="骑手稀缺商圈",
         kind="synthetic demo",
-        description="Courier-scarce case where bundle coverage and reuse avoidance dominate.",
+        description="骑手供给少于调度压力，重点观察稀缺骑手策略、合单和资源占用。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/scarce_couriers_seed401.txt",
+        scenario_type="scarce_couriers",
+        risk_tags=("骑手稀缺", "合单取舍", "资源占用"),
     ),
     "low_willingness_seed501": SampleCase(
         case_id="low_willingness_seed501",
-        name="low_willingness_seed501",
+        name="雨天低接单意愿",
         kind="synthetic demo",
-        description="Low-willingness case for showing risk-aware assignment behavior.",
+        description="整体接单意愿偏低，用于观察低意愿搜索、质量门和无人接单风险控制。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/low_willingness_seed501.txt",
+        scenario_type="low_willingness",
+        risk_tags=("低接单意愿", "无人接单风险"),
     ),
     "high_noise_seed601": SampleCase(
         case_id="high_noise_seed601",
-        name="high_noise_seed601",
+        name="高噪声候选质量样例",
         kind="synthetic demo",
-        description="Noisy quality/willingness case with deliberately uneven signals.",
+        description="成本和意愿信号更不均匀，用于检查 Critic 接受/拒绝和候选稳定性。",
         relative_path=f"web_agent_demo/{GENERATED_CASE_DIR}/high_noise_seed601.txt",
+        scenario_type="high_noise",
+        risk_tags=("信号噪声", "候选稳定性"),
     ),
 }
 
@@ -136,7 +158,8 @@ def ensure_sample_cases(base_dir: str | Path) -> dict[str, Path]:
             paths[case_id] = path
             continue
         spec = _spec_by_case_id(case_id)
-        path.write_text(_render_case(spec), encoding="utf-8")
+        if not path.exists():
+            path.write_text(_render_case(spec), encoding="utf-8")
         paths[case_id] = path
     return paths
 

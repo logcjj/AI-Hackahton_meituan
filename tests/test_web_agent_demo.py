@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import unittest
+from types import SimpleNamespace
 from unittest import mock
 
 
@@ -12,11 +13,18 @@ class WebAgentDemoTest(unittest.TestCase):
         html = render_index()
 
         self.assertIn("AutoSolver Agent System", html)
-        self.assertIn(">AutoSolver Agent</h1>", html)
+        self.assertIn(">AutoSolver Agent Workbench</h1>", html)
         self.assertNotIn("看见 Agent 如何一步步求解", html)
         self.assertNotIn("AGENT LOOP", html)
         self.assertIn("id=\"run-agent\"", html)
-        self.assertIn("Live Agent Workbench", html)
+        self.assertIn("Developer Workbench", html)
+        self.assertIn("场景摘要", html)
+        self.assertIn("id=\"scenario-name\"", html)
+        self.assertIn("id=\"scenario-risk-tags\"", html)
+        self.assertIn("Baseline vs AutoSolver", html)
+        self.assertIn("id=\"result-comparison\"", html)
+        self.assertIn("运行调度分析", html)
+        self.assertIn("调度场景", html)
         self.assertIn("Agent 阶段", html)
         self.assertIn("Planner", html)
         self.assertIn("Executor", html)
@@ -91,6 +99,15 @@ class WebAgentDemoTest(unittest.TestCase):
 
         self.assertTrue(any(case["id"] == "large_seed301" for case in cases))
         self.assertTrue(all("path" not in case for case in cases))
+        self.assertTrue(all("scenario_name" in case for case in cases))
+        self.assertTrue(all("scenario_type" in case for case in cases))
+        self.assertTrue(all("risk_tags" in case for case in cases))
+        self.assertTrue(all("operator_note" in case for case in cases))
+        self.assertTrue(all("source_type" in case for case in cases))
+        large_case = next(case for case in cases if case["id"] == "large_seed301")
+        self.assertEqual(large_case["scenario_name"], "官方大规模候选调度")
+        self.assertEqual(large_case["source_type"], "official_case")
+        self.assertIn("候选行多", large_case["risk_tags"])
 
     def test_blueprint_exposes_agent_capabilities(self):
         from autosolver_agent.system import get_agent_blueprint
@@ -177,8 +194,14 @@ class WebAgentDemoTest(unittest.TestCase):
         fake_module._solve_scarce_k2_column_search.return_value = []
         fake_module._solve_scarce_bundle_mcf_enum.return_value = []
         fake_module.solve.return_value = []
+        fake_evolution = mock.Mock()
+        fake_evolution.memory_path = "mock-evolution-memory.jsonl"
+        fake_evolution.registry_path = "mock-strategy-registry.json"
+        fake_evolution.trusted_strategies.return_value = []
+        fake_evolution.generate_strategy.return_value = SimpleNamespace(strategy_id="gen_test_v001", path="gen_test_v001.py")
+        fake_evolution.safety_check.return_value = SimpleNamespace(passed=False, reason="mock safety gate")
 
-        with mock.patch.object(system, "load_solver", return_value=fake_module), mock.patch.object(system, "parse_candidates", return_value=([("T0000", ("T0000",), "C000", 1.0, 0.9, 0)], {"T0000"})), mock.patch.object(system, "infer_regime", return_value="large"), mock.patch.object(system, "summarize_solution", return_value={"valid": True, "covered_tasks": 1, "total_tasks": 1, "groups": 0, "used_couriers": 0, "uncovered_tasks": [], "riders_per_group": {}, "tasks_per_group": {}, "invalid_reasons": []}):
+        with mock.patch.object(system, "load_solver", return_value=fake_module), mock.patch.object(system, "parse_candidates", return_value=([("T0000", ("T0000",), "C000", 1.0, 0.9, 0)], {"T0000"})), mock.patch.object(system, "infer_regime", return_value="large"), mock.patch.object(system, "EvolutionManager", return_value=fake_evolution), mock.patch.object(system, "summarize_solution", return_value={"valid": True, "covered_tasks": 1, "total_tasks": 1, "groups": 0, "used_couriers": 0, "uncovered_tasks": [], "riders_per_group": {}, "tasks_per_group": {}, "invalid_reasons": []}):
             report = system.run_agent("task_id_list\nT0000\tC000\t1\t0.9\n", budget_s=1.0, observer=observer)
 
         self.assertEqual(report["status"], "ok")

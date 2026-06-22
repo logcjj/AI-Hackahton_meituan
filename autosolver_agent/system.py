@@ -406,7 +406,7 @@ def run_agent(
 
     evolution = EvolutionManager(EVOLUTION_ROOT)
 
-    emit({"type": "perception", "message": f"识别为 {regime} 场景", "features": features})
+    emit({"type": "perception", "message": f"识别为 {regime} 场景", "regime": regime, "features": features})
     emit(
         {
             "type": "critic_policy",

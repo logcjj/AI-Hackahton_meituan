@@ -16,8 +16,9 @@ if str(ROOT) not in sys.path:
 from autosolver_agent.system import get_agent_blueprint, run_case_agent as _run_case_agent
 
 try:
-    from web_agent_demo.sample_cases import ensure_sample_cases
+    from web_agent_demo.sample_cases import SAMPLE_CASES, ensure_sample_cases
 except ImportError:  # The demo can still run before optional synthetic cases are generated.
+    SAMPLE_CASES = {}
     ensure_sample_cases = None
 
 
@@ -42,8 +43,26 @@ def list_cases() -> list[dict[str, object]]:
             continue
         lines = path.read_text(encoding="utf-8").strip().splitlines()
         row_count = max(0, len(lines) - (1 if lines and lines[0].startswith("task_id_list") else 0))
+        sample = SAMPLE_CASES.get(case_id)
         case_type = "real provided case" if case_id == "large_seed301" else "synthetic demo case"
-        cases.append({"id": case_id, "name": case_id, "rows": row_count, "type": case_type})
+        scenario_name = sample.name if sample is not None else case_id
+        scenario_type = sample.scenario_type if sample is not None else "generic"
+        risk_tags = list(sample.risk_tags) if sample is not None else []
+        operator_note = sample.description if sample is not None else "Case metadata is unavailable; using technical case id."
+        source_type = "official_case" if case_id == "large_seed301" else "synthetic_demo_case"
+        cases.append(
+            {
+                "id": case_id,
+                "name": scenario_name,
+                "scenario_name": scenario_name,
+                "scenario_type": scenario_type,
+                "risk_tags": risk_tags,
+                "operator_note": operator_note,
+                "source_type": source_type,
+                "rows": row_count,
+                "type": case_type,
+            }
+        )
     return cases
 
 
@@ -123,6 +142,60 @@ def render_index() -> str:
     .lead { color: var(--muted); font-size: 17px; line-height: 1.75; max-width: 790px; position: relative; z-index: 1; }
     .controls { padding: 22px; display: grid; gap: 12px; }
     .control-row { display: grid; grid-template-columns: 1fr 130px; gap: 10px; }
+    .summary-panel, .compare-panel { padding: 20px; margin-bottom: 18px; }
+    .summary-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 14px;
+    }
+    .summary-grid, .result-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .summary-item, .result-item {
+      padding: 13px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.68);
+      border: 1px solid var(--line);
+      min-height: 88px;
+    }
+    .summary-item span, .result-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    .summary-item strong, .result-item strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.3;
+      letter-spacing: -.03em;
+    }
+    .summary-item code, .result-item code {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      word-break: break-all;
+    }
+    .tag-list { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      border-radius: 999px;
+      padding: 5px 8px;
+      background: rgba(46,95,115,.12);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .result-caption { margin: 8px 0 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
     label { color: var(--muted); font-size: 13px; font-weight: 800; display: grid; gap: 7px; }
     select, input, button {
       width: 100%;
@@ -427,6 +500,7 @@ def render_index() -> str:
     }
     @media (max-width: 1100px) {
       .workbench, .topbar { grid-template-columns: 1fr; }
+      .summary-grid, .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .code-loop { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .rail, .inspector { position: static; }
       .rail, .timeline-panel, .inspector { min-height: 0; }
@@ -435,6 +509,7 @@ def render_index() -> str:
     @media (max-width: 760px) {
       main { width: min(100vw - 20px, 1180px); padding-top: 16px; }
       .control-row, .timeline-toolbar, .attempt, .code-loop, .evolution-head { grid-template-columns: 1fr; }
+      .summary-head, .summary-grid, .result-grid { grid-template-columns: 1fr; }
       .event { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: 1fr; }
     }
@@ -444,20 +519,48 @@ def render_index() -> str:
 <main>
   <div class="topbar">
     <section class="hero panel">
-      <div class="eyebrow">Live Agent Workbench</div>
-      <h1>AutoSolver Agent</h1>
-      <p class="lead">页面重点展示运行过程，而不是静态成绩。启动后可以从阶段轨道、实时事件流、右侧检查器和候选表里看到 Planner 提案、Executor 调用、Critic 接受/拒绝、Controller 调整、Memory 保留 best-so-far，以及 Evolution 记录生成实验并仅复用已接受候选。</p>
+      <div class="eyebrow">Developer Workbench</div>
+      <h1>AutoSolver Agent Workbench</h1>
+      <p class="lead">用于复核同一套 Agent 控制器如何处理当前调度场景。页面按输入摘要、运行轨迹、候选策略、结果对比和实验轨道组织信息，保留技术 ID，避免把内部估算包装成正式评测结论。</p>
     </section>
     <section class="controls panel">
       <div class="control-row">
-        <label>测试用例<select id="case-select"></select></label>
+        <label>调度场景<select id="case-select"></select></label>
         <label>预算秒数<input id="budget" type="number" min="1" max="10" step="0.5" value="10"></label>
       </div>
-      <button id="run-agent">启动 Agent 求解</button>
-      <button id="reload-cases" class="secondary">刷新用例和能力</button>
+      <button id="run-agent">运行调度分析</button>
+      <button id="reload-cases" class="secondary">刷新场景与能力</button>
       <div id="status" class="status-pill">等待启动</div>
     </section>
   </div>
+
+  <section class="summary-panel panel" aria-label="场景摘要">
+    <div class="summary-head">
+      <div>
+        <h2>场景摘要</h2>
+        <p class="result-caption">运行前确认 case ID、数据来源、风险标签和候选规模；运行后补充 Agent 识别出的 regime 与输入画像。</p>
+      </div>
+      <div class="loop-badge">Input Summary</div>
+    </div>
+    <div class="summary-grid">
+      <div class="summary-item"><span>Scenario</span><strong id="scenario-name">等待加载</strong><code id="scenario-id">case_id pending</code></div>
+      <div class="summary-item"><span>Type</span><strong id="scenario-type">unknown</strong><code id="scenario-source">source pending</code></div>
+      <div class="summary-item"><span>Rows</span><strong id="scenario-rows">0</strong><code id="scenario-profile">profile pending</code></div>
+      <div class="summary-item"><span>Risk Tags</span><div id="scenario-risk-tags" class="tag-list"><span class="tag">pending</span></div></div>
+    </div>
+    <p id="scenario-note" class="result-caption">选择场景后会显示 operator note。</p>
+  </section>
+
+  <section class="compare-panel panel" aria-label="结果对比">
+    <div class="summary-head">
+      <div>
+        <h2>Baseline vs AutoSolver</h2>
+        <p class="result-caption">运行完成后展示最快稳定基线与最终 best-so-far 的本地对比参考；这里只展示可复核字段，不展示内部排序数值。</p>
+      </div>
+      <div class="loop-badge">Result Comparison</div>
+    </div>
+    <div id="result-comparison" class="result-grid"><div class="empty">运行调度分析后，这里会展示覆盖、候选组、骑手占用、耗时和接受策略数。</div></div>
+  </section>
 
   <section class="workbench">
     <aside class="rail panel">
@@ -524,6 +627,7 @@ let autoScroll = true;
 let compactView = false;
 let acceptedCount = 0;
 let evolutionState = initialEvolutionState();
+let casesById = {};
 const stages = [
   ['perception', 'Perception', '读取 case，识别任务、骑手、bundle 和意愿分布。'],
   ['planner', 'Planner', '提出本轮策略批次，并说明尝试原因。'],
@@ -544,6 +648,62 @@ const filterItems = [
 ];
 function safe(text) {
   return String(text ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function selectedCase() {
+  return casesById[$('case-select')?.value] || null;
+}
+function renderTags(tags) {
+  const items = Array.isArray(tags) && tags.length ? tags : ['未标注'];
+  return items.map(item => `<span class="tag">${safe(item)}</span>`).join('');
+}
+function renderScenarioSummary(caseData, profile) {
+  const data = caseData || {};
+  const scenarioName = data.scenario_name || data.name || data.id || '等待加载';
+  $('scenario-name').textContent = scenarioName;
+  $('scenario-id').textContent = data.id ? `case_id: ${data.id}` : 'case_id pending';
+  $('scenario-type').textContent = data.scenario_type || 'unknown';
+  $('scenario-source').textContent = data.source_type || data.type || 'source pending';
+  $('scenario-rows').textContent = String(profile?.rows ?? data.rows ?? 0);
+  const profileText = profile
+    ? `regime ${profile.regime ?? 'unknown'} · tasks ${profile.tasks ?? '?'} · couriers ${profile.couriers ?? '?'}`
+    : 'profile pending';
+  $('scenario-profile').textContent = profileText;
+  $('scenario-risk-tags').innerHTML = renderTags(data.risk_tags);
+  $('scenario-note').textContent = data.operator_note || '选择场景后会显示 operator note。';
+}
+function coverageText(record) {
+  if (!record) return 'n/a';
+  const covered = record.covered_tasks ?? '?';
+  const total = record.total_tasks ?? '?';
+  return `${covered}/${total}`;
+}
+function strategyName(record) {
+  return record?.label || record?.name || record?.strategy || 'n/a';
+}
+function strategyId(record) {
+  return record?.name || record?.strategy || 'n/a';
+}
+function attemptDecisionText(record) {
+  if (!record) return '等待运行';
+  if (record.error) return `拒绝：${record.error}`;
+  if (record.accepted) return '接受：更新 best-so-far';
+  if (record.valid === false) return '拒绝：候选无效';
+  return '参考：未优于当前 best-so-far';
+}
+function renderResultComparison(report) {
+  const baseline = attempts.find(item => item.name === 'greedy_baseline') || attempts[0] || null;
+  const best = report?.best || null;
+  const accepted = attempts.filter(item => item.accepted).length;
+  const bestUncovered = Array.isArray(best?.uncovered_tasks) ? best.uncovered_tasks.length : 'n/a';
+  const wallMs = Number.isFinite(Number(report?.wall_time_s)) ? `${Math.round(Number(report.wall_time_s) * 1000)} ms` : 'n/a';
+  $('result-comparison').innerHTML = `
+    <div class="result-item"><span>Baseline Source</span><strong>${safe(strategyName(baseline))}</strong><code>strategy_id: ${safe(strategyId(baseline))}</code></div>
+    <div class="result-item"><span>Baseline Coverage</span><strong>${safe(coverageText(baseline))}</strong><code>${safe(attemptDecisionText(baseline))}</code></div>
+    <div class="result-item"><span>AutoSolver Source</span><strong>${safe(best?.strategy || 'n/a')}</strong><code>final best-so-far</code></div>
+    <div class="result-item"><span>AutoSolver Coverage</span><strong>${safe(coverageText(best))}</strong><code>uncovered tasks: ${safe(bestUncovered)}</code></div>
+    <div class="result-item"><span>Resource Use</span><strong>${safe(best?.used_couriers ?? 'n/a')}</strong><code>couriers · groups ${safe(best?.groups ?? 'n/a')}</code></div>
+    <div class="result-item"><span>Run Evidence</span><strong>${safe(wallMs)}</strong><code>${safe(accepted)} accepted / ${safe(attempts.length)} attempts</code></div>
+  `;
 }
 function initialEvolutionState() {
   return {
@@ -763,8 +923,10 @@ async function loadCases() {
   const payload = await casesRes.json();
   const blueprint = await blueprintRes.json();
   paintBlueprint(blueprint.blueprint);
-  $('case-select').innerHTML = payload.cases.map(c => `<option value="${safe(c.id)}">${safe(c.name)} · ${safe(c.type)}</option>`).join('');
-  $('case-profile').textContent = '已加载用例列表。启动后会展示本次 case 的结构画像。';
+  casesById = Object.fromEntries(payload.cases.map(c => [c.id, c]));
+  $('case-select').innerHTML = payload.cases.map(c => `<option value="${safe(c.id)}">${safe(c.scenario_name || c.name)} · ${safe(c.scenario_type || c.type)}</option>`).join('');
+  renderScenarioSummary(selectedCase());
+  $('case-profile').textContent = '已加载场景列表。启动后会展示本次 case 的结构画像。';
 }
 function stageForType(type) {
   if (type === 'perception' || type === 'critic_policy') return 'perception';
@@ -879,14 +1041,15 @@ function paintAttempts(report) {
   }
   $('rounds').innerHTML = attempts.map(s => `
     <div class="attempt ${s.accepted ? 'accepted' : 'rejected'}">
-      <div class="name">${safe(s.label || s.name)}</div>
-      <div class="why">${safe(s.reason || '策略执行记录')}</div>
+      <div class="name">${safe(s.label || s.name)}<code>strategy_id: ${safe(s.name)}</code></div>
+      <div class="why">${safe(s.reason || '策略执行记录')} · ${safe(attemptDecisionText(s))}</div>
       <div class="muted">${Math.round(s.elapsed_ms || 0)} ms · round ${safe(s.round)}</div>
       <div class="verdict">${s.accepted ? 'Best-so-far' : 'Reference'}</div>
     </div>`).join('');
 }
 function render(report) {
   $('case-profile').textContent = `${report.case_id} · regime ${report.regime} · tasks ${report.features.tasks} · couriers ${report.features.couriers} · rows ${report.features.rows}`;
+  renderScenarioSummary(selectedCase(), {...(report.features || {}), regime: report.regime});
   $('current-action').textContent = '运行结束，Memory 已输出 best-so-far。';
   setStage('memory', `Agent session finished for ${report.case_id}.`);
   if (report.evolution) {
@@ -918,6 +1081,7 @@ function render(report) {
     paintEvolutionPanel();
   }
   paintAttempts(report);
+  renderResultComparison(report);
 }
 function resetRun() {
   events = [];
@@ -928,6 +1092,7 @@ function resetRun() {
   $('metric-accepted').textContent = '0';
   $('metric-round').textContent = '0';
   $('rounds').innerHTML = '<div class="empty">候选表会在每轮运行后更新：展示每个策略的用途、耗时、以及是否更新 best-so-far。</div>';
+  $('result-comparison').innerHTML = '<div class="empty">运行调度分析后，这里会展示覆盖、候选组、骑手占用、耗时和接受策略数。</div>';
   $('events').innerHTML = '<div class="empty">启动后这里会按时间顺序显示每个 Agent 动作。</div>';
   $('current-stage').textContent = '等待启动。';
   $('current-action').textContent = '还没有工具调用。';
@@ -956,6 +1121,7 @@ async function streamRun() {
     setStage('perception', payload.message);
     const f = payload.features || {};
     $('case-profile').textContent = `tasks ${f.tasks} · couriers ${f.couriers} · rows ${f.rows} · avg willingness ${f.avg_willingness} · bundles ${f.has_bundles ? 'yes' : 'no'}`;
+    renderScenarioSummary(selectedCase(), {...f, regime: payload.regime});
     $('current-action').textContent = '已完成 case 画像，准备规划策略。';
   });
   currentRun.addEventListener('critic_policy', (ev) => {
@@ -1039,6 +1205,7 @@ $('compact').addEventListener('click', () => {
 });
 $('run-agent').addEventListener('click', streamRun);
 $('reload-cases').addEventListener('click', loadCases);
+$('case-select').addEventListener('change', () => renderScenarioSummary(selectedCase()));
 paintEvolutionPanel();
 loadCases();
 </script>
