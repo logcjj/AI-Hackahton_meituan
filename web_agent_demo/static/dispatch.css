@@ -118,6 +118,15 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   box-shadow:0 8px 20px rgba(67,213,255,.22)}
 .replay-btn:active{transform:translateY(1px) scale(.98)}
 .replay-btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(67,213,255,.3)}
+/* iteration-15：当前求解上下文角标（头牌官方案例 vs 场景脱敏样例），让评委一眼知道在解哪个场景 */
+.case-tag{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;
+  font-size:11.5px;font-weight:800;color:#d7e7e0;background:rgba(67,213,255,.07);
+  border:1px solid rgba(67,213,255,.26);white-space:nowrap}
+.case-tag b{color:#fff}
+.case-tag .ct-dot{display:inline-block;width:7px;height:7px;border-radius:50%}
+.case-tag .ct-dot.real{background:var(--green);box-shadow:0 0 8px var(--green)}
+.case-tag .ct-dot.syn{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.case-tag .demo-tag{margin-left:4px}
 .chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 /* iter-7：贴目标稿——彩色图标圆角方块 + 标签 + 彩色±%；hover 微升 */
 .chip{display:flex;align-items:center;gap:11px;padding:7px 16px 7px 8px;border-radius:14px;

@@ -26,9 +26,16 @@ const SCENES = [
   {id:'bundle', ico:'🗂️', t:'合单机会密集', d:'多订单同向集中'},
   {id:'newshop',ico:'🏪', t:'新店突发订单', d:'新店订单突然增加'},
 ];
+/* iteration-15：当前选中的业务场景 id（用户点击场景后置位）。null=头牌默认态。
+ * renderScenes 在每次感知/verdict 回填时会重绘场景列表——必须据此保住用户选中高亮，
+ * 否则求解完成回填 regime 会把高亮错误地跳回 bundle。 */
+let SELECTED_SCENE=null;
 function renderScenes(activeRegime){
   $('scenelist').innerHTML = SCENES.map((s,i)=>{
-    const act = (activeRegime==='bundle-heavy' && s.id==='bundle') || (!activeRegime && i===3);
+    // 优先：用户显式选中的场景；否则头牌默认态用 regime 推断（bundle-heavy→bundle，第4项）
+    const act = SELECTED_SCENE!=null
+      ? (s.id===SELECTED_SCENE)
+      : ((activeRegime==='bundle-heavy' && s.id==='bundle') || (!activeRegime && i===3));
     return `<div class="scene ${act?'active':''}" data-id="${s.id}">
       <div class="si">${s.ico}</div>
       <div><div class="st">${i+1} ${safe(s.t)}</div><div class="sd">${safe(s.d)}</div></div>
@@ -1066,18 +1073,24 @@ function renderRiskFromPerc(p){
   ]);
 }
 
+/* iteration-15：当前求解上下文（头牌 large_seed301 或某业务场景脱敏样例）。
+ * runStream 据此构造 POST body，并在 phase/状态条上显示「在解哪个场景」。 */
+let CURRENT_CTX={kind:'headliner', body:{case:'large_seed301',memory_enabled:true}, label:'头牌官方案例 large_seed301（bundle-heavy）'};
+const SCENE_LABELS={peak:'午高峰爆单',rain:'雨天低接单意愿',scarce:'骑手稀缺商圈',bundle:'合单机会密集',newshop:'新店突发订单'};
+
 function runStream(){
   $('runbtn').disabled=true;
   // P0-1 运行中态：脉冲绿「● 调度运行中」+ 计时器走动（贴目标稿系统状态）
   const rl=$('runlight'); rl.classList.remove('idle','done'); rl.classList.add('running');
   $('runtext').textContent='调度运行中';
-  $('phase').textContent='盲测求解中…（solver_v4：v3 base + 余量精修，约 10 秒内逐事件点亮）';
+  const ctxLbl=CURRENT_CTX.label||'';
+  $('phase').textContent=`现场求解中 · ${ctxLbl} …（run_blind_solve 全流程 + 贪心基线，约 7~10s 逐阶段点亮）`;
   renderRings();
   RINGS.forEach((r,i)=> setRing(r[0], i===0?'run':'wait'));
   startTimer();
 
   fetch('/api/cockpit/stream',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({case:'large_seed301',memory_enabled:true})}).then(async resp=>{
+    body:JSON.stringify(CURRENT_CTX.body||{case:'large_seed301',memory_enabled:true})}).then(async resp=>{
     const reader=resp.body.getReader(), dec=new TextDecoder(); let buf='';
     while(true){
       const {done,value}=await reader.read(); if(done) break;
@@ -1093,11 +1106,27 @@ function runStream(){
   }).catch(e=>{ $('phase').textContent='出错：'+e.message; finishRun(); });
 }
 function dispatchEvent2(type,d){
-  if(type==='trace'){ handleTrace(d); }
+  if(type==='meta'){ handleMeta(d); }
+  else if(type==='trace'){ handleTrace(d); }
   else if(type==='baseline'){ renderBaseline(d.baseline);
     const pct=d.baseline?.improvement?.cost_pct; if(pct!=null){ costImprovePct=Math.min(80,pct); costImproveIsReal=true; recomputeRoi(); } }
   else if(type==='result'){ applyStory(d.story); }
   else if(type==='error'){ $('phase').textContent='出错：'+(d.message||''); }
+}
+/* iteration-15：meta 事件——服务端确认「正在求解哪个场景/案例」（脱敏标识/seed），
+ * 立即更新状态条与场景角标，让加载态清晰可读。 */
+function handleMeta(d){
+  if(!d) return;
+  const tag=$('case-tag');
+  if(d.is_synthetic_sample && d.scene){
+    const nm=SCENE_LABELS[d.scene]||d.scene;
+    if(tag){ tag.style.display='inline-flex';
+      tag.innerHTML=`<span class="ct-dot syn"></span>场景脱敏样例 · <b>${safe(nm)}</b> · regime=${safe(d.regime_key||'—')} · seed=${safe(d.seed)}<span class="demo-tag">现场合成·非记忆</span>`; }
+    $('phase').textContent=`正在对「${nm}」脱敏样例跑完整真实求解（regime=${d.regime_key} seed=${d.seed}）…`;
+  }else{
+    if(tag){ tag.style.display='inline-flex';
+      tag.innerHTML=`<span class="ct-dot real"></span>头牌官方案例 · <b>large_seed301</b>（bundle-heavy）`; }
+  }
 }
 let LAST_STORY=null;
 function applyStory(s){
@@ -1129,9 +1158,12 @@ function finishRun(){
   $('runtext').textContent='完成';
   stopTimer();
   const total=timerStart?fmtElapsed(Date.now()-timerStart):'';
-  $('phase').textContent=`推理完成 · 全量真值已回填${total?`（本次求解总耗时 ${total}）`:''}`;
+  const ctxLbl=CURRENT_CTX.label||'';
+  $('phase').textContent=`求解完成 · ${ctxLbl} · 全量真值已回填${total?`（本次求解总耗时 ${total}）`:''}`;
   // 重新演示按钮：求解完成后可见，便于答辩反复演示整段动画
   const rb=$('replaybtn'); if(rb) rb.style.display='inline-flex';
+  // iteration-15：在场景态下露出「回到头牌案例」按钮（头牌态隐藏）
+  const hb=$('headlinerbtn'); if(hb) hb.style.display=(CURRENT_CTX.kind==='scene')?'inline-flex':'none';
 }
 
 /* ---------- 初始骨架（秒开）+ 自动推理（P0-1：加载即有数据，便于截图/答辩） ---------- */
@@ -1180,28 +1212,59 @@ $('evotoggle').onclick=()=> $('evopanel').classList.toggle('collapsed');
 document.addEventListener('click',e=>{
   const sc=e.target.closest('.scene');
   if(sc){
+    if($('runbtn').disabled){
+      // 求解中：不切换高亮，避免误导（active 仍指向正在跑的场景）
+      $('phase').textContent='当前正在求解，请等本次完成后再切换场景…';
+      return;
+    }
     document.querySelectorAll('.scene').forEach(n=>n.classList.toggle('active',n===sc));
     switchScene(sc.dataset.id);
   }
 });
-/* P1-7：点击场景 → 拉 /api/generate 脱敏样例，感知真实重判 */
-async function switchScene(sceneId){
-  $('phase').textContent='切换场景 · 合成脱敏样例并重跑感知判定…';
-  try{
-    const r=await(await fetch('/api/generate?regime='+encodeURIComponent(sceneId))).json();
-    if(r.status==='ok'){
-      const verd={regime:r.regime_verdict.regime,rules:r.regime_verdict.rules};
-      $('verdict-name').textContent='AI 判定：'+(verd.regime||'—')+'（脱敏样例·真实重判）';
-      $('verdict-rule').innerHTML=(verd.rules||[]).map(safe).join('<br>')||'—';
-      if(r.chips) renderChips(r.chips);
-      if(r.risk) renderRisk(r.risk);
-      $('phase').textContent=`脱敏样例 ${r.regime_key}（T=${r.n_tasks}, 行=${r.n_rows}）→ 感知真实判出 regime=${verd.regime}（非记忆样例）`;
-    }else{
-      $('phase').textContent='场景生成不可用，已保留当前判定（占位）：'+(r.error||'');
-    }
-  }catch(err){
-    $('phase').textContent='场景切换失败（占位）：'+err.message;
+/* iteration-15 P0：点击场景 → 对该场景脱敏样例跑【完整真实求解】（run_blind_solve 全流程 + 贪心基线），
+ * 所有面板（KPI/Baseline/决策/候选/地图/证书/四方/自进化）回填为该场景真值，带流式动画。
+ * 不再只重判感知；不写死任何场景真值——由服务端现场合成 regime 脱敏样例并真跑。 */
+function switchScene(sceneId){
+  if($('runbtn').disabled){
+    // 正在求解中：忽略点击，给提示（避免并发两路 SSE）
+    $('phase').textContent='当前正在求解，请等本次完成后再切换场景…';
+    // 还原 active 高亮到正在跑的上下文
+    return;
   }
+  SELECTED_SCENE=sceneId;
+  CURRENT_CTX={kind:'scene', body:{scene:sceneId, memory_enabled:true}, label:`${SCENE_LABELS[sceneId]||sceneId}（脱敏样例·现场合成）`};
+  // 1) 面板回求解中骨架（「求解中」加载态清晰，避免误读上一场景真值为本场景）
+  resetPanelsToSolving(`正在合成「${SCENE_LABELS[sceneId]||sceneId}」脱敏样例并完整真 solve…`);
+  // 2) 启动完整 SSE 流式求解（与头牌同一条 runStream 链路，只是 body 指向该场景）
+  setTimeout(runStream, 220);
+}
+
+/* iteration-15：把全部面板重置为「求解中」骨架（与首屏 loadSkeleton/replay 同观感），
+ * 让切换场景时有明确加载态，不残留上一场景真值。 */
+function resetPanelsToSolving(phaseTxt){
+  const rl=$('runlight'); rl.classList.remove('running','done'); rl.classList.add('idle');
+  $('runtext').textContent='待机'; $('timer').textContent='00:00:00'; timerStart=0;
+  $('solverused').textContent='—';
+  renderRings(); RINGS.forEach(r=> setRing(r[0],'wait'));
+  renderKpiSkeleton();
+  $('risk').innerHTML=skeletonPanel('感知模块据该场景脱敏样例当场判风险');
+  $('strategy').innerHTML=skeletonPanel('Planner 镜像解读该场景策略链');
+  $('decision').innerHTML=skeletonPanel('该场景求解后聚焦代表派单组');
+  $('cert').innerHTML=skeletonPanel('solver_v4 对该场景求解后回填 gap·r1 证书');
+  $('candidates').innerHTML=`<div style="grid-column:1/-1">${skeletonPanel('该场景方案 A/B/C 自动评估')}</div>`;
+  $('baseline').innerHTML=skeletonPanel('该场景：纯贪心真跑 vs AutoSolver 对比');
+  $('stkbody').innerHTML=skeletonPanel('该场景求解后接入 report.stakeholders 真值');
+  if(phaseTxt) $('phase').textContent=phaseTxt;
+}
+
+/* iteration-15：一键回到头牌官方案例（large_seed301）并重跑完整求解。 */
+function backToHeadliner(){
+  if($('runbtn').disabled) return;
+  SELECTED_SCENE=null;
+  CURRENT_CTX={kind:'headliner', body:{case:'large_seed301',memory_enabled:true}, label:'头牌官方案例 large_seed301（bundle-heavy）'};
+  document.querySelectorAll('.scene').forEach(n=>n.classList.remove('active'));
+  resetPanelsToSolving('回到头牌官方案例 large_seed301 · 重跑完整真实求解…');
+  setTimeout(runStream, 220);
 }
 $('runbtn').onclick=runStream;
 
@@ -1229,6 +1292,7 @@ function replayDemo(){
   setTimeout(runStream, 320);
 }
 $('replaybtn').onclick=replayDemo;
+{ const hb=$('headlinerbtn'); if(hb) hb.onclick=backToHeadliner; }
 
 /* 键盘：空格开始推理 */
 document.addEventListener('keydown',e=>{

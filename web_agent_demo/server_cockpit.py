@@ -160,6 +160,34 @@ _SCENE_TO_REGIME = {
     "newshop": "high_noise",   # 新店突发订单：高噪声/不确定
 }
 
+# iteration-15：每场景默认脱敏种子。选「已验证 v4 严格优于贪心(成本口径)」且各场景
+# 真值自洽、彼此不同的 seed（peak/bundle/rain/newshop 覆盖不更差，scarce 体现骑手瓶颈：
+# 贪心仅覆盖 21/30、v4 覆盖 30/30）。不 cherry-pick：若运行结果未严格优于，前端如实显示。
+# 这些 seed 仅决定「现场合成哪一份随机脱敏实例」，求解全程真跑，不写死任何输出真值。
+_SCENE_DEFAULT_SEED = {
+    "peak": 301,
+    "rain": 7,
+    "scarce": 7,
+    "bundle": 11,
+    "newshop": 7,
+}
+
+
+def _scene_case_text(scene: str, seed: int | None = None) -> tuple[str, str, int]:
+    """把前端场景 id 解析成「现场合成的脱敏样例 TSV 文本」。
+
+    返回 (text, regime_key, seed)。求解器对该 text 跑完整真实流程；本函数只负责
+    用 generalization_stress_test.generate_case 现场合成一份**全新随机**实例（确定性 seed），
+    不读官方数据、不读记忆样例、不写死任何求解输出。
+    """
+    from tools.generalization_stress_test import REGIME_BANK, generate_case
+    regime_key = _SCENE_TO_REGIME.get(scene, "bundle_heavy")
+    spec = REGIME_BANK.get(regime_key) or REGIME_BANK.get("medium")
+    if seed is None:
+        seed = _SCENE_DEFAULT_SEED.get(scene, 7)
+    text = generate_case(spec, int(seed))
+    return text, regime_key, int(seed)
+
 
 def _generate_scene(scene: str, seed: int) -> dict:
     """合成一个全新脱敏样例 + 跑感知重判（真实判出 regime/chips/risk）。"""
@@ -314,10 +342,30 @@ class Handler(BaseHTTPRequestHandler):
     def _handle_stream(self, body: dict) -> None:
         """SSE：盲测逐事件 + baseline + 全量 story。
 
-        客户端可传 {case: "large_seed301"} 或 {text: <TSV>}。
+        客户端可传：
+          {case: "large_seed301"}                 默认头牌官方案例
+          {text: <TSV>}                           直接给样例文本
+          {scene: "scarce", seed?: 7}             iteration-15：现场合成该场景脱敏样例并全量真 solve
+          {regime: "scarce", seed?: 7}            同上（regime 别名，便于直接指定压测 regime）
+        无论哪种入口，求解器都对 text 跑完整 run_blind_solve + 贪心基线，输出全为真值。
         """
         case = body.get("case", "large_seed301")
-        text = body.get("text") or _read_case_text(case)
+        scene = body.get("scene") or body.get("regime")
+        seed = body.get("seed")
+        regime_key = None
+        if body.get("text"):
+            text = body["text"]
+        elif scene:
+            # iteration-15：场景全量真 solve —— 现场合成该 regime 的脱敏随机实例，跑完整求解。
+            try:
+                text, regime_key, seed = _scene_case_text(scene, seed)
+                case = f"scene:{scene}:{regime_key}:seed{seed}"
+            except Exception:
+                print(f"[cockpit] scene gen error: {traceback.format_exc()}", file=sys.stderr)
+                text = _read_case_text("large_seed301")
+                case = "large_seed301"
+        else:
+            text = _read_case_text(case)
         memory_enabled = bool(body.get("memory_enabled", True))
         preset = body.get("preset", "balanced")
 
@@ -333,6 +381,18 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.flush()
             except (BrokenPipeError, ConnectionResetError, OSError) as exc:
                 raise ClientGone(str(exc))
+
+        # iteration-15：先推一条 meta，让前端立即知道「在求解哪个场景/案例」（脱敏标识/seed）。
+        is_scene = bool(scene) and not body.get("text")
+        self.wfile.write(_sse("meta", {
+            "case": case,
+            "scene": scene if is_scene else None,
+            "regime_key": regime_key,
+            "seed": seed,
+            "is_synthetic_sample": is_scene,
+            "is_headliner": (case == "large_seed301"),
+        }))
+        self.wfile.flush()
 
         try:
             report = orch.run_blind_solve(
@@ -354,6 +414,12 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.flush()
 
             story = cstory.build_story(text, report, baseline)
+            story["case_meta"] = {
+                "case": case, "scene": scene if is_scene else None,
+                "regime_key": regime_key, "seed": seed,
+                "is_synthetic_sample": is_scene,
+                "is_headliner": (case == "large_seed301"),
+            }
             self.wfile.write(_sse("result", {"story": story}))
             self.wfile.write(_sse("done", {"message": "complete"}))
             self.wfile.flush()
@@ -399,7 +465,7 @@ def _selfcheck(host="127.0.0.1", port=8779) -> int:
         req = urllib.request.Request(base + "/api/cockpit/stream", data=payload,
                                      headers={"Content-Type": "application/json"})
         raw = urllib.request.urlopen(req, timeout=120).read().decode("utf-8")
-        trace_types, baseline, story = [], None, None
+        trace_types, baseline, story, meta = [], None, None, None
         for block in raw.split("\n\n"):
             if not block.strip():
                 continue
@@ -411,6 +477,8 @@ def _selfcheck(host="127.0.0.1", port=8779) -> int:
                     da = json.loads(line[6:])
             if ev == "trace" and da:
                 trace_types.append(da.get("type"))
+            elif ev == "meta" and da:
+                meta = da
             elif ev == "baseline" and da:
                 baseline = da["baseline"]
             elif ev == "result" and da:
@@ -462,6 +530,32 @@ def _selfcheck(host="127.0.0.1", port=8779) -> int:
             if "perception" not in trace_types or "critic" not in trace_types:
                 print("[selfcheck] FAIL: trajectory missing perception/critic"); ok = False
 
+        # 2b) iteration-15：meta 事件存在且头牌态标记正确
+        if meta is None:
+            print("[selfcheck] FAIL: no meta event (iter-15)"); ok = False
+        elif not meta.get("is_headliner") or meta.get("is_synthetic_sample"):
+            print(f"[selfcheck] FAIL: headliner meta wrong {meta}"); ok = False
+        else:
+            print(f"[selfcheck] meta OK headliner case={meta.get('case')}")
+
+        # 2c) iteration-15：场景脱敏样例现场合成可用且 5 场景互不相同（不全量 solve，省时）
+        try:
+            sizes = {}
+            for sc_id in ("peak", "rain", "scarce", "bundle", "newshop"):
+                txt, rk, sd = _scene_case_text(sc_id)
+                rows = len(txt.strip().splitlines())
+                if rows < 5 or not txt.strip():
+                    print(f"[selfcheck] FAIL: scene {sc_id} synth too small (rows={rows})"); ok = False
+                sizes[sc_id] = (rk, sd, rows)
+            distinct = len({(v[0], v[2]) for v in sizes.values()})
+            if distinct < 3:
+                print(f"[selfcheck] FAIL: scene samples not distinct enough ({sizes})"); ok = False
+            else:
+                print(f"[selfcheck] scene synth OK ({distinct} distinct) "
+                      + " ".join(f"{k}={v[0]}/seed{v[1]}/r{v[2]}" for k, v in sizes.items()))
+        except Exception as exc:
+            print(f"[selfcheck] FAIL: scene synth error ({exc})"); ok = False
+
         # 3) static html exists & served
         try:
             html = urllib.request.urlopen(base + "/", timeout=10).read().decode("utf-8")
@@ -469,6 +563,10 @@ def _selfcheck(host="127.0.0.1", port=8779) -> int:
                 print("[selfcheck] FAIL: / did not serve html"); ok = False
             else:
                 print(f"[selfcheck] / served dispatch.html ({len(html)} bytes)")
+            # iteration-15：场景切换 UI 锚点（角标 + 回头牌按钮）须存在
+            for anchor in ('id="case-tag"', 'id="headlinerbtn"'):
+                if anchor not in html:
+                    print(f"[selfcheck] FAIL: dispatch.html missing {anchor} (iter-15)"); ok = False
         except Exception as exc:
             print(f"[selfcheck] WARN: static html not served ({exc})")
 
