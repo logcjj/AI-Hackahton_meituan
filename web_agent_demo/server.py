@@ -1322,6 +1322,10 @@ def render_index() -> str:
       --yellow: #ffd12d;
       --orange: #ff9a2e;
       --red: #ff5b65;
+      --map-merchant: #ffd02f;
+      --map-courier: #0f766e;
+      --map-route: #16a34a;
+      --map-route-focus: #0f766e;
       --mono: "SFMono-Regular", "Cascadia Mono", "Menlo", monospace;
     }
     * { box-sizing: border-box; }
@@ -1652,33 +1656,33 @@ def render_index() -> str:
     .map-bg[data-weather="rain"] .traffic-band.heavy { stroke: rgba(255, 91, 101, .78); }
     body.sample-preview .traffic-band { opacity: .32; }
     .dispatch-link { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 980; stroke-dashoffset: 980; animation: draw 1.45s ease-out forwards; pointer-events: stroke; cursor: pointer; }
-    .dispatch-link.primary { stroke: #6ee7f0; stroke-width: 3.3; filter: drop-shadow(0 0 4px rgba(103,232,249,.24)); }
-    .dispatch-link.secondary { stroke: rgba(103, 232, 249, .34); stroke-width: 1.45; stroke-dasharray: none; filter: none; opacity: .54; }
-    .dispatch-link.overview-route { stroke: rgba(103, 232, 249, .3); stroke-width: 1.45; opacity: .48; filter: none; }
-    .dispatch-link.pickup-leg { stroke: rgba(103, 232, 249, .56); stroke-width: 2.1; filter: none; }
-    .dispatch-link.pickup-leg.overview-route { stroke: rgba(255, 197, 69, .62); stroke-width: 2.05; opacity: .72; stroke-dasharray: none; filter: drop-shadow(0 0 3px rgba(255,197,69,.12)); }
-    .dispatch-link.endpoint-connector { stroke: rgba(155, 232, 241, .2); stroke-width: 1.1; opacity: .34; stroke-dasharray: 3 4; filter: none; animation: none; pointer-events: none; }
+    .dispatch-link.primary { stroke: var(--map-route-focus); stroke-width: 3.2; filter: drop-shadow(0 1px 2px rgba(15,118,110,.24)); }
+    .dispatch-link.secondary { stroke: var(--route-color, var(--map-route)); stroke-width: 1.55; stroke-dasharray: none; filter: none; opacity: .58; }
+    .dispatch-link.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.55; opacity: .56; filter: none; }
+    .dispatch-link.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 2.05; filter: none; }
+    .dispatch-link.pickup-leg.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 2.25; opacity: .76; stroke-dasharray: none; filter: drop-shadow(0 1px 2px rgba(22,163,74,.12)); }
+    .dispatch-link.endpoint-connector { stroke: rgba(22, 163, 74, .42); stroke-width: 1.2; opacity: .48; stroke-dasharray: 4 3; filter: none; animation: none; pointer-events: none; }
     .dispatch-link.selected-overview {
-      stroke: #ffc545;
+      stroke: #d99a00;
       stroke-width: 2.25;
       opacity: .82;
       stroke-dasharray: none;
       filter: none;
     }
     .dispatch-link.pickup-leg.selected-overview {
-      stroke: rgba(255, 197, 69, .86);
+      stroke: #d99a00;
       stroke-width: 2.45;
       opacity: .9;
     }
     .dispatch-arrow.selected-overview {
-      fill: #ffc545;
+      fill: #d99a00;
       opacity: .84;
       filter: none;
     }
     .dispatch-link.active-assignment { stroke-width: 3.4; opacity: .96; filter: drop-shadow(0 0 4px rgba(103,232,249,.28)); stroke-dasharray: 980; }
     .dispatch-link.pickup-leg.active-assignment { stroke-width: 3.2; filter: drop-shadow(0 0 4px rgba(103,232,249,.22)); }
-    .dispatch-arrow { fill: #ffc545; opacity: .74; filter: none; pointer-events: auto; cursor: pointer; }
-    .dispatch-arrow.overview-route { fill: rgba(255, 197, 69, .74); opacity: .64; }
+    .dispatch-arrow { fill: #d99a00; opacity: .78; filter: drop-shadow(0 1px 1px rgba(68, 64, 60, .18)); pointer-events: auto; cursor: pointer; }
+    .dispatch-arrow.overview-route { fill: #d99a00; opacity: .68; }
     .dispatch-arrow.active-assignment { opacity: 1; }
     .dispatch-hit-area {
       fill: none;
@@ -1696,39 +1700,67 @@ def render_index() -> str:
       left: 16px;
       top: 14px;
       z-index: 4;
-      width: 106px;
-      padding: 8px 9px;
-      border: 1px solid rgba(62, 92, 112, .48);
-      border-radius: 8px;
-      background: rgba(5, 15, 24, .58);
-      box-shadow: 0 12px 30px rgba(0,0,0,.28), inset 0 1px 0 rgba(160,219,255,.06);
-      backdrop-filter: blur(5px);
+      width: 132px;
+      padding: 9px 10px;
+      border: 1px solid rgba(71, 85, 105, .24);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .82);
+      box-shadow: 0 12px 28px rgba(15, 23, 42, .14), inset 0 1px 0 rgba(255,255,255,.7);
+      backdrop-filter: blur(8px);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 7px;
       align-items: stretch;
     }
-    .map-legend div { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 10px; color: rgba(220,236,255,.82); }
-    .mark { width: 14px; height: 14px; border-radius: 5px; display: inline-grid; place-items: center; font-size: 9px; font-weight: 900; }
+    .map-legend div { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 11px; color: rgba(15, 23, 42, .78); font-weight: 650; }
+    .map-legend .line-key { width: 28px; margin-right: 0; }
+    .mark { width: 16px; height: 16px; border-radius: 6px; display: inline-grid; place-items: center; font-size: 9px; font-weight: 900; letter-spacing: -.08em; }
     .mark.depot { background: #0f7ed3; color: #dff4ff; }
-    .mark.rest, .mark.merchant { background: #f6b64b; color: #1c1001; border: 1px solid rgba(255,236,166,.7); border-radius: 50%; }
+    .mark.rest, .mark.merchant { background: linear-gradient(180deg, #ffe680, var(--map-merchant)); color: #392300; border: 1px solid rgba(160, 103, 0, .38); border-radius: 7px 7px 9px 9px; box-shadow: inset 0 1px 0 rgba(255,255,255,.68); }
     .mark.dest { background: #7bcc46; color: #071906; border: 1px solid rgba(202, 255, 162, .75); border-radius: 50%; }
-    .mark.courier { background: #082c34; color: #9be8f1; border: 1px solid rgba(155,232,241,.72); border-radius: 50%; }
+    .mark.courier { background: linear-gradient(180deg, #13968a, var(--map-courier)); color: #e8fffb; border: 1px solid rgba(13, 148, 136, .55); border-radius: 50%; box-shadow: inset 0 1px 0 rgba(187,247,208,.32); }
+    .mark-symbol { transform: translateY(-.5px); }
     .toolbar {
       position: absolute;
       top: 8px;
       right: 10px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
       z-index: 4;
+      padding: 6px;
+      border: 1px solid rgba(71, 85, 105, .22);
+      border-radius: 10px;
+      background: rgba(255,255,255,.84);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, .13);
+      backdrop-filter: blur(8px);
     }
-    .toolbar button { width: 32px; height: 29px; padding: 0; }
+    .toolbar button {
+      width: auto;
+      min-width: 48px;
+      height: 30px;
+      padding: 0 10px;
+      color: #334155;
+      background: #f8fafc;
+      border-color: rgba(100, 116, 139, .28);
+      border-radius: 8px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .toolbar select {
+      height: 30px;
+      color: #334155;
+      background: #f8fafc;
+      border-color: rgba(100, 116, 139, .28);
+      border-radius: 8px;
+      font-weight: 700;
+    }
     .toolbar button[disabled] { opacity: .42; cursor: not-allowed; }
     .toolbar button.active, .zoom button.active, .panel-head button.active {
-      border-color: var(--cyan);
-      color: var(--cyan);
-      box-shadow: 0 0 12px rgba(39, 230, 208, .22);
+      border-color: rgba(15, 118, 110, .58);
+      color: #0f766e;
+      background: #ecfdf5;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .12);
     }
     .map-label {
       position: absolute;
@@ -1766,17 +1798,17 @@ def render_index() -> str:
     .map-frame.focus-selected .map-label:not(.active-assignment) { display: none; }
     .map-frame.focus-selected .pin:not(.active-assignment) { opacity: .78; transform: translate(-50%, -50%) scale(.88); }
     .map-frame.focus-selected .pin.active-assignment { z-index: 5; opacity: 1; }
-    .map-frame.focus-selected .pin.active-assignment .mark { box-shadow: 0 0 0 4px rgba(39,230,208,.16), 0 0 18px rgba(39,230,208,.55); }
+    .map-frame.focus-selected .pin.active-assignment .mark { box-shadow: 0 0 0 4px rgba(15,118,110,.14), 0 4px 12px rgba(15,118,110,.26); }
     .map-frame.focus-selected .dispatch-link.secondary:not(.active-assignment) { opacity: .28; stroke-width: 1.7; filter: none; }
     .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .24; fill: rgba(43,222,205,.5); }
     .map-frame.assignment-overview .dispatch-link { stroke-dashoffset: 0; }
-    .map-frame.assignment-overview .dispatch-link.primary { stroke: rgba(37, 234, 216, .82); stroke-width: 3.35; opacity: .94; filter: drop-shadow(0 0 5px rgba(37,234,216,.24)); }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .48); stroke-width: 1.7; opacity: .62; filter: none; }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg.selected-overview { stroke: rgba(155, 232, 241, .78); stroke-width: 2.15; opacity: .76; filter: drop-shadow(0 0 4px rgba(155,232,241,.12)); }
-    .map-frame.assignment-overview .dispatch-arrow { opacity: .58; }
-    .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .76; }
-    .map-frame.assignment-overview .dispatch-link.active-assignment { stroke: #25ead8; stroke-width: 4.15; opacity: 1; stroke-dasharray: 980; filter: drop-shadow(0 0 7px rgba(37,234,216,.42)); }
-    .map-frame.assignment-overview .dispatch-arrow.active-assignment { opacity: .96; fill: #25ead8; }
+    .map-frame.assignment-overview .dispatch-link.primary { stroke: var(--map-route-focus); stroke-width: 3.35; opacity: .94; filter: drop-shadow(0 1px 2px rgba(15,118,110,.24)); }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.85; opacity: .68; filter: none; }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg.selected-overview { stroke: var(--map-route-focus); stroke-width: 2.35; opacity: .86; filter: drop-shadow(0 1px 2px rgba(15,118,110,.16)); }
+    .map-frame.assignment-overview .dispatch-arrow { opacity: .64; }
+    .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .82; fill: var(--map-route-focus); }
+    .map-frame.assignment-overview .dispatch-link.active-assignment { stroke: var(--map-route-focus); stroke-width: 4; opacity: 1; stroke-dasharray: 980; filter: drop-shadow(0 2px 4px rgba(15,118,110,.24)); }
+    .map-frame.assignment-overview .dispatch-arrow.active-assignment { opacity: .96; fill: var(--map-route-focus); }
     .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup.active-assignment,
     .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup {
       stroke: rgba(206, 218, 226, .46);
@@ -1797,14 +1829,14 @@ def render_index() -> str:
     .map-frame.hide-entities .map-label.active-assignment { opacity: .45; }
     .map-entities { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
-    .pin { position: absolute; z-index: 3; width: 14px; height: 14px; transform: translate(-50%, -50%); cursor: pointer; }
+    .pin { position: absolute; z-index: 3; width: 18px; height: 18px; transform: translate(-50%, -50%); cursor: pointer; }
     .pin.rest, .pin.merchant { z-index: 6; }
     .pin.courier { z-index: 5; }
     .pin.dest { z-index: 4; }
-    .pin .mark { width: 14px; height: 14px; box-shadow: 0 0 6px rgba(0,0,0,.34); }
+    .pin .mark { width: 18px; height: 18px; box-shadow: 0 2px 7px rgba(15,23,42,.22); }
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
-    .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; }
-    .zoom button { width: 36px; height: 35px; color: #fff; background: rgba(7, 23, 37, .9); border: 1px solid var(--stroke-2); font-size: 22px; }
+    .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; gap: 1px; border: 1px solid rgba(71,85,105,.2); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 24px rgba(15,23,42,.14); }
+    .zoom button { width: 38px; height: 35px; color: #334155; background: rgba(255,255,255,.9); border: 0; border-bottom: 1px solid rgba(100,116,139,.18); font-size: 20px; font-weight: 800; }
     .map-frame.zoomed .map-bg,
     .map-frame.zoomed .route-svg,
     .map-frame.zoomed .map-entities { transform: scale(1.16); transform-origin: 52% 46%; }
@@ -1823,9 +1855,9 @@ def render_index() -> str:
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
       position: absolute; right: 20px; bottom: 16px; z-index: 4; width: 138px;
-      background: rgba(8, 18, 29, .68); border: 1px solid rgba(23,52,75,.72); border-radius: 8px; padding: 8px 10px; font-size: 11px;
+      background: rgba(255,255,255,.86); border: 1px solid rgba(71,85,105,.22); border-radius: 10px; padding: 9px 11px; font-size: 11px; color: #334155; box-shadow: 0 12px 28px rgba(15,23,42,.14); backdrop-filter: blur(8px);
     }
-    .bar { height: 4px; background: linear-gradient(90deg, #ffe13b 0 67%, rgba(255,255,255,.16) 67%); margin: 7px 0 9px; }
+    .bar { height: 4px; background: linear-gradient(90deg, #d99a00 0 67%, rgba(100,116,139,.18) 67%); margin: 7px 0 9px; border-radius: 999px; }
     .toast {
       position: absolute;
       right: 18px;
@@ -1897,6 +1929,34 @@ def render_index() -> str:
     .status-ok { color: var(--green); }
     .status-bad { color: #ff777f; }
     .controls { display: flex; gap: 7px; align-items: center; min-width: 0; }
+    .map-panel .panel-head { gap: 7px; padding: 0 10px; white-space: nowrap; }
+    .map-panel .controls { gap: 5px; flex-wrap: nowrap; }
+    .map-panel .controls button,
+    .map-panel .controls select,
+    .map-panel .controls #case-select {
+      height: 30px;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      border-color: rgba(100, 116, 139, .28);
+      background: rgba(248, 250, 252, .94);
+      color: #334155;
+      font-weight: 750;
+      white-space: nowrap;
+      box-shadow: none;
+    }
+    .map-panel .controls #reload-cases,
+    .map-panel .controls #refresh-map { min-width: 66px; padding-left: 9px; padding-right: 9px; }
+    .map-panel .controls #run-agent { min-width: 104px; }
+    .map-panel .controls #run-agent {
+      background: linear-gradient(180deg, #16a34a, #15803d);
+      border-color: rgba(21, 128, 61, .7);
+      color: #f7fee7;
+    }
+    .map-panel .controls #run-agent.running {
+      background: linear-gradient(180deg, #0f766e, #115e59);
+      color: #ecfeff;
+    }
+    .map-panel .scene-select-label { color: #cbd5e1; font-weight: 700; }
     .scene-select-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
     #case-select { max-width: 240px; min-width: 172px; }
     #run-agent.running { opacity: .72; }
@@ -1991,10 +2051,10 @@ def render_index() -> str:
           </svg>
           <div class="toast" id="map-toast">地图图层已更新</div>
           <script id="autosolver-debug-state" type="application/json">{}</script>
-          <div class="toolbar"><select id="layer-mode" title="切换派单线显示模式"><option value="all">全部图层</option><option value="selected">聚焦派单</option><option value="candidates">增强线路</option></select><button data-map-action="depots" type="button" title="弱化/恢复商家与骑手点位" aria-label="弱化点位">点</button><button data-map-action="routes" type="button" title="隐藏/恢复派单关系线" aria-label="隐藏派单线">线</button><button data-map-action="fit" type="button" title="适配全部点位和派单线" aria-label="适配视图">适</button><button data-map-action="locate" type="button" title="定位当前派单包" aria-label="定位当前派单">定</button><button data-map-action="fullscreen" type="button" title="切换地图聚焦视图" aria-label="地图聚焦视图">↗</button></div>
+          <div class="toolbar"><select id="layer-mode" title="切换派单线显示模式"><option value="all">全部图层</option><option value="selected">聚焦派单</option><option value="candidates">增强线路</option></select><button data-map-action="depots" type="button" title="弱化/恢复商家与骑手点位" aria-label="弱化点位">点位</button><button data-map-action="routes" type="button" title="隐藏/恢复派单关系线" aria-label="隐藏派单线">线路</button><button data-map-action="fit" type="button" title="适配全部点位和派单线" aria-label="适配视图">适配</button><button data-map-action="locate" type="button" title="定位当前派单包" aria-label="定位当前派单">定位</button><button data-map-action="fullscreen" type="button" title="切换地图聚焦视图" aria-label="地图聚焦视图">全屏</button></div>
           <div class="map-legend">
-            <div><span class="mark merchant">M</span>商家订单</div><div><span class="mark courier">C</span>骑手位置</div>
-            <div><i class="line-key sel"></i>派单关系</div><div><i class="line-key rej"></i>长距离低噪</div>
+            <div><span class="mark merchant"><span class="mark-symbol">商</span></span>商家</div><div><span class="mark courier"><span class="mark-symbol">骑</span></span>骑手</div>
+            <div><i class="line-key sel"></i>派单线</div><div><i class="line-key rej"></i>低优先级</div>
           </div>
           <div class="map-entities" aria-live="polite"></div>
           <div class="zoom"><button id="zoom-in" type="button" title="放大地图">+</button><button id="zoom-out" type="button" title="缩小地图">−</button><button id="recenter" type="button" title="回到派单总览">⌾</button></div>
@@ -3348,7 +3408,7 @@ def render_index() -> str:
         pin.style.left = Number(rawPoint.x).toFixed(1) + "%";
         pin.style.top = Number(rawPoint.y).toFixed(1) + "%";
         pin.title = hasAssignments ? "点击聚焦 " + item.id + " 的派单链路" : "点击查看 " + item.id + " 的样本详情";
-        pin.innerHTML = `<span class="mark ${markKind}">${isMerchantPoint ? "M" : "C"}</span>`;
+        pin.innerHTML = `<span class="mark ${markKind}"><span class="mark-symbol">${isMerchantPoint ? "商" : "骑"}</span></span>`;
         entityLayer.appendChild(pin);
 
         if (item.hideLabel && !showSelectedLabel) return;
@@ -3900,7 +3960,7 @@ def render_index() -> str:
       const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
       const overviewAssignmentId = focusMode ? selectedAssignment : overviewAssignmentIdForRoutes(profile.dispatchMap.assignments, entityPoints, mapLayers, selectedAssignment);
-      const routePalette = ["#25ead8", "#37d6c8", "#51e5d1", "#7de3ff", "#40c7bc", "#67f0dc", "#8fd9ff", "#2bcfbe"];
+      const routePalette = ["#16a34a", "#0f766e", "#2563eb", "#ca8a04", "#15803d", "#0d9488", "#64748b", "#2f855a"];
       const pathHtml = profile.dispatchMap.assignments.map((assignment, index) => {
         const couriers = assignment.map_couriers || courierTokens(assignment.courier);
         const courierPoints = couriers.map((courier) => entityPoints[courier]).filter(Boolean);
@@ -4798,7 +4858,7 @@ def render_index() -> str:
             const frame = document.querySelector(".map-frame");
             const expanded = panel.classList.toggle("active");
             frame.dataset.fullscreen = expanded ? "true" : "false";
-            button.textContent = expanded ? "↙" : "↗";
+            button.textContent = expanded ? "退出" : "全屏";
             showToast(expanded ? "演示视图已进入地图聚焦模式" : "演示视图已退出地图聚焦模式");
             return;
           }

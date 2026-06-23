@@ -87,6 +87,19 @@
 验证标准：地图底图、商家/骑手图标、线路纹理、箭头、工具按钮统一为专业 To B 风格；视觉参考调研清单但不直接复制外部版权图；截图中无明显廉价感、花哨感或遮挡。
 
 完成记录：
+- 已将地图工具栏从旧的单字按钮 `点/线/适/定/↗` 改为可读中文运营按钮：`点位`、`线路`、`适配`、`定位`、`全屏/退出`。
+- 已把地图工具栏、地图头部按钮、缩放控件、图例和天气卡片统一为浅色 To B 浮层样式，降低旧版深色玻璃/霓虹感。
+- 已把商家/骑手标记从 `M/C` 字母改为中文 `商/骑` 图标；商家使用美团语境黄色，骑手使用青绿色，尺寸从 14px 增强到 18px，降低地图上识别成本。
+- 已把派单线从高饱和青色系改为更克制的绿色/青绿色线路调色板，箭头和聚焦线改成低饱和业务色；保留路线点击、端点连接和派单关系详情逻辑。
+- 已修复地图头部控件换行问题，浏览器审计显示 `刷新位置`、`刷新地图`、`运行派单推理` 高度均为 30px，`headerWrapRisk=false`。
+- 已补回归测试：工具按钮不能退回单字，图例/点位不能退回 `M/C`，路线调色板不能退回旧霓虹色。
+- 已保存浏览器审计与截图：`goal/goal-8/task5-visual-audit.json`、`goal/goal-8/task5-visual-map.png`。
+- 浏览器审计通过：`hasOldSingleCharTools=false`、`hasOldMCMarks=false`、`routeLinks=6`、`routeArrows=6`、`runtimeText=00:00:10`、MapLibre 文本图层继续 `visible=0`。
+- 浏览器错误日志为空。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
 
 ## Task 6: 刷新地图/刷新位置交互完善
 

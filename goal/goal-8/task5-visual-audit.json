@@ -1,0 +1,132 @@
+{
+  "assignments": 6,
+  "elapsedMs": 11675,
+  "hasOldMCMarks": false,
+  "hasOldSingleCharTools": false,
+  "headerButtons": [
+    {
+      "clientWidth": 64,
+      "height": 30,
+      "scrollWidth": 64,
+      "text": "刷新位置",
+      "width": 66
+    },
+    {
+      "clientWidth": 64,
+      "height": 30,
+      "scrollWidth": 64,
+      "text": "刷新地图",
+      "width": 66
+    },
+    {
+      "clientWidth": 102,
+      "height": 30,
+      "scrollWidth": 102,
+      "text": "运行派单推理",
+      "width": 104
+    }
+  ],
+  "headerWrapRisk": false,
+  "legendText": [
+    "商商家",
+    "骑骑手",
+    "派单线",
+    "低优先级"
+  ],
+  "mapRegion": "运营分析浅色区域 B",
+  "markText": [
+    "商",
+    "骑"
+  ],
+  "merchants": 6,
+  "pinText": [
+    "商",
+    "商",
+    "商",
+    "商",
+    "商",
+    "商",
+    "骑",
+    "骑",
+    "骑",
+    "骑"
+  ],
+  "routeArrows": 6,
+  "routeLinks": 6,
+  "routeStyles": [
+    {
+      "opacity": "0.86",
+      "stroke": "rgb(15, 118, 110)",
+      "width": "2.35px"
+    },
+    {
+      "opacity": "0.86",
+      "stroke": "rgb(15, 118, 110)",
+      "width": "2.35px"
+    },
+    {
+      "opacity": "0.86",
+      "stroke": "rgb(15, 118, 110)",
+      "width": "2.35px"
+    },
+    {
+      "opacity": "0.86",
+      "stroke": "rgb(15, 118, 110)",
+      "width": "2.35px"
+    },
+    {
+      "opacity": "0.86",
+      "stroke": "rgb(15, 118, 110)",
+      "width": "2.35px"
+    },
+    {
+      "opacity": "0.86",
+      "stroke": "rgb(15, 118, 110)",
+      "width": "2.35px"
+    }
+  ],
+  "runtimeText": "00:00:10",
+  "status": "当前场景派单完成",
+  "textLayers": {
+    "hidden": 19,
+    "total": 19,
+    "visible": 0
+  },
+  "toolbarButtons": [
+    {
+      "clientWidth": 46,
+      "height": 30,
+      "scrollWidth": 46,
+      "text": "点位",
+      "width": 48
+    },
+    {
+      "clientWidth": 46,
+      "height": 30,
+      "scrollWidth": 46,
+      "text": "线路",
+      "width": 48
+    },
+    {
+      "clientWidth": 46,
+      "height": 30,
+      "scrollWidth": 46,
+      "text": "适配",
+      "width": 48
+    },
+    {
+      "clientWidth": 46,
+      "height": 30,
+      "scrollWidth": 46,
+      "text": "定位",
+      "width": 48
+    },
+    {
+      "clientWidth": 46,
+      "height": 30,
+      "scrollWidth": 46,
+      "text": "全屏",
+      "width": 48
+    }
+  ]
+}
