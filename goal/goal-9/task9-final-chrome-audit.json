@@ -1,0 +1,108 @@
+{
+  "finalAudit": {
+    "arrowCount": 5,
+    "courierPins": 5,
+    "duplicateCouriers": [],
+    "merchantPins": 5,
+    "routeCount": 5,
+    "routeCourierMismatch": [],
+    "routes": [
+      {
+        "assignment": "A0101",
+        "courier": "R0101",
+        "d": "M406.1 257.2 L422.1 257.2",
+        "finalCourier": "R0101",
+        "i": 0,
+        "merchant": "M0101"
+      },
+      {
+        "assignment": "A0102",
+        "courier": "R0102",
+        "d": "M591.0 291.8 L607.0 291.8",
+        "finalCourier": "R0102",
+        "i": 1,
+        "merchant": "M0102"
+      },
+      {
+        "assignment": "A0103",
+        "courier": "R0103",
+        "d": "M468.5 183.8 L484.5 183.8",
+        "finalCourier": "R0103",
+        "i": 2,
+        "merchant": "M0103"
+      },
+      {
+        "assignment": "A0104",
+        "courier": "R0110",
+        "d": "M551.6 299.9 L567.6 299.9",
+        "finalCourier": "R0110",
+        "i": 3,
+        "merchant": "M0104"
+      },
+      {
+        "assignment": "A0105",
+        "courier": "R0108",
+        "d": "M562.0 232.3 L578.0 232.3",
+        "finalCourier": "R0108",
+        "i": 4,
+        "merchant": "M0105"
+      }
+    ],
+    "runtime": "00:00:10",
+    "visualCount": 5,
+    "weather": {
+      "bg": "rgba(0, 0, 0, 0) linear-gradient(rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.98)) repeat scroll 0% 0% / auto padding-box border-box",
+      "grid": "80px 80px",
+      "oldRows": 0,
+      "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。"
+    }
+  },
+  "clickAudit": [
+    {
+      "expected": {
+        "courier": "R0101",
+        "merchant": "M0101"
+      },
+      "ok": true,
+      "text": "派单关系：骑手到商家 对象 R0101 最终派单 M0101 → R0101；地图线 R0101 → M0101 表达骑手承接该商家，不作为骑行导航。M0101R0101 派单履约 ETA15 分钟 预计派单成本$21.20 接单 / 覆盖概率52%",
+      "title": "派单关系：骑手到商家"
+    },
+    {
+      "expected": {
+        "courier": "R0102",
+        "merchant": "M0102"
+      },
+      "ok": true,
+      "text": "派单关系：骑手到商家 对象 R0102 最终派单 M0102 → R0102；地图线 R0102 → M0102 表达骑手承接该商家，不作为骑行导航。M0102R0102 派单履约 ETA19 分钟 预计派单成本$40.20 接单 / 覆盖概率64%",
+      "title": "派单关系：骑手到商家"
+    },
+    {
+      "expected": {
+        "courier": "R0103",
+        "merchant": "M0103"
+      },
+      "ok": true,
+      "text": "派单关系：骑手到商家 对象 R0103 最终派单 M0103 → R0103；地图线 R0103 → M0103 表达骑手承接该商家，不作为骑行导航。M0103R0103 派单履约 ETA17 分钟 预计派单成本$26.40 接单 / 覆盖概率79%",
+      "title": "派单关系：骑手到商家"
+    },
+    {
+      "expected": {
+        "courier": "R0110",
+        "merchant": "M0104"
+      },
+      "ok": true,
+      "text": "派单关系：骑手到商家 对象 R0110 最终派单 M0104 → R0110；地图线 R0110 → M0104 表达骑手承接该商家，不作为骑行导航。M0104R0110 派单履约 ETA18 分钟 预计派单成本$37.40 接单 / 覆盖概率64%",
+      "title": "派单关系：骑手到商家"
+    },
+    {
+      "expected": {
+        "courier": "R0108",
+        "merchant": "M0105"
+      },
+      "ok": true,
+      "text": "派单关系：骑手到商家 对象 R0108 最终派单 M0105 → R0108；地图线 R0108 → M0105 表达骑手承接该商家，不作为骑行导航。M0105R0108 派单履约 ETA20 分钟 预计派单成本$35.00 接单 / 覆盖概率58%",
+      "title": "派单关系：骑手到商家"
+    }
+  ],
+  "errorLogs": []
+}

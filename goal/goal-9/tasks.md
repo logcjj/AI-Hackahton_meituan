@@ -81,3 +81,41 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 8: 企业级验收循环 3：视觉密度、拖拽性能和业务一致性复核
+
+验证标准：以严格评审视角继续检查当前 UI 是否达到 To B 演示质量；覆盖真实拖拽、连续缩放、刷新位置、刷新地图、10 秒推理后性能、路线点击层、全屏/窄屏视觉、天气/收益/策略解释一致性；若截图或 JSON 证据显示视觉拥挤、按钮无效、数据错配、明显卡顿或业务表达不合理，必须继续修复。
+
+完成记录：
+- 已按严格评审反馈修正业务口径：顶部 KPI 改为 `商家覆盖率` / `未派商家`，避免把商家覆盖误写成订单统计。
+- 已修正收益量化口径：使用 assignments 的订单数推导保守每单履约损耗节约，并显示 `运营测算批次节约` 与 `单城月节约测算`，避免直接把算法成本分解释成人民币。
+- 已修复 `定位` 按钮：会基于当前选中商家和骑手中点执行 `map.easeTo({center: lngLat, ...})`，并标记 `locate-assignment-control`。
+- 已修复右侧证据卡片复用问题：新增 `setEvidenceRows(items)`，不同详情类型使用不同中文标签和值，避免路线、商家、骑手和总览混用同一组证据文案。
+- 已强化天气卡片点击与视觉隔离：天气层 `pointer-events: none`，不再挡住地图路线点击。
+- 已强化骑手点位密度控制：最终重配增加近距离重叠惩罚，减少骑手挤到一起。
+- 已修复路线层级：`.route-svg` 提升到 `z-index: 7`，可见路线和透明点击层分离。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+- 深度审计通过：`goal/goal-9/task8-deep-audit.json` 中 `failures=[]`，覆盖 3 个场景的拖拽、缩放、刷新、路线数量、点击层和天气/收益标签。
+- 业务一致性复核通过：路线定位后点击可进入对应“派单关系：骑手到商家”，详情包含正确商家和骑手。
+
+## Task 9: Chrome 实测修复最终派单线与天气卡片二次问题
+
+验证标准：在用户 Chrome 当前页面复现并修复“最终答案没有派给某骑手，但地图有两根黄线连到该骑手”的问题；最终黄线只能表达商家到最终承接骑手，候选/备选骑手不能以最终派单线展示；点击任意黄线后右侧详情必须与该线商家和最终承接骑手一致；天气卡片改为清晰浅色 To B 状态条，不再出现黑块或一坨信息；补充自动化审计与单元测试。
+
+完成记录：
+- 已在 Chrome 当前 `http://127.0.0.1:8768/` 复现运行后重复骑手问题：同一场景曾出现 6 个商家中 2 条最终线连到 `R0103`，说明最终 payload 进入渲染前没有强制唯一重配。
+- 已修复最终派单线源头：新增 `finalCourierTokensForAssignment()` / `finalCourierForAssignment()`，最终黄线、活跃骑手过滤、路线详情、定位按钮和收益统计都只使用最终承接骑手。
+- 已修复后端预览/最终构图：`build_dispatch_assignment_map()` 不再把 `courier` 写成 `R1 + R2`，`map_couriers` 只包含最终骑手，其他候选保留为 `backup_couriers`，不进入最终黄线。
+- 已修复最终 payload 渲染时机：`applyDispatchAssignmentMap()` 在 `simulation_final/final` 阶段先执行 `reconcileDispatchPairsToVisibleMap(profile)`，再渲染地图，确保骑手充足时默认一商家一骑手。
+- 已修复路线点击误判：`.route-click-target` 优先进入路线详情，不再被 7px 端点保护改判成附近商家/骑手点位；真实点击 pin 仍打开点位详情。
+- 已重做天气卡片为浅色 To B 状态条：两列显示天气/履约影响，底部动态显示调度建议；旧 `.row/.bar` 天气结构为 0。
+- Chrome 最终审计通过：`runtime=00:00:10`、`routeCount=5`、`visualCount=5`、`arrowCount=5`、`merchantPins=5`、`courierPins=5`、`duplicateCouriers=[]`、`routeCourierMismatch=[]`、天气 `oldRows=0`、页面 error log 为 0。
+- Chrome 逐线点击审计通过：5/5 条路线点击后标题均为 `派单关系：骑手到商家`，详情均包含该线的 `merchant` 和最终 `courier`，全部 `ok=true`。
+- 已保存审计证据：`goal/goal-9/task9-final-chrome-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。

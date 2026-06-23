@@ -1,0 +1,4547 @@
+{
+  "scenarioValues": [
+    "large_seed301",
+    "medium_seed201",
+    "scarce_couriers_seed401"
+  ],
+  "results": [
+    {
+      "scenarioValue": "large_seed301",
+      "states": [
+        {
+          "label": "scenario-0-before-zoom",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 6,
+          "courierCount": 12,
+          "duplicateCouriers": [],
+          "minPinDistance": 5.62,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：商圈十字路口高峰",
+          "detailText": "↯\n派单决策解释\n场景输入：商圈十字路口高峰\n对象 -\n已生成 6 个商家点和 12 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 6\n骑手 12\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n6 个商家\n◎ 骑手供给\n12 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n63%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "商圈十字路口高峰\t6 个商家\t-\t-\t12 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 0,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 18,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 0,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S1",
+              "merchant_count": 6,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900"
+              }
+            },
+            "dom": {
+              "pins": 18,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：商圈十字路口高峰",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-0-zoomed",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "14.20",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 6,
+          "courierCount": 12,
+          "duplicateCouriers": [],
+          "minPinDistance": 9.94,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：商圈十字路口高峰",
+          "detailText": "↯\n派单决策解释\n场景输入：商圈十字路口高峰\n对象 -\n已生成 6 个商家点和 12 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 6\n骑手 12\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n6 个商家\n◎ 骑手供给\n12 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n63%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "商圈十字路口高峰\t6 个商家\t-\t-\t12 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 0,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 18,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 0,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S1",
+              "merchant_count": 6,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 14.2,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "14.20",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900"
+              }
+            },
+            "dom": {
+              "pins": 18,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：商圈十字路口高峰",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-0-refreshed-after-zoom",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 12,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.98,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：商圈十字路口高峰",
+          "detailText": "↯\n派单决策解释\n场景输入：商圈十字路口高峰\n对象 -\n已生成 5 个商家点和 12 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 12\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n12 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n65%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "商圈十字路口高峰\t5 个商家\t-\t-\t12 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 17,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 1,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900"
+              }
+            },
+            "dom": {
+              "pins": 17,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：商圈十字路口高峰",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-0-drag-before",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 12,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.98,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：商圈十字路口高峰",
+          "detailText": "↯\n派单决策解释\n场景输入：商圈十字路口高峰\n对象 -\n已生成 5 个商家点和 12 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 12\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n12 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n65%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "商圈十字路口高峰\t5 个商家\t-\t-\t12 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 17,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 1,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900"
+              }
+            },
+            "dom": {
+              "pins": 17,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：商圈十字路口高峰",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-0-drag-after",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45074,31.23163"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45074,31.23163",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 12,
+          "duplicateCouriers": [],
+          "minPinDistance": 3.05,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：商圈十字路口高峰",
+          "detailText": "↯\n派单决策解释\n场景输入：商圈十字路口高峰\n对象 -\n已生成 5 个商家点和 12 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 12\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n12 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n65%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "商圈十字路口高峰\t5 个商家\t-\t-\t12 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 17,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 1,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450741,
+                "lat": 31.231626
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45074,31.23163"
+              }
+            },
+            "dom": {
+              "pins": 17,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：商圈十字路口高峰",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-0-after-run",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45074,31.23163",
+            "selectedAssignment": "A0201"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45074,31.23163",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 6.62,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "className": "dispatch-visual secondary overview-route pickup-leg selected-overview",
+              "d": "M759.6 385.0 Q794.0 360.2 787.3 327.0",
+              "display": "inline",
+              "opacity": "0.7",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M542.9 481.7 Q522.4 460.2 484.0 464.3",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M723.7 485.8 Q763.6 477.0 794.5 495.7",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M753.9 264.1 Q713.4 238.7 712.4 202.0",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M780.7 439.7 Q696.8 459.5 637.0 502.6",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "d": "M775.8 358.1 L791.8 358.1",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "d": "M509.9 466.6 L525.9 466.6",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "d": "M753.4 483.9 L769.4 483.9",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "d": "M715.3 235.9 L731.3 235.9",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "d": "M694.8 465.3 L710.8 465.3",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "startError": 0.3,
+              "endError": 0.36,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "startError": 0.22,
+              "endError": 0.32,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "startError": 0.46,
+              "endError": 0.41,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "startError": 0.36,
+              "endError": 0.25,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "startError": 0.36,
+              "endError": 0.2,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "detailText": "↯\n派单决策解释\n派单总览：全部商家已自动连线\n对象 5 个骑手\n运行完成后，地图已自动展示 5 个商家分别派给哪个骑手；商家点同时代表该商家的 8 单。\nM0201 → R0205\nM0202 → R0208\nM0203 → R0212\nM0204 → R0201\n派单履约 ETA\n15 分钟平均\n预计派单成本\n$133.40\n接单 / 覆盖概率\n100%\n▣ 决策依据\n当前默认是全局派单总览：所有商家到骑手的派单线保持可见。\n点击任意商家、骑手或线路后，才进入单条派单聚焦模式。\n运营测算假设：每单履约损耗节约 ￥0.43，当前批次约 8 单，批次节约 ￥3.47；按日均 10 万单估算单城月节约 ￥1,301,671。\n证据\n▧ 商家覆盖\n100%\n◎ 派单对象\n5 个商家\n◷ ETA / 时效\n15 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+51.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥3.47\n单城月节约测算\n￥1,301,671",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$193.33\t5 个骑手\tMed (中)\t0.69\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$146.59\t5 个骑手\tLow (中)\t0.91\t可行\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$247.04\t5 个骑手\tMed (中)\t0.54\t已淘汰\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$272.24\t5 个骑手\tMed (中)\t0.49\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$247.04\t5 个骑手\tMed (中)\t0.54\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t12 分钟\t$133.40\t4 个骑手\tLow (中)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "A0201",
+              "mapFocusMode": "overview",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 17,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "single_task_multidispatch",
+                "local_cost": 133.4,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 1,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450741,
+                "lat": 31.231626
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45074,31.23163",
+                "selectedAssignment": "A0201"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "status": "当前场景派单完成"
+            }
+          }
+        },
+        {
+          "label": "scenario-0-after-route-clicks",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45074,31.23163",
+            "selectedAssignment": "A0205"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45074,31.23163",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 6.62,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "className": "dispatch-visual pickup-leg selected-overview secondary overview-route",
+              "d": "M759.6 385.0 Q794.0 360.2 787.3 327.0",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M542.9 481.7 Q522.4 460.2 484.0 464.3",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M723.7 485.8 Q763.6 477.0 794.5 495.7",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M753.9 264.1 Q713.4 238.7 712.4 202.0",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "className": "dispatch-visual pickup-leg active-assignment primary",
+              "d": "M780.7 439.7 Q696.8 459.5 637.0 502.6",
+              "display": "inline",
+              "opacity": "0.86",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "d": "M775.8 358.1 L791.8 358.1",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "d": "M509.9 466.6 L525.9 466.6",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "d": "M753.4 483.9 L769.4 483.9",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "d": "M715.3 235.9 L731.3 235.9",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "d": "M694.8 465.3 L710.8 465.3",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "startError": 0.3,
+              "endError": 0.36,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "startError": 0.22,
+              "endError": 0.32,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "startError": 0.46,
+              "endError": 0.41,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "startError": 0.36,
+              "endError": 0.25,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "startError": 0.36,
+              "endError": 0.2,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单关系：骑手到商家",
+          "detailText": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0207\n最终派单 M0205 → R0207；地图线 R0207 → M0205 表达骑手承接该商家，不作为骑行导航。\nM0205\nR0207\n派单履约 ETA\n17 分钟\n预计派单成本\n$34.30\n接单 / 覆盖概率\n75%\n▣ 决策依据\n该线属于最终派单 A0205：商家 M0205 派给骑手 R0207。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S2 · 多派候选；风险 Medium；接单概率 75%。\n证据\n▧ 线段采样\n3 节点\n◎ 派单关系\nM0205 → R0207\n◷ ETA / 时效\n17 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+51.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥3.47\n单城月节约测算\n￥1,301,671",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$193.33\t5 个骑手\tMed (中)\t0.69\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$146.59\t5 个骑手\tLow (中)\t0.91\t可行\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$247.04\t5 个骑手\tMed (中)\t0.54\t已淘汰\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$272.24\t5 个骑手\tMed (中)\t0.49\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$247.04\t5 个骑手\tMed (中)\t0.54\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t12 分钟\t$133.40\t4 个骑手\tLow (中)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "A0205",
+              "mapFocusMode": "focus",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 17,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "single_task_multidispatch",
+                "local_cost": 133.4,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 1,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450741,
+                "lat": 31.231626
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology focus-selected",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45074,31.23163",
+                "selectedAssignment": "A0205"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单关系：骑手到商家",
+              "status": "当前场景派单完成"
+            }
+          }
+        },
+        {
+          "label": "scenario-0-fullscreen",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.45074,31.23163",
+            "selectedAssignment": "A0205",
+            "fullscreen": "true"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45074,31.23163",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 3.54,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M628.3 359.3 Q656.2 345.4 642.5 324.2",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M517.1 417.8 Q512.2 400.1 487.0 407.3",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M609.9 420.3 Q622.7 436.9 646.1 426.3",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M625.3 286.1 Q594.4 272.3 604.0 248.6",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "className": "dispatch-visual primary active-assignment pickup-leg",
+              "d": "M639.1 392.4 Q615.6 422.5 565.4 430.5",
+              "display": "inline",
+              "opacity": "0.86",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "d": "M637.8 343.6 L653.8 343.6",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "d": "M499.1 406.3 L515.1 406.3",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "d": "M617.3 430.1 L633.3 430.1",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "d": "M596.6 269.8 L612.6 269.8",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "d": "M600.9 417.0 L616.9 417.0",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0205",
+              "startError": 0.29,
+              "endError": 0.47,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0208",
+              "startError": 0.36,
+              "endError": 0.27,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0212",
+              "startError": 0.38,
+              "endError": 0.29,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0201",
+              "startError": 0.06,
+              "endError": 0.48,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0207",
+              "startError": 0.16,
+              "endError": 0.23,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单关系：骑手到商家",
+          "detailText": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0207\n最终派单 M0205 → R0207；地图线 R0207 → M0205 表达骑手承接该商家，不作为骑行导航。\nM0205\nR0207\n派单履约 ETA\n17 分钟\n预计派单成本\n$34.30\n接单 / 覆盖概率\n75%\n▣ 决策依据\n该线属于最终派单 A0205：商家 M0205 派给骑手 R0207。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S2 · 多派候选；风险 Medium；接单概率 75%。\n证据\n▧ 线段采样\n3 节点\n◎ 派单关系\nM0205 → R0207\n◷ ETA / 时效\n17 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+51.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥3.47\n单城月节约测算\n￥1,301,671",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$193.33\t5 个骑手\tMed (中)\t0.69\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$146.59\t5 个骑手\tLow (中)\t0.91\t可行\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$247.04\t5 个骑手\tMed (中)\t0.54\t已淘汰\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$272.24\t5 个骑手\tMed (中)\t0.49\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$247.04\t5 个骑手\tMed (中)\t0.54\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t12 分钟\t$133.40\t4 个骑手\tLow (中)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "商圈十字路口高峰",
+              "selected": "A0205",
+              "mapFocusMode": "focus",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "large_seed301",
+                "scenario_id": "commerce_peak",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 17,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "single_task_multidispatch",
+                "local_cost": 133.4,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "large_seed301",
+              "scenario_id": "commerce_peak",
+              "sample_index": 1,
+              "name": "商圈十字路口高峰",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 12
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450741,
+                "lat": 31.231626
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology focus-selected",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.45074,31.23163",
+                "selectedAssignment": "A0205",
+                "fullscreen": "true"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单关系：骑手到商家",
+              "status": "当前场景派单完成"
+            }
+          }
+        }
+      ],
+      "routeClicks": [
+        {
+          "assignment": "A0201",
+          "merchant": "M0201",
+          "courier": "R0205",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0202",
+          "merchant": "M0202",
+          "courier": "R0208",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0203",
+          "merchant": "M0203",
+          "courier": "R0212",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0204",
+          "merchant": "M0204",
+          "courier": "R0201",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0205",
+          "merchant": "M0205",
+          "courier": "R0207",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        }
+      ]
+    },
+    {
+      "scenarioValue": "medium_seed201",
+      "states": [
+        {
+          "label": "scenario-1-before-zoom",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 11,
+          "duplicateCouriers": [],
+          "minPinDistance": 4.27,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：中型并行派单",
+          "detailText": "↯\n派单决策解释\n场景输入：中型并行派单\n对象 -\n已生成 5 个商家点和 11 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 11\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n11 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n63%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "中型并行派单\t5 个商家\t-\t-\t11 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 0,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 16,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 0,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 11
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 16,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：中型并行派单",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-1-zoomed",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "14.20",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "zoom-in-control",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 11,
+          "duplicateCouriers": [],
+          "minPinDistance": 7.6,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：中型并行派单",
+          "detailText": "↯\n派单决策解释\n场景输入：中型并行派单\n对象 -\n已生成 5 个商家点和 11 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 11\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n11 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n63%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "中型并行派单\t5 个商家\t-\t-\t11 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 0,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 16,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 0,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 11
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 14.2,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "14.20",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "zoom-in-control",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 16,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：中型并行派单",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-1-refreshed-after-zoom",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 9,
+          "duplicateCouriers": [],
+          "minPinDistance": 3.64,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n畅通\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：中型并行派单",
+          "detailText": "↯\n派单决策解释\n场景输入：中型并行派单\n对象 -\n已生成 5 个商家点和 9 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 9\n路况 smooth\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n9 个骑手\n◷ 路况\nsmooth\n△ 平均意愿\n58%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "中型并行派单\t5 个商家\t-\t-\t9 个骑手\tsmooth\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 1,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 14,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：中型并行派单",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-1-drag-before",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 9,
+          "duplicateCouriers": [],
+          "minPinDistance": 3.64,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n畅通\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：中型并行派单",
+          "detailText": "↯\n派单决策解释\n场景输入：中型并行派单\n对象 -\n已生成 5 个商家点和 9 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 9\n路况 smooth\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n9 个骑手\n◷ 路况\nsmooth\n△ 平均意愿\n58%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "中型并行派单\t5 个商家\t-\t-\t9 个骑手\tsmooth\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 1,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 14,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：中型并行派单",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-1-drag-after",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45088,31.23159",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45088,31.23159",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 9,
+          "duplicateCouriers": [],
+          "minPinDistance": 3.58,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n畅通\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：中型并行派单",
+          "detailText": "↯\n派单决策解释\n场景输入：中型并行派单\n对象 -\n已生成 5 个商家点和 9 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 9\n路况 smooth\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n9 个骑手\n◷ 路况\nsmooth\n△ 平均意愿\n58%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "中型并行派单\t5 个商家\t-\t-\t9 个骑手\tsmooth\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t同路高重叠订单合并派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tsmooth\t-\t待评估\t最近/最低成本基线派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 1,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450878,
+                "lat": 31.231594
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45088,31.23159",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 14,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：中型并行派单",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-1-after-run",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45088,31.23159",
+            "fullscreen": "false",
+            "selectedAssignment": "A0205"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45088,31.23159",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 3.58,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M797.0 459.2 Q771.6 433.1 789.1 404.4",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M539.9 480.8 Q501.5 485.0 481.0 463.4",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M753.0 284.0 Q710.8 247.2 709.2 201.2",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M639.9 482.5 Q676.9 483.4 687.5 506.6",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "className": "dispatch-visual secondary overview-route pickup-leg selected-overview",
+              "d": "M756.1 340.7 Q748.5 314.3 781.2 297.9",
+              "display": "inline",
+              "opacity": "0.7",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "d": "M774.3 432.5 L790.3 432.5",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "d": "M498.0 478.5 L514.0 478.5",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "d": "M712.9 244.9 L728.9 244.9",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "d": "M662.3 489.0 L678.3 489.0",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "d": "M750.5 316.8 L766.5 316.8",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "startError": 0.41,
+              "endError": 0.22,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "startError": 0.18,
+              "endError": 0.18,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "startError": 0.39,
+              "endError": 0.4,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "startError": 0.07,
+              "endError": 0.54,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "startError": 0.51,
+              "endError": 0.33,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n畅通\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "detailText": "↯\n派单决策解释\n派单总览：全部商家已自动连线\n对象 5 个骑手\n运行完成后，地图已自动展示 5 个商家分别派给哪个骑手；商家点同时代表该商家的 8 单。\nM0201 → R0203\nM0202 → R0209\nM0203 → R0207\nM0204 → R0204\n派单履约 ETA\n14 分钟平均\n预计派单成本\n$143.80\n接单 / 覆盖概率\n100%\n▣ 决策依据\n当前默认是全局派单总览：所有商家到骑手的派单线保持可见。\n点击任意商家、骑手或线路后，才进入单条派单聚焦模式。\n运营测算假设：每单履约损耗节约 ￥0.45，当前批次约 8 单，批次节约 ￥3.60；按日均 10 万单估算单城月节约 ￥1,348,125。\n证据\n▧ 商家覆盖\n100%\n◎ 派单对象\n5 个商家\n◷ ETA / 时效\n14 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+50.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥3.60\n单城月节约测算\n￥1,348,125",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$231.94\t5 个骑手\tMed (低)\t0.62\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$161.57\t5 个骑手\tLow (低)\t0.89\t可行\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$261.45\t5 个骑手\tMed (低)\t0.55\t已淘汰\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$287.60\t5 个骑手\tMed (低)\t0.50\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$271.32\t5 个骑手\tMed (低)\t0.53\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t13 分钟\t$143.80\t4 个骑手\tLow (低)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "A0205",
+              "mapFocusMode": "overview",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "single_task_multidispatch",
+                "local_cost": 143.8,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 1,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450878,
+                "lat": 31.231594
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45088,31.23159",
+                "fullscreen": "false",
+                "selectedAssignment": "A0205"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "status": "当前场景派单完成"
+            }
+          }
+        },
+        {
+          "label": "scenario-1-after-route-clicks",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45088,31.23159",
+            "fullscreen": "false",
+            "selectedAssignment": "A0205"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45088,31.23159",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 3.58,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M797.0 459.2 Q771.6 433.1 789.1 404.4",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M539.9 480.8 Q501.5 485.0 481.0 463.4",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M753.0 284.0 Q710.8 247.2 709.2 201.2",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M639.9 482.5 Q676.9 483.4 687.5 506.6",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "className": "dispatch-visual pickup-leg selected-overview active-assignment primary",
+              "d": "M756.1 340.7 Q748.5 314.3 781.2 297.9",
+              "display": "inline",
+              "opacity": "0.78",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "d": "M774.3 432.5 L790.3 432.5",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "d": "M498.0 478.5 L514.0 478.5",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "d": "M712.9 244.9 L728.9 244.9",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "d": "M662.3 489.0 L678.3 489.0",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "d": "M750.5 316.8 L766.5 316.8",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "startError": 0.41,
+              "endError": 0.22,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "startError": 0.18,
+              "endError": 0.18,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "startError": 0.39,
+              "endError": 0.4,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "startError": 0.07,
+              "endError": 0.54,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "startError": 0.51,
+              "endError": 0.33,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n畅通\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单关系：骑手到商家",
+          "detailText": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0205\n最终派单 M0205 → R0205；地图线 R0205 → M0205 表达骑手承接该商家，不作为骑行导航。\nM0205\nR0205\n派单履约 ETA\n19 分钟\n预计派单成本\n$44.50\n接单 / 覆盖概率\n61%\n▣ 决策依据\n该线属于最终派单 A0205：商家 M0205 派给骑手 R0205。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S2 · 多派候选；风险 Medium；接单概率 61%。\n证据\n▧ 线段采样\n3 节点\n◎ 派单关系\nM0205 → R0205\n◷ ETA / 时效\n19 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+50.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥3.60\n单城月节约测算\n￥1,348,125",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$231.94\t5 个骑手\tMed (低)\t0.62\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$161.57\t5 个骑手\tLow (低)\t0.89\t可行\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$261.45\t5 个骑手\tMed (低)\t0.55\t已淘汰\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$287.60\t5 个骑手\tMed (低)\t0.50\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$271.32\t5 个骑手\tMed (低)\t0.53\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t13 分钟\t$143.80\t4 个骑手\tLow (低)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "A0205",
+              "mapFocusMode": "focus",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "single_task_multidispatch",
+                "local_cost": 143.8,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 1,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450878,
+                "lat": 31.231594
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology focus-selected",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45088,31.23159",
+                "fullscreen": "false",
+                "selectedAssignment": "A0205"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单关系：骑手到商家",
+              "status": "当前场景派单完成"
+            }
+          }
+        },
+        {
+          "label": "scenario-1-fullscreen",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.45088,31.23159",
+            "fullscreen": "true",
+            "selectedAssignment": "A0205"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45088,31.23159",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 1.91,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M647.4 404.2 Q666.9 386.5 643.4 371.1",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M515.6 417.3 Q510.7 399.6 485.4 406.7",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M624.8 298.2 Q592.9 277.1 602.4 248.1",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M566.8 418.3 Q593.6 415.2 591.2 432.9",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "className": "dispatch-visual primary active-assignment pickup-leg",
+              "d": "M626.4 332.5 Q653.3 323.9 639.3 306.7",
+              "display": "inline",
+              "opacity": "0.86",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "d": "M648.1 387.1 L664.1 387.1",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "d": "M497.6 405.8 L513.6 405.8",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "d": "M595.3 275.1 L611.3 275.1",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "d": "M578.3 420.4 L594.3 420.4",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "d": "M635.1 321.8 L651.1 321.8",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0203",
+              "startError": 0.52,
+              "endError": 0.47,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0209",
+              "startError": 0.12,
+              "endError": 0.42,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0207",
+              "startError": 0.44,
+              "endError": 0.37,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0204",
+              "startError": 0.44,
+              "endError": 0.37,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0205",
+              "startError": 0.35,
+              "endError": 0.37,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n畅通\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单关系：骑手到商家",
+          "detailText": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0205\n最终派单 M0205 → R0205；地图线 R0205 → M0205 表达骑手承接该商家，不作为骑行导航。\nM0205\nR0205\n派单履约 ETA\n19 分钟\n预计派单成本\n$44.50\n接单 / 覆盖概率\n61%\n▣ 决策依据\n该线属于最终派单 A0205：商家 M0205 派给骑手 R0205。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S2 · 多派候选；风险 Medium；接单概率 61%。\n证据\n▧ 线段采样\n3 节点\n◎ 派单关系\nM0205 → R0205\n◷ ETA / 时效\n19 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+50.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥3.60\n单城月节约测算\n￥1,348,125",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$231.94\t5 个骑手\tMed (低)\t0.62\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$161.57\t5 个骑手\tLow (低)\t0.89\t可行\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$261.45\t5 个骑手\tMed (低)\t0.55\t已淘汰\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$287.60\t5 个骑手\tMed (低)\t0.50\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$271.32\t5 个骑手\tMed (低)\t0.53\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t13 分钟\t$143.80\t4 个骑手\tLow (低)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "中型并行派单",
+              "selected": "A0205",
+              "mapFocusMode": "focus",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "medium_seed201",
+                "scenario_id": "medium_parallel",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "single_task_multidispatch",
+                "local_cost": 143.8,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "medium_seed201",
+              "scenario_id": "medium_parallel",
+              "sample_index": 1,
+              "name": "中型并行派单",
+              "selected_strategy_id": "S2",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450878,
+                "lat": 31.231594
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology focus-selected",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.45088,31.23159",
+                "fullscreen": "true",
+                "selectedAssignment": "A0205"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单关系：骑手到商家",
+              "status": "当前场景派单完成"
+            }
+          }
+        }
+      ],
+      "routeClicks": [
+        {
+          "assignment": "A0201",
+          "merchant": "M0201",
+          "courier": "R0203",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0202",
+          "merchant": "M0202",
+          "courier": "R0209",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0203",
+          "merchant": "M0203",
+          "courier": "R0207",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0204",
+          "merchant": "M0204",
+          "courier": "R0204",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0205",
+          "merchant": "M0205",
+          "courier": "R0205",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        }
+      ]
+    },
+    {
+      "scenarioValue": "scarce_couriers_seed401",
+      "states": [
+        {
+          "label": "scenario-2-before-zoom",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 9,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.83,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：骑手稀缺修复",
+          "detailText": "↯\n派单决策解释\n场景输入：骑手稀缺修复\n对象 -\n已生成 5 个商家点和 9 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 9\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n9 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n56%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "骑手稀缺修复\t5 个商家\t-\t-\t9 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 0,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 0,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 14,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：骑手稀缺修复",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-2-zoomed",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "14.20",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "zoom-in-control",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 9,
+          "duplicateCouriers": [],
+          "minPinDistance": 5.17,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：骑手稀缺修复",
+          "detailText": "↯\n派单决策解释\n场景输入：骑手稀缺修复\n对象 -\n已生成 5 个商家点和 9 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 9\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n9 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n56%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "骑手稀缺修复\t5 个商家\t-\t-\t9 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 0,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 14,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 0,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 9
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 14.2,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "14.20",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "zoom-in-control",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 14,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：骑手稀缺修复",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-2-refreshed-after-zoom",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 7,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.98,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：骑手稀缺修复",
+          "detailText": "↯\n派单决策解释\n场景输入：骑手稀缺修复\n对象 -\n已生成 5 个商家点和 7 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 7\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n7 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n56%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "骑手稀缺修复\t5 个商家\t-\t-\t7 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 12,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 1,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 7
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 12,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：骑手稀缺修复",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-2-drag-before",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.46200,31.22900",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.46200,31.22900",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 7,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.98,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：骑手稀缺修复",
+          "detailText": "↯\n派单决策解释\n场景输入：骑手稀缺修复\n对象 -\n已生成 5 个商家点和 7 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 7\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n7 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n56%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "骑手稀缺修复\t5 个商家\t-\t-\t7 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 12,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 1,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 7
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.462,
+                "lat": 31.229
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.46200,31.22900",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 12,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：骑手稀缺修复",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-2-drag-after",
+          "status": "场景已刷新，等待推理",
+          "runtime": "--:--:--",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45083,31.23161",
+            "fullscreen": "false"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45083,31.23161",
+          "visualCount": 0,
+          "clickTargetCount": 0,
+          "arrowCount": 0,
+          "merchantCount": 5,
+          "courierCount": 7,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.98,
+          "visuals": [],
+          "clickTargets": [],
+          "endpointErrors": [],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "场景输入：骑手稀缺修复",
+          "detailText": "↯\n派单决策解释\n场景输入：骑手稀缺修复\n对象 -\n已生成 5 个商家点和 7 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 7\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--\n▣ 决策依据\n刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。\n运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。\n点击地图上的商家或骑手可查看候选信息，不显示内部编号。\n证据\n▧ 商家输入\n5 个商家\n◎ 骑手供给\n7 个骑手\n◷ 路况\nmoderate\n△ 平均意愿\n56%\n相对贪心基线\n成本改进\n-\nETA 改进\n-\n无人接单风险下降\n-\n运营测算批次节约\n-\n单城月节约测算\n-",
+          "tableRows": [
+            {
+              "type": "scene-summary",
+              "text": "骑手稀缺修复\t5 个商家\t-\t-\t7 个骑手\tmoderate\t-\t待推理\t当前只展示点位；运行后输出最终派单关系"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S3 · 局部修复\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t从基线方案做局部修复"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S5 · 风险平衡\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t低意愿与时间窗风险平衡"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S4 · 贪心基线\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t最近/最低成本基线派单"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S2 · 多派候选\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t单任务多骑手候选扩展"
+            },
+            {
+              "type": "preview-strategy",
+              "text": "S1 · 合单优先\t待推理\t-\t-\t-\tmoderate\t-\t待评估\t同路高重叠订单合并派单"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "",
+              "mapFocusMode": "overview",
+              "assignmentCount": 0,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 1,
+                "stage": "sample_preview",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "entityCount": 12,
+                "assignmentCount": 0,
+                "roadCount": 90
+              }
+            },
+            "currentReport": null,
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 1,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 7
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450826,
+                "lat": 31.231606
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45083,31.23161",
+                "fullscreen": "false"
+              }
+            },
+            "dom": {
+              "pins": 12,
+              "routeLinks": 0,
+              "routeArrows": 0,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "场景输入：骑手稀缺修复",
+              "status": "场景已刷新，等待推理"
+            }
+          }
+        },
+        {
+          "label": "scenario-2-after-run",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45083,31.23161",
+            "fullscreen": "false",
+            "selectedAssignment": "A0203"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45083,31.23161",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.98,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M562.3 484.4 Q596.3 505.9 642.9 500.5",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M754.1 284.3 Q752.6 238.3 710.4 201.5",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "className": "dispatch-visual secondary overview-route pickup-leg selected-overview",
+              "d": "M815.0 482.9 Q780.1 426.5 787.8 365.8",
+              "display": "inline",
+              "opacity": "0.7",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M442.5 502.0 Q480.2 490.8 482.2 463.7",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M672.0 481.8 Q735.9 474.6 792.5 495.2",
+              "display": "inline",
+              "opacity": "0.54",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "d": "M591.4 499.2 L607.4 499.2",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "d": "M734.4 240.6 L750.4 240.6",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "d": "M782.7 425.4 L798.7 425.4",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "d": "M463.2 486.8 L479.2 486.8",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "d": "M726.1 481.5 L742.1 481.5",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "startError": 0.23,
+              "endError": 0.03,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "startError": 0.52,
+              "endError": 0.14,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "startError": 0.47,
+              "endError": 0.3,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "startError": 0.57,
+              "endError": 0.3,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "startError": 0.3,
+              "endError": 0.36,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "detailText": "↯\n派单决策解释\n派单总览：全部商家已自动连线\n对象 5 个骑手\n运行完成后，地图已自动展示 5 个商家分别派给哪个骑手；商家点同时代表该商家的 8 单。\nM0201 → R0201\nM0202 → R0207\nM0203 → R0203\nM0204 → R0205\n派单履约 ETA\n20 分钟平均\n预计派单成本\n$215.00\n接单 / 覆盖概率\n100%\n▣ 决策依据\n当前默认是全局派单总览：所有商家到骑手的派单线保持可见。\n点击任意商家、骑手或线路后，才进入单条派单聚焦模式。\n运营测算假设：每单履约损耗节约 ￥0.51，当前批次约 8 单，批次节约 ￥4.05；按日均 10 万单估算单城月节约 ￥1,520,559。\n证据\n▧ 商家覆盖\n100%\n◎ 派单对象\n5 个商家\n◷ ETA / 时效\n20 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+43.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥4.05\n单城月节约测算\n￥1,520,559",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$421.57\t5 个骑手\tMed (中)\t0.51\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$383.93\t5 个骑手\tMed (中)\t0.56\t已淘汰\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$217.17\t5 个骑手\tLow (中)\t0.91\t可行\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$377.19\t5 个骑手\tMed (中)\t0.57\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$370.69\t5 个骑手\tMed (中)\t0.58\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t16 分钟\t$215.00\t4 个骑手\tLow (中)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "A0203",
+              "mapFocusMode": "overview",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 12,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "sparse_cover",
+                "local_cost": 215,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 1,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 7
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450826,
+                "lat": 31.231606
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45083,31.23161",
+                "fullscreen": "false",
+                "selectedAssignment": "A0203"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "status": "当前场景派单完成"
+            }
+          }
+        },
+        {
+          "label": "scenario-2-after-route-clicks",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "manual-pan",
+            "mapCenter": "121.45083,31.23161",
+            "fullscreen": "false",
+            "selectedAssignment": "A0205"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45083,31.23161",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 2.98,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M562.3 484.4 Q596.3 505.9 642.9 500.5",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M754.1 284.3 Q752.6 238.3 710.4 201.5",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "className": "dispatch-visual pickup-leg selected-overview secondary overview-route",
+              "d": "M815.0 482.9 Q780.1 426.5 787.8 365.8",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "className": "dispatch-visual pickup-leg secondary overview-route",
+              "d": "M442.5 502.0 Q480.2 490.8 482.2 463.7",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "className": "dispatch-visual pickup-leg active-assignment primary",
+              "d": "M672.0 481.8 Q735.9 474.6 792.5 495.2",
+              "display": "inline",
+              "opacity": "0.86",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "d": "M591.4 499.2 L607.4 499.2",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "d": "M734.4 240.6 L750.4 240.6",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "d": "M782.7 425.4 L798.7 425.4",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "d": "M463.2 486.8 L479.2 486.8",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "d": "M726.1 481.5 L742.1 481.5",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "startError": 0.23,
+              "endError": 0.03,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "startError": 0.52,
+              "endError": 0.14,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "startError": 0.47,
+              "endError": 0.3,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "startError": 0.57,
+              "endError": 0.3,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "startError": 0.3,
+              "endError": 0.36,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单关系：骑手到商家",
+          "detailText": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0206\n最终派单 M0205 → R0206；地图线 R0206 → M0205 表达骑手承接该商家，不作为骑行导航。\nM0205\nR0206\n派单履约 ETA\n25 分钟\n预计派单成本\n$60.00\n接单 / 覆盖概率\n58%\n▣ 决策依据\n该线属于最终派单 A0205：商家 M0205 派给骑手 R0206。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S3 · 局部修复；风险 Medium；接单概率 58%。\n证据\n▧ 线段采样\n3 节点\n◎ 派单关系\nM0205 → R0206\n◷ ETA / 时效\n25 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+43.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥4.05\n单城月节约测算\n￥1,520,559",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$421.57\t5 个骑手\tMed (中)\t0.51\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$383.93\t5 个骑手\tMed (中)\t0.56\t已淘汰\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$217.17\t5 个骑手\tLow (中)\t0.91\t可行\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$377.19\t5 个骑手\tMed (中)\t0.57\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$370.69\t5 个骑手\tMed (中)\t0.58\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t16 分钟\t$215.00\t4 个骑手\tLow (中)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "A0205",
+              "mapFocusMode": "focus",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 12,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "sparse_cover",
+                "local_cost": 215,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 1,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 7
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450826,
+                "lat": 31.231606
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology focus-selected",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "manual-pan",
+                "mapCenter": "121.45083,31.23161",
+                "fullscreen": "false",
+                "selectedAssignment": "A0205"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单关系：骑手到商家",
+              "status": "当前场景派单完成"
+            }
+          }
+        },
+        {
+          "label": "scenario-2-fullscreen",
+          "status": "当前场景派单完成",
+          "runtime": "00:00:10",
+          "frameDataset": {
+            "dragFallbackBound": "native-maplibre",
+            "dragPan": "native",
+            "zoomLevel": "13.35",
+            "controlState": "all",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "lastViewportSync": "viewport-live",
+            "mapCenter": "121.45083,31.23161",
+            "fullscreen": "true",
+            "selectedAssignment": "A0205"
+          },
+          "canvasTransform": "none",
+          "mapCenter": "121.45083,31.23161",
+          "visualCount": 5,
+          "clickTargetCount": 5,
+          "arrowCount": 5,
+          "merchantCount": 5,
+          "courierCount": 5,
+          "duplicateCouriers": [],
+          "minPinDistance": 1.7,
+          "visuals": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M527.1 419.4 Q555.1 411.1 568.4 429.2",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M625.4 298.4 Q634.9 269.4 603.0 248.3",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M656.7 418.6 Q628.3 384.9 642.7 347.7",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "className": "dispatch-visual secondary overview-route pickup-leg",
+              "d": "M465.7 430.1 Q457.1 411.5 486.0 406.9",
+              "display": "inline",
+              "opacity": "0.28",
+              "pointer": "none"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "className": "dispatch-visual primary active-assignment pickup-leg",
+              "d": "M583.3 417.9 Q618.5 408.1 645.1 426.0",
+              "display": "inline",
+              "opacity": "0.86",
+              "pointer": "none"
+            }
+          ],
+          "clickTargets": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "d": "M543.5 417.7 L559.5 417.7",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "d": "M616.6 271.4 L632.6 271.4",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "d": "M631.0 384.0 L647.0 384.0",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "d": "M458.5 415.0 L474.5 415.0",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "d": "M608.3 415.0 L624.3 415.0",
+              "pointer": "stroke",
+              "strokeWidth": "18px"
+            }
+          ],
+          "endpointErrors": [
+            {
+              "assignment": "A0201",
+              "merchant": "M0201",
+              "courier": "R0201",
+              "startError": 0.24,
+              "endError": 0.24,
+              "ok": true
+            },
+            {
+              "assignment": "A0202",
+              "merchant": "M0202",
+              "courier": "R0207",
+              "startError": 0.23,
+              "endError": 0.3,
+              "ok": true
+            },
+            {
+              "assignment": "A0203",
+              "merchant": "M0203",
+              "courier": "R0203",
+              "startError": 0.11,
+              "endError": 0.25,
+              "ok": true
+            },
+            {
+              "assignment": "A0204",
+              "merchant": "M0204",
+              "courier": "R0205",
+              "startError": 0.2,
+              "endError": 0.16,
+              "ok": true
+            },
+            {
+              "assignment": "A0205",
+              "merchant": "M0205",
+              "courier": "R0206",
+              "startError": 0.2,
+              "endError": 0.35,
+              "ok": true
+            }
+          ],
+          "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+          "weatherBackground": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+          "detailTitle": "派单关系：骑手到商家",
+          "detailText": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0206\n最终派单 M0205 → R0206；地图线 R0206 → M0205 表达骑手承接该商家，不作为骑行导航。\nM0205\nR0206\n派单履约 ETA\n25 分钟\n预计派单成本\n$60.00\n接单 / 覆盖概率\n58%\n▣ 决策依据\n该线属于最终派单 A0205：商家 M0205 派给骑手 R0206。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S3 · 局部修复；风险 Medium；接单概率 58%。\n证据\n▧ 线段采样\n3 节点\n◎ 派单关系\nM0205 → R0206\n◷ ETA / 时效\n25 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+43.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n运营测算批次节约\n￥4.05\n单城月节约测算\n￥1,520,559",
+          "tableRows": [
+            {
+              "type": "strategy-candidate",
+              "text": "合单优先\t100%\t15.5 分钟\t$421.57\t5 个骑手\tMed (中)\t0.51\t已淘汰\t合单收益不足或局部绕行偏大"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "多派候选\t100%\t15.5 分钟\t$383.93\t5 个骑手\tMed (中)\t0.56\t已淘汰\t保留多个骑手候选，适合距离接近但资源占用更高"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "局部修复\t100%\t15.5 分钟\t$217.17\t5 个骑手\tLow (中)\t0.91\t可行\t可修复高风险派单，但整体成本仍高于当前方案"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "贪心基线\t100%\t15.5 分钟\t$377.19\t5 个骑手\tMed (中)\t0.57\t已淘汰\t最近骑手优先，作为业务基线但容易放大无人接单风险"
+            },
+            {
+              "type": "strategy-candidate",
+              "text": "风险平衡\t100%\t15.5 分钟\t$370.69\t5 个骑手\tMed (中)\t0.58\t已淘汰\t降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+            },
+            {
+              "type": "final-strategy",
+              "text": "★最终 AutoSolver\n选中方案\t100%\t16 分钟\t$215.00\t4 个骑手\tLow (中)\t0.89\t已选中\t成本、风险、履约时效综合最优"
+            }
+          ],
+          "debug": {
+            "currentProfile": {
+              "label": "骑手稀缺修复",
+              "selected": "A0205",
+              "mapFocusMode": "focus",
+              "assignmentCount": 5,
+              "dispatchMap": {
+                "case_id": "scarce_couriers_seed401",
+                "scenario_id": "scarce_repair",
+                "sample_index": 1,
+                "stage": "simulation_final",
+                "anchor_source": "maplibre-rendered",
+                "anchor_variant": "运营分析浅色区域 A",
+                "assignment_reconciled_variant": "运营分析浅色区域 A",
+                "entityCount": 12,
+                "assignmentCount": 5,
+                "roadCount": 90
+              }
+            },
+            "currentReport": {
+              "wall_time_s": 10,
+              "best": {
+                "strategy": "sparse_cover",
+                "local_cost": 215,
+                "valid": true,
+                "covered_tasks": 5,
+                "total_tasks": 5,
+                "order_tasks": 8,
+                "groups": 5,
+                "used_couriers": 4,
+                "uncovered_tasks": []
+              },
+              "has_dispatch_assignment_map": true
+            },
+            "currentReasoningState": null,
+            "currentSimulationSample": {
+              "case_id": "scarce_couriers_seed401",
+              "scenario_id": "scarce_repair",
+              "sample_index": 1,
+              "name": "骑手稀缺修复",
+              "selected_strategy_id": "S3",
+              "merchant_count": 5,
+              "courier_count": 7
+            },
+            "semiRealMapReady": true,
+            "semiRealMapRegion": 0,
+            "semiRealMapRegionLabel": "运营分析浅色区域 A",
+            "semiRealMapStyle": "https://tiles.openfreemap.org/styles/positron",
+            "semiRealMapViewport": {
+              "zoom": 13.35,
+              "center": {
+                "lng": 121.450826,
+                "lat": 31.231606
+              }
+            },
+            "semiRealMapTextLayers": {
+              "total": 19,
+              "visible": 0,
+              "hidden": 19
+            },
+            "mapFrame": {
+              "className": "map-frame project-map-ready maplibre-ready topology focus-selected",
+              "dataset": {
+                "dragFallbackBound": "native-maplibre",
+                "dragPan": "native",
+                "zoomLevel": "13.35",
+                "controlState": "all",
+                "mapRegion": "运营分析浅色区域 A",
+                "mapStyle": "运营分析浅色图",
+                "lastViewportSync": "viewport-live",
+                "mapCenter": "121.45083,31.23161",
+                "fullscreen": "true",
+                "selectedAssignment": "A0205"
+              }
+            },
+            "dom": {
+              "pins": 10,
+              "routeLinks": 5,
+              "routeArrows": 5,
+              "strategyCards": 5,
+              "tableRows": 6,
+              "detailTitle": "派单关系：骑手到商家",
+              "status": "当前场景派单完成"
+            }
+          }
+        }
+      ],
+      "routeClicks": [
+        {
+          "assignment": "A0201",
+          "merchant": "M0201",
+          "courier": "R0201",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0202",
+          "merchant": "M0202",
+          "courier": "R0207",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0203",
+          "merchant": "M0203",
+          "courier": "R0203",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0204",
+          "merchant": "M0204",
+          "courier": "R0205",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        },
+        {
+          "assignment": "A0205",
+          "merchant": "M0205",
+          "courier": "R0206",
+          "ok": true,
+          "title": "派单关系：骑手到商家"
+        }
+      ]
+    }
+  ],
+  "dragChecks": [
+    {
+      "scenarioValue": "large_seed301",
+      "before": "121.46200,31.22900",
+      "after": "121.45074,31.23163",
+      "beforePins": "0:5:2.98",
+      "afterPins": "0:5:3.05",
+      "changed": true
+    },
+    {
+      "scenarioValue": "medium_seed201",
+      "before": "121.46200,31.22900",
+      "after": "121.45088,31.23159",
+      "beforePins": "0:5:3.64",
+      "afterPins": "0:5:3.58",
+      "changed": true
+    },
+    {
+      "scenarioValue": "scarce_couriers_seed401",
+      "before": "121.46200,31.22900",
+      "after": "121.45083,31.23161",
+      "beforePins": "0:5:2.98",
+      "afterPins": "0:5:2.98",
+      "changed": true
+    }
+  ],
+  "errors": [],
+  "failures": []
+}

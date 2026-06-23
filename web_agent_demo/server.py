@@ -1204,7 +1204,7 @@ def build_dispatch_assignment_map(case_id: str, report: dict[str, object] | None
             len(task_ids),
         )
         add_entity(pickup_id, "pickup_cluster", f"{pickup_id} 商家", index, pickup_point)
-        display_couriers = couriers if index == 0 else couriers[:1]
+        display_couriers = couriers[:1]
         for courier_index, visible_courier in enumerate(display_couriers):
             courier_offset = (
                 round(min(92.0, courier_point[0] + courier_index * 2.8), 1),
@@ -1222,8 +1222,9 @@ def build_dispatch_assignment_map(case_id: str, report: dict[str, object] | None
                 "pickup_label": f"{pickup_id}：{task_key}",
                 "merchant": pickup_id,
                 "merchant_note": "输入文件不包含真实商家坐标；此处为由 task_id_list 推断的商家取餐点。",
-                "courier": " + ".join(couriers),
+                "courier": courier_id,
                 "map_couriers": display_couriers,
+                "backup_couriers": couriers[1:],
                 "map_orders": [],
                 "orders": list(task_ids),
                 "order_count": order_count,
@@ -1602,7 +1603,7 @@ def render_index() -> str:
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .38; z-index: 1; pointer-events: none; }
-    .route-svg { z-index: 5; pointer-events: none; }
+    .route-svg { z-index: 7; pointer-events: none; }
     .district, .zone-block { fill: rgba(24, 36, 47, .3); stroke: rgba(124, 146, 162, .075); stroke-width: 1; }
     .water { fill: rgba(13, 31, 40, .56); stroke: rgba(85, 116, 137, .14); }
     .building-block {
@@ -1883,23 +1884,27 @@ def render_index() -> str:
       right: 14px;
       bottom: 13px;
       z-index: 12;
-      width: 176px;
-      padding: 10px 11px;
-      border: 1px solid rgba(148, 163, 184, .32);
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.96));
+      width: 188px;
+      padding: 10px;
+      border: 1px solid rgba(203, 213, 225, .9);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,250,252,.98));
       color: #334155 !important;
-      box-shadow: 0 12px 28px rgba(15,23,42,.13);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(15,23,42,.12);
+      backdrop-filter: blur(12px);
+      display: grid;
+      gap: 7px;
+      pointer-events: none;
     }
-    .weather-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
-    .weather-title { font-size: 10px; font-weight: 850; color: #334155; letter-spacing: .02em; }
-    .weather-badge { padding: 2px 8px; border-radius: 999px; background: #fff7ed; color: #b45309; border: 1px solid rgba(217,119,6,.2); font-size: 10px; font-weight: 850; }
-    .weather-bar { height: 5px; background: linear-gradient(90deg, #d99a00 0 67%, rgba(100,116,139,.16) 67%); margin: 6px 0 8px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
-    .weather-meta { display: grid; grid-template-columns: 1fr; gap: 5px; }
-    .weather-line { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; line-height: 1.25; color: #64748b; background: rgba(241,245,249,.72); border: 1px solid rgba(226,232,240,.7); border-radius: 9px; padding: 5px 7px; }
-    .weather-line strong { color: #0f172a; font-weight: 800; text-align: right; }
-    .weather-impact { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(148,163,184,.2); color: #475569; font-size: 10px; line-height: 1.3; }
+    .weather-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .weather-title { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 850; color: #334155; letter-spacing: .02em; }
+    .weather-title::before { content: ""; width: 7px; height: 7px; border-radius: 999px; background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.14); }
+    .weather-badge { padding: 3px 8px; border-radius: 999px; background: #fff7ed; color: #b45309; border: 1px solid rgba(217,119,6,.2); font-size: 10px; font-weight: 850; white-space: nowrap; }
+    .weather-bar { height: 4px; background: linear-gradient(90deg, #d99a00 0 67%, rgba(100,116,139,.16) 67%); border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
+    .weather-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .weather-line { display: grid; gap: 3px; min-width: 0; font-size: 10px; line-height: 1.2; color: #64748b; background: rgba(255,255,255,.78); border: 1px solid rgba(226,232,240,.86); border-radius: 10px; padding: 6px 7px; }
+    .weather-line strong { color: #0f172a; font-weight: 850; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .weather-impact { margin: 0; padding: 7px 8px; border: 1px solid rgba(226,232,240,.9); border-radius: 11px; background: rgba(248,250,252,.78); color: #475569; font-size: 10px; line-height: 1.32; }
     .toast {
       position: absolute;
       right: 18px;
@@ -2035,8 +2040,8 @@ def render_index() -> str:
       </div>
       <div class="kpi"><label>调度场景</label><strong id="case-id">large_seed301</strong></div>
       <div class="kpi"><label>推理耗时</label><strong class="green" id="runtime">00:00:08</strong></div>
-      <div class="kpi rate"><div><label>派单完成率</label><strong id="completion-rate">100%</strong></div><div class="ring"></div></div>
-      <div class="kpi"><label>未派订单</label><strong id="unassigned">0</strong></div>
+      <div class="kpi rate"><div><label>商家覆盖率</label><strong id="completion-rate">100%</strong></div><div class="ring"></div></div>
+      <div class="kpi"><label>未派商家</label><strong id="unassigned">0</strong></div>
       <div class="kpi"><label>预计履约成本</label><strong id="expected-cost">$657.10</strong></div>
       <div class="kpi">
         <label>相比贪心基线优化</label>
@@ -2140,7 +2145,7 @@ def render_index() -> str:
         </div>
         <div class="decision-card evidence">
           <h3>证据</h3>
-          <div class="row"><span>▧ 场景输入</span><strong>-</strong></div>
+          <div class="row"><span>▧ 商家覆盖</span><strong>-</strong></div>
           <div class="row"><span>◎ 派单对象</span><strong>-</strong></div>
           <div class="row"><span>◷ ETA / 时效</span><strong class="good">-</strong></div>
           <div class="row"><span>△ 接单风险</span><strong class="good">-</strong></div>
@@ -2151,8 +2156,8 @@ def render_index() -> str:
           <div class="row"><span>成本改进</span><strong class="positive">-</strong></div>
           <div class="row"><span>ETA 改进</span><strong class="positive">-</strong></div>
           <div class="row"><span>无人接单风险下降</span><strong class="positive">-</strong></div>
-          <div class="row"><span>批次节约</span><strong class="positive" id="benefit-batch">-</strong></div>
-          <div class="row"><span>单城月节约估算</span><strong class="positive" id="benefit-month">-</strong></div>
+          <div class="row"><span>运营测算批次节约</span><strong class="positive" id="benefit-batch">-</strong></div>
+          <div class="row"><span>单城月节约测算</span><strong class="positive" id="benefit-month">-</strong></div>
         </div>
       </aside>
 
@@ -2749,6 +2754,7 @@ def render_index() -> str:
     }
     function syncNormalizedAssignment(profile, assignment) {
       if (!profile || !assignment) return;
+      const finalCouriers = finalCourierTokensForAssignment(assignment);
       if (!profile.assignments) profile.assignments = {};
       profile.assignments[assignment.id] = {
         id: assignment.id,
@@ -2766,7 +2772,10 @@ def render_index() -> str:
         distance: assignment.distance,
         risk: assignment.risk || "Medium",
         strategyId: assignment.strategy_id || "",
-        map_couriers: assignment.map_couriers || courierTokens(assignment.courier),
+        map_couriers: finalCouriers,
+        backup_couriers: Array.isArray(assignment.map_couriers)
+          ? assignment.map_couriers.filter((courier) => !finalCouriers.includes(courier))
+          : courierTokens(assignment.courier).slice(1),
         map_orders: assignment.map_orders || assignment.orders || []
       };
     }
@@ -2824,7 +2833,8 @@ def render_index() -> str:
           const load = courierLoad[courier.id] || 0;
           const distance = distance2D([merchant.x, merchant.y], [courier.x, courier.y]);
           const reusePenalty = preferUniqueCouriers ? load * 10000 : load * 36;
-          return {courier, score: distance + reusePenalty};
+          const overlapPenalty = distance < 5.2 ? (5.2 - distance) * 90 : 0;
+          return {courier, score: distance + reusePenalty + overlapPenalty};
         }).sort((left, right) => left.score - right.score);
         const chosen = ranked[0] && ranked[0].courier;
         if (!chosen) return;
@@ -2922,6 +2932,16 @@ def render_index() -> str:
     function courierTokens(courierText) {
       return String(courierText || "").split("+").map((item) => item.trim()).filter(Boolean);
     }
+    function finalCourierTokensForAssignment(assignment) {
+      if (!assignment) return [];
+      const finalFromCourier = courierTokens(assignment.courier);
+      if (finalFromCourier.length) return [finalFromCourier[0]];
+      const mapped = Array.isArray(assignment.map_couriers) ? assignment.map_couriers.map((item) => String(item || "").trim()).filter(Boolean) : [];
+      return mapped.length ? [mapped[0]] : [];
+    }
+    function finalCourierForAssignment(assignment) {
+      return finalCourierTokensForAssignment(assignment)[0] || "";
+    }
     function assignmentForEntity(profile, entityId) {
       const entity = String(entityId || "").trim();
       if (!entity || entity.startsWith("D")) return "";
@@ -2930,8 +2950,7 @@ def render_index() -> str:
         if (assignment.merchant === entity || String(assignment.merchant || "").startsWith(entity + "：")) return assignmentId;
         if ((assignment.orders || []).includes(entity)) return assignmentId;
         if ((assignment.map_orders || []).includes(entity)) return assignmentId;
-        if ((assignment.map_couriers || []).includes(entity)) return assignmentId;
-        if (courierTokens(assignment.courier).includes(entity)) return assignmentId;
+        if (finalCourierTokensForAssignment(assignment).includes(entity)) return assignmentId;
       }
       return "";
     }
@@ -2942,11 +2961,13 @@ def render_index() -> str:
     function normalizeAssignmentsFromMap(mapPayload) {
       const assignments = {};
       (mapPayload.assignments || []).forEach((item, index) => {
+        const finalCouriers = finalCourierTokensForAssignment(item);
+        const mappedCouriers = Array.isArray(item.map_couriers) ? item.map_couriers : courierTokens(item.courier);
         assignments[item.id || `A${index + 1}`] = {
           pickup: item.pickup,
           merchant: item.pickup_label || item.merchant || item.pickup || `G${index + 1}`,
           merchantNote: item.merchant_note || mapPayload.note || "",
-          courier: item.courier,
+          courier: finalCouriers[0] || item.courier,
           orders: item.orders || [],
           orderCount: safeNumber(item.order_count, (item.orders || []).length),
           eta: item.eta,
@@ -2957,7 +2978,8 @@ def render_index() -> str:
           distance: item.distance,
           risk: item.risk || "Medium",
           strategyId: item.strategy_id || "",
-          map_couriers: item.map_couriers || courierTokens(item.courier),
+          map_couriers: finalCouriers,
+          backup_couriers: mappedCouriers.filter((courier) => !finalCouriers.includes(courier)),
           map_orders: item.map_orders || item.orders || []
         };
       });
@@ -2972,7 +2994,7 @@ def render_index() -> str:
       });
       const scoreFor = ([assignmentId, assignment]) => {
         const pickup = entityById[assignment.pickup] || {};
-        const courierId = (assignment.map_couriers && assignment.map_couriers[0]) || courierTokens(assignment.courier)[0] || "";
+        const courierId = finalCourierForAssignment(assignment);
         const courier = entityById[courierId] || {};
         const px = safeNumber(pickup.x, 50);
         const py = safeNumber(pickup.y, 50);
@@ -3117,6 +3139,7 @@ def render_index() -> str:
       const strategyPath = Array.isArray(sample.strategy_path) ? sample.strategy_path : [];
       const totalCost = (mapPayload.assignments || []).reduce((sum, item) => sum + safeNumber(String(item.cost || "0").replace("$", ""), 0), 0);
       const totalTasks = (sample.merchants || []).length;
+      const totalOrders = (mapPayload.assignments || []).reduce((sum, item) => sum + safeNumber(item.order_count, (item.orders || []).length || 1), 0);
       const usedCouriers = new Set((mapPayload.assignments || []).map((item) => item.courier)).size;
       return {
         case_id: sample.case_id,
@@ -3124,6 +3147,7 @@ def render_index() -> str:
         wall_time_s: 10,
         features: {
           tasks: totalTasks,
+          orders: totalOrders,
           couriers: (sample.couriers || []).length,
           rows: (sample.candidates || []).length
         },
@@ -3133,6 +3157,7 @@ def render_index() -> str:
           valid: true,
           covered_tasks: totalTasks,
           total_tasks: totalTasks,
+          order_tasks: totalOrders,
           groups: (mapPayload.assignments || []).length,
           used_couriers: usedCouriers,
           uncovered_tasks: []
@@ -3184,12 +3209,13 @@ def render_index() -> str:
         "<li>运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。</li>",
         "<li>点击地图上的商家或骑手可查看候选信息，不显示内部编号。</li>",
       ].join("");
-      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-      if (rows[0]) rows[0].textContent = `${(sample.merchants || []).length} 个商家`;
-      if (rows[1]) rows[1].textContent = `${(sample.couriers || []).length} 个骑手`;
-      if (rows[2]) rows[2].textContent = sample.summary ? sample.summary.traffic : "-";
-      if (rows[3]) rows[3].textContent = sample.summary ? `${Math.round(safeNumber(sample.summary.avg_willingness, 0) * 100)}%` : "-";
-      if (rows[4]) rows[4].textContent = sample.selected_strategy_id || "-";
+      setEvidenceRows([
+        ["▧ 商家输入", `${(sample.merchants || []).length} 个商家`],
+        ["◎ 骑手供给", `${(sample.couriers || []).length} 个骑手`],
+        ["◷ 路况", sample.summary ? sample.summary.traffic : "-"],
+        ["△ 平均意愿", sample.summary ? `${Math.round(safeNumber(sample.summary.avg_willingness, 0) * 100)}%` : "-"],
+        ["▣ 候选策略", sample.selected_strategy_id || "-"]
+      ]);
       const compareRows = document.querySelectorAll(".decision-card:last-child .row strong");
       compareRows.forEach((row) => { row.textContent = "-"; });
     }
@@ -3275,6 +3301,9 @@ def render_index() -> str:
       profile.selected = preferredAssignmentIdForMap(mapPayload, profile.assignments) || Object.keys(profile.assignments)[0] || "A1";
       profile.mapFocusMode = "overview";
       profile.dispatchMap = mapPayload;
+      if (mapPayload.stage === "simulation_final" || mapPayload.stage === "final") {
+        reconcileDispatchPairsToVisibleMap(profile);
+      }
       resetMapControlState();
       if (mapPayload.total_tasks) profile.totalTasks = mapPayload.total_tasks;
       if (mapPayload.total_couriers) profile.totalCouriers = mapPayload.total_couriers;
@@ -3313,8 +3342,13 @@ def render_index() -> str:
         "<li>刷新后生成当前场景输入，只显示商家点和骑手点。</li>",
         "<li>运行推理完成后自动显示每个商家派给哪个骑手。</li>"
       ].join("");
-      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-      rows.forEach((row) => { row.textContent = "-"; });
+      setEvidenceRows([
+        ["▧ 商家覆盖", "-"],
+        ["◎ 派单对象", "-"],
+        ["◷ ETA / 时效", "-"],
+        ["△ 接单风险", "-"],
+        ["▣ 策略/负载", "-"]
+      ]);
       const compareRows = document.querySelectorAll(".decision-card:last-child .row strong");
       compareRows.forEach((row) => { row.textContent = "-"; });
       document.body.classList.add("pending-run");
@@ -3336,7 +3370,7 @@ def render_index() -> str:
       const activeCouriers = new Set();
       if (hasFinalAssignments) {
         Object.values(profile.assignments).forEach((assignment) => {
-          (assignment.map_couriers || courierTokens(assignment.courier)).forEach((courier) => activeCouriers.add(courier));
+          finalCourierTokensForAssignment(assignment).forEach((courier) => activeCouriers.add(courier));
         });
       }
       const kindOrder = ["pickup_cluster", "merchant_order", "courier"];
@@ -3730,6 +3764,7 @@ def render_index() -> str:
       const bar = weather.querySelector(".weather-bar");
       const weatherStrong = weather.querySelector(".weather-state");
       const impactStrong = weather.querySelector(".weather-impact-value");
+      const impactBody = weather.querySelector(".weather-impact");
       const impactText = traffic === "heavy"
         ? "ETA 上浮"
         : weatherName === "rain"
@@ -3737,6 +3772,13 @@ def render_index() -> str:
           : weatherName === "event"
             ? "局部绕行"
             : "正常履约";
+      const impactBodyText = traffic === "heavy"
+        ? "调度建议：提高近场骑手权重，避免跨区派单。"
+        : weatherName === "rain"
+          ? "调度建议：提高接单意愿权重，预留雨天 ETA 缓冲。"
+          : weatherName === "event"
+            ? "调度建议：绕开活动核心区，优先稳定履约。"
+            : "调度建议：按常规成本与时效权重派单。";
       if (trafficStrong) {
         trafficStrong.textContent = label;
         trafficStrong.style.color = color;
@@ -3748,6 +3790,7 @@ def render_index() -> str:
       }
       if (weatherStrong) weatherStrong.textContent = weatherLabel;
       if (impactStrong) impactStrong.textContent = impactText;
+      if (impactBody) impactBody.textContent = impactBodyText;
     }
     function displayPositionsForLabels(labels) {
       const placed = [];
@@ -4473,7 +4516,8 @@ def render_index() -> str:
       const mapLayers = profile.dispatchMap.map_layers;
       const routePalette = ["#16a34a", "#0f766e", "#2563eb", "#ca8a04", "#15803d", "#0d9488", "#64748b", "#2f855a"];
       const pathHtml = profile.dispatchMap.assignments.flatMap((assignment, index) => {
-        const couriers = assignment.map_couriers || courierTokens(assignment.courier);
+        const normalizedAssignment = (profile.assignments && profile.assignments[assignment.id]) || assignment;
+        const couriers = finalCourierTokensForAssignment(normalizedAssignment);
         const pickupPoint = entityPoints[assignment.pickup];
         if (!pickupPoint || !couriers.length) return "";
         const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
@@ -4495,6 +4539,7 @@ def render_index() -> str:
             courier: courierId,
             leg: "courier-to-merchant",
             "leg-index": courierIndex,
+            "final-courier": finalCourierForAssignment(normalizedAssignment),
             "route-source": "dispatch-relationship-line-v4",
             "route-points": visiblePickupRoute.length,
             "road-core-points": Array.isArray(pickupRoute.roadCore) ? pickupRoute.roadCore.length : visiblePickupRoute.length,
@@ -4633,12 +4678,13 @@ def render_index() -> str:
           "<li>当前仅展示输入侧候选，不提前显示最终派单。</li>",
           "<li>接单概率用于判断该商家是否需要多派候选或风险平衡策略。</li>"
         ].join("");
-        const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-        if (rows[0]) rows[0].textContent = merchant.hotspot === "crossroad" ? "路口商圈" : "街区商家";
-        if (rows[1]) rows[1].textContent = relatedCandidates.length ? relatedCandidates.map((candidate) => candidate.courier_id).join(" / ") : "待匹配";
-        if (rows[2]) rows[2].textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} 分钟` : "-";
-        if (rows[3]) rows[3].textContent = relatedCandidates[0] ? relatedCandidates[0].risk : "-";
-        if (rows[4]) rows[4].textContent = "待评估";
+        setEvidenceRows([
+          ["▧ 商家类型", merchant.hotspot === "crossroad" ? "路口商圈" : "街区商家"],
+          ["◎ 候选骑手", relatedCandidates.length ? relatedCandidates.map((candidate) => candidate.courier_id).join(" / ") : "待匹配"],
+          ["◷ ETA 目标", merchant.expected_eta_min ? `${merchant.expected_eta_min} 分钟` : "-"],
+          ["△ 候选风险", relatedCandidates[0] ? relatedCandidates[0].risk : "-"],
+          ["▣ 当前阶段", "待评估"]
+        ]);
         showToast(`已选中商家 ${entity.id}`);
         return true;
       }
@@ -4673,12 +4719,13 @@ def render_index() -> str:
           "<li>系统优先避免把低意愿骑手绑定到高风险商家。</li>",
           "<li>运行完成后，如果该骑手被选中，地图会显示其承接的商家关系线。</li>"
         ].join("");
-        const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-        if (rows[0]) rows[0].textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
-        if (rows[1]) rows[1].textContent = relatedCandidates.map((candidate) => candidate.merchant_id).join(" / ") || "-";
-        if (rows[2]) rows[2].textContent = courier.status || "-";
-        if (rows[3]) rows[3].textContent = relatedCandidates[0] ? relatedCandidates[0].risk : "-";
-        if (rows[4]) rows[4].textContent = relatedCandidates.length + " 个候选";
+        setEvidenceRows([
+          ["▧ 接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`],
+          ["◎ 候选商家", relatedCandidates.map((candidate) => candidate.merchant_id).join(" / ") || "-"],
+          ["◷ 骑手状态", courier.status || "-"],
+          ["△ 候选风险", relatedCandidates[0] ? relatedCandidates[0].risk : "-"],
+          ["▣ 候选数量", relatedCandidates.length + " 个候选"]
+        ]);
         showToast(`已选中骑手 ${entity.id}`);
         return true;
       }
@@ -4692,7 +4739,7 @@ def render_index() -> str:
       if (!entity || !assignment) return false;
       profile.selected = assignmentId;
       applyMapFocus(profile, assignmentId, true);
-      const courierId = (assignment.map_couriers && assignment.map_couriers[0]) || courierTokens(assignment.courier)[0] || "";
+      const courierId = finalCourierForAssignment(assignment);
       const merchantId = assignment.pickup;
       const merchant = sampleMerchantById(merchantId) || entityById(profile, merchantId) || {};
       const courier = sampleCourierById(courierId) || entityById(profile, courierId) || {};
@@ -4714,17 +4761,18 @@ def render_index() -> str:
           `<li>策略依据：${strategyText}；风险等级 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`,
           `<li>${assignment.merchantNote || "该派单来自当前场景样本的最终策略选择。"}</li>`
         ].join("");
-        const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-        if (rows[0]) rows[0].textContent = assignment.fit;
-        if (rows[1]) rows[1].textContent = assignment.courier;
-        if (rows[2]) rows[2].textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} 分钟` : etaText(assignment.eta);
-        if (rows[3]) rows[3].textContent = assignment.risk;
-        if (rows[4]) rows[4].textContent = strategyText;
+        setEvidenceRows([
+          ["▧ 接单概率", assignment.fit],
+          ["◎ 承接骑手", assignment.courier],
+          ["◷ ETA / 时效", merchant.expected_eta_min ? `${merchant.expected_eta_min} 分钟` : etaText(assignment.eta)],
+          ["△ 接单风险", assignment.risk],
+          ["▣ 策略依据", strategyText]
+        ]);
         showToast(`商家 ${entity.id} 已派给 ${assignment.courier}`);
         return true;
       }
       if (entity.kind === "courier") {
-        const courierAssignments = Object.entries(assignments).filter(([, item]) => courierTokens(item.courier).includes(entity.id) || (item.map_couriers || []).includes(entity.id));
+        const courierAssignments = Object.entries(assignments).filter(([, item]) => finalCourierForAssignment(item) === entity.id);
         const assignedOrders = courierAssignments.flatMap(([, item]) => item.orders || []);
         const totalCost = courierAssignments.reduce((sum, [, item]) => sum + safeNumber(String(item.cost || "0").replace("$", ""), 0), 0);
         const avgEta = courierAssignments.length
@@ -4744,16 +4792,28 @@ def render_index() -> str:
           `<li>覆盖订单数：${assignedOrders.length || 0}；平均 ETA：${avgEta ? avgEta + " 分钟" : etaText(assignment.eta)}。</li>`,
           `<li>当前风险 ${assignment.risk}；累计派单成本 ${money(totalCost || safeNumber(String(assignment.cost || "0").replace("$", ""), 0))}。</li>`
         ].join("");
-        const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-        if (rows[0]) rows[0].textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
-        if (rows[1]) rows[1].textContent = courierAssignments.map(([, item]) => item.pickup).join(" / ") || "-";
-        if (rows[2]) rows[2].textContent = courier.status || "-";
-        if (rows[3]) rows[3].textContent = assignment.risk;
-        if (rows[4]) rows[4].textContent = `${courierAssignments.length} 个商家`;
+        setEvidenceRows([
+          ["▧ 接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`],
+          ["◎ 已派商家", courierAssignments.map(([, item]) => item.pickup).join(" / ") || "-"],
+          ["◷ 骑手状态", courier.status || "-"],
+          ["△ 接单风险", assignment.risk],
+          ["▣ 承接规模", `${courierAssignments.length} 个商家`]
+        ]);
         showToast(`骑手 ${entity.id} 当前承接 ${courierAssignments.length} 个商家`);
         return true;
       }
       return false;
+    }
+    function setEvidenceRows(items) {
+      const rows = document.querySelectorAll(".decision-card.evidence .row");
+      (items || []).forEach((item, index) => {
+        const row = rows[index];
+        if (!row) return;
+        const label = row.querySelector("span");
+        const value = row.querySelector("strong");
+        if (label) label.textContent = item[0] || "-";
+        if (value) value.textContent = item[1] || "-";
+      });
     }
     function renderRouteDetail(profile, assignmentId, routeDataset = {}) {
       const assignments = (profile && profile.assignments) || {};
@@ -4764,7 +4824,10 @@ def render_index() -> str:
       applyMapFocus(profile, resolvedAssignment, true);
       const leg = routeDataset.leg || "";
       const merchantId = routeDataset.merchant || assignment.pickup;
-      const courierId = routeDataset.courier || (assignment.map_couriers && assignment.map_couriers[0]) || courierTokens(assignment.courier)[0] || "";
+      const finalCourierId = finalCourierForAssignment(assignment);
+      const clickedCourierId = routeDataset.courier || finalCourierId;
+      if (finalCourierId && clickedCourierId && clickedCourierId !== finalCourierId) return false;
+      const courierId = finalCourierId || clickedCourierId;
       const routePoints = routeDataset.routePoints || routeDataset.routepoints || "";
       const routeSource = routeDataset.routeSource || routeDataset.routesource || "delivery-routes-road-graph-v3";
       const endpointConnectors = routeDataset.endpointConnectors || routeDataset.endpointconnectors || "0";
@@ -4785,12 +4848,13 @@ def render_index() -> str:
         `<li>派单线证据来自当前地图路网；采样节点 ${routePoints || "-"} 个，端点贴合校验 ${endpointConnectors} 段。</li>`,
         `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`
       ].join("");
-      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-      if (rows[0]) rows[0].textContent = routePoints ? `${routePoints} 节点` : "-";
-      if (rows[1]) rows[1].textContent = legLabel;
-      if (rows[2]) rows[2].textContent = etaText(assignment.eta);
-      if (rows[3]) rows[3].textContent = assignment.risk;
-      if (rows[4]) rows[4].textContent = resolvedAssignment;
+      setEvidenceRows([
+        ["▧ 线段采样", routePoints ? `${routePoints} 节点` : "-"],
+        ["◎ 派单关系", `${merchantId} → ${courierId}`],
+        ["◷ ETA / 时效", etaText(assignment.eta)],
+        ["△ 接单风险", assignment.risk],
+        ["▣ 派单编号", resolvedAssignment]
+      ]);
       showToast(`${legLabel}：${endpointText}`);
       return true;
     }
@@ -4840,12 +4904,13 @@ def render_index() -> str:
         `<li>策略证据：${revealDetail && sampleItem && sampleItem.evidence ? sampleItem.evidence : "运行推理到该策略后再显示"}。</li>`,
         `<li>当前状态：${statusText}${isSelected ? "，地图保持展示全部最终派单关系" : "，可与选中策略对比成本、风险和覆盖率"}。</li>`
       ].join("");
-      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-      if (rows[0]) rows[0].textContent = branch.title;
-      if (rows[1]) rows[1].textContent = revealDetail && sampleItem && sampleItem.evidence ? sampleItem.evidence : "-";
-      if (rows[2]) rows[2].textContent = revealDetail && sampleItem && sampleItem.score ? Number(sampleItem.score).toFixed(2) : "-";
-      if (rows[3]) rows[3].textContent = statusText;
-      if (rows[4]) rows[4].textContent = branch.id;
+      setEvidenceRows([
+        ["▧ 策略名称", branch.title],
+        ["◎ 策略证据", revealDetail && sampleItem && sampleItem.evidence ? sampleItem.evidence : "-"],
+        ["◷ 评分", revealDetail && sampleItem && sampleItem.score ? Number(sampleItem.score).toFixed(2) : "-"],
+        ["△ 当前状态", statusText],
+        ["▣ 策略编号", branch.id]
+      ]);
       showToast(`策略 ${branch.id}：${statusText}`);
       return true;
     }
@@ -4889,12 +4954,13 @@ def render_index() -> str:
         `<li>风险：${row.dataset.risk || cells[5] || "-"}；状态：${row.dataset.status || cells[7] || "-"}。</li>`,
         `<li>业务解释：${cells[8] || "等待刷新位置后生成候选关系"}。</li>`
       ].join("");
-      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-      if (rows[0]) rows[0].textContent = cells[1] || "-";
-      if (rows[1]) rows[1].textContent = row.dataset.cost || cells[3] || "-";
-      if (rows[2]) rows[2].textContent = rowEtaText;
-      if (rows[3]) rows[3].textContent = row.dataset.risk || cells[5] || "-";
-      if (rows[4]) rows[4].textContent = branchId || rowType;
+      setEvidenceRows([
+        ["▧ 覆盖率", cells[1] || "-"],
+        ["◎ 成本分", row.dataset.cost || cells[3] || "-"],
+        ["◷ ETA / 时效", rowEtaText],
+        ["△ 接单风险", row.dataset.risk || cells[5] || "-"],
+        ["▣ 策略/行类型", branchId || rowType]
+      ]);
       showToast(`已打开表格详情：${cells[0] || rowType}`);
       return true;
     }
@@ -4902,7 +4968,7 @@ def render_index() -> str:
       const assignments = Object.values((profile && profile.assignments) || {});
       if (!assignments.length) return false;
       const totalOrders = assignments.reduce((sum, assignment) => sum + safeNumber(assignment.orderCount, (assignment.orders || []).length || 1), 0);
-      const courierSet = new Set(assignments.flatMap((assignment) => courierTokens(assignment.courier)));
+      const courierSet = new Set(assignments.flatMap((assignment) => finalCourierTokensForAssignment(assignment)));
       const totalCost = assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.cost || "0").replace("$", ""), 0), 0);
       const avgEta = Math.round(assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.eta || "").replace("min", ""), 0), 0) / Math.max(1, assignments.length));
       const best = report && report.best ? report.best : {};
@@ -4926,15 +4992,16 @@ def render_index() -> str:
       $("detail-reasons").innerHTML = [
         "<li>当前默认是全局派单总览：所有商家到骑手的派单线保持可见。</li>",
         "<li>点击任意商家、骑手或线路后，才进入单条派单聚焦模式。</li>",
-        `<li>每单约节约 ${yuan(value.perOrderSaving)}，批次节约 ${yuan(value.batchSaving)}；按日均 10 万单估算单城月节约 ${yuan(value.monthSaving)}。</li>`,
+        `<li>运营测算假设：每单履约损耗节约 ${yuan(value.perOrderSaving)}，当前批次约 ${value.tasks} 单，批次节约 ${yuan(value.batchSaving)}；按日均 10 万单估算单城月节约 ${yuan(value.monthSaving)}。</li>`,
         ...assignments.slice(0, 5).map((assignment) => `<li>${assignment.pickup || assignment.merchant} 派给 ${assignment.courier}，ETA ${etaText(assignment.eta)}，成本 ${assignment.cost}，风险 ${assignment.risk}。</li>`)
       ].join("");
-      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-      if (rows[0]) rows[0].textContent = `${coverage}%`;
-      if (rows[1]) rows[1].textContent = `${assignments.length} 个商家`;
-      if (rows[2]) rows[2].textContent = avgEta ? `${avgEta} 分钟` : "-";
-      if (rows[3]) rows[3].textContent = assignments.some((assignment) => assignment.risk === "High") ? "High" : assignments.some((assignment) => assignment.risk === "Medium") ? "Medium" : "Low";
-      if (rows[4]) rows[4].textContent = profile.utilization;
+      setEvidenceRows([
+        ["▧ 商家覆盖", `${coverage}%`],
+        ["◎ 派单对象", `${assignments.length} 个商家`],
+        ["◷ ETA / 时效", avgEta ? `${avgEta} 分钟` : "-"],
+        ["△ 接单风险", assignments.some((assignment) => assignment.risk === "High") ? "High" : assignments.some((assignment) => assignment.risk === "Medium") ? "Medium" : "Low"],
+        ["▣ 策略/负载", profile.utilization]
+      ]);
       return true;
     }
     function renderAssignmentDetail(profile, assignmentId, sourceLabel = "", focusMap = true) {
@@ -4955,12 +5022,13 @@ def render_index() -> str:
       document.querySelector(".prob span").textContent = assignment.probability;
       $("detail-reasons").innerHTML = assignment.reason.map((item) => `<li>${item}</li>`).join("");
       if (assignment.merchantNote) $("detail-reasons").innerHTML += `<li>${assignment.merchantNote}</li>`;
-      const rows = document.querySelectorAll(".decision-card.evidence .row strong");
-      if (rows[0]) rows[0].textContent = assignment.fit;
-      if (rows[1]) rows[1].textContent = assignment.distance;
-      if (rows[2]) rows[2].textContent = assignment.risk === "High" ? "Warning" : "Good";
-      if (rows[3]) rows[3].textContent = assignment.risk;
-      if (rows[4]) rows[4].textContent = profile.utilization;
+      setEvidenceRows([
+        ["▧ 接单概率", assignment.fit],
+        ["◎ 骑手距离", assignment.distance],
+        ["◷ ETA / 时效", etaText(assignment.eta)],
+        ["△ 接单风险", assignment.risk],
+        ["▣ 策略/负载", profile.utilization]
+      ]);
       showToast(`${assignment.merchant} → ${assignment.courier}，${orderCount} 单`);
     }
     function updateDecisionPanel(profile, report) {
@@ -4992,10 +5060,12 @@ def render_index() -> str:
       const parsedImprovement = Math.max(0, safeNumber(String(profile && profile.improvement || "0").replace(/[+%]/g, ""), 0)) / 100;
       const fallbackGreedy = parsedImprovement > 0 && parsedImprovement < 0.95 ? cost / Math.max(0.05, 1 - parsedImprovement) : cost * 1.8;
       const greedyCost = Math.max(cost, safeNumber(greedyAttempt && greedyAttempt["local" + "_cost"], fallbackGreedy));
-      const tasks = Math.max(1, safeNumber(best.total_tasks || features.tasks, 1));
+      const assignmentOrders = Object.values((profile && profile.assignments) || {})
+        .reduce((sum, assignment) => sum + safeNumber(assignment.orderCount, (assignment.orders || []).length || 1), 0);
+      const tasks = Math.max(1, assignmentOrders || safeNumber(best.order_tasks || features.orders || best.total_tasks || features.tasks, 1));
       const rawBatchSaving = Math.max(0, greedyCost - cost);
       const rawPerOrderSaving = rawBatchSaving / tasks;
-      const perOrderSaving = Math.max(0.5, Math.min(1.0, rawPerOrderSaving * 0.03));
+      const perOrderSaving = Math.max(0.35, Math.min(1.0, rawPerOrderSaving * 0.025));
       const batchSaving = perOrderSaving * tasks;
       const dailyOrders = 100000;
       const monthSaving = perOrderSaving * dailyOrders * 30;
@@ -5370,6 +5440,22 @@ def render_index() -> str:
             const profile = currentProfile || profileForCase(selectedCase());
             const selected = profile.assignments && (profile.assignments[profile.selected] || profile.assignments.A1);
             if (selected) {
+              const map = ensureSemiRealMap();
+              const pickup = entityById(profile, selected.pickup);
+              const courierId = finalCourierForAssignment(selected);
+              const courier = entityById(profile, courierId);
+              if (map && pickup && courier) {
+                const center = [
+                  (safeNumber(pickup.x, 50) + safeNumber(courier.x, 50)) / 2,
+                  (safeNumber(pickup.y, 50) + safeNumber(courier.y, 50)) / 2
+                ];
+                const lngLat = screenNormToLngLat(center);
+                if (lngLat) {
+                  semiRealMapMoveMode = "locate-assignment-control";
+                  map.easeTo({center: lngLat, zoom: Math.max(14.0, map.getZoom()), pitch: 0, bearing: 0, duration: 520});
+                  frame.dataset.mapCenter = `${lngLat[0].toFixed(5)},${lngLat[1].toFixed(5)}`;
+                }
+              }
               renderAssignmentDetail(profile, profile.selected, selected.merchant);
               showToast("已定位到 " + selected.courier + " 当前派单包");
             } else {
@@ -5481,7 +5567,8 @@ def render_index() -> str:
         if (!profile.assignments || Object.keys(profile.assignments).length === 0) {
           if (renderEntityPreviewDetail(profile, target.dataset.entity || "")) return;
         }
-        const endpointPin = (target.classList.contains("dispatch-link") || target.classList.contains("dispatch-arrow"))
+        const routeClickTarget = target.classList.contains("route-click-target");
+        const endpointPin = ((target.classList.contains("dispatch-link") && !routeClickTarget) || target.classList.contains("dispatch-arrow"))
           ? entityPinAtClientPoint(event)
           : null;
         if (endpointPin && endpointPin.dataset.entity && renderFinalEntityDetail(profile, endpointPin.dataset.entity)) return;
