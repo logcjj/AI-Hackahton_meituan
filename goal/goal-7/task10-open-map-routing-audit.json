@@ -1,0 +1,68 @@
+{
+  "courierPins": 13,
+  "entityLayerOpacity": "1",
+  "frameClass": "map-frame tile-ready topology leaflet-ready assignment-overview",
+  "leafletRoutes": 0,
+  "loadedTileCount": 15,
+  "merchantPins": 5,
+  "osrmRoutes": 5,
+  "routeStyles": [
+    {
+      "assignment": "A0101",
+      "dSize": 727,
+      "display": "inline",
+      "length": "24.1",
+      "opacity": "0.76",
+      "points": "56",
+      "source": "osrm",
+      "stroke": "rgba(155, 232, 241, 0.78)"
+    },
+    {
+      "assignment": "A0102",
+      "dSize": 441,
+      "display": "inline",
+      "length": "26.7",
+      "opacity": "0.76",
+      "points": "34",
+      "source": "osrm",
+      "stroke": "rgba(155, 232, 241, 0.78)"
+    },
+    {
+      "assignment": "A0103",
+      "dSize": 454,
+      "display": "inline",
+      "length": "23.2",
+      "opacity": "0.76",
+      "points": "35",
+      "source": "osrm",
+      "stroke": "rgba(155, 232, 241, 0.78)"
+    },
+    {
+      "assignment": "A0104",
+      "dSize": 519,
+      "display": "inline",
+      "length": "18.1",
+      "opacity": "0.76",
+      "points": "40",
+      "source": "osrm",
+      "stroke": "rgba(155, 232, 241, 0.78)"
+    },
+    {
+      "assignment": "A0105",
+      "dSize": 324,
+      "display": "inline",
+      "length": "13.8",
+      "opacity": "0.76",
+      "points": "25",
+      "source": "osrm",
+      "stroke": "rgba(155, 232, 241, 0.78)"
+    }
+  ],
+  "routeSvgOpacity": "1",
+  "runtime": "00:00:10",
+  "status": "当前样本派单完成",
+  "svgRoutes": 5,
+  "tileCount": 15,
+  "visibleOverviewRoutes": 5,
+  "visiblePins": 18
+}

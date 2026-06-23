@@ -29,6 +29,7 @@ except ImportError:  # The demo can still run before optional synthetic cases ar
 
 DATA_DIR = ROOT / "data" / "official_cases"
 GENERATED_CASE_DIR = ROOT / "web_agent_demo" / "generated_cases"
+STATIC_DIR = ROOT / "web_agent_demo" / "static"
 CASE_FILES = {
     "large_seed301": DATA_DIR / "large_seed301.txt",
 }
@@ -995,6 +996,7 @@ def render_index() -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AutoSolver Agent - Real-time Dispatch Assignment Optimization</title>
+  <link rel="stylesheet" href="/assets/leaflet/leaflet.css?v=1.9.4-local">
   <style>
     :root {
       --bg: #020911;
@@ -1259,6 +1261,63 @@ def render_index() -> str:
     }
     .map-frame.topology .map-bg { opacity: .95; filter: saturate(.76) contrast(1.05) brightness(.86); }
     .map-frame.topology .pin { display: block; }
+    .tile-map { position: absolute; inset: 0; z-index: 0; overflow: hidden; background: #07121b; }
+    .tile-map img { position: absolute; display: block; border: 0; filter: saturate(.68) contrast(1.08) brightness(.72); background: #08131d; }
+    .tile-map::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 32% 36%, rgba(34, 211, 238, .12), transparent 24%),
+        radial-gradient(circle at 72% 64%, rgba(251, 191, 36, .08), transparent 22%),
+        linear-gradient(180deg, rgba(3, 8, 15, .12), rgba(3, 8, 15, .36));
+    }
+    .tile-map .tile-credit {
+      position: absolute;
+      right: 10px;
+      bottom: 8px;
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: rgba(190, 203, 214, .58);
+      background: rgba(4, 12, 20, .64);
+      border: 1px solid rgba(148, 163, 184, .12);
+      font-size: 10px;
+      letter-spacing: .04em;
+    }
+    .map-frame.tile-ready .map-bg { opacity: .12; mix-blend-mode: screen; pointer-events: none; }
+    .real-map { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .35s ease; background: #07121b; }
+    .map-frame.leaflet-ready .real-map { opacity: 1; }
+    .map-frame.leaflet-ready .map-bg { opacity: .16; mix-blend-mode: screen; pointer-events: none; }
+    .map-frame.leaflet-ready .route-svg,
+    .map-frame.leaflet-ready .map-entities { opacity: 1; pointer-events: auto; }
+    .real-map .leaflet-control-attribution { display: none; }
+    .real-map .leaflet-tile { filter: saturate(.68) contrast(1.08) brightness(.72); }
+    .leaflet-dispatch-marker {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font: 900 12px/1 "SFMono-Regular", monospace;
+      box-shadow: 0 0 0 3px rgba(0,0,0,.28), 0 0 14px rgba(0,0,0,.38);
+    }
+    .leaflet-dispatch-marker.merchant { color: #1b1304; background: #f6b64b; border: 1px solid rgba(255,236,166,.72); }
+    .leaflet-dispatch-marker.courier { color: #bff8ff; background: #062d35; border: 1px solid rgba(155,232,241,.82); }
+    .leaflet-dispatch-marker.active { box-shadow: 0 0 0 5px rgba(37,234,216,.18), 0 0 20px rgba(37,234,216,.34); }
+    .leaflet-dispatch-route { stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgba(103,232,249,.18)); cursor: pointer; }
+    .leaflet-dispatch-route.long { stroke-dasharray: 7 8; filter: none; opacity: .48; }
+    .leaflet-dispatch-route.active { filter: drop-shadow(0 0 8px rgba(103,232,249,.34)); }
+    .leaflet-route-arrow {
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 9px solid rgba(155, 232, 241, .9);
+      filter: drop-shadow(0 0 4px rgba(103,232,249,.4));
+    }
+    .map-frame.hide-dispatch-routes .leaflet-dispatch-route { display: none; }
+    .map-frame.hide-entities .leaflet-dispatch-marker { opacity: .14; pointer-events: none; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .74; z-index: 1; }
     .route-svg { z-index: 2; pointer-events: auto; }
@@ -1679,6 +1738,8 @@ def render_index() -> str:
           <button class="scene-button" data-case="low_willingness_seed501"><strong>雨天低接单意愿</strong><span>低意愿搜索 · 无人接单风险</span></button>
         </div>
         <div class="map-frame">
+          <div id="tile-map" class="tile-map" aria-label="open source raster street map"></div>
+          <div id="real-map" class="real-map" aria-label="open source street map"></div>
           <svg class="map-bg" viewBox="0 0 980 640" preserveAspectRatio="none" aria-hidden="true" data-map-style="anonymous-navigation-layer">
             <g id="simulated-map-layer"></g>
           </svg>
@@ -1741,6 +1802,7 @@ def render_index() -> str:
       </section>
     </section>
   </main>
+  <script src="/assets/leaflet/leaflet.js?v=1.9.4-local" onload="window.__leafletAssetLoaded=true" onerror="window.__leafletAssetError=true"></script>
   <script>
     const $ = (id) => document.getElementById(id);
     let currentRun = null;
@@ -1753,6 +1815,13 @@ def render_index() -> str:
     let simulationSampleLoadPromise = null;
     const simulationSampleIndex = {};
     let simulationRefreshNonce = 0;
+    let leafletMap = null;
+    let leafletMarkerLayer = null;
+    let leafletRouteLayer = null;
+    let leafletRouteVersion = 0;
+    let dispatchRouteVersion = 0;
+    const leafletRouteCache = {};
+    const leafletBounds = {latMin: 31.204, latMax: 31.252, lngMin: 121.418, lngMax: 121.506};
     const dynamicProfiles = {};
     const sceneProfiles = {
       large_seed301: {
@@ -1841,6 +1910,198 @@ def render_index() -> str:
         '"': "&quot;",
         "'": "&#39;"
       }[char]));
+    }
+    function cssEscapeValue(value) {
+      if (window.CSS && typeof window.CSS.escape === "function") return window.CSS.escape(String(value ?? ""));
+      const slash = String.fromCharCode(92);
+      return String(value ?? "").replaceAll(slash, slash + slash).replaceAll('"', slash + '"');
+    }
+    function pointToLatLng(point) {
+      const x = safeNumber(point && point[0], 50);
+      const y = safeNumber(point && point[1], 50);
+      const lat = leafletBounds.latMax - (Math.max(0, Math.min(100, y)) / 100) * (leafletBounds.latMax - leafletBounds.latMin);
+      const lng = leafletBounds.lngMin + (Math.max(0, Math.min(100, x)) / 100) * (leafletBounds.lngMax - leafletBounds.lngMin);
+      return [lat, lng];
+    }
+    function latLngToPoint(latLng) {
+      const lat = Array.isArray(latLng) ? safeNumber(latLng[0], (leafletBounds.latMin + leafletBounds.latMax) / 2) : safeNumber(latLng && latLng.lat, (leafletBounds.latMin + leafletBounds.latMax) / 2);
+      const lng = Array.isArray(latLng) ? safeNumber(latLng[1], (leafletBounds.lngMin + leafletBounds.lngMax) / 2) : safeNumber(latLng && latLng.lng, (leafletBounds.lngMin + leafletBounds.lngMax) / 2);
+      const x = (lng - leafletBounds.lngMin) / (leafletBounds.lngMax - leafletBounds.lngMin) * 100;
+      const y = (leafletBounds.latMax - lat) / (leafletBounds.latMax - leafletBounds.latMin) * 100;
+      return [Math.max(-12, Math.min(112, x)), Math.max(-12, Math.min(112, y))];
+    }
+    function routeToLatLngs(route) {
+      return (route || []).filter(Boolean).map((point) => pointToLatLng(point));
+    }
+    function tileWorldPoint(lat, lng, zoom) {
+      const scale = 256 * Math.pow(2, zoom);
+      const sinLat = Math.sin(lat * Math.PI / 180);
+      return {
+        x: (lng + 180) / 360 * scale,
+        y: (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale
+      };
+    }
+    function renderRasterTileBasemap() {
+      const frame = document.querySelector(".map-frame");
+      const tileMap = $("tile-map");
+      if (!frame || !tileMap) return;
+      const zoom = 14;
+      const topLeft = tileWorldPoint(leafletBounds.latMax, leafletBounds.lngMin, zoom);
+      const bottomRight = tileWorldPoint(leafletBounds.latMin, leafletBounds.lngMax, zoom);
+      const width = Math.max(1, bottomRight.x - topLeft.x);
+      const height = Math.max(1, bottomRight.y - topLeft.y);
+      const minTileX = Math.floor(topLeft.x / 256);
+      const maxTileX = Math.floor(bottomRight.x / 256);
+      const minTileY = Math.floor(topLeft.y / 256);
+      const maxTileY = Math.floor(bottomRight.y / 256);
+      const subdomains = ["a", "b", "c", "d"];
+      const tiles = [];
+      for (let x = minTileX; x <= maxTileX; x += 1) {
+        for (let y = minTileY; y <= maxTileY; y += 1) {
+          const left = (x * 256 - topLeft.x) / width * 100;
+          const top = (y * 256 - topLeft.y) / height * 100;
+          const tileWidth = 256 / width * 100;
+          const tileHeight = 256 / height * 100;
+          const subdomain = subdomains[Math.abs(x + y) % subdomains.length];
+          tiles.push(`<img alt="" data-tile="${zoom}/${x}/${y}" src="https://${subdomain}.basemaps.cartocdn.com/dark_nolabels/${zoom}/${x}/${y}.png" style="left:${left.toFixed(4)}%;top:${top.toFixed(4)}%;width:${tileWidth.toFixed(4)}%;height:${tileHeight.toFixed(4)}%;">`);
+        }
+      }
+      tileMap.innerHTML = tiles.join("") + `<span class="tile-credit">OSM / CARTO tiles · OSRM routing</span>`;
+      frame.classList.add("tile-ready");
+    }
+    function ensureLeafletMap() {
+      const frame = document.querySelector(".map-frame");
+      const mapNode = $("real-map");
+      if (!frame || !mapNode || !window.L) {
+        if (frame) frame.classList.remove("leaflet-ready");
+        return null;
+      }
+      if (!leafletMap) {
+        leafletMap = L.map(mapNode, {
+          attributionControl: false,
+          zoomControl: false,
+          preferCanvas: true,
+          scrollWheelZoom: false,
+          dragging: false,
+          doubleClickZoom: false,
+          boxZoom: false,
+          keyboard: false,
+        }).setView([(leafletBounds.latMin + leafletBounds.latMax) / 2, (leafletBounds.lngMin + leafletBounds.lngMax) / 2], 13);
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
+          maxZoom: 19,
+          subdomains: "abcd",
+          crossOrigin: true,
+        }).addTo(leafletMap);
+        leafletRouteLayer = L.layerGroup().addTo(leafletMap);
+        leafletMarkerLayer = L.layerGroup().addTo(leafletMap);
+      }
+      window.setTimeout(() => leafletMap.invalidateSize(false), 0);
+      frame.classList.add("leaflet-ready");
+      return leafletMap;
+    }
+    function clearLeafletDispatchMap(removeReady = false) {
+      leafletRouteVersion += 1;
+      if (leafletRouteLayer) leafletRouteLayer.clearLayers();
+      if (leafletMarkerLayer) leafletMarkerLayer.clearLayers();
+      if (removeReady) {
+        const frame = document.querySelector(".map-frame");
+        if (frame) frame.classList.remove("leaflet-ready");
+      }
+    }
+    function osrmRouteKey(start, end) {
+      return [start, end].map((point) => point.map((value) => Number(value).toFixed(5)).join(",")).join(";");
+    }
+    async function fetchOsrmRoute(startLatLng, endLatLng) {
+      const key = osrmRouteKey(startLatLng, endLatLng);
+      if (leafletRouteCache[key]) return leafletRouteCache[key];
+      const coords = `${startLatLng[1]},${startLatLng[0]};${endLatLng[1]},${endLatLng[0]}`;
+      const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`;
+      const promise = fetch(url)
+        .then((res) => res.ok ? res.json() : Promise.reject(new Error("osrm failed")))
+        .then((payload) => {
+          const coordinates = payload && payload.routes && payload.routes[0] && payload.routes[0].geometry && payload.routes[0].geometry.coordinates;
+          return Array.isArray(coordinates) && coordinates.length >= 2 ? coordinates.map((point) => [point[1], point[0]]) : null;
+        })
+        .catch(() => null);
+      leafletRouteCache[key] = promise;
+      return promise;
+    }
+    function leafletMarkerHtml(kind, active) {
+      const markerKind = kind === "merchant_order" || kind === "pickup_cluster" ? "merchant" : "courier";
+      return `<span class="leaflet-dispatch-marker ${markerKind}${active ? " active" : ""}">${markerKind === "merchant" ? "M" : "C"}</span>`;
+    }
+    function renderLeafletDispatchMap(profile, entityPoints) {
+      const map = ensureLeafletMap();
+      if (!map || !profile || !profile.dispatchMap || !Array.isArray(profile.dispatchMap.entities)) return;
+      const version = ++leafletRouteVersion;
+      if (leafletRouteLayer) leafletRouteLayer.clearLayers();
+      if (leafletMarkerLayer) leafletMarkerLayer.clearLayers();
+      const bounds = [];
+      const assignments = (profile && profile.assignments) || {};
+      const focusMode = profile.mapFocusMode === "focus";
+      const selectedAssignment = profile.selected || Object.keys(assignments)[0] || "";
+      profile.dispatchMap.entities.forEach((entity) => {
+        const assignmentId = assignmentForEntity(profile, entity.id);
+        const active = Boolean(focusMode && assignmentId === selectedAssignment);
+        const marker = L.marker(pointToLatLng([entity.x, entity.y]), {
+          icon: L.divIcon({
+            className: "",
+            html: leafletMarkerHtml(entity.kind, active),
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          }),
+          keyboard: false,
+          interactive: true,
+        });
+        marker.on("click", () => {
+          if (profile.assignments && Object.keys(profile.assignments).length) {
+            renderFinalEntityDetail(profile, entity.id);
+          } else {
+            renderEntityPreviewDetail(profile, entity.id);
+          }
+        });
+        marker.addTo(leafletMarkerLayer);
+        bounds.push(pointToLatLng([entity.x, entity.y]));
+      });
+      if (profile.dispatchMap.assignments && Array.isArray(profile.dispatchMap.assignments)) {
+        profile.dispatchMap.assignments.forEach((assignment, index) => {
+          const couriers = assignment.map_couriers || courierTokens(assignment.courier);
+          const courierPoint = entityPoints[couriers[0]];
+          const pickupPoint = entityPoints[assignment.pickup];
+          if (!courierPoint || !pickupPoint) return;
+          const fallbackRoute = roadFollowingRoute(courierPoint, pickupPoint, profile.dispatchMap.map_layers);
+          const longPickup = longRouteClass(courierPoint, pickupPoint, fallbackRoute, {direct: 21, span: 34, length: 44});
+          const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
+          const color = isActive ? "#25ead8" : ["#8deaf2", "#6ee7f0", "#72d7ff", "#9be8f1", "#67f0dc"][index % 5];
+          const options = {
+            color,
+            weight: isActive ? 4.5 : 3.2,
+            opacity: longPickup ? 0.52 : 0.82,
+            dashArray: longPickup ? "7 8" : null,
+            className: `leaflet-dispatch-route${longPickup ? " long" : ""}${isActive ? " active" : ""}`,
+          };
+          const polyline = L.polyline(routeToLatLngs(fallbackRoute), options).addTo(leafletRouteLayer);
+          polyline.on("click", () => renderRouteDetail(profile, assignment.id, {
+            assignment: assignment.id,
+            merchant: assignment.pickup,
+            courier: couriers[0],
+            leg: "courier-to-merchant",
+            "route-points": String(fallbackRoute.length),
+            "route-length": routePolylineLength(fallbackRoute).toFixed(1),
+            "long-leg": longPickup ? "true" : "false",
+          }));
+          bounds.push(...routeToLatLngs(fallbackRoute));
+          const startLatLng = pointToLatLng(courierPoint);
+          const endLatLng = pointToLatLng(pickupPoint);
+          fetchOsrmRoute(startLatLng, endLatLng).then((latLngs) => {
+            if (version !== leafletRouteVersion || !latLngs || latLngs.length < 2) return;
+            polyline.setLatLngs(latLngs);
+          });
+        });
+      }
+      if (bounds.length) {
+        map.fitBounds(bounds, {padding: [36, 36], maxZoom: 14});
+      }
     }
     function assignmentEntries(profile) {
       return Object.entries((profile && profile.assignments) || {});
@@ -2201,6 +2462,7 @@ def render_index() -> str:
       if (entityLayer) entityLayer.innerHTML = "";
       const routeSvg = document.querySelector(".route-svg");
       if (routeSvg) routeSvg.innerHTML = "";
+      clearLeafletDispatchMap(true);
       renderSimulatedBaseMap(null);
       const frame = document.querySelector(".map-frame");
       frame.classList.remove("topology", "focus-selected");
@@ -2693,6 +2955,7 @@ def render_index() -> str:
       frame.classList.toggle("topology", Boolean(profile.dispatchMap));
       frame.classList.toggle("focus-selected", focusMode);
       frame.classList.toggle("assignment-overview", Boolean(hasAssignments && !focusMode));
+      renderRasterTileBasemap();
       renderSimulatedBaseMap(profile.dispatchMap && profile.dispatchMap.map_layers);
       if (hasAssignments && profile.selected && focusMode) {
         frame.dataset.selectedAssignment = profile.selected;
@@ -2749,6 +3012,7 @@ def render_index() -> str:
         entityLayer.appendChild(label);
       });
       renderDispatchLinks(profile, entityPoints);
+      renderLeafletDispatchMap(profile, entityPoints);
       applyMapFocus(profile, profile.selected, profile.mapFocusMode === "focus");
     }
     function svgPoint(point) {
@@ -3094,20 +3358,25 @@ def render_index() -> str:
         .join("");
     }
     function dispatchArrowFor(points, cls, assignmentId = "", active = false, style = "", meta = {}) {
+      const pointsAttr = dispatchArrowPoints(points, cls.includes("primary"));
+      if (!pointsAttr) return "";
+      const styleAttr = style ? ` style="${style}"` : "";
+      return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}" data-route-role="arrow"${routeMetaAttributes(meta)}${styleAttr} points="${pointsAttr}"></polygon>`;
+    }
+    function dispatchArrowPoints(points, primary = false) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
       const [x1, y1] = svgPoint(usable[usable.length - 2]);
       const [x2, y2] = svgPoint(usable[usable.length - 1]);
       const angle = Math.atan2(y2 - y1, x2 - x1);
-      const size = cls.includes("primary") ? 9 : 6;
+      const size = primary ? 9 : 6;
       const tipX = x2;
       const tipY = y2;
       const leftX = tipX - Math.cos(angle - 0.52) * size;
       const leftY = tipY - Math.sin(angle - 0.52) * size;
       const rightX = tipX - Math.cos(angle + 0.52) * size;
       const rightY = tipY - Math.sin(angle + 0.52) * size;
-      const styleAttr = style ? ` style="${style}"` : "";
-      return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}"${routeMetaAttributes(meta)}${styleAttr} points="${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
+      return `${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}`;
     }
     function routeMidpoint(points) {
       const usable = (points || []).filter(Boolean);
@@ -3214,13 +3483,52 @@ def render_index() -> str:
       }).filter((item) => item.id);
       return scored.sort((left, right) => right.score - left.score)[0]?.id || selectedAssignment;
     }
+    function upgradeDispatchRoutesWithOsrm(profile, entityPoints, version) {
+      if (!profile || !profile.dispatchMap || !Array.isArray(profile.dispatchMap.assignments)) return;
+      profile.dispatchMap.assignments.forEach((assignment) => {
+        const couriers = assignment.map_couriers || courierTokens(assignment.courier);
+        const courierPoint = entityPoints[couriers[0]];
+        const pickupPoint = entityPoints[assignment.pickup];
+        if (!courierPoint || !pickupPoint) return;
+        const startLatLng = pointToLatLng(courierPoint);
+        const endLatLng = pointToLatLng(pickupPoint);
+        fetchOsrmRoute(startLatLng, endLatLng).then((latLngs) => {
+          if (version !== dispatchRouteVersion || !latLngs || latLngs.length < 2) return;
+          const routePoints = latLngs.map((latLng) => latLngToPoint(latLng));
+          const d = dispatchPathFor(routePoints);
+          if (!d) return;
+          const escapedId = cssEscapeValue(assignment.id);
+          const mainPath = document.querySelector(`.dispatch-link.pickup-leg[data-assignment="${escapedId}"]`);
+          const hitPath = document.querySelector(`.dispatch-hit-area.pickup-leg[data-assignment="${escapedId}"]`);
+          const arrow = document.querySelector(`.dispatch-arrow[data-assignment="${escapedId}"][data-route-role="arrow"]`);
+          if (mainPath) {
+            mainPath.setAttribute("d", d);
+            mainPath.dataset.routeSource = "osrm";
+            mainPath.dataset.routePoints = String(routePoints.length);
+            mainPath.dataset.routeLength = routePolylineLength(routePoints).toFixed(1);
+          }
+          if (hitPath) {
+            hitPath.setAttribute("d", d);
+            hitPath.dataset.routeSource = "osrm";
+            hitPath.dataset.routePoints = String(routePoints.length);
+            hitPath.dataset.routeLength = routePolylineLength(routePoints).toFixed(1);
+          }
+          if (arrow) {
+            const pointsAttr = dispatchArrowPoints(routePoints, arrow.classList.contains("primary"));
+            if (pointsAttr) arrow.setAttribute("points", pointsAttr);
+          }
+        });
+      });
+    }
     function renderDispatchLinks(profile, entityPoints) {
       const svg = document.querySelector(".route-svg");
       if (!svg) return;
       if (!profile.dispatchMap || !Array.isArray(profile.dispatchMap.assignments)) {
         svg.innerHTML = "";
+        dispatchRouteVersion += 1;
         return;
       }
+      const routeVersion = ++dispatchRouteVersion;
       const focusMode = profile.mapFocusMode === "focus";
       const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
@@ -3251,7 +3559,7 @@ def render_index() -> str:
         const arrowCls = isActive ? "primary" : "secondary overview-route";
         const routeParts = [
           dispatchEndpointConnectorsFor(pickupRoute, assignment.id, pickupMeta),
-          `<path class="${pickupClass}" data-assignment="${assignment.id}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
+          `<path class="${pickupClass}" data-assignment="${assignment.id}" data-route-role="main"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
           dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
           dispatchArrowFor(pickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
         ];
@@ -3259,6 +3567,7 @@ def render_index() -> str:
       }).join("");
       const bundleOverlay = focusMode ? renderReferenceRouteBundle(profile.dispatchMap.assignments, entityPoints, mapLayers, overviewAssignmentId) : "";
       svg.innerHTML = pathHtml + bundleOverlay;
+      upgradeDispatchRoutesWithOsrm(profile, entityPoints, routeVersion);
     }
     function applyMapFocus(profile, assignmentId, focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
@@ -4090,13 +4399,19 @@ def render_index() -> str:
             document.querySelector(".map-frame").classList.remove("locating");
             $("zoom-in").classList.remove("active");
             const profile = currentProfile || profileForCase(selectedCase());
-            if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
+            if (profile.assignments && Object.keys(profile.assignments).length) {
+              applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
+              updateMapScene(profile);
+            } else if (leafletMap) {
+              leafletMap.setView([(leafletBounds.latMin + leafletBounds.latMax) / 2, (leafletBounds.lngMin + leafletBounds.lngMax) / 2], 13);
+            }
             showToast("视图已适配全部派单关系");
             return;
           }
           if (action === "fullscreen") {
             const expanded = document.querySelector(".map-panel").classList.toggle("active");
             button.textContent = expanded ? "↙" : "↗";
+            if (leafletMap) window.setTimeout(() => leafletMap.invalidateSize(false), 120);
             showToast(expanded ? "演示视图已进入地图聚焦模式" : "演示视图已退出地图聚焦模式");
             return;
           }
@@ -4105,18 +4420,23 @@ def render_index() -> str:
       });
       $("zoom-in").addEventListener("click", () => {
         document.querySelector(".map-frame").classList.add("zoomed");
+        if (leafletMap) leafletMap.zoomIn(1);
         $("zoom-in").classList.add("active");
         showToast("地图已放大");
       });
       $("zoom-out").addEventListener("click", () => {
         document.querySelector(".map-frame").classList.remove("zoomed");
+        if (leafletMap) leafletMap.zoomOut(1);
         $("zoom-in").classList.remove("active");
         showToast("地图已缩小");
       });
       $("recenter").addEventListener("click", () => {
         document.querySelector(".map-frame").classList.add("locating");
         const profile = currentProfile || profileForCase(selectedCase());
-        if (profile.assignments && Object.keys(profile.assignments).length) applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
+        if (profile.assignments && Object.keys(profile.assignments).length) {
+          applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
+          updateMapScene(profile);
+        }
         showToast("已回到当前派单关系中心");
       });
       document.querySelector(".map-frame").addEventListener("click", (event) => {
@@ -4166,6 +4486,7 @@ def render_index() -> str:
     document.querySelectorAll(".scene-button").forEach((button) => {
       button.addEventListener("click", () => applyScene(button.dataset.case, "button"));
     });
+    renderRasterTileBasemap();
     bindMapControls();
     loadCases();
   </script>
@@ -4191,9 +4512,31 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
+    def _send_static_asset(self, path: str) -> bool:
+        allowed = {
+            "/assets/leaflet/leaflet.js": ("application/javascript; charset=utf-8", STATIC_DIR / "leaflet" / "leaflet.js"),
+            "/assets/leaflet/leaflet.css": ("text/css; charset=utf-8", STATIC_DIR / "leaflet" / "leaflet.css"),
+        }
+        asset = allowed.get(path)
+        if not asset:
+            return False
+        content_type, asset_path = asset
+        if not asset_path.exists():
+            return False
+        raw = asset_path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Cache-Control", "public, max-age=3600")
+        self.send_header("Content-Length", str(len(raw)))
+        self.end_headers()
+        self.wfile.write(raw)
+        return True
+
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API.
         parsed = urlparse(self.path)
         try:
+            if parsed.path.startswith("/assets/") and self._send_static_asset(parsed.path):
+                return
             if parsed.path == "/":
                 self._send_html(render_index())
                 return

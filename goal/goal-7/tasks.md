@@ -153,3 +153,18 @@
 - 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+
+## Task 10: 接入开源地图与真实道路 routing
+
+验证标准：地图不再依赖自绘 SVG 线稿作为主视觉，而是接入成熟开源地图渲染；最终派单线默认全部显示，并优先沿真实道路 routing 绘制，不再出现明显横穿楼宇/道路的直线。若外部 routing 临时失败，必须有可用 fallback，不影响页面运行和按钮交互。
+
+完成记录：
+- 已按用户要求搜索/选型开源地图方案，采用 Carto/OpenStreetMap 暗色瓦片作为主底图，OSRM public route service 作为道路 routing 来源；Leaflet 本地资源保留为可选增强，但不再阻塞主业务脚本。
+- 已新增 `tile-map` 瓦片层和 Web Mercator 瓦片定位逻辑，页面初始未刷新/未推理时也会显示真实地图底图，不再是空白或纯 SVG 假地图。
+- 已新增 OSRM 派单线升级逻辑：运行完成后先显示本地道路 fallback，随后异步把每个商家-骑手派单关系替换为 OSRM 道路路径；有版本号保护，刷新/切场景不会被旧请求覆盖。
+- 已修复 Leaflet-ready 隐藏业务层的问题：真实地图只作为底图，商家、骑手、全部派单线始终由业务 SVG 层显示在上方，最终态不需要点击才显示线路。
+- 浏览器最终审计通过：`runtime=00:00:10`、`tileCount=15`、`loadedTileCount=15`、`merchantPins=5`、`courierPins=13`、`svgRoutes=5`、`visibleOverviewRoutes=5`、`osrmRoutes=5`、`routeSvgOpacity=1`、`entityLayerOpacity=1`。
+- 截图与审计产物：`goal/goal-7/task10-open-map-routing-final.png`、`goal/goal-7/task10-open-map-routing-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。

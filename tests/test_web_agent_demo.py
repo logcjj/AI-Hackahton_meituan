@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import unittest
 from types import SimpleNamespace
 from unittest import mock
@@ -11,6 +12,9 @@ class WebAgentDemoTest(unittest.TestCase):
         from web_agent_demo.server import render_index
 
         html = render_index()
+        asset_root = Path(__file__).resolve().parents[1] / "web_agent_demo" / "static" / "leaflet"
+        self.assertTrue((asset_root / "leaflet.js").exists())
+        self.assertTrue((asset_root / "leaflet.css").exists())
 
         self.assertIn("AutoSolver Agent", html)
         self.assertIn("Real-time Dispatch Assignment Optimization", html)
@@ -92,17 +96,26 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("派单关系", html)
         self.assertIn("长距离低噪", html)
         self.assertIn("骑手位置", html)
-        for external_map_dependency in [
-            "leaflet.css",
-            "leaflet.js",
-            "id=\"real-map\"",
-            "basemaps.cartocdn.com",
-            "unpkg.com/leaflet",
-            "pointToLatLng",
-            "renderLeafletDispatchMap",
-            "ensureLeafletMap",
-        ]:
-            self.assertNotIn(external_map_dependency, html)
+        self.assertIn("leaflet.css", html)
+        self.assertIn("leaflet.js", html)
+        self.assertIn("id=\"tile-map\"", html)
+        self.assertIn("id=\"real-map\"", html)
+        self.assertIn("basemaps.cartocdn.com", html)
+        self.assertIn("renderRasterTileBasemap", html)
+        self.assertIn("tileWorldPoint", html)
+        self.assertIn("/assets/leaflet/leaflet.js", html)
+        self.assertIn("/assets/leaflet/leaflet.css", html)
+        self.assertNotIn("unpkg.com/leaflet", html)
+        self.assertIn("router.project-osrm.org", html)
+        self.assertIn("pointToLatLng", html)
+        self.assertIn("latLngToPoint", html)
+        self.assertIn("upgradeDispatchRoutesWithOsrm", html)
+        self.assertIn("renderLeafletDispatchMap", html)
+        self.assertIn("ensureLeafletMap", html)
+        self.assertIn("fetchOsrmRoute", html)
+        self.assertIn("leaflet-ready", html)
+        self.assertIn("leaflet-dispatch-route", html)
+        self.assertIn("data-route-role=\"main\"", html)
         self.assertIn("map-entities", html)
         self.assertIn("pickup-leg", html)
         self.assertIn("dispatchArrowFor", html)
