@@ -99,8 +99,8 @@ def _clamp_point(x: float, y: float) -> tuple[float, float]:
 
 
 _DISPATCH_ROADS = [
-    # Normalized from the reference dark-map crop so route snapping follows
-    # the same visual corridors as the basemap instead of a separate line set.
+    # Stable simulated delivery map: ring roads, arterials, feeders and service
+    # alleys are predeclared so anchors and final dispatch lines share one graph.
     ((21.0, 66.0), (26.0, 55.0), (31.0, 45.0), (43.0, 36.0), (55.0, 22.0), (64.0, 24.0), (70.0, 33.0), (67.0, 45.0), (59.0, 50.0), (55.0, 61.0), (47.0, 69.0), (34.0, 67.0), (24.0, 61.0)),
     ((6.0, 36.0), (24.0, 35.0), (42.0, 35.0), (60.0, 31.0), (79.0, 27.0), (96.0, 19.0)),
     ((4.0, 60.0), (22.0, 56.0), (39.0, 53.0), (58.0, 52.0), (77.0, 55.0), (96.0, 63.0)),
@@ -115,6 +115,37 @@ _DISPATCH_ROADS = [
     ((55.0, 8.0), (56.0, 22.0), (54.0, 37.0), (50.0, 52.0), (47.0, 73.0)),
     ((65.0, 18.0), (58.0, 27.0), (50.0, 36.0), (41.0, 44.0), (31.0, 52.0), (22.0, 64.0)),
     ((24.0, 74.0), (35.0, 69.0), (48.0, 66.0), (63.0, 67.0), (82.0, 73.0)),
+    ((12.0, 22.0), (28.0, 28.0), (44.0, 32.0), (62.0, 34.0), (83.0, 36.0)),
+    ((10.0, 45.0), (26.0, 45.0), (45.0, 47.0), (64.0, 50.0), (86.0, 52.0)),
+    ((14.0, 78.0), (30.0, 75.0), (50.0, 74.0), (70.0, 76.0), (90.0, 82.0)),
+    ((18.0, 14.0), (22.0, 34.0), (24.0, 56.0), (28.0, 76.0)),
+    ((35.0, 18.0), (37.0, 44.0), (42.0, 63.0), (45.0, 86.0)),
+    ((48.0, 12.0), (49.0, 30.0), (49.0, 50.5), (48.5, 70.0)),
+    ((62.0, 14.0), (64.0, 33.0), (67.5, 48.0), (67.5, 68.0), (70.0, 84.0)),
+    ((78.0, 18.0), (80.0, 36.0), (78.0, 55.0), (82.0, 72.0), (88.0, 90.0)),
+    ((30.0, 40.0), (48.5, 41.5), (65.5, 36.0), (83.0, 52.0)),
+    ((34.5, 73.0), (46.0, 55.5), (52.0, 43.5), (59.0, 30.5), (72.0, 39.0)),
+    ((41.5, 52.0), (55.5, 52.0), (61.5, 56.0), (72.5, 47.0), (87.0, 39.0)),
+    ((50.0, 35.5), (55.0, 39.0), (58.0, 48.0), (72.0, 70.0)),
+    ((16.0, 52.0), (24.0, 56.0), (37.0, 44.0), (45.0, 47.0), (57.0, 45.0)),
+    ((23.0, 64.0), (28.0, 67.0), (34.5, 73.0), (42.0, 63.0)),
+    ((52.0, 31.0), (53.5, 27.5), (59.0, 30.5), (65.5, 36.0), (75.0, 43.0)),
+    ((55.0, 22.0), (52.0, 26.0), (50.0, 35.5), (52.0, 43.5), (55.5, 52.0), (58.0, 60.0)),
+    ((21.0, 66.0), (27.0, 77.0), (45.0, 86.0), (59.0, 82.0), (86.0, 81.0)),
+    ((70.0, 12.0), (80.0, 25.0), (87.0, 39.0), (83.0, 52.0), (77.0, 55.0)),
+    ((31.0, 30.0), (43.0, 36.0), (47.0, 45.0), (57.0, 45.0), (67.0, 45.0)),
+    ((39.0, 53.0), (42.0, 63.0), (47.0, 69.0), (58.0, 60.0), (64.0, 61.0)),
+    ((24.0, 35.0), (37.0, 44.0), (49.0, 50.5), (58.0, 52.0), (75.0, 43.0)),
+    ((60.0, 31.0), (64.0, 33.0), (70.0, 39.0), (72.5, 47.0), (77.0, 64.0)),
+    ((28.0, 67.0), (41.5, 52.0), (55.0, 39.0), (64.0, 33.0), (75.0, 35.0)),
+    ((45.0, 47.0), (49.0, 50.5), (55.5, 52.0), (61.5, 56.0), (67.5, 68.0)),
+    ((53.5, 27.5), (58.0, 48.0), (64.0, 61.0), (82.0, 72.0)),
+    ((42.0, 35.0), (48.5, 41.5), (52.0, 43.5), (58.0, 48.0), (72.0, 70.0)),
+    ((67.0, 45.0), (75.0, 43.0), (78.0, 55.0), (82.0, 72.0)),
+    ((24.0, 35.0), (31.0, 30.0), (36.0, 29.0), (40.0, 23.0), (46.0, 18.0)),
+    ((59.0, 82.0), (67.5, 68.0), (72.0, 70.0), (77.0, 64.0), (90.0, 77.0)),
+    ((43.0, 36.0), (50.0, 36.0), (56.0, 37.0), (63.0, 33.0), (70.0, 33.0)),
+    ((39.0, 53.0), (46.0, 55.5), (50.0, 52.0), (55.5, 52.0), (61.5, 56.0)),
 ]
 
 
@@ -365,17 +396,40 @@ def _nearest_dispatch_road_id(point: tuple[float, float]) -> str:
     return f"R{best_index + 1:02d}"
 
 
+def _push_merchant_anchor_off_road(point: tuple[float, float], anchor_id: str) -> tuple[float, float]:
+    x, y = point
+    for attempt in range(14):
+        nearest = _nearest_dispatch_road_projection((x, y))
+        if float(nearest["distance"]) >= 1.42:
+            break
+        projected = nearest["projected"]
+        segment = nearest["segment"]
+        px, py = projected
+        (sx, sy), (ex, ey) = segment
+        dx = ex - sx
+        dy = ey - sy
+        length = math.hypot(dx, dy) or 1.0
+        target_curb = 2.15 + attempt * 0.28
+        preferred_side = -1.0 if _unit_hash(anchor_id, attempt, salt="merchant-anchor-side") < 0.5 else 1.0
+        candidates = []
+        for side in (preferred_side, -preferred_side):
+            candidate = _clamp_point(px + side * (-dy / length) * target_curb, py + side * (dx / length) * target_curb)
+            candidates.append((candidate, _distance_to_dispatch_road(candidate)))
+        x, y = max(candidates, key=lambda item: item[1])[0]
+    return x, y
+
+
 _MERCHANT_ANCHOR_BLUEPRINTS = [
     {"id": "MA-CBD-01", "point": (48.5, 41.5), "zone": "central_foodcourt", "tags": ["dense_commerce", "clustered", "rain_clustered", "event_clustered", "night_commerce"]},
     {"id": "MA-CBD-02", "point": (52.0, 43.5), "zone": "central_foodcourt", "tags": ["dense_commerce", "clustered", "rain_clustered", "event_clustered", "night_commerce"]},
     {"id": "MA-CBD-03", "point": (55.0, 39.0), "zone": "central_mall_edge", "tags": ["dense_commerce", "clustered", "event_mixed", "night_commerce"]},
-    {"id": "MA-CBD-04", "point": (45.0, 47.0), "zone": "central_mall_edge", "tags": ["dense_commerce", "clustered", "medium_parallel", "campus_lunch"]},
-    {"id": "MA-CBD-05", "point": (58.0, 48.0), "zone": "office_food_street", "tags": ["dense_commerce", "medium_parallel", "event_mixed", "medical_office_peak"]},
-    {"id": "MA-CBD-06", "point": (50.0, 35.5), "zone": "office_food_street", "tags": ["dense_commerce", "medium_parallel", "rain_clustered"]},
+    {"id": "MA-CBD-04", "point": (45.0, 47.0), "zone": "central_mall_edge", "tags": ["dense_commerce", "medium_parallel", "campus_lunch"]},
+    {"id": "MA-CBD-05", "point": (58.0, 48.0), "zone": "office_food_street", "tags": ["dense_commerce", "clustered", "medium_parallel", "event_mixed", "medical_office_peak"]},
+    {"id": "MA-CBD-06", "point": (50.0, 35.5), "zone": "office_food_street", "tags": ["dense_commerce", "clustered", "medium_parallel", "rain_clustered"]},
     {"id": "MA-RAIN-01", "point": (49.0, 50.5), "zone": "rain_sheltered_block", "tags": ["low_willingness", "rain_clustered", "medium_parallel"]},
     {"id": "MA-RAIN-02", "point": (55.5, 52.0), "zone": "rain_sheltered_block", "tags": ["low_willingness", "rain_clustered", "event_clustered"]},
     {"id": "MA-RAIN-03", "point": (46.0, 55.5), "zone": "rain_sheltered_block", "tags": ["low_willingness", "rain_clustered"]},
-    {"id": "MA-MID-01", "point": (37.0, 44.0), "zone": "midtown_restaurant", "tags": ["medium_parallel", "balanced", "clustered", "campus_lunch"]},
+    {"id": "MA-MID-01", "point": (37.0, 44.0), "zone": "midtown_restaurant", "tags": ["medium_parallel", "balanced", "campus_lunch"]},
     {"id": "MA-MID-02", "point": (41.5, 52.0), "zone": "midtown_restaurant", "tags": ["medium_parallel", "balanced", "spread", "campus_lunch"]},
     {"id": "MA-MID-03", "point": (61.5, 56.0), "zone": "midtown_restaurant", "tags": ["medium_parallel", "balanced", "event_mixed", "medical_office_peak"]},
     {"id": "MA-SPR-01", "point": (28.0, 67.0), "zone": "residential_edge", "tags": ["offpeak_balanced", "spread", "scarce_spread"]},
@@ -433,19 +487,7 @@ def _materialize_anchor(blueprint: dict[str, object], role: str) -> dict[str, ob
         raw_point = tuple(raw_point)  # type: ignore[arg-type]
     if role == "merchant":
         x, y = _snap_to_dispatch_road(raw_point, str(blueprint["id"]), 0.75, min_curb=3.1)
-        for _ in range(8):
-            nearest = _nearest_dispatch_road_projection((x, y))
-            if float(nearest["distance"]) >= 1.35:
-                break
-            projected = nearest["projected"]
-            segment = nearest["segment"]
-            px, py = projected
-            (sx, sy), (ex, ey) = segment
-            dx = ex - sx
-            dy = ey - sy
-            length = math.hypot(dx, dy) or 1.0
-            side = -1.0 if _unit_hash(blueprint["id"], salt="merchant-anchor-side") < 0.5 else 1.0
-            x, y = _clamp_point(px + side * (-dy / length) * 1.85, py + side * (dx / length) * 1.85)
+        x, y = _push_merchant_anchor_off_road((x, y), str(blueprint["id"]))
     else:
         x, y = _snap_to_dispatch_road(raw_point, str(blueprint["id"]), 0.22, min_curb=0.03)
     point = (x, y)
@@ -563,7 +605,7 @@ def list_simulated_scenarios() -> list[dict[str, object]]:
             "scene_type": str(config["scene_type"]),
             "sample_count": 10,
             "primary_strategies": sorted(set(config["strategy_cycle"])),
-            "map_style": "baidu_like_simulated",
+            "map_style": "meituan_delivery_project_map_v3",
             "hide_road_names": True,
             "description": str(config["description"]),
         }
@@ -698,11 +740,60 @@ def _strategy_score_model(
     }
 
 
+def _delivery_project_map_traces(config: dict[str, object], sample_key: object) -> list[dict[str, object]]:
+    """Dense non-routing basemap traces inspired by the delivery-routes map layer."""
+
+    traces: list[dict[str, object]] = []
+    trace_index = 0
+
+    for row in range(11):
+        y = 7.0 + row * 8.2 + (_unit_hash(config["id"], sample_key, row, salt="trace-row-y") - 0.5) * 3.4
+        x_start = 1.5 + (_unit_hash(config["id"], sample_key, row, salt="trace-row-start") - 0.5) * 4.2
+        points = []
+        for column in range(7):
+            x = x_start + column * 16.3
+            bend = (_unit_hash(config["id"], sample_key, row, column, salt="trace-row-bend") - 0.5) * 4.8
+            points.append(_clamp_point(x, y + bend))
+        trace_index += 1
+        traces.append({"id": f"MT{trace_index:02d}", "class": "collector", "points": [{"x": round(x, 1), "y": round(y, 1)} for x, y in points]})
+
+    for column in range(12):
+        x = 4.0 + column * 8.4 + (_unit_hash(config["id"], sample_key, column, salt="trace-col-x") - 0.5) * 2.8
+        y_start = 4.0 + (_unit_hash(config["id"], sample_key, column, salt="trace-col-start") - 0.5) * 4.0
+        points = []
+        for row in range(6):
+            y = y_start + row * 17.5
+            bend = (_unit_hash(config["id"], sample_key, column, row, salt="trace-col-bend") - 0.5) * 3.8
+            points.append(_clamp_point(x + bend, y))
+        trace_index += 1
+        traces.append({"id": f"MT{trace_index:02d}", "class": "local", "points": [{"x": round(x, 1), "y": round(y, 1)} for x, y in points]})
+
+    diagonal_templates = [
+        ((4.0, 78.0), (22.0, 58.0), (44.0, 41.0), (68.0, 26.0), (96.0, 15.0)),
+        ((6.0, 24.0), (29.0, 38.0), (49.0, 48.0), (70.0, 62.0), (94.0, 82.0)),
+        ((14.0, 92.0), (31.0, 72.0), (53.0, 56.0), (77.0, 38.0), (97.0, 22.0)),
+        ((10.0, 12.0), (28.0, 24.0), (48.0, 36.0), (72.0, 50.0), (96.0, 67.0)),
+        ((2.0, 48.0), (20.0, 43.0), (41.0, 50.0), (63.0, 47.0), (90.0, 57.0)),
+        ((20.0, 6.0), (28.0, 26.0), (41.0, 45.0), (48.0, 64.0), (52.0, 91.0)),
+    ]
+    for index, template in enumerate(diagonal_templates):
+        jittered = []
+        for point_index, point in enumerate(template):
+            x = point[0] + (_unit_hash(config["id"], sample_key, index, point_index, salt="trace-diag-x") - 0.5) * 2.2
+            y = point[1] + (_unit_hash(config["id"], sample_key, index, point_index, salt="trace-diag-y") - 0.5) * 2.2
+            jittered.append(_clamp_point(x, y))
+        trace_index += 1
+        traces.append({"id": f"MT{trace_index:02d}", "class": "ring", "points": [{"x": round(x, 1), "y": round(y, 1)} for x, y in jittered]})
+
+    return traces
+
+
 def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_seed: str | None = None) -> dict[str, object]:
     sample_key = variant_seed or sample_index
     traffic_bias = float(config["traffic_bias"])
     density_profile = str(config.get("density_profile", "balanced"))
     weather = str(config.get("weather", "clear"))
+    base_map_traces = _delivery_project_map_traces(config, sample_key)
     roads = []
     for index, road in enumerate(_DISPATCH_ROADS):
         traffic_level = max(0.12, min(0.94, traffic_bias + (_unit_hash(config["id"], sample_key, index, salt="traffic") - 0.5) * 0.32))
@@ -719,43 +810,6 @@ def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_
                 "width": 8.8 if road_type == "arterial" else 4.9 if road_type == "secondary" else 2.6,
                 "name_visible": False,
                 "points": [{"x": point[0], "y": point[1]} for point in road],
-            }
-        )
-    for index in range(30):
-        row = index // 10
-        column = index % 10
-        orientation = "east_west" if index % 2 == 0 else "north_south"
-        if orientation == "east_west":
-            y = 13.0 + row * 24.0 + (_unit_hash(config["id"], sample_key, index, salt="local-y") - 0.5) * 8.0
-            x1 = 4.0 + column * 1.8 + (_unit_hash(config["id"], sample_key, index, salt="local-x1") - 0.5) * 3.0
-            x2 = 35.0 + column * 6.4 + (_unit_hash(config["id"], sample_key, index, salt="local-x2") - 0.5) * 9.0
-            road_points = [
-                _clamp_point(x1, y),
-                _clamp_point((x1 + x2) / 2, y + (_unit_hash(config["id"], sample_key, index, salt="local-bend") - 0.5) * 6.0),
-                _clamp_point(x2, y + (_unit_hash(config["id"], sample_key, index, salt="local-end") - 0.5) * 4.0),
-            ]
-        else:
-            x = 10.0 + column * 8.2 + (_unit_hash(config["id"], sample_key, index, salt="local-x") - 0.5) * 5.4
-            y1 = 6.0 + row * 15.0 + (_unit_hash(config["id"], sample_key, index, salt="local-y1") - 0.5) * 4.0
-            y2 = 54.0 + row * 9.0 + (_unit_hash(config["id"], sample_key, index, salt="local-y2") - 0.5) * 6.5
-            road_points = [
-                _clamp_point(x, y1),
-                _clamp_point(x + (_unit_hash(config["id"], sample_key, index, salt="local-bend") - 0.5) * 5.0, (y1 + y2) / 2),
-                _clamp_point(x + (_unit_hash(config["id"], sample_key, index, salt="local-end") - 0.5) * 4.0, y2),
-            ]
-        traffic_level = max(0.1, min(0.78, traffic_bias * 0.72 + (_unit_hash(config["id"], sample_key, index, salt="local-traffic") - 0.5) * 0.22))
-        condition = _road_condition(traffic_level)
-        roads.append(
-            {
-                "id": f"L{index + 1:02d}",
-                "type": "service",
-                "corridor": "匿名支路",
-                "traffic": condition,
-                "traffic_label": _traffic_label(condition),
-                "traffic_level": round(traffic_level, 2),
-                "width": 1.6 + _unit_hash(config["id"], index, salt="local-width") * 1.2,
-                "name_visible": False,
-                "points": [{"x": point[0], "y": point[1]} for point in road_points],
             }
         )
     districts = []
@@ -847,12 +901,16 @@ def _simulated_map_layers(config: dict[str, object], sample_index: int, variant_
         if len(intersections) >= 10:
             break
     return {
-        "style": "baidu_like_simulated",
+        "style": "meituan_delivery_project_map_v3",
         "canvas": {"width": 980, "height": 640},
+        "map_provider": "delivery_routes_clone_meituan_grid",
+        "road_graph": "delivery_routes_project_road_graph_v3",
+        "layer_schema": "delivery_routes_optimization_maplibre_clone",
         "hide_road_names": True,
         "road_name_labels": [],
-        "layers": ["district_blocks", "building_blocks", "arterial_roads", "secondary_roads", "service_roads", "traffic_overlay", "commerce_hotspots", "signal_intersections"],
+        "layers": ["delivery_project_trace_map", "delivery_route_source", "candidate_route_layer", "selected_route_layer", "meituan_delivery_grid", "district_blocks", "building_blocks", "arterial_roads", "secondary_roads", "service_roads", "traffic_overlay", "commerce_hotspots", "signal_intersections"],
         "districts": districts,
+        "base_map_traces": base_map_traces,
         "roads": roads,
         "building_blocks": blocks,
         "commerce_hotspots": hotspots,
@@ -1246,7 +1304,7 @@ def render_index() -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AutoSolver Agent - Real-time Dispatch Assignment Optimization</title>
-  <link rel="stylesheet" href="/assets/leaflet/leaflet.css?v=1.9.4-local">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
   <style>
     :root {
       --bg: #020911;
@@ -1449,6 +1507,15 @@ def render_index() -> str:
     .line-key.eval { border-top: 2px dotted var(--blue); }
     .line-key.rej { border-top: 2px dashed #a1a1a1; opacity: .7; }
     .map-frame { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #0a121b; }
+    .semi-real-map {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: #edf3ed;
+      filter: saturate(1.08) contrast(.98) brightness(1.03);
+    }
+    .semi-real-map .maplibregl-ctrl-logo,
+    .semi-real-map .maplibregl-ctrl-attrib { display: none !important; }
     .map-panel.active {
       position: fixed;
       inset: 12px;
@@ -1461,11 +1528,12 @@ def render_index() -> str:
     .map-panel.active .map-frame { min-height: 0; flex: 1; }
     .map-frame.topology {
       background:
-        radial-gradient(circle at 52% 42%, rgba(50, 92, 112, .14), transparent 36%),
-        linear-gradient(90deg, rgba(148,163,184,.016) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(148,163,184,.014) 1px, transparent 1px),
-        linear-gradient(180deg, #08121b 0%, #040a11 100%);
-      background-size: auto, 56px 56px, 56px 56px, auto;
+        radial-gradient(circle at 42% 48%, rgba(255, 218, 56, .12), transparent 30%),
+        radial-gradient(circle at 72% 20%, rgba(110, 196, 83, .12), transparent 34%),
+        linear-gradient(90deg, rgba(148,163,184,.04) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(148,163,184,.035) 1px, transparent 1px),
+        linear-gradient(180deg, #edf3ed 0%, #dfe9e4 100%);
+      background-size: auto, auto, 48px 48px, 48px 48px, auto;
     }
     .map-frame.topology::before {
       content: "";
@@ -1473,74 +1541,29 @@ def render_index() -> str:
       inset: 0;
       z-index: 0;
       background:
-        radial-gradient(circle at 46% 42%, rgba(70, 104, 121, .18), transparent 30%),
-        radial-gradient(circle at 72% 24%, rgba(66, 89, 111, .16), transparent 28%),
-        linear-gradient(180deg, rgba(2, 9, 17, .08), rgba(2, 9, 17, .28));
-      opacity: .92;
+        radial-gradient(circle at 50% 44%, rgba(255, 211, 51, .08), transparent 28%),
+        radial-gradient(circle at 72% 24%, rgba(81, 173, 92, .08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02));
+      opacity: .78;
       pointer-events: none;
     }
-    .map-frame.topology .map-bg { opacity: .95; filter: saturate(.76) contrast(1.05) brightness(.86); }
+    .map-frame.topology .map-bg { opacity: .2; filter: saturate(.9) contrast(1.02) brightness(1.05); }
+    .map-frame.maplibre-ready .map-bg { opacity: .12; mix-blend-mode: multiply; }
+    .map-bg[data-map-style="meituan_delivery_project_map_v3"] .district {
+      fill: rgba(30, 39, 45, .34);
+      stroke: rgba(238, 195, 84, .08);
+    }
+    .map-bg[data-map-style="meituan_delivery_project_map_v3"] .road-core.arterial { stroke: rgba(255, 202, 43, .5); }
+    .map-bg[data-map-style="meituan_delivery_project_map_v3"] .road-core.secondary { stroke: rgba(228, 186, 55, .28); }
+    .map-bg[data-map-style="meituan_delivery_project_map_v3"] .road-core.service { stroke: rgba(132, 151, 157, .16); stroke-dasharray: none; }
+    .map-bg[data-map-style="meituan_delivery_project_map_v3"] .commerce-hotspot {
+      fill: rgba(255, 190, 59, .095);
+      stroke: rgba(255, 194, 70, .2);
+    }
     .map-frame.topology .pin { display: block; }
-    .tile-map { position: absolute; inset: 0; z-index: 0; overflow: hidden; background: #07121b; }
-    .tile-map img { position: absolute; display: block; border: 0; filter: saturate(.68) contrast(1.08) brightness(.72); background: #08131d; }
-    .tile-map::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        radial-gradient(circle at 32% 36%, rgba(34, 211, 238, .12), transparent 24%),
-        radial-gradient(circle at 72% 64%, rgba(251, 191, 36, .08), transparent 22%),
-        linear-gradient(180deg, rgba(3, 8, 15, .12), rgba(3, 8, 15, .36));
-    }
-    .tile-map .tile-credit {
-      position: absolute;
-      right: 10px;
-      bottom: 8px;
-      padding: 4px 7px;
-      border-radius: 999px;
-      color: rgba(190, 203, 214, .58);
-      background: rgba(4, 12, 20, .64);
-      border: 1px solid rgba(148, 163, 184, .12);
-      font-size: 10px;
-      letter-spacing: .04em;
-    }
-    .map-frame.tile-ready .map-bg { opacity: .12; mix-blend-mode: screen; pointer-events: none; }
-    .real-map { position: absolute; inset: 0; z-index: 0; opacity: 0; pointer-events: none; background: #07121b; }
-    .map-frame.leaflet-ready .real-map { opacity: 0; pointer-events: none; }
-    .map-frame.leaflet-ready .map-bg { opacity: .16; mix-blend-mode: screen; pointer-events: none; }
-    .map-frame.leaflet-ready .route-svg,
-    .map-frame.leaflet-ready .map-entities { opacity: 1; pointer-events: auto; }
-    .real-map .leaflet-control-attribution { display: none; }
-    .real-map .leaflet-tile { filter: saturate(.68) contrast(1.08) brightness(.72); }
-    .leaflet-dispatch-marker {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font: 900 12px/1 "SFMono-Regular", monospace;
-      box-shadow: 0 0 0 3px rgba(0,0,0,.28), 0 0 14px rgba(0,0,0,.38);
-    }
-    .leaflet-dispatch-marker.merchant { color: #1b1304; background: #f6b64b; border: 1px solid rgba(255,236,166,.72); }
-    .leaflet-dispatch-marker.courier { color: #bff8ff; background: #062d35; border: 1px solid rgba(155,232,241,.82); }
-    .leaflet-dispatch-marker.active { box-shadow: 0 0 0 5px rgba(37,234,216,.18), 0 0 20px rgba(37,234,216,.34); }
-    .leaflet-dispatch-route { stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgba(103,232,249,.18)); cursor: pointer; }
-    .leaflet-dispatch-route.long { stroke-dasharray: 7 8; filter: none; opacity: .48; }
-    .leaflet-dispatch-route.active { filter: drop-shadow(0 0 8px rgba(103,232,249,.34)); }
-    .leaflet-route-arrow {
-      width: 0;
-      height: 0;
-      border-top: 5px solid transparent;
-      border-bottom: 5px solid transparent;
-      border-left: 9px solid rgba(155, 232, 241, .9);
-      filter: drop-shadow(0 0 4px rgba(103,232,249,.4));
-    }
-    .map-frame.hide-dispatch-routes .leaflet-dispatch-route { display: none; }
-    .map-frame.hide-entities .leaflet-dispatch-marker { opacity: .14; pointer-events: none; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .map-bg { opacity: .74; z-index: 1; }
-    .route-svg { z-index: 2; pointer-events: auto; }
+    .map-bg { opacity: .38; z-index: 1; }
+    .route-svg { z-index: 6; pointer-events: none; }
     .route-bundle-highlight,
     .route-bundle-candidate,
     .route-bundle-arrow { pointer-events: none; }
@@ -1566,7 +1589,7 @@ def render_index() -> str:
     }
     .route-bundle-arrow { fill: rgba(103, 232, 249, .52); opacity: .38; filter: none; }
     .district, .zone-block { fill: rgba(24, 36, 47, .3); stroke: rgba(124, 146, 162, .075); stroke-width: 1; }
-    .water { fill: rgba(11, 24, 35, .62); stroke: rgba(85, 116, 137, .14); }
+    .water { fill: rgba(13, 31, 40, .56); stroke: rgba(85, 116, 137, .14); }
     .building-block {
       fill: rgba(36, 48, 58, .24);
       stroke: rgba(126, 145, 158, .09);
@@ -1588,12 +1611,16 @@ def render_index() -> str:
       stroke-width: 1;
     }
     .intersection-node.busy { stroke: rgba(255, 209, 45, .48); fill: rgba(70, 51, 19, .55); }
-    .road-base, .road-core, .traffic-band, .road-major, .road-minor, .road-service {
+    .map-trace, .road-base, .road-core, .traffic-band, .road-major, .road-minor, .road-service {
       fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
     }
+    .map-trace { stroke: rgba(92, 113, 127, .14); stroke-width: .8; opacity: .78; }
+    .map-trace.collector { stroke: rgba(111, 130, 141, .18); stroke-width: 1.15; }
+    .map-trace.ring { stroke: rgba(132, 145, 149, .16); stroke-width: 1.35; }
+    .map-trace.local { stroke: rgba(74, 93, 108, .13); stroke-width: .72; }
     .road-base { stroke: rgba(0, 4, 9, .48); stroke-width: calc(var(--road-width, 8px) + 2px); }
     .road-base.secondary { stroke: rgba(0, 4, 9, .38); stroke-width: calc(var(--road-width, 6px) + 1.2px); }
     .road-base.service { stroke: rgba(0, 4, 9, .2); stroke-width: calc(var(--road-width, 4px) + .5px); }
@@ -1629,29 +1656,29 @@ def render_index() -> str:
     .dispatch-link.secondary { stroke: rgba(103, 232, 249, .34); stroke-width: 1.45; stroke-dasharray: none; filter: none; opacity: .54; }
     .dispatch-link.overview-route { stroke: rgba(103, 232, 249, .3); stroke-width: 1.45; opacity: .48; filter: none; }
     .dispatch-link.pickup-leg { stroke: rgba(103, 232, 249, .56); stroke-width: 2.1; filter: none; }
-    .dispatch-link.pickup-leg.overview-route { stroke: rgba(103, 232, 249, .42); stroke-width: 1.75; opacity: .58; stroke-dasharray: none; filter: none; }
+    .dispatch-link.pickup-leg.overview-route { stroke: rgba(255, 197, 69, .62); stroke-width: 2.05; opacity: .72; stroke-dasharray: none; filter: drop-shadow(0 0 3px rgba(255,197,69,.12)); }
     .dispatch-link.endpoint-connector { stroke: rgba(155, 232, 241, .2); stroke-width: 1.1; opacity: .34; stroke-dasharray: 3 4; filter: none; animation: none; pointer-events: none; }
     .dispatch-link.selected-overview {
-      stroke: #9be8f1;
-      stroke-width: 1.9;
-      opacity: .5;
+      stroke: #ffc545;
+      stroke-width: 2.25;
+      opacity: .82;
       stroke-dasharray: none;
       filter: none;
     }
     .dispatch-link.pickup-leg.selected-overview {
-      stroke: rgba(155, 232, 241, .72);
-      stroke-width: 2.15;
-      opacity: .72;
+      stroke: rgba(255, 197, 69, .86);
+      stroke-width: 2.45;
+      opacity: .9;
     }
     .dispatch-arrow.selected-overview {
-      fill: #9be8f1;
-      opacity: .58;
+      fill: #ffc545;
+      opacity: .84;
       filter: none;
     }
     .dispatch-link.active-assignment { stroke-width: 3.4; opacity: .96; filter: drop-shadow(0 0 4px rgba(103,232,249,.28)); stroke-dasharray: 980; }
     .dispatch-link.pickup-leg.active-assignment { stroke-width: 3.2; filter: drop-shadow(0 0 4px rgba(103,232,249,.22)); }
-    .dispatch-arrow { fill: #9be8f1; opacity: .58; filter: none; pointer-events: auto; cursor: pointer; }
-    .dispatch-arrow.overview-route { fill: rgba(155, 232, 241, .62); opacity: .48; }
+    .dispatch-arrow { fill: #ffc545; opacity: .74; filter: none; pointer-events: auto; cursor: pointer; }
+    .dispatch-arrow.overview-route { fill: rgba(255, 197, 69, .74); opacity: .64; }
     .dispatch-arrow.active-assignment { opacity: 1; }
     .dispatch-hit-area {
       fill: none;
@@ -1768,18 +1795,16 @@ def render_index() -> str:
     .map-frame.hide-entities .map-label { opacity: .12; pointer-events: none; }
     .map-frame.hide-entities .pin.active-assignment,
     .map-frame.hide-entities .map-label.active-assignment { opacity: .45; }
-    .map-entities { position: absolute; inset: 0; pointer-events: none; }
+    .map-entities { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
     .pin { position: absolute; z-index: 3; width: 14px; height: 14px; transform: translate(-50%, -50%); cursor: pointer; }
     .pin.rest, .pin.merchant { z-index: 6; }
     .pin.courier { z-index: 5; }
     .pin.dest { z-index: 4; }
     .pin .mark { width: 14px; height: 14px; box-shadow: 0 0 6px rgba(0,0,0,.34); }
-    .pin.avoided .mark { box-shadow: 0 0 0 2px rgba(255,209,45,.12), 0 0 10px rgba(0,0,0,.38); }
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
     .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; }
     .zoom button { width: 36px; height: 35px; color: #fff; background: rgba(7, 23, 37, .9); border: 1px solid var(--stroke-2); font-size: 22px; }
-    .map-frame.zoomed .tile-map,
     .map-frame.zoomed .map-bg,
     .map-frame.zoomed .route-svg,
     .map-frame.zoomed .map-entities { transform: scale(1.16); transform-origin: 52% 46%; }
@@ -1956,16 +1981,16 @@ def render_index() -> str:
       </aside>
 
       <section class="panel map-panel" aria-label="实时派单地图">
-        <div class="panel-head"><span>←</span> 实时派单地图 <span class="spacer"></span><div class="controls"><label class="scene-select-label" for="case-select">调度场景</label><select id="case-select"><option value="large_seed301">large_seed301</option></select><button id="reload-cases" type="button">刷新场景</button><button id="run-agent" type="button">运行派单推理</button><span class="mini" id="status">就绪</span></div></div>
+        <div class="panel-head"><span>←</span> 实时派单地图 <span class="spacer"></span><div class="controls"><label class="scene-select-label" for="case-select">调度场景</label><select id="case-select"><option value="large_seed301">large_seed301</option></select><button id="reload-cases" type="button">刷新位置</button><button id="refresh-map" type="button">刷新地图</button><button id="run-agent" type="button">运行派单推理</button><span class="mini" id="status">就绪</span></div></div>
         <div class="map-frame">
-          <div id="tile-map" class="tile-map" aria-label="open source raster street map"></div>
-          <div id="real-map" class="real-map" aria-label="open source street map"></div>
+          <div id="semi-real-map" class="semi-real-map" aria-label="半真实美团配送地图"></div>
           <svg class="map-bg" viewBox="0 0 980 640" preserveAspectRatio="none" aria-hidden="true" data-map-style="anonymous-navigation-layer">
             <g id="simulated-map-layer"></g>
           </svg>
           <svg class="route-svg" viewBox="0 0 980 640" preserveAspectRatio="none" aria-label="dispatch assignment overlay">
           </svg>
           <div class="toast" id="map-toast">地图图层已更新</div>
+          <script id="autosolver-debug-state" type="application/json">{}</script>
           <div class="toolbar"><select id="layer-mode" title="切换派单线显示模式"><option value="all">全部图层</option><option value="selected">聚焦派单</option><option value="candidates">增强线路</option></select><button data-map-action="depots" type="button" title="弱化/恢复商家与骑手点位" aria-label="弱化点位">点</button><button data-map-action="routes" type="button" title="隐藏/恢复派单关系线" aria-label="隐藏派单线">线</button><button data-map-action="fit" type="button" title="适配全部点位和派单线" aria-label="适配视图">适</button><button data-map-action="locate" type="button" title="定位当前派单包" aria-label="定位当前派单">定</button><button data-map-action="fullscreen" type="button" title="切换地图聚焦视图" aria-label="地图聚焦视图">↗</button></div>
           <div class="map-legend">
             <div><span class="mark merchant">M</span>商家订单</div><div><span class="mark courier">C</span>骑手位置</div>
@@ -2020,7 +2045,7 @@ def render_index() -> str:
       </section>
     </section>
   </main>
-  <script src="/assets/leaflet/leaflet.js?v=1.9.4-local" onload="window.__leafletAssetLoaded=true" onerror="window.__leafletAssetError=true"></script>
+  <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
   <script>
     const $ = (id) => document.getElementById(id);
     let currentRun = null;
@@ -2033,13 +2058,20 @@ def render_index() -> str:
     let simulationSampleLoadPromise = null;
     const simulationSampleIndex = {};
     let simulationRefreshNonce = 0;
-    let leafletMap = null;
-    let leafletMarkerLayer = null;
-    let leafletRouteLayer = null;
-    let leafletRouteVersion = 0;
     let dispatchRouteVersion = 0;
-    const leafletRouteCache = {};
-    const leafletBounds = {latMin: 31.204, latMax: 31.252, lngMin: 121.418, lngMax: 121.506};
+    let semiRealMap = null;
+    let semiRealMapReady = false;
+    let semiRealMapStyle = "";
+    let semiRealMapRegion = 0;
+    const semiRealMapLayerSchema = "delivery_routes_optimization_maplibre_clone";
+    const semiRealMapStyleUrl = "https://tiles.openfreemap.org/styles/positron";
+    const semiRealMapBounds = {lngMin: 121.418, lngMax: 121.506, latMin: 31.204, latMax: 31.252};
+    const semiRealMapRegions = [
+      {label: "运营分析浅色区域 A", center: [121.462, 31.229], zoom: 13.35, pitch: 0, bearing: 0},
+      {label: "运营分析浅色区域 B", center: [121.476, 31.222], zoom: 13.42, pitch: 0, bearing: 0},
+      {label: "运营分析浅色区域 C", center: [121.444, 31.238], zoom: 13.38, pitch: 0, bearing: 0},
+      {label: "运营分析浅色区域 D", center: [121.486, 31.238], zoom: 13.30, pitch: 0, bearing: 0}
+    ];
     const dynamicProfiles = {};
     const sceneProfiles = {
       large_seed301: {
@@ -2121,6 +2153,15 @@ def render_index() -> str:
       const number = Number(value);
       return Number.isFinite(number) ? number : fallback;
     }
+    function stableHash(value) {
+      let hash = 2166136261;
+      const text = String(value ?? "");
+      for (let index = 0; index < text.length; index += 1) {
+        hash ^= text.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+      }
+      return Math.abs(hash >>> 0);
+    }
     function escapeAttr(value) {
       return String(value ?? "").replace(/[&<>"']/g, (char) => ({
         "&": "&amp;",
@@ -2135,192 +2176,280 @@ def render_index() -> str:
       const slash = String.fromCharCode(92);
       return String(value ?? "").replaceAll(slash, slash + slash).replaceAll('"', slash + '"');
     }
-    function pointToLatLng(point) {
-      const x = safeNumber(point && point[0], 50);
-      const y = safeNumber(point && point[1], 50);
-      const lat = leafletBounds.latMax - (Math.max(0, Math.min(100, y)) / 100) * (leafletBounds.latMax - leafletBounds.latMin);
-      const lng = leafletBounds.lngMin + (Math.max(0, Math.min(100, x)) / 100) * (leafletBounds.lngMax - leafletBounds.lngMin);
-      return [lat, lng];
-    }
-    function latLngToPoint(latLng) {
-      const lat = Array.isArray(latLng) ? safeNumber(latLng[0], (leafletBounds.latMin + leafletBounds.latMax) / 2) : safeNumber(latLng && latLng.lat, (leafletBounds.latMin + leafletBounds.latMax) / 2);
-      const lng = Array.isArray(latLng) ? safeNumber(latLng[1], (leafletBounds.lngMin + leafletBounds.lngMax) / 2) : safeNumber(latLng && latLng.lng, (leafletBounds.lngMin + leafletBounds.lngMax) / 2);
-      const x = (lng - leafletBounds.lngMin) / (leafletBounds.lngMax - leafletBounds.lngMin) * 100;
-      const y = (leafletBounds.latMax - lat) / (leafletBounds.latMax - leafletBounds.latMin) * 100;
-      return [Math.max(-12, Math.min(112, x)), Math.max(-12, Math.min(112, y))];
-    }
-    function routeToLatLngs(route) {
-      return (route || []).filter(Boolean).map((point) => pointToLatLng(point));
-    }
-    function tileWorldPoint(lat, lng, zoom) {
-      const scale = 256 * Math.pow(2, zoom);
-      const sinLat = Math.sin(lat * Math.PI / 180);
-      return {
-        x: (lng + 180) / 360 * scale,
-        y: (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale
-      };
-    }
-    function renderRasterTileBasemap() {
+    function renderProjectBasemapState() {
       const frame = document.querySelector(".map-frame");
-      const tileMap = $("tile-map");
-      if (!frame || !tileMap) return;
-      const zoom = 14;
-      const topLeft = tileWorldPoint(leafletBounds.latMax, leafletBounds.lngMin, zoom);
-      const bottomRight = tileWorldPoint(leafletBounds.latMin, leafletBounds.lngMax, zoom);
-      const width = Math.max(1, bottomRight.x - topLeft.x);
-      const height = Math.max(1, bottomRight.y - topLeft.y);
-      const minTileX = Math.floor(topLeft.x / 256);
-      const maxTileX = Math.floor(bottomRight.x / 256);
-      const minTileY = Math.floor(topLeft.y / 256);
-      const maxTileY = Math.floor(bottomRight.y / 256);
-      const subdomains = ["a", "b", "c", "d"];
-      const tiles = [];
-      for (let x = minTileX; x <= maxTileX; x += 1) {
-        for (let y = minTileY; y <= maxTileY; y += 1) {
-          const left = (x * 256 - topLeft.x) / width * 100;
-          const top = (y * 256 - topLeft.y) / height * 100;
-          const tileWidth = 256 / width * 100;
-          const tileHeight = 256 / height * 100;
-          const subdomain = subdomains[Math.abs(x + y) % subdomains.length];
-          tiles.push(`<img alt="" data-tile="${zoom}/${x}/${y}" src="https://${subdomain}.basemaps.cartocdn.com/dark_nolabels/${zoom}/${x}/${y}.png" style="left:${left.toFixed(4)}%;top:${top.toFixed(4)}%;width:${tileWidth.toFixed(4)}%;height:${tileHeight.toFixed(4)}%;">`);
+      if (!frame) return;
+      frame.classList.add("project-map-ready");
+      ensureSemiRealMap();
+    }
+    function clearExternalMapFallback() {
+      return false;
+    }
+    function normalizedToLngLat(point) {
+      const x = Math.max(0, Math.min(100, safeNumber(Array.isArray(point) ? point[0] : point && point.x, 50)));
+      const y = Math.max(0, Math.min(100, safeNumber(Array.isArray(point) ? point[1] : point && point.y, 50)));
+      const lng = semiRealMapBounds.lngMin + (x / 100) * (semiRealMapBounds.lngMax - semiRealMapBounds.lngMin);
+      const lat = semiRealMapBounds.latMax - (y / 100) * (semiRealMapBounds.latMax - semiRealMapBounds.latMin);
+      return [lng, lat];
+    }
+    function currentSemiRealMapRegion() {
+      return semiRealMapRegions[semiRealMapRegion % semiRealMapRegions.length];
+    }
+    function hideSemiRealMapTextLayers() {
+      if (!semiRealMap || !semiRealMap.getStyle()) return;
+      (semiRealMap.getStyle().layers || []).forEach((layer) => {
+        const hasText = layer.type === "symbol" || Boolean(layer.layout && layer.layout["text-field"]);
+        if (!hasText) return;
+        try {
+          semiRealMap.setLayoutProperty(layer.id, "visibility", "none");
+        } catch (error) {
+          // Some third-party vector styles expose locked layers; ignore them and keep the map usable.
         }
-      }
-      tileMap.innerHTML = tiles.join("") + `<span class="tile-credit">OSM / CARTO tiles · stable dispatch routing</span>`;
-      frame.classList.add("tile-ready");
+      });
     }
-    function ensureLeafletMap() {
+    function semiRealMapTextLayerAudit() {
+      if (!semiRealMap || !semiRealMap.getStyle()) return {total: 0, visible: 0, hidden: 0};
+      const textLayers = (semiRealMap.getStyle().layers || []).filter((layer) => layer.type === "symbol" || Boolean(layer.layout && layer.layout["text-field"]));
+      const visible = textLayers.filter((layer) => {
+        try {
+          return semiRealMap.getLayoutProperty(layer.id, "visibility") !== "none";
+        } catch (error) {
+          return false;
+        }
+      });
+      return {total: textLayers.length, visible: visible.length, hidden: textLayers.length - visible.length};
+    }
+    function ensureSemiRealMap() {
       const frame = document.querySelector(".map-frame");
-      const mapNode = $("real-map");
-      if (!frame || !mapNode || !window.L) {
-        if (frame) frame.classList.remove("leaflet-ready");
+      const container = $("semi-real-map");
+      if (!frame || !container || !window.maplibregl) {
+        if (frame) frame.classList.remove("maplibre-ready");
         return null;
       }
-      if (!leafletMap) {
-        leafletMap = L.map(mapNode, {
+      const region = currentSemiRealMapRegion();
+      if (!semiRealMap) {
+        semiRealMap = new maplibregl.Map({
+          container,
+          style: semiRealMapStyleUrl,
+          center: region.center,
+          zoom: region.zoom,
+          pitch: region.pitch,
+          bearing: region.bearing,
           attributionControl: false,
-          zoomControl: false,
-          preferCanvas: true,
-          scrollWheelZoom: false,
-          dragging: false,
-          doubleClickZoom: false,
-          boxZoom: false,
-          keyboard: false,
-        }).setView([(leafletBounds.latMin + leafletBounds.latMax) / 2, (leafletBounds.lngMin + leafletBounds.lngMax) / 2], 13);
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png", {
-          maxZoom: 19,
-          subdomains: "abcd",
-          crossOrigin: true,
-        }).addTo(leafletMap);
-        leafletRouteLayer = L.layerGroup().addTo(leafletMap);
-        leafletMarkerLayer = L.layerGroup().addTo(leafletMap);
-      }
-      window.setTimeout(() => leafletMap.invalidateSize(false), 0);
-      frame.classList.add("leaflet-ready");
-      return leafletMap;
-    }
-    function clearLeafletDispatchMap(removeReady = false) {
-      leafletRouteVersion += 1;
-      if (leafletRouteLayer) leafletRouteLayer.clearLayers();
-      if (leafletMarkerLayer) leafletMarkerLayer.clearLayers();
-      if (removeReady) {
-        const frame = document.querySelector(".map-frame");
-        if (frame) frame.classList.remove("leaflet-ready");
-      }
-    }
-    function osrmRouteKey(start, end) {
-      return [start, end].map((point) => point.map((value) => Number(value).toFixed(5)).join(",")).join(";");
-    }
-    async function fetchOsrmRoute(startLatLng, endLatLng) {
-      const key = osrmRouteKey(startLatLng, endLatLng);
-      if (leafletRouteCache[key]) return leafletRouteCache[key];
-      const coords = `${startLatLng[1]},${startLatLng[0]};${endLatLng[1]},${endLatLng[0]}`;
-      const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson&steps=false`;
-      const promise = fetch(url)
-        .then((res) => res.ok ? res.json() : Promise.reject(new Error("osrm failed")))
-        .then((payload) => {
-          const coordinates = payload && payload.routes && payload.routes[0] && payload.routes[0].geometry && payload.routes[0].geometry.coordinates;
-          return Array.isArray(coordinates) && coordinates.length >= 2 ? coordinates.map((point) => [point[1], point[0]]) : null;
-        })
-        .catch(() => null);
-      leafletRouteCache[key] = promise;
-      return promise;
-    }
-    function leafletMarkerHtml(kind, active) {
-      const markerKind = kind === "merchant_order" || kind === "pickup_cluster" ? "merchant" : "courier";
-      return `<span class="leaflet-dispatch-marker ${markerKind}${active ? " active" : ""}">${markerKind === "merchant" ? "M" : "C"}</span>`;
-    }
-    function renderLeafletDispatchMap(profile, entityPoints) {
-      const map = ensureLeafletMap();
-      if (!map || !profile || !profile.dispatchMap || !Array.isArray(profile.dispatchMap.entities)) return;
-      const version = ++leafletRouteVersion;
-      if (leafletRouteLayer) leafletRouteLayer.clearLayers();
-      if (leafletMarkerLayer) leafletMarkerLayer.clearLayers();
-      const bounds = [];
-      const assignments = (profile && profile.assignments) || {};
-      const focusMode = profile.mapFocusMode === "focus";
-      const selectedAssignment = profile.selected || Object.keys(assignments)[0] || "";
-      profile.dispatchMap.entities.forEach((entity) => {
-        const assignmentId = assignmentForEntity(profile, entity.id);
-        const active = Boolean(focusMode && assignmentId === selectedAssignment);
-        const marker = L.marker(pointToLatLng([entity.x, entity.y]), {
-          icon: L.divIcon({
-            className: "",
-            html: leafletMarkerHtml(entity.kind, active),
-            iconSize: [20, 20],
-            iconAnchor: [10, 10],
-          }),
-          keyboard: false,
-          interactive: true,
+          interactive: false
         });
-        marker.on("click", () => {
-          if (profile.assignments && Object.keys(profile.assignments).length) {
-            renderFinalEntityDetail(profile, entity.id);
-          } else {
-            renderEntityPreviewDetail(profile, entity.id);
-          }
+        semiRealMapStyle = semiRealMapStyleUrl;
+        semiRealMap.on("load", () => {
+          semiRealMapReady = true;
+          hideSemiRealMapTextLayers();
+          frame.classList.add("maplibre-ready");
+          syncSemiRealMapOverlay(currentProfile);
         });
-        marker.addTo(leafletMarkerLayer);
-        bounds.push(pointToLatLng([entity.x, entity.y]));
+        semiRealMap.on("styledata", hideSemiRealMapTextLayers);
+        semiRealMap.on("error", () => {
+          semiRealMapReady = false;
+          frame.classList.remove("maplibre-ready");
+        });
+      } else if (semiRealMapStyle !== semiRealMapStyleUrl) {
+        semiRealMap.setStyle(semiRealMapStyleUrl);
+        semiRealMapStyle = semiRealMapStyleUrl;
+      }
+      return semiRealMap;
+    }
+    function resetRenderedMapAnchors(profile) {
+      if (!profile || !profile.dispatchMap) return;
+      delete profile.dispatchMap.anchor_source;
+      delete profile.dispatchMap.anchor_variant;
+      (profile.dispatchMap.entities || []).forEach((entity) => {
+        delete entity.rendered_anchor_source;
       });
-      if (profile.dispatchMap.assignments && Array.isArray(profile.dispatchMap.assignments)) {
-        profile.dispatchMap.assignments.forEach((assignment, index) => {
-          const couriers = assignment.map_couriers || courierTokens(assignment.courier);
-          const courierPoint = entityPoints[couriers[0]];
-          const pickupPoint = entityPoints[assignment.pickup];
-          if (!courierPoint || !pickupPoint) return;
-          const fallbackRoute = roadFollowingRoute(courierPoint, pickupPoint, profile.dispatchMap.map_layers);
-          const longPickup = longRouteClass(courierPoint, pickupPoint, fallbackRoute, {direct: 21, span: 34, length: 44});
-          const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
-          const color = isActive ? "#25ead8" : ["#8deaf2", "#6ee7f0", "#72d7ff", "#9be8f1", "#67f0dc"][index % 5];
-          const options = {
-            color,
-            weight: isActive ? 4.5 : 3.2,
-            opacity: longPickup ? 0.52 : 0.82,
-            dashArray: longPickup ? "7 8" : null,
-            className: `leaflet-dispatch-route${longPickup ? " long" : ""}${isActive ? " active" : ""}`,
-          };
-          const polyline = L.polyline(routeToLatLngs(fallbackRoute), options).addTo(leafletRouteLayer);
-          polyline.on("click", () => renderRouteDetail(profile, assignment.id, {
-            assignment: assignment.id,
-            merchant: assignment.pickup,
-            courier: couriers[0],
-            leg: "courier-to-merchant",
-            "route-points": String(fallbackRoute.length),
-            "route-length": routePolylineLength(fallbackRoute).toFixed(1),
-            "long-leg": longPickup ? "true" : "false",
-          }));
-          bounds.push(...routeToLatLngs(fallbackRoute));
-          const startLatLng = pointToLatLng(courierPoint);
-          const endLatLng = pointToLatLng(pickupPoint);
-          fetchOsrmRoute(startLatLng, endLatLng).then((latLngs) => {
-            if (version !== leafletRouteVersion || !latLngs || latLngs.length < 2) return;
-            polyline.setLatLngs(latLngs);
+    }
+    function reanchorCurrentProfileToMapRegion() {
+      const profile = currentProfile;
+      if (!profile || !profile.dispatchMap) return;
+      resetRenderedMapAnchors(profile);
+      profile.assignments = {};
+      profile.selected = "";
+      profile.mapFocusMode = "overview";
+      currentReport = null;
+      const routeSvg = document.querySelector(".route-svg");
+      if (routeSvg) routeSvg.innerHTML = "";
+      document.body.classList.add("pending-run", "sample-preview");
+      updateMapScene(profile);
+      updateReasonProgress(0);
+      updateReasonSummary(profile, null);
+      if (currentSimulationSample) {
+        renderSimulationPreviewTable(currentSimulationSample);
+        resetDecisionPanelForSimulationPreview(currentSimulationSample);
+      } else {
+        resetDecisionPanelForSimulationPreview({name: profile.label, merchants: [], couriers: [], summary: {}});
+      }
+      setStatus("地图区域已刷新，等待推理", false);
+    }
+    function refreshSemiRealMap() {
+      semiRealMapRegion = (semiRealMapRegion + 1) % semiRealMapRegions.length;
+      const region = currentSemiRealMapRegion();
+      const map = ensureSemiRealMap();
+      if (!map) {
+        showToast("半真实地图加载中，稍后再刷新区域");
+        return;
+      }
+      hideSemiRealMapTextLayers();
+      map.easeTo({center: region.center, zoom: region.zoom, pitch: region.pitch, bearing: region.bearing, duration: 650});
+      const frame = document.querySelector(".map-frame");
+      if (frame) {
+        frame.dataset.mapRegion = region.label;
+        frame.dataset.mapStyle = "运营分析浅色图";
+      }
+      map.once("moveend", reanchorCurrentProfileToMapRegion);
+      showToast(`已刷新配送区域：${region.label}`);
+    }
+    function syncSemiRealMapOverlay(profile) {
+      const map = ensureSemiRealMap();
+      if (!map || !semiRealMapReady) return;
+      hideSemiRealMapTextLayers();
+      const region = currentSemiRealMapRegion();
+      const frame = document.querySelector(".map-frame");
+      if (frame) {
+        frame.dataset.mapRegion = region.label;
+        frame.dataset.mapStyle = "运营分析浅色图";
+      }
+    }
+    function renderedFeatureCoordinateSets(feature) {
+      const geometry = feature && feature.geometry;
+      if (!geometry || !Array.isArray(geometry.coordinates)) return [];
+      if (geometry.type === "LineString") return [geometry.coordinates];
+      if (geometry.type === "MultiLineString") return geometry.coordinates;
+      if (geometry.type === "Polygon") return geometry.coordinates;
+      if (geometry.type === "MultiPolygon") return geometry.coordinates.flat();
+      return [];
+    }
+    function lngLatToScreenNorm(coord) {
+      if (!semiRealMap || !Array.isArray(coord) || coord.length < 2) return null;
+      const point = semiRealMap.project(coord);
+      const canvas = semiRealMap.getCanvas();
+      const width = canvas && canvas.clientWidth ? canvas.clientWidth : 1;
+      const height = canvas && canvas.clientHeight ? canvas.clientHeight : 1;
+      const x = point.x / width * 100;
+      const y = point.y / height * 100;
+      if (!Number.isFinite(x) || !Number.isFinite(y) || x < -4 || x > 104 || y < -4 || y > 104) return null;
+      return [Math.max(0, Math.min(100, x)), Math.max(0, Math.min(100, y))];
+    }
+    function lineSamplePoints(points, spacing = 6) {
+      const samples = [];
+      const usable = (points || []).filter(Boolean);
+      for (let index = 0; index < usable.length - 1; index += 1) {
+        const start = usable[index];
+        const end = usable[index + 1];
+        const length = distance2D(start, end);
+        const steps = Math.max(1, Math.floor(length / spacing));
+        for (let step = 0; step <= steps; step += 1) {
+          const t = step / steps;
+          samples.push([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t]);
+        }
+      }
+      return samples;
+    }
+    function renderedMapRoadNetwork() {
+      if (!semiRealMap || !semiRealMapReady) return null;
+      const roadLayers = semiRealMap.getStyle().layers
+        .filter((layer) => layer.type === "line" && /highway|road/.test(layer.id))
+        .map((layer) => layer.id);
+      if (!roadLayers.length) return null;
+      const features = semiRealMap.queryRenderedFeatures({layers: roadLayers});
+      const roads = [];
+      const seen = new Set();
+      features.forEach((feature) => {
+        renderedFeatureCoordinateSets(feature).forEach((coords) => {
+          const points = coords.map(lngLatToScreenNorm).filter(Boolean);
+          if (points.length < 2) return;
+          const key = points.map((point) => `${point[0].toFixed(1)},${point[1].toFixed(1)}`).join("|");
+          if (seen.has(key)) return;
+          seen.add(key);
+          const layerId = feature.layer && feature.layer.id ? feature.layer.id : "";
+          const roadType = /motorway|major/.test(layerId) ? "arterial" : /minor/.test(layerId) ? "secondary" : "service";
+          roads.push({
+            id: `MR${roads.length + 1}`,
+            type: roadType,
+            corridor: "MapLibre道路",
+            traffic: "smooth",
+            width: roadType === "arterial" ? 8.2 : roadType === "secondary" ? 5.0 : 2.8,
+            points: points.map((point) => ({x: point[0], y: point[1]}))
           });
         });
-      }
-      if (bounds.length) {
-        map.fitBounds(bounds, {padding: [36, 36], maxZoom: 14});
-      }
+      });
+      if (roads.length < 12) return null;
+      return roads.slice(0, 90);
+    }
+    function renderedMapMerchantAnchors(roadSamples) {
+      if (!semiRealMap || !semiRealMapReady) return [];
+      const styleLayers = semiRealMap.getStyle().layers;
+      const fillLayers = styleLayers
+        .filter((layer) => layer.type === "fill" && /building|landuse_residential|landuse_park/.test(layer.id))
+        .map((layer) => layer.id);
+      const anchors = [];
+      const features = fillLayers.length ? semiRealMap.queryRenderedFeatures({layers: fillLayers}) : [];
+      features.forEach((feature) => {
+        renderedFeatureCoordinateSets(feature).forEach((ring) => {
+          const points = ring.map(lngLatToScreenNorm).filter(Boolean);
+          if (points.length < 3) return;
+          const center = points.reduce((sum, point) => [sum[0] + point[0], sum[1] + point[1]], [0, 0]).map((value) => value / points.length);
+          if (center[0] < 5 || center[0] > 95 || center[1] < 5 || center[1] > 95) return;
+          const nearestRoadDistance = Math.min(...roadSamples.map((roadPoint) => distance2D(center, roadPoint)));
+          if (nearestRoadDistance < 1.25 || nearestRoadDistance > 6.5) return;
+          anchors.push({
+            x: center[0],
+            y: center[1],
+            roadDistance: nearestRoadDistance,
+            roadEdgeScore: Math.abs(nearestRoadDistance - 2.8)
+          });
+        });
+      });
+      return anchors
+        .sort((left, right) => left.roadEdgeScore - right.roadEdgeScore)
+        .slice(0, 120);
+    }
+    function renderedMapAnchorsForProfile(profile) {
+      const roads = renderedMapRoadNetwork();
+      if (!roads) return null;
+      const roadSamples = roads.flatMap((road) => lineSamplePoints(normalizedRoadPoints(road), 4.4));
+      const merchantAnchors = renderedMapMerchantAnchors(roadSamples);
+      if (roadSamples.length < 24 || merchantAnchors.length < 4) return null;
+      return {roads, roadSamples, merchantAnchors};
+    }
+    function applyRenderedMapAnchors(profile) {
+      if (!profile || !profile.dispatchMap || !semiRealMapReady) return false;
+      if (profile.dispatchMap.anchor_source === "maplibre-rendered") return true;
+      const anchors = renderedMapAnchorsForProfile(profile);
+      if (!anchors) return false;
+      const entities = Array.isArray(profile.dispatchMap.entities) ? profile.dispatchMap.entities : [];
+      const merchantAnchors = anchors.merchantAnchors;
+      const roadSamples = anchors.roadSamples;
+      const sampleKey = `${profile.dispatchMap.scenario_id || profile.label || ""}:${profile.dispatchMap.sample_index || 0}`;
+      entities.forEach((entity) => {
+        const seed = stableHash(`${sampleKey}:${entity.id}`);
+        if (entity.kind === "merchant_order" || entity.kind === "pickup_cluster") {
+          const anchor = merchantAnchors[seed % merchantAnchors.length];
+          entity.x = Number(anchor.x.toFixed(2));
+          entity.y = Number(anchor.y.toFixed(2));
+          entity.rendered_anchor_source = "maplibre-building-or-landuse";
+        } else if (entity.kind === "courier") {
+          const anchor = roadSamples[seed % roadSamples.length];
+          entity.x = Number(anchor[0].toFixed(2));
+          entity.y = Number(anchor[1].toFixed(2));
+          entity.rendered_anchor_source = "maplibre-road";
+        }
+      });
+      profile.dispatchMap.map_layers = {
+        ...(profile.dispatchMap.map_layers || {}),
+        roads: anchors.roads,
+        anchor_source: "maplibre-rendered",
+        road_graph: "maplibre_rendered_road_graph",
+        layer_schema: semiRealMapLayerSchema
+      };
+      profile.dispatchMap.anchor_source = "maplibre-rendered";
+      profile.dispatchMap.anchor_variant = currentSemiRealMapRegion().label;
+      return true;
     }
     function assignmentEntries(profile) {
       return Object.entries((profile && profile.assignments) || {});
@@ -2440,7 +2569,7 @@ def render_index() -> str:
         map_layers: sample.map_layers,
         total_tasks: merchantEntities.length,
         total_couriers: courierEntities.length,
-        note: "刷新场景仅展示商家与骑手点位；运行推理后才生成最终派单线。"
+        note: "刷新位置仅重抽当前场景商家与骑手点位；运行推理后才生成最终派单线。"
       };
     }
     function strategyRuntimeName(strategyId) {
@@ -2682,7 +2811,7 @@ def render_index() -> str:
       if (entityLayer) entityLayer.innerHTML = "";
       const routeSvg = document.querySelector(".route-svg");
       if (routeSvg) routeSvg.innerHTML = "";
-      clearLeafletDispatchMap(true);
+      clearExternalMapFallback();
       renderSimulatedBaseMap(null);
       const frame = document.querySelector(".map-frame");
       frame.classList.remove("topology", "focus-selected");
@@ -2693,7 +2822,7 @@ def render_index() -> str:
       setDetailContext("waiting", "", "", "");
       $("detail-title").textContent = "等待运行派单推理";
       $("detail-courier").textContent = "-";
-      $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新场景</code> 生成输入；运行派单推理后，系统会按商家、骑手意愿、价格和路况生成最终派单关系。";
+      $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新位置</code> 生成输入；运行派单推理后，系统会按商家、骑手意愿、价格和路况生成最终派单关系。";
       $("detail-orders").innerHTML = "";
       $("detail-eta").textContent = "-";
       $("right-cost").textContent = "-";
@@ -2711,7 +2840,7 @@ def render_index() -> str:
       const tbody = document.querySelector(".table-panel tbody");
       if (tbody) {
         tbody.innerHTML = [
-          `<tr data-row-type="empty-state"><td>场景已选择</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">就绪</td><td>已选择 ${profile.label}，等待刷新场景或运行推理</td></tr>`,
+          `<tr data-row-type="empty-state"><td>场景已选择</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">就绪</td><td>已选择 ${profile.label}，等待刷新位置或运行推理</td></tr>`,
           `<tr data-row-type="empty-state"><td>候选输入</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>输入</td><td>候选关系由商家位置、骑手位置、接单意愿、价格和路况共同生成</td></tr>`,
           `<tr data-row-type="empty-state"><td>派单结果</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-bad">待运行</td><td>运行完成后自动展示全部商家与骑手派单线</td></tr>`
         ].join("");
@@ -3005,6 +3134,7 @@ def render_index() -> str:
       svg.dataset.mapStyle = mapLayers && mapLayers.style ? mapLayers.style : "empty";
       const districts = Array.isArray(mapLayers && mapLayers.districts) ? mapLayers.districts : [];
       const blocks = Array.isArray(mapLayers && mapLayers.building_blocks) ? mapLayers.building_blocks : [];
+      const traces = Array.isArray(mapLayers && mapLayers.base_map_traces) ? mapLayers.base_map_traces : [];
       const roads = Array.isArray(mapLayers && mapLayers.roads) ? mapLayers.roads.slice() : [];
       const hotspots = Array.isArray(mapLayers && mapLayers.commerce_hotspots) ? mapLayers.commerce_hotspots : [];
       const intersections = Array.isArray(mapLayers && mapLayers.intersections) ? mapLayers.intersections : [];
@@ -3038,6 +3168,11 @@ def render_index() -> str:
         const opacity = Math.max(0.24, Math.min(0.78, safeNumber(item.intensity, 0.4)));
         const usage = ["commerce", "office", "residential"].includes(item.usage) ? item.usage : "office";
         return `<rect class="building-block ${usage}" data-block="${escapeAttr(item.id)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${width.toFixed(1)}" height="${height.toFixed(1)}" rx="4" opacity="${opacity.toFixed(2)}" transform="rotate(${safeNumber(item.rotation, 0).toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})"></rect>`;
+      }).join("");
+      const traceHtml = traces.map((trace) => {
+        const d = layerPath(trace.points);
+        const cls = ["collector", "local", "ring"].includes(trace.class) ? trace.class : "local";
+        return d ? `<path class="map-trace ${cls}" data-trace="${escapeAttr(trace.id)}" d="${d}"></path>` : "";
       }).join("");
       const hotspotHtml = hotspots.map((item) => {
         const opacity = Math.max(0.16, Math.min(0.46, safeNumber(item.intensity, 0.32)));
@@ -3076,11 +3211,13 @@ def render_index() -> str:
           }).join("")}</g>`
         : "";
       svg.innerHTML = [
-        `<defs><pattern id="anonymous-grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(148,163,184,.05)" stroke-width="1"/></pattern><pattern id="fine-street-mesh" width="132" height="96" patternUnits="userSpaceOnUse"><path d="M-16 26H148M18 -10V110M-22 74H126M82 -8V104M4 96L132 18M-26 8L96 94M38 0L118 62M-12 46L64 112" fill="none" stroke="rgba(122,151,168,.115)" stroke-width=".9" stroke-linecap="round"/></pattern></defs>`,
-        `<rect x="0" y="0" width="980" height="640" fill="#07121b"></rect>`,
-        `<rect x="0" y="0" width="980" height="640" fill="url(#anonymous-grid)" opacity=".2"></rect>`,
-        `<rect x="0" y="0" width="980" height="640" fill="url(#fine-street-mesh)" opacity=".24"></rect>`,
-        `<path class="water" d="M0 546 C128 503 188 570 304 536 C412 504 470 573 582 536 C684 502 758 558 862 526 C922 508 956 510 980 496 L980 640 L0 640 Z" opacity=".34"></path>`,
+        `<defs><pattern id="meituan-grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="rgba(190,203,214,.045)" stroke-width="1"/></pattern><pattern id="delivery-parcel-mesh" width="154" height="118" patternUnits="userSpaceOnUse"><path d="M-18 30H170M20 -12V132M-20 82H138M92 -10V126M8 108L150 18M-32 12L104 104M46 0L132 72M-18 54L72 128" fill="none" stroke="rgba(136,156,160,.12)" stroke-width=".85" stroke-linecap="round"/></pattern><linearGradient id="meituan-map-warmth" x1="0" x2="1"><stop offset="0" stop-color="rgba(255,184,49,.04)"/><stop offset=".52" stop-color="rgba(45,212,191,.025)"/><stop offset="1" stop-color="rgba(255,184,49,.035)"/></linearGradient></defs>`,
+        `<rect x="0" y="0" width="980" height="640" fill="#0b141b"></rect>`,
+        `<rect x="0" y="0" width="980" height="640" fill="url(#meituan-map-warmth)" opacity=".9"></rect>`,
+        `<rect x="0" y="0" width="980" height="640" fill="url(#meituan-grid)" opacity=".28"></rect>`,
+        `<rect x="0" y="0" width="980" height="640" fill="url(#delivery-parcel-mesh)" opacity=".32"></rect>`,
+        `<path class="water" d="M0 548 C122 508 188 574 304 538 C412 506 470 570 582 536 C684 502 758 558 862 526 C922 508 956 510 980 496 L980 640 L0 640 Z" opacity=".26"></path>`,
+        traceHtml,
         districtHtml,
         blockHtml,
         hotspotHtml,
@@ -3161,6 +3298,8 @@ def render_index() -> str:
       return positions;
     }
     function updateMapScene(profile) {
+      renderProjectBasemapState();
+      applyRenderedMapAnchors(profile);
       const dynamicLabels = sceneLabels(profile);
       const displayPositions = displayPositionsForLabels(dynamicLabels);
       const entityPoints = {};
@@ -3177,8 +3316,8 @@ def render_index() -> str:
       frame.classList.toggle("topology", Boolean(profile.dispatchMap));
       frame.classList.toggle("focus-selected", focusMode);
       frame.classList.toggle("assignment-overview", Boolean(hasAssignments && !focusMode));
-      renderRasterTileBasemap();
       renderSimulatedBaseMap(profile.dispatchMap && profile.dispatchMap.map_layers);
+      syncSemiRealMapOverlay(profile);
       if (hasAssignments && profile.selected && focusMode) {
         frame.dataset.selectedAssignment = profile.selected;
       } else {
@@ -3189,6 +3328,7 @@ def render_index() -> str:
       dynamicLabels.forEach((item) => {
         const assignmentId = assignmentForEntity(profile, item.id);
         const display = displayPositions[item.id] || {x: item.x, y: item.y, rawX: item.x, rawY: item.y, avoided: false};
+        const rawPoint = {x: safeNumber(item.x, safeNumber(display.rawX, 50)), y: safeNumber(item.y, safeNumber(display.rawY, 50))};
         const labelOffset = labelOffsetFor(item, assignmentId, profile.selected);
         const pin = document.createElement("div");
         const isMerchantPoint = item.kind === "pickup_cluster" || item.kind === "merchant_order";
@@ -3199,14 +3339,14 @@ def render_index() -> str:
         pin.dataset.entity = item.id;
         pin.dataset.kind = item.kind || "";
         pin.dataset.assignment = assignmentId;
-        pin.dataset.rawX = Number(display.rawX).toFixed(1);
-        pin.dataset.rawY = Number(display.rawY).toFixed(1);
-        pin.dataset.displayX = Number(display.x).toFixed(1);
-        pin.dataset.displayY = Number(display.y).toFixed(1);
+        pin.dataset.rawX = Number(rawPoint.x).toFixed(1);
+        pin.dataset.rawY = Number(rawPoint.y).toFixed(1);
+        pin.dataset.displayX = Number(rawPoint.x).toFixed(1);
+        pin.dataset.displayY = Number(rawPoint.y).toFixed(1);
         pin.classList.toggle("active-assignment", assignmentId === profile.selected);
-        pin.classList.toggle("avoided", Boolean(display.avoided));
-        pin.style.left = Number(display.x).toFixed(1) + "%";
-        pin.style.top = Number(display.y).toFixed(1) + "%";
+        pin.classList.toggle("label-avoided", Boolean(display.avoided));
+        pin.style.left = Number(rawPoint.x).toFixed(1) + "%";
+        pin.style.top = Number(rawPoint.y).toFixed(1) + "%";
         pin.title = hasAssignments ? "点击聚焦 " + item.id + " 的派单链路" : "点击查看 " + item.id + " 的样本详情";
         pin.innerHTML = `<span class="mark ${markKind}">${isMerchantPoint ? "M" : "C"}</span>`;
         entityLayer.appendChild(pin);
@@ -3383,16 +3523,32 @@ def render_index() -> str:
         return list;
       }, []);
     }
+    function densifyRoutePoints(points, maxGap = 4.8) {
+      const usable = compactRoutePoints(points || []);
+      if (usable.length < 2) return usable;
+      const dense = [usable[0]];
+      for (let index = 1; index < usable.length; index += 1) {
+        const start = usable[index - 1];
+        const end = usable[index];
+        const length = distance2D(start, end);
+        const steps = Math.max(1, Math.ceil(length / maxGap));
+        for (let step = 1; step <= steps; step += 1) {
+          const t = step / steps;
+          dense.push([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t]);
+        }
+      }
+      return compactRoutePoints(dense);
+    }
     function endpointConnectorFor(entityPoint, roadPoint) {
       if (!entityPoint || !roadPoint) return [];
       const distance = distance2D(entityPoint, roadPoint);
-      if (distance <= 0.28 || distance > 2.4) return [];
-      return compactRoutePoints([entityPoint, roadPoint]);
+      if (distance <= 0.28 || distance > 8.0) return [];
+      return densifyRoutePoints([entityPoint, roadPoint], 2.8);
     }
     function roadTerminalRoute(start, startSnap, coreRoute, endSnap, end) {
       const startPoint = startSnap && startSnap.point ? startSnap.point : start;
       const endPoint = endSnap && endSnap.point ? endSnap.point : end;
-      const route = compactRoutePoints([startPoint, ...(coreRoute || []), endPoint]);
+      const route = densifyRoutePoints([startPoint, ...(coreRoute || []), endPoint], 4.8);
       route.endpointConnectors = [
         endpointConnectorFor(start, startPoint),
         endpointConnectorFor(end, endPoint)
@@ -3540,29 +3696,6 @@ def render_index() -> str:
         return list;
       }, []);
     }
-    function gridSnap(value, step = 4) {
-      return Math.max(4, Math.min(96, Math.round(safeNumber(value, 50) / step) * step));
-    }
-    function stableDispatchRoute(start, end) {
-      const sx = safeNumber(start && start[0], 50);
-      const sy = safeNumber(start && start[1], 50);
-      const ex = safeNumber(end && end[0], 50);
-      const ey = safeNumber(end && end[1], 50);
-      const dx = Math.abs(ex - sx);
-      const dy = Math.abs(ey - sy);
-      if (Math.hypot(dx, dy) < 7) return compactRoutePoints([[sx, sy], [ex, ey]]);
-      if (dx > dy * 1.45) {
-        const midX = gridSnap((sx + ex) / 2);
-        return compactRoutePoints([[sx, sy], [midX, sy], [midX, ey], [ex, ey]]);
-      }
-      if (dy > dx * 1.45) {
-        const midY = gridSnap((sy + ey) / 2);
-        return compactRoutePoints([[sx, sy], [sx, midY], [ex, midY], [ex, ey]]);
-      }
-      const firstTurn = dx >= dy ? [gridSnap(ex), sy] : [sx, gridSnap(ey)];
-      const secondTurn = dx >= dy ? [gridSnap(ex), gridSnap(ey)] : [gridSnap(ex), gridSnap(ey)];
-      return compactRoutePoints([[sx, sy], firstTurn, secondTurn, [ex, ey]]);
-    }
     function dispatchPathFor(points) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
@@ -3620,23 +3753,29 @@ def render_index() -> str:
     function dispatchArrowPoints(points, primary = false) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
-      let bestStart = usable[usable.length - 2];
-      let bestEnd = usable[usable.length - 1];
-      let bestDistance = -1;
+      const totalLength = routePolylineLength(usable);
+      const targetLength = totalLength * 0.56;
+      let accumulated = 0;
+      let bestStart = usable[0];
+      let bestEnd = usable[1];
       for (let index = 1; index < usable.length; index += 1) {
         const segmentDistance = distance2D(usable[index - 1], usable[index]);
-        if (segmentDistance > bestDistance) {
-          bestDistance = segmentDistance;
+        if (accumulated + segmentDistance >= targetLength) {
           bestStart = usable[index - 1];
           bestEnd = usable[index];
+          break;
         }
+        accumulated += segmentDistance;
       }
       const [x1, y1] = svgPoint(bestStart);
       const [x2, y2] = svgPoint(bestEnd);
       const angle = Math.atan2(y2 - y1, x2 - x1);
       const size = primary ? 9 : 6;
-      const tipX = x1 + (x2 - x1) * 0.68;
-      const tipY = y1 + (y2 - y1) * 0.68;
+      const segmentLength = Math.max(0.001, distance2D(bestStart, bestEnd));
+      const remainingOnSegment = Math.max(0, Math.min(segmentLength, targetLength - accumulated));
+      const ratio = Math.max(0.34, Math.min(0.72, remainingOnSegment / segmentLength));
+      const tipX = x1 + (x2 - x1) * ratio;
+      const tipY = y1 + (y2 - y1) * ratio;
       const leftX = tipX - Math.cos(angle - 0.52) * size;
       const leftY = tipY - Math.sin(angle - 0.52) * size;
       const rightX = tipX - Math.cos(angle + 0.52) * size;
@@ -3701,7 +3840,7 @@ def render_index() -> str:
         const shortRoutes = [];
         const allRoutes = [];
         const pickupRoute = roadFollowingRoute(courierPoint, pickupPoint, mapLayers);
-        const pickupLong = longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 21, span: 34, length: 44});
+        const pickupLong = longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 55, span: 82, length: 120});
         allRoutes.push({route: pickupRoute, long: pickupLong});
         if (!pickupLong) shortRoutes.push(pickupRoute);
         const centerPenalty = Math.abs(safeNumber(pickupPoint[0], 50) - 52) * 0.3 + Math.abs(safeNumber(pickupPoint[1], 50) - 48) * 0.38;
@@ -3736,7 +3875,7 @@ def render_index() -> str:
         if (!courierPoint || !pickupPoint) return {id: assignment.id, score: -Infinity};
         const pickupDistance = distance2D(courierPoint, pickupPoint);
         const pickupRoute = roadFollowingRoute(courierPoint, pickupPoint, mapLayers);
-        const pickupIsShort = !longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 21, span: 34, length: 44});
+        const pickupIsShort = !longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 55, span: 82, length: 120});
         const centerPenalty = Math.abs(safeNumber(pickupPoint[0], 50) - 52) * 0.45 + Math.abs(safeNumber(pickupPoint[1], 50) - 48) * 0.55;
         const selectedBonus = assignment.id === selectedAssignment ? 4 : 0;
         const shortPickupBonus = pickupIsShort ? 14 : 0;
@@ -3770,24 +3909,26 @@ def render_index() -> str:
         const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
         const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
-        const pickupRoute = stableDispatchRoute(courierPoints[0], pickupPoint);
+        const pickupRoute = roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers);
         const pickupD = dispatchPathFor(pickupRoute);
         if (!pickupD) return "";
-        const longPickup = longRouteClass(courierPoints[0], pickupPoint, pickupRoute, {direct: 21, span: 34, length: 44});
+        const longPickup = longRouteClass(courierPoints[0], pickupPoint, pickupRoute, {direct: 55, span: 82, length: 120});
         const showInOverview = Boolean(!focusMode && !longPickup);
         const pickupClass = `${cls} pickup-leg${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`;
         const pickupMeta = {
           merchant: assignment.pickup,
           courier: couriers[0],
           leg: "courier-to-merchant",
-          "route-source": "stable-local",
+          "route-source": "delivery-routes-road-graph-v3",
           "route-points": pickupRoute.length,
           "route-length": routePolylineLength(pickupRoute).toFixed(1),
+          "endpoint-connectors": Array.isArray(pickupRoute.endpointConnectors) ? pickupRoute.endpointConnectors.length : 0,
           "long-leg": longPickup ? "true" : "false"
         };
         const arrowCls = isActive ? "primary" : "secondary overview-route";
         const routeParts = [
           `<path class="${pickupClass}" data-assignment="${assignment.id}" data-route-role="main"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
+          dispatchEndpointConnectorsFor(pickupRoute, assignment.id, pickupMeta),
           dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
           dispatchArrowFor(pickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
         ];
@@ -4048,6 +4189,8 @@ def render_index() -> str:
       const merchantId = routeDataset.merchant || assignment.pickup;
       const courierId = routeDataset.courier || (assignment.map_couriers && assignment.map_couriers[0]) || courierTokens(assignment.courier)[0] || "";
       const routePoints = routeDataset.routePoints || routeDataset.routepoints || "";
+      const routeSource = routeDataset.routeSource || routeDataset.routesource || "delivery-routes-road-graph-v3";
+      const endpointConnectors = routeDataset.endpointConnectors || routeDataset.endpointconnectors || "0";
       const merchant = entityById(profile, merchantId);
       const courier = entityById(profile, courierId);
       const legLabel = "骑手到商家";
@@ -4055,14 +4198,14 @@ def render_index() -> str:
       setDetailContext("route", resolvedAssignment, merchantId, leg || "courier-to-merchant");
       $("detail-title").textContent = "派单关系：" + legLabel;
       $("detail-courier").textContent = assignment.courier;
-      $("detail-merchant").innerHTML = `关系线 <code>${endpointText}</code>，用于表达骑手承接商家；线条沿稳定调度路网绘制，不作为真实导航指令。`;
+      $("detail-merchant").innerHTML = `关系线 <code>${endpointText}</code>，用于表达骑手承接商家；线条沿美团配送语境的模拟路网绘制，不作为真实导航指令。`;
       $("detail-orders").innerHTML = [merchantId, courierId].filter(Boolean).map((item) => `<span class="chip">${item}</span>`).join("");
       $("detail-eta").textContent = assignment.eta;
       $("right-cost").textContent = assignment.cost;
       document.querySelector(".prob span").textContent = assignment.probability;
       $("detail-reasons").innerHTML = [
         `<li>该线属于派单 ${resolvedAssignment}，点击后聚焦对应商家与骑手。</li>`,
-        `<li>折线节点 ${routePoints || "-"} 个，采用稳定调度线，避免运行后路径跳变。</li>`,
+        `<li>路网来源 ${routeSource}；道路节点 ${routePoints || "-"} 个，端点连接 ${endpointConnectors} 段。</li>`,
         `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
@@ -4142,10 +4285,10 @@ def render_index() -> str:
       setDetailContext("table-row", row.dataset.assignment || "", branchId || rowType, "");
       const rowDescriptions = {
         "scene-summary": "该行说明当前调度场景输入，包括商家规模、骑手供给、天气/密度和风险画像。",
-        "preview-strategy": "该行展示刷新场景后的预期策略倾向，只作为推理前输入，不提前泄露最终结果。",
+        "preview-strategy": "该行展示刷新位置后的预期策略倾向，只作为推理前输入，不提前泄露最终结果。",
         "strategy-candidate": "该行对比一种候选派单策略在覆盖率、ETA、成本、骑手占用和无人接单风险上的表现。",
         "final-strategy": "该行是 AutoSolver 最终采纳方案，用于和贪心、合单、多派、修复、风险平衡策略做业务对比。",
-        "empty-state": "该行提示当前工作台状态：刷新场景可查看输入，运行推理后才生成最终派单。"
+        "empty-state": "该行提示当前工作台状态：刷新位置可查看输入，运行推理后才生成最终派单。"
       };
       const title = rowType === "preview-candidate"
         ? `候选关系：${row.dataset.merchant || cells[0] || "-"} → ${row.dataset.courier || "-"}`
@@ -4167,7 +4310,7 @@ def render_index() -> str:
         `<li>${rowDescriptions[rowType] || "该详情由表格行点击触发，用于说明候选/最终策略，不是纯视觉表格。"}</li>`,
         `<li>覆盖率：${cells[1] || "-"}；ETA：${cells[2] || "-"}；成本：${cells[3] || "-"}。</li>`,
         `<li>风险：${row.dataset.risk || cells[5] || "-"}；状态：${row.dataset.status || cells[7] || "-"}。</li>`,
-        `<li>业务解释：${cells[8] || "等待刷新场景后生成候选关系"}。</li>`
+        `<li>业务解释：${cells[8] || "等待刷新位置后生成候选关系"}。</li>`
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
       if (rows[0]) rows[0].textContent = cells[1] || "-";
@@ -4536,7 +4679,7 @@ def render_index() -> str:
         clearReasoningState();
         document.body.classList.remove("pending-run", "sample-preview", "reasoning");
         setStatus("模拟派单运行失败", false);
-        showToast("运行失败，请刷新场景后重试");
+        showToast("运行失败，请刷新位置后重试");
         return false;
       }
     }
@@ -4646,8 +4789,6 @@ def render_index() -> str:
             if (profile.assignments && Object.keys(profile.assignments).length) {
               applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
               updateMapScene(profile);
-            } else if (leafletMap) {
-              leafletMap.setView([(leafletBounds.latMin + leafletBounds.latMax) / 2, (leafletBounds.lngMin + leafletBounds.lngMax) / 2], 13);
             }
             showToast("视图已适配全部派单关系");
             return;
@@ -4658,7 +4799,6 @@ def render_index() -> str:
             const expanded = panel.classList.toggle("active");
             frame.dataset.fullscreen = expanded ? "true" : "false";
             button.textContent = expanded ? "↙" : "↗";
-            if (leafletMap) window.setTimeout(() => leafletMap.invalidateSize(false), 120);
             showToast(expanded ? "演示视图已进入地图聚焦模式" : "演示视图已退出地图聚焦模式");
             return;
           }
@@ -4669,7 +4809,6 @@ def render_index() -> str:
         const frame = document.querySelector(".map-frame");
         frame.classList.add("zoomed");
         frame.dataset.zoomLevel = "1.16";
-        if (leafletMap) leafletMap.zoomIn(1);
         $("zoom-in").classList.add("active");
         showToast("地图已放大");
       });
@@ -4677,7 +4816,6 @@ def render_index() -> str:
         const frame = document.querySelector(".map-frame");
         frame.classList.remove("zoomed");
         frame.dataset.zoomLevel = "1";
-        if (leafletMap) leafletMap.zoomOut(1);
         $("zoom-in").classList.remove("active");
         showToast("地图已缩小");
       });
@@ -4715,14 +4853,67 @@ def render_index() -> str:
         renderTableRowDetail(row);
       });
     }
+    function debugStateSnapshot() {
+      const profile = currentProfile || null;
+      const dispatchMap = profile && profile.dispatchMap ? profile.dispatchMap : null;
+      const sample = currentSimulationSample ? {
+        case_id: currentSimulationSample.case_id,
+        scenario_id: currentSimulationSample.scenario_id,
+        sample_index: currentSimulationSample.sample_index,
+        name: currentSimulationSample.name,
+        selected_strategy_id: currentSimulationSample.selected_strategy_id,
+        merchant_count: Array.isArray(currentSimulationSample.merchants) ? currentSimulationSample.merchants.length : 0,
+        courier_count: Array.isArray(currentSimulationSample.couriers) ? currentSimulationSample.couriers.length : 0
+      } : null;
+      return {
+      currentProfile: profile,
+      currentReport: currentReport ? {
+        wall_time_s: currentReport.wall_time_s,
+        best: currentReport.best,
+        has_dispatch_assignment_map: Boolean(currentReport.dispatch_assignment_map)
+      } : null,
+      currentReasoningState,
+      currentSimulationSample: sample,
+      semiRealMapReady,
+      semiRealMapRegion,
+      semiRealMapRegionLabel: currentSemiRealMapRegion().label,
+      semiRealMapStyle,
+      semiRealMapTextLayers: semiRealMapTextLayerAudit(),
+      mapFrame: {
+        className: document.querySelector(".map-frame")?.className || "",
+        dataset: {...(document.querySelector(".map-frame")?.dataset || {})}
+      },
+      dom: {
+        pins: document.querySelectorAll(".pin").length,
+        routeLinks: document.querySelectorAll(".dispatch-link.pickup-leg").length,
+        routeArrows: document.querySelectorAll(".dispatch-arrow").length,
+        strategyCards: document.querySelectorAll(".strategy").length,
+        tableRows: document.querySelectorAll(".table-panel tbody tr").length,
+        detailTitle: document.querySelector("#detail-title")?.textContent || "",
+        status: document.querySelector("#status")?.textContent || ""
+      }
+      };
+    }
+    function publishDebugState() {
+      const target = $("autosolver-debug-state");
+      if (!target) return;
+      try {
+        target.textContent = JSON.stringify(debugStateSnapshot());
+      } catch (error) {
+        target.textContent = JSON.stringify({error: String(error && error.message ? error.message : error)});
+      }
+    }
+    window.__AUTO_SOLVER_DEBUG__ = debugStateSnapshot;
+    window.setInterval(publishDebugState, 300);
     $("run-agent").addEventListener("click", streamRun);
     $("reload-cases").addEventListener("click", () => {
       refreshSimulationSample().catch((error) => {
         console.error(error);
-        setStatus("刷新场景失败", false);
-        showToast("刷新场景失败，请检查仿真场景接口");
+        setStatus("刷新位置失败", false);
+        showToast("刷新位置失败，请检查仿真场景接口");
       });
     });
+    $("refresh-map").addEventListener("click", refreshSemiRealMap);
     $("case-select").addEventListener("change", async () => {
       const option = $("case-select").selectedOptions && $("case-select").selectedOptions[0];
       if (option && option.dataset.scenario) {
@@ -4736,7 +4927,7 @@ def render_index() -> str:
       }
       applyScene(selectedCase());
     });
-    renderRasterTileBasemap();
+    renderProjectBasemapState();
     bindMapControls();
     loadCases();
   </script>
@@ -4764,8 +4955,6 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
     def _send_static_asset(self, path: str) -> bool:
         allowed = {
-            "/assets/leaflet/leaflet.js": ("application/javascript; charset=utf-8", STATIC_DIR / "leaflet" / "leaflet.js"),
-            "/assets/leaflet/leaflet.css": ("text/css; charset=utf-8", STATIC_DIR / "leaflet" / "leaflet.css"),
         }
         asset = allowed.get(path)
         if not asset:

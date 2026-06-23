@@ -1,0 +1,48 @@
+{
+  "task": "Task 4: 替换地图路网基础并重构沿路派单线",
+  "server_under_test": "http://127.0.0.1:8766/",
+  "map_replacement": {
+    "old_visual_dependency": "CARTO/OSM dark tiles were previously the dominant visible map layer",
+    "new_primary_map_style": "meituan_delivery_grid_v2",
+    "map_provider": "simulated_meituan_delivery",
+    "road_graph": "predeclared_delivery_roads_v2",
+    "external_tile_opacity_after_fix": 0,
+    "simulated_map_opacity_after_fix": 0.98,
+    "road_count_in_browser": 45,
+    "mesh_patterns_present": ["meituan-grid", "delivery-parcel-mesh"]
+  },
+  "route_replacement": {
+    "removed_old_route_source": "stable-local",
+    "removed_old_route_function": "stableDispatchRoute",
+    "new_route_source": "meituan-road-graph-v2",
+    "route_builder": "roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers)",
+    "endpoint_connectors_rendered": true,
+    "arrow_placement": "middle-of-route-length instead of last/longest terminal segment"
+  },
+  "browser_reasoning_audit": {
+    "runtime": "00:00:10",
+    "merchant_count": 5,
+    "main_route_count": 5,
+    "arrow_count": 5,
+    "connector_count": 3,
+    "route_sources": ["meituan-road-graph-v2"],
+    "map_style": "meituan_delivery_grid_v2",
+    "page_js_errors": []
+  },
+  "route_click_audit": {
+    "clicked_element": "dispatch arrow for a final assignment route",
+    "detail_title": "派单关系：骑手到商家",
+    "detail_type": "route",
+    "detail_mentions_road_graph": true,
+    "focused_assignment": true,
+    "active_main_route_count_after_click": 1
+  },
+  "screenshots": [
+    "goal/goal-8/task4-map-route-audit-v3.png"
+  ],
+  "known_follow_up_risks": [
+    "Task 5 still needs final To B polish for buttons, icon resources, line texture and overall visual density.",
+    "Task 6 still needs separate '刷新位置' and '刷新地图' controls; this task changed the map foundation and route graph, not refresh semantics."
+  ],
+  "violations": []
+}

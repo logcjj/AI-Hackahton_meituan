@@ -1,0 +1,289 @@
+{
+  "steps": [
+    {
+      "name": "layer-mode-selected",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "layerMode": "selected",
+        "mapDataset": {
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "已聚焦当前派单，其余关系降噪"
+      }
+    },
+    {
+      "name": "layer-mode-candidates",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "layerMode": "candidates",
+        "mapDataset": {
+          "controlState": "selected",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "已增强派单关系线，便于检查"
+      }
+    },
+    {
+      "name": "button-depots",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "layerMode": "candidates",
+        "mapDataset": {
+          "controlState": "candidates",
+          "entitiesMuted": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "点位图层已弱化，仅保留派单关系"
+      }
+    },
+    {
+      "name": "button-routes",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "layerMode": "candidates",
+        "mapDataset": {
+          "controlState": "candidates",
+          "entitiesMuted": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "true",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "派单关系线已隐藏，仅保留点位"
+      }
+    },
+    {
+      "name": "button-fit",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "locating": "false",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "视图已适配全部派单关系"
+      }
+    },
+    {
+      "name": "button-locate",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单详情：M0104",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "已定位到 R0104 当前派单包"
+      }
+    },
+    {
+      "name": "button-fullscreen-open",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单详情：M0104",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "fullscreen": "true",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "演示视图已进入地图聚焦模式"
+      }
+    },
+    {
+      "name": "button-fullscreen-close",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单详情：M0104",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "演示视图已退出地图聚焦模式"
+      }
+    },
+    {
+      "name": "zoom-in",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单详情：M0104",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1.16"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "地图已放大"
+      }
+    },
+    {
+      "name": "zoom-out",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单详情：M0104",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "地图已缩小"
+      }
+    },
+    {
+      "name": "recenter",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单详情：M0104",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0104",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "已回到当前派单关系中心"
+      }
+    },
+    {
+      "name": "click-first-pin",
+      "ok": true,
+      "state": {
+        "detailTitle": "商家派单：M0101",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0101",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "商家 M0101 已派给 R0102"
+      }
+    },
+    {
+      "name": "click-first-route",
+      "ok": true,
+      "state": {
+        "detailTitle": "派单详情：R0112",
+        "layerMode": "all",
+        "mapDataset": {
+          "controlState": "all",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "locating": "true",
+          "mapRegion": "运营分析浅色区域 B",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0101",
+          "zoomLevel": "1"
+        },
+        "pins": 19,
+        "routeLinks": 5,
+        "status": "当前场景派单完成",
+        "toast": "M0101 → R0102，1 单"
+      }
+    }
+  ],
+  "ok": true
+}

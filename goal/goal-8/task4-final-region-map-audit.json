@@ -1,0 +1,23 @@
+{
+  "anchorSource": "maplibre-rendered",
+  "anchorVariant": "运营分析浅色区域 B",
+  "assignments": 5,
+  "detailTitle": "派单关系：骑手到商家",
+  "elapsedMs": 12222,
+  "endpointConnectorTotal": 5,
+  "htmlHasBright": false,
+  "htmlHasLiberty": false,
+  "longLegCount": 0,
+  "merchants": 5,
+  "minRoutePoints": 3,
+  "region": "运营分析浅色区域 B",
+  "routeArrows": 5,
+  "routeLinks": 5,
+  "style": "https://tiles.openfreemap.org/styles/positron",
+  "textLayers": {
+    "hidden": 19,
+    "total": 19,
+    "visible": 0
+  },
+  "toast": "骑手到商家：R0112 → M0105"
+}

@@ -61,11 +61,26 @@
 - 完整 10 秒推理检查通过：运行后 `runtime=00:00:10`、完成率 `100%`、ReasonGraph 1 个 selected / 4 个 rejected、5 个商家生成 5 条派单线和 5 个箭头、详情为“派单总览：全部商家已自动连线”，页面日志无本地 JS error。
 - 本轮没有发现 Task 1-3 范围内的 P0/P1/P2 问题；仍保留后续风险：Task 4 需要继续提升沿路派单线质量，Task 5 需要继续 To B 地图/图标/按钮视觉升级，Task 6 必须拆分“刷新位置”和“刷新地图”。
 
-## Task 4: 重构骑手到商家的沿路派单线
+## Task 4: 替换地图路网基础并重构沿路派单线
 
-验证标准：最终派单线默认全部显示，数量等于商家数；线路基于道路节点连接，箭头位于道路段中部；没有明显跨楼宇/跨地图直线；点击线进入“派单关系”详情。
+验证标准：地图不能继续守着旧路网视觉，必须替换为更接近参考项目/美团配送语境的专业地图结构；固定使用运营分析浅色底图；道路/街道结构可见但道路名、地名、POI 文本不显示；刷新地图切换所在配送区域位置而不是切换风格；最终派单线默认全部显示，数量等于商家数；线路基于新道路节点连接，箭头位于道路段中部；没有明显跨楼宇/跨地图直线；点击线进入“派单关系”详情。
 
 完成记录：
+- 已替换为 MapLibre + OpenFreeMap 半真实地图层，固定使用 `https://tiles.openfreemap.org/styles/positron` 运营分析浅色底图；代码中不再包含 `bright` / `liberty` 风格切换。
+- 已新增 4 个“运营分析浅色区域”配置；`刷新地图` 现在切换配送区域位置，不再切换地图风格，浏览器验证从区域 A 切到区域 B 后仍保持 `positron`。
+- 已隐藏 MapLibre 全部文字图层；浏览器审计显示 `textLayers.total=19`、`visible=0`、`hidden=19`，道路名、地名和 POI 名称不显示，只保留道路/街区结构。
+- 已把商家/骑手点位绑定到 MapLibre 渲染要素：商家来自 `maplibre-building-or-landuse`，骑手来自 `maplibre-road`；最终 `roadGraph=maplibre_rendered_road_graph`，本轮审计路网数量 `90`。
+- 已修正商家锚点选择逻辑：商家落在建筑/用地内但靠近道路边界，不再选离道路最远的块中心；最终每个商家都有端点连接线。
+- 已重构最终 SVG 派单线：从旧 `stableDispatchRoute()` 切换到 `roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers)`，并删除旧 `stableDispatchRoute()` / `stable-local` 路线源。
+- 已增强线路质量：增加 `densifyRoutePoints()` 分段插值、扩大端点连接覆盖距离、提高长距离低噪阈值；最终审计 `endpointConnectorTotal=5`、`longLegCount=0`、`minRoutePoints=3`。
+- 已修复路线点击优先级：路线 SVG 交互层高于点位层，点击箭头进入“派单关系：骑手到商家”，不会被骑手/商家 pin 抢事件。
+- 已保存浏览器审计与截图：`goal/goal-8/task4-final-region-map-audit.json`、`goal/goal-8/task4-final-region-map.png`、`goal/goal-8/task4-final-overview-map.png`、`goal/goal-8/task4-control-audit.json`、`goal/goal-8/task4-route-arrow-audit.json`。
+- 浏览器验证通过：运行 10 秒后 UI 显示 `00:00:10`，5 个商家生成 5 条派单线和 5 个箭头，路线源全部为 `delivery-routes-road-graph-v3`，商家数、派单数、路线数一致。
+- 浏览器控件验证通过：图层模式、点、线、适、定、全屏、放大、缩小、回中、点击商家、点击路线入口均可触发状态或详情变化。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
 
 ## Task 5: To B 地图纹理、图标、按钮和线路视觉升级
 
@@ -75,7 +90,7 @@
 
 ## Task 6: 刷新地图/刷新位置交互完善
 
-验证标准：页面提供清晰分离的“刷新位置”和“刷新地图”能力；刷新位置改变当前场景骑手/商家点位和候选关系，保留当前场景特征；刷新地图改变底图纹理、道路/交通可视变体或地图视图状态，但不等同于重抽骑手/商家；运行后任一刷新会清空最终线和结果，回到输入态。
+验证标准：页面提供清晰分离的“刷新位置”和“刷新地图”能力；刷新位置改变当前场景骑手/商家点位和候选关系，保留当前场景特征；刷新地图切换当前配送区域位置，固定使用运营分析浅色底图且不切换地图风格；运行后任一刷新会清空最终线和结果，回到输入态。
 
 完成记录：
 
