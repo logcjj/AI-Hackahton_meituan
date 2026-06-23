@@ -1401,7 +1401,7 @@ def render_index() -> str:
       display: grid;
       flex: 1 1 auto;
       min-height: 0;
-      grid-template-columns: minmax(300px, 23.5vw) minmax(0, 1fr) minmax(236px, 18.5vw);
+      grid-template-columns: minmax(330px, 25.5vw) minmax(0, 1fr) minmax(228px, 17.5vw);
       grid-template-rows: minmax(0, 1fr) 204px;
       gap: 5px;
       overflow: hidden;
@@ -1430,16 +1430,23 @@ def render_index() -> str:
       font-size: 11px;
     }
     .panel-head .spacer, .toolbar .spacer { flex: 1; }
-    .reason-wrap { position: relative; height: calc(100% - 36px); padding-top: 8px; overflow: hidden; }
+    .reason-wrap {
+      position: relative;
+      height: calc(100% - 36px);
+      padding: 6px 2px 2px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(100, 181, 246, .45) rgba(8, 20, 34, .5);
+    }
     .node {
-      width: calc(100% - 54px);
-      margin-left: 46px;
-      min-height: 50px;
+      width: 100%;
+      min-height: 39px;
       display: grid;
-      grid-template-columns: 32px 1fr 76px;
-      gap: 10px;
+      grid-template-columns: 30px 24px minmax(0, 1fr) 58px;
+      gap: 7px;
       align-items: center;
-      padding: 8px 10px;
+      padding: 5px 7px;
       border: 1px solid var(--stroke-2);
       border-radius: 7px;
       background: linear-gradient(180deg, rgba(14, 35, 54, .96), rgba(8, 25, 40, .96));
@@ -1451,10 +1458,9 @@ def render_index() -> str:
     .node.current { border-color: rgba(39, 230, 208, .8); box-shadow: 0 0 17px rgba(39, 230, 208, .28); }
     .node.rejected { opacity: .78; }
     .step-index {
-      position: absolute;
-      left: -46px;
-      width: 31px;
-      height: 31px;
+      position: static;
+      width: 28px;
+      height: 28px;
       border-radius: 6px;
       display: grid;
       place-items: center;
@@ -1464,22 +1470,25 @@ def render_index() -> str:
       font-family: var(--mono);
       box-shadow: 0 0 13px rgba(40, 168, 255, .35);
     }
-    .node h3, .strategy h4 { margin: 0 0 4px; font-size: 13px; }
-    .node p, .strategy p, .tiny { margin: 0; color: var(--muted); font-size: 10.5px; line-height: 1.3; }
+    .node h3, .strategy h4 { margin: 0 0 2px; font-size: 12px; }
+    .node p, .strategy p, .tiny { margin: 0; color: var(--muted); font-size: 9.5px; line-height: 1.18; }
+    .node p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .node p br { display: none; }
     .node .icon {
-      width: 27px; height: 27px; border-radius: 8px;
+      width: 23px; height: 23px; border-radius: 7px;
       display: grid; place-items: center;
       background: rgba(42, 163, 255, .12);
       color: #7ad4ff;
       border: 1px solid rgba(78, 185, 255, .32);
+      font-size: 12px;
     }
     .metric { text-align: right; }
-    .metric strong { color: var(--green); display: block; font-size: 19px; font-family: var(--mono); }
-    .metric span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 2px; }
+    .metric strong { color: var(--green); display: block; font-size: 14px; font-family: var(--mono); line-height: 1.1; }
+    .metric span { display: block; color: var(--muted); font-size: 9.5px; margin-bottom: 2px; }
     .connector {
-      height: 8px;
+      height: 4px;
       width: 2px;
-      margin-left: 32px;
+      margin-left: 14px;
       background: linear-gradient(var(--stroke-2), var(--cyan));
       opacity: .8;
       position: relative;
@@ -1488,22 +1497,22 @@ def render_index() -> str:
     .branch-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 5px;
-      margin: 7px 0 8px 46px;
-      width: calc(100% - 54px);
+      gap: 3px;
+      margin: 5px 0 6px;
+      width: 100%;
       position: relative;
     }
     .branch-grid:before { content: none; }
     .strategy {
-      min-height: 38px;
+      min-height: 26px;
       display: grid;
-      grid-template-columns: 28px minmax(0, 1fr) auto;
-      gap: 7px;
+      grid-template-columns: 26px minmax(0, 1fr) 86px;
+      gap: 6px;
       align-items: center;
       border: 1px solid rgba(135, 152, 166, .35);
       background: linear-gradient(180deg, rgba(16, 32, 47, .96), rgba(8, 20, 34, .96));
       border-radius: 6px;
-      padding: 5px 7px;
+      padding: 3px 6px;
       position: relative;
       z-index: 2;
       cursor: pointer;
@@ -1512,10 +1521,10 @@ def render_index() -> str:
     .strategy.best { border-color: var(--green); box-shadow: 0 0 18px rgba(54, 230, 126, .34); background: linear-gradient(180deg, rgba(8, 69, 52, .95), rgba(5, 38, 35, .95)); }
     .strategy.evaluating { border-color: var(--blue); box-shadow: 0 0 16px rgba(40, 168, 255, .24); }
     .strategy.rejected { opacity: .72; }
-    .strategy h4 { margin: 0; font-family: var(--mono); font-size: 12px; color: #d8efff; }
-    .strategy p { font-size: 10px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .strategy h4 { margin: 0; font-family: var(--mono); font-size: 11px; color: #d8efff; }
+    .strategy p { font-size: 9.5px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .strategy p br { display: none; }
-    .strategy strong { display: flex; align-items: center; gap: 5px; color: var(--green); font-family: var(--mono); margin-top: 0; font-size: 12px; white-space: nowrap; }
+    .strategy strong { display: flex; justify-content: flex-end; align-items: center; gap: 4px; color: var(--green); font-family: var(--mono); margin-top: 0; font-size: 10.5px; white-space: nowrap; }
     .strategy.rejected strong, .strategy.pending strong { color: var(--muted); }
     .strategy .evidence { display: block; margin-top: 4px; color: #9db1c3; font-family: var(--mono); font-size: 10px; }
     .badge { display: inline-block; border: 1px solid rgba(255,91,101,.48); color: #ff7881; background: rgba(255,91,101,.12); border-radius: 4px; padding: 2px 5px; font-size: 9px; margin-left: 5px; }

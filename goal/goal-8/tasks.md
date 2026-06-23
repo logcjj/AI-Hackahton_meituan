@@ -5,6 +5,18 @@
 验证标准：完成 deck.gl / GitHub / To B 地图参考调研；形成可落地的地图、线路、按钮、图标、锚点体系设计清单；不修改业务代码，只产出审计和设计依据。
 
 完成记录：
+- 用户指出左侧 ReasonGraph 仍然拥挤，本轮作为 Task 9 最终验收阻断问题处理。
+- 已修复左栏横向拥挤：左栏从 `minmax(300px, 23.5vw)` 提升到 `minmax(330px, 25.5vw)`，右侧列略收窄，保证 ReasonGraph 有足够阅读宽度。
+- 已移除节点和策略列表的外置 46px 缩进，编号改为节点内部网格列；节点、策略卡都恢复为左栏完整宽度，避免实际内容区只剩约 240px。
+- 已压缩 ReasonGraph 节点为单行业务摘要，降低节点高度、连接线高度和策略卡高度；左侧 6 个节点与 5 个策略卡在默认视图下全部可见。
+- 已给 `.reason-wrap` 增加内部滚动兜底，但浏览器审计显示当前默认视图无需滚动即可完整显示。
+- 已补回归测试，禁止回退到 `margin-left: 46px`、`width: calc(100% - 54px)` 和 `overflow:hidden` 裁切布局。
+- 已保存左侧布局审计和截图：`goal/goal-8/task9-left-layout-audit.json`、`goal/goal-8/task9-left-layout-after.png`、`goal/goal-8/task9-left-layout-run-audit.json`、`goal/goal-8/task9-left-layout-run.png`、`goal/goal-8/task9-left-layout-final-run-audit.json`、`goal/goal-8/task9-left-layout-final-run.png`。
+- 浏览器布局审计通过：`overlaps=[]`、`outside=[]`、`allVisibleWithoutScroll=true`，6 个节点和 5 个策略卡没有互相覆盖或超出左侧面板。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
 - 已完成外部调研，覆盖 deck.gl TripsLayer、PathLayer、deck.gl + Mapbox 叠层、Kepler.gl 数据格式、Snowflake Fleet demo、Valhalla routing、美团骑手/订单分配语境。
 - 已写入调研与差距审计文档：`goal/goal-8/task1-research-audit.md`。
 - 已确认当前代码关键差距：只有 6 个场景、没有显式商家/骑手锚点池、最终总览线仍使用 `stableDispatchRoute()` 而不是 `roadFollowingRoute()`、缺少独立“刷新地图/刷新位置”入口、图标/按钮/线路纹理仍偏程序化。
