@@ -1669,10 +1669,10 @@ def render_index() -> str:
     body.sample-preview .traffic-band { opacity: .32; }
     .dispatch-visual { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: none; stroke-dashoffset: 0; animation: none; pointer-events: none; }
     .dispatch-visual.primary { stroke: var(--map-route-focus); stroke-width: 2.1; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
-    .dispatch-visual.secondary { stroke: var(--route-color, var(--map-route)); stroke-width: 1.3; stroke-dasharray: none; filter: none; opacity: .5; }
-    .dispatch-visual.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.3; opacity: .48; filter: none; }
-    .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.35; filter: none; }
-    .dispatch-visual.pickup-leg.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.35; opacity: .56; stroke-dasharray: none; filter: none; }
+    .dispatch-visual.secondary { stroke: var(--route-color, var(--map-route)); stroke-width: 1.45; stroke-dasharray: none; filter: none; opacity: .58; }
+    .dispatch-visual.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.5; opacity: .62; filter: none; }
+    .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.55; filter: none; }
+    .dispatch-visual.pickup-leg.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.7; opacity: .72; stroke-dasharray: none; filter: drop-shadow(0 1px 1px rgba(15, 118, 110, .12)); }
     .dispatch-visual.endpoint-connector { stroke: var(--route-color, var(--map-route)); stroke-width: 1.65; opacity: .64; stroke-dasharray: none; filter: none; animation: none; pointer-events: none; }
     .dispatch-visual.selected-overview {
       stroke: #d99a00;
@@ -1705,7 +1705,7 @@ def render_index() -> str:
       opacity: .01;
     }
     .dispatch-arrow { fill: #d99a00; opacity: .78; filter: drop-shadow(0 1px 1px rgba(68, 64, 60, .18)); pointer-events: auto; cursor: pointer; }
-    .dispatch-arrow.overview-route { fill: #d99a00; opacity: .76; }
+    .dispatch-arrow.overview-route { fill: var(--route-color, #0f766e); opacity: .84; }
     .dispatch-arrow.active-assignment { opacity: 1; }
     .arrow { fill: var(--cyan); filter: drop-shadow(0 0 6px rgba(39,230,208,.75)); }
     @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -1819,8 +1819,8 @@ def render_index() -> str:
     .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .24; fill: rgba(43,222,205,.5); }
     .map-frame.assignment-overview .dispatch-visual { stroke-dashoffset: 0; }
     .map-frame.assignment-overview .dispatch-visual.primary { stroke: var(--map-route-focus); stroke-width: 2.15; opacity: .82; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
-    .map-frame.assignment-overview .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.35; opacity: .54; filter: none; }
-    .map-frame.assignment-overview .dispatch-visual.pickup-leg.selected-overview { stroke: var(--map-route-focus); stroke-width: 1.65; opacity: .7; filter: none; }
+    .map-frame.assignment-overview .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.75; opacity: .72; filter: drop-shadow(0 1px 1px rgba(15, 118, 110, .12)); }
+    .map-frame.assignment-overview .dispatch-visual.pickup-leg.selected-overview { stroke: var(--map-route-focus); stroke-width: 2.05; opacity: .84; filter: drop-shadow(0 1px 2px rgba(15, 118, 110, .16)); }
     .map-frame.assignment-overview .dispatch-arrow { opacity: .68; }
     .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .76; fill: var(--map-route-focus); }
     .map-frame.assignment-overview .dispatch-visual.active-assignment { stroke: var(--map-route-focus); stroke-width: 2.0; opacity: .78; stroke-dasharray: none; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
@@ -4519,7 +4519,7 @@ def render_index() -> str:
       const focusMode = profile.mapFocusMode === "focus";
       const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
-      const routePalette = ["#16a34a", "#0f766e", "#2563eb", "#ca8a04", "#15803d", "#0d9488", "#64748b", "#2f855a"];
+      const routePalette = ["#0f766e", "#11836e", "#147a64", "#0d9488", "#15803d", "#0f766e", "#11836e", "#147a64"];
       const pathHtml = profile.dispatchMap.assignments.flatMap((assignment, index) => {
         const normalizedAssignment = (profile.assignments && profile.assignments[assignment.id]) || assignment;
         const couriers = finalCourierTokensForAssignment(normalizedAssignment);

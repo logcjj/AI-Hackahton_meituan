@@ -1,0 +1,1456 @@
+{
+  "failureCount": 0,
+  "failures": [],
+  "observations": [
+    {
+      "phase": "preview",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "--",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "counts": {
+        "routes": 0,
+        "visuals": 0,
+        "arrows": 0,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 0,
+        "couriers": 0
+      },
+      "routes": [],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况待刷新 天气等待场景 履约影响待评估 运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "等待运行派单推理",
+        "body": "等待运行派单推理 对象 - 请选择场景并点击 刷新位置 生成输入；运行派单推理后，系统会按商家、骑手意愿、价格和路况生成最终派单关系。 派单履约 ETA- 预计派单成本- 接单 / 覆盖概率--"
+      },
+      "finalRowText": "",
+      "reasonFinal": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图"
+        },
+        "className": "map-frame project-map-ready maplibre-ready"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    },
+    {
+      "phase": "after-zoom-refresh",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "6",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "counts": {
+        "routes": 0,
+        "visuals": 0,
+        "arrows": 0,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 12
+      },
+      "routes": [],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "场景输入：商圈十字路口高峰",
+        "body": "场景输入：商圈十字路口高峰 对象 - 已生成 6 个商家点和 12 个骑手点；当前仅展示输入，不提前生成派单结果。商家 6骑手 12路况 moderate 派单履约 ETA- 预计派单成本- 接单 / 覆盖概率--"
+      },
+      "finalRowText": "",
+      "reasonFinal": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    },
+    {
+      "phase": "final",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$179.00",
+        "improvement": "+54.0%",
+        "benefitBatch": "￥5.25",
+        "benefitMonth": "￥1,751,087"
+      },
+      "counts": {
+        "routes": 6,
+        "visuals": 6,
+        "arrows": 6,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 6
+      },
+      "routes": [
+        {
+          "assignment": "A0101",
+          "merchant": "M0101",
+          "courier": "R0104",
+          "finalCourier": "R0104",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M427.8 403.3 L443.8 403.3"
+        },
+        {
+          "assignment": "A0102",
+          "merchant": "M0102",
+          "courier": "R0108",
+          "finalCourier": "R0108",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M481.3 157.1 L497.3 157.1"
+        },
+        {
+          "assignment": "A0103",
+          "merchant": "M0103",
+          "courier": "R0103",
+          "finalCourier": "R0103",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M498.8 283.1 L514.8 283.1"
+        },
+        {
+          "assignment": "A0104",
+          "merchant": "M0104",
+          "courier": "R0101",
+          "finalCourier": "R0101",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M237.3 412.8 L253.3 412.8"
+        },
+        {
+          "assignment": "A0105",
+          "merchant": "M0105",
+          "courier": "R0107",
+          "finalCourier": "R0107",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M539.9 374.7 L555.9 374.7"
+        },
+        {
+          "assignment": "A0106",
+          "merchant": "M0106",
+          "courier": "R0106",
+          "finalCourier": "R0106",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M466.1 226.0 L482.1 226.0"
+        }
+      ],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "派单总览：全部商家已自动连线",
+        "body": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0104M0102 → R0108M0103 → R0103M0104 → R0101M0105 → R0107M0106 → R0106 派单履约 ETA17 分钟平均 预计派单成本$179.00 接单 / 覆盖概率100%"
+      },
+      "finalRowText": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinal": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.83",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "selectedAssignment": "A0106"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology assignment-overview"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ],
+      "elapsedMs": 10681
+    },
+    {
+      "phase": "routes-hidden",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$179.00",
+        "improvement": "+54.0%",
+        "benefitBatch": "￥5.25",
+        "benefitMonth": "￥1,751,087"
+      },
+      "counts": {
+        "routes": 6,
+        "visuals": 6,
+        "arrows": 6,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 6
+      },
+      "routes": [
+        {
+          "assignment": "A0101",
+          "merchant": "M0101",
+          "courier": "R0104",
+          "finalCourier": "R0104",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M427.8 403.3 L443.8 403.3"
+        },
+        {
+          "assignment": "A0102",
+          "merchant": "M0102",
+          "courier": "R0108",
+          "finalCourier": "R0108",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M481.3 157.1 L497.3 157.1"
+        },
+        {
+          "assignment": "A0103",
+          "merchant": "M0103",
+          "courier": "R0103",
+          "finalCourier": "R0103",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M498.8 283.1 L514.8 283.1"
+        },
+        {
+          "assignment": "A0104",
+          "merchant": "M0104",
+          "courier": "R0101",
+          "finalCourier": "R0101",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M237.3 412.8 L253.3 412.8"
+        },
+        {
+          "assignment": "A0105",
+          "merchant": "M0105",
+          "courier": "R0107",
+          "finalCourier": "R0107",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M539.9 374.7 L555.9 374.7"
+        },
+        {
+          "assignment": "A0106",
+          "merchant": "M0106",
+          "courier": "R0106",
+          "finalCourier": "R0106",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M466.1 226.0 L482.1 226.0"
+        }
+      ],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "派单总览：全部商家已自动连线",
+        "body": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0104M0102 → R0108M0103 → R0103M0104 → R0101M0105 → R0107M0106 → R0106 派单履约 ETA17 分钟平均 预计派单成本$179.00 接单 / 覆盖概率100%"
+      },
+      "finalRowText": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinal": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.83",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "selectedAssignment": "A0106",
+          "routesHidden": "true"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology assignment-overview hide-dispatch-routes"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": true
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    },
+    {
+      "phase": "depots-muted",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$179.00",
+        "improvement": "+54.0%",
+        "benefitBatch": "￥5.25",
+        "benefitMonth": "￥1,751,087"
+      },
+      "counts": {
+        "routes": 6,
+        "visuals": 6,
+        "arrows": 6,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 6
+      },
+      "routes": [
+        {
+          "assignment": "A0101",
+          "merchant": "M0101",
+          "courier": "R0104",
+          "finalCourier": "R0104",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M427.8 403.3 L443.8 403.3"
+        },
+        {
+          "assignment": "A0102",
+          "merchant": "M0102",
+          "courier": "R0108",
+          "finalCourier": "R0108",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M481.3 157.1 L497.3 157.1"
+        },
+        {
+          "assignment": "A0103",
+          "merchant": "M0103",
+          "courier": "R0103",
+          "finalCourier": "R0103",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M498.8 283.1 L514.8 283.1"
+        },
+        {
+          "assignment": "A0104",
+          "merchant": "M0104",
+          "courier": "R0101",
+          "finalCourier": "R0101",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M237.3 412.8 L253.3 412.8"
+        },
+        {
+          "assignment": "A0105",
+          "merchant": "M0105",
+          "courier": "R0107",
+          "finalCourier": "R0107",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M539.9 374.7 L555.9 374.7"
+        },
+        {
+          "assignment": "A0106",
+          "merchant": "M0106",
+          "courier": "R0106",
+          "finalCourier": "R0106",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M466.1 226.0 L482.1 226.0"
+        }
+      ],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "派单总览：全部商家已自动连线",
+        "body": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0104M0102 → R0108M0103 → R0103M0104 → R0101M0105 → R0107M0106 → R0106 派单履约 ETA17 分钟平均 预计派单成本$179.00 接单 / 覆盖概率100%"
+      },
+      "finalRowText": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinal": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.83",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "selectedAssignment": "A0106",
+          "routesHidden": "false",
+          "entitiesMuted": "true"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology assignment-overview hide-entities"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": true
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    },
+    {
+      "phase": "selected-layer",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$179.00",
+        "improvement": "+54.0%",
+        "benefitBatch": "￥5.25",
+        "benefitMonth": "￥1,751,087"
+      },
+      "counts": {
+        "routes": 6,
+        "visuals": 6,
+        "arrows": 6,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 6
+      },
+      "routes": [
+        {
+          "assignment": "A0101",
+          "merchant": "M0101",
+          "courier": "R0104",
+          "finalCourier": "R0104",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M427.8 403.3 L443.8 403.3"
+        },
+        {
+          "assignment": "A0102",
+          "merchant": "M0102",
+          "courier": "R0108",
+          "finalCourier": "R0108",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M481.3 157.1 L497.3 157.1"
+        },
+        {
+          "assignment": "A0103",
+          "merchant": "M0103",
+          "courier": "R0103",
+          "finalCourier": "R0103",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M498.8 283.1 L514.8 283.1"
+        },
+        {
+          "assignment": "A0104",
+          "merchant": "M0104",
+          "courier": "R0101",
+          "finalCourier": "R0101",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M237.3 412.8 L253.3 412.8"
+        },
+        {
+          "assignment": "A0105",
+          "merchant": "M0105",
+          "courier": "R0107",
+          "finalCourier": "R0107",
+          "display": "none",
+          "pointer": "stroke",
+          "d": "M539.9 374.7 L555.9 374.7"
+        },
+        {
+          "assignment": "A0106",
+          "merchant": "M0106",
+          "courier": "R0106",
+          "finalCourier": "R0106",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M466.1 226.0 L482.1 226.0"
+        }
+      ],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "派单总览：全部商家已自动连线",
+        "body": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0104M0102 → R0108M0103 → R0103M0104 → R0101M0105 → R0107M0106 → R0106 派单履约 ETA17 分钟平均 预计派单成本$179.00 接单 / 覆盖概率100%"
+      },
+      "finalRowText": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinal": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.83",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "selected",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "selectedAssignment": "A0106",
+          "routesHidden": "false",
+          "entitiesMuted": "false"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology focus-selected hide-candidates"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    },
+    {
+      "phase": "fit",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$179.00",
+        "improvement": "+54.0%",
+        "benefitBatch": "￥5.25",
+        "benefitMonth": "￥1,751,087"
+      },
+      "counts": {
+        "routes": 6,
+        "visuals": 6,
+        "arrows": 6,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 6
+      },
+      "routes": [
+        {
+          "assignment": "A0101",
+          "merchant": "M0101",
+          "courier": "R0104",
+          "finalCourier": "R0104",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M427.8 403.3 L443.8 403.3"
+        },
+        {
+          "assignment": "A0102",
+          "merchant": "M0102",
+          "courier": "R0108",
+          "finalCourier": "R0108",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M481.3 157.1 L497.3 157.1"
+        },
+        {
+          "assignment": "A0103",
+          "merchant": "M0103",
+          "courier": "R0103",
+          "finalCourier": "R0103",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M498.8 283.1 L514.8 283.1"
+        },
+        {
+          "assignment": "A0104",
+          "merchant": "M0104",
+          "courier": "R0101",
+          "finalCourier": "R0101",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M237.3 412.8 L253.3 412.8"
+        },
+        {
+          "assignment": "A0105",
+          "merchant": "M0105",
+          "courier": "R0107",
+          "finalCourier": "R0107",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M539.9 374.7 L555.9 374.7"
+        },
+        {
+          "assignment": "A0106",
+          "merchant": "M0106",
+          "courier": "R0106",
+          "finalCourier": "R0106",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M466.1 226.0 L482.1 226.0"
+        }
+      ],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "派单总览：全部商家已自动连线",
+        "body": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0104M0102 → R0108M0103 → R0103M0104 → R0101M0105 → R0107M0106 → R0106 派单履约 ETA17 分钟平均 预计派单成本$179.00 接单 / 覆盖概率100%"
+      },
+      "finalRowText": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinal": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.83",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "locating": "false",
+          "selectedAssignment": "A0106"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology assignment-overview"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": true
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    },
+    {
+      "phase": "locate",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$179.00",
+        "improvement": "+54.0%",
+        "benefitBatch": "￥5.25",
+        "benefitMonth": "￥1,751,087"
+      },
+      "counts": {
+        "routes": 6,
+        "visuals": 6,
+        "arrows": 6,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 6
+      },
+      "routes": [
+        {
+          "assignment": "A0101",
+          "merchant": "M0101",
+          "courier": "R0104",
+          "finalCourier": "R0104",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M411.9 601.4 L427.9 601.4"
+        },
+        {
+          "assignment": "A0102",
+          "merchant": "M0102",
+          "courier": "R0108",
+          "finalCourier": "R0108",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M486.3 219.7 L502.3 219.7"
+        },
+        {
+          "assignment": "A0103",
+          "merchant": "M0103",
+          "courier": "R0103",
+          "finalCourier": "R0103",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M545.7 421.7 L561.7 421.7"
+        },
+        {
+          "assignment": "A0104",
+          "merchant": "M0104",
+          "courier": "R0101",
+          "finalCourier": "R0101",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M109.7 615.4 L125.7 615.4"
+        },
+        {
+          "assignment": "A0105",
+          "merchant": "M0105",
+          "courier": "R0107",
+          "finalCourier": "R0107",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M584.3 555.6 L600.3 555.6"
+        },
+        {
+          "assignment": "A0106",
+          "merchant": "M0106",
+          "courier": "R0106",
+          "finalCourier": "R0106",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M490.8 316.0 L506.8 316.0"
+        }
+      ],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "派单详情：M0106",
+        "body": "派单详情：M0106 对象 R0106 商家 M0106 共 2 单，最终派给 R0106M0106 · 2单 派单履约 ETA15 分钟 预计派单成本$27.20 接单 / 覆盖概率47%"
+      },
+      "finalRowText": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinal": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.83",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "14.00",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "locate-assignment-control",
+          "mapCenter": "121.46166,31.23251",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "locating": "true",
+          "selectedAssignment": "A0106"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology locating focus-selected"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": true
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": true
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    },
+    {
+      "phase": "route-click",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "scale": "1.0000",
+      "bodyScroll": {
+        "w": 1280,
+        "h": 720
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$179.00",
+        "improvement": "+54.0%",
+        "benefitBatch": "￥5.25",
+        "benefitMonth": "￥1,751,087"
+      },
+      "counts": {
+        "routes": 6,
+        "visuals": 6,
+        "arrows": 6,
+        "hitAreas": 0,
+        "weatherBars": 0,
+        "merchants": 6,
+        "couriers": 6
+      },
+      "routes": [
+        {
+          "assignment": "A0101",
+          "merchant": "M0101",
+          "courier": "R0104",
+          "finalCourier": "R0104",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M411.9 601.4 L427.9 601.4"
+        },
+        {
+          "assignment": "A0102",
+          "merchant": "M0102",
+          "courier": "R0108",
+          "finalCourier": "R0108",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M486.3 219.7 L502.3 219.7"
+        },
+        {
+          "assignment": "A0103",
+          "merchant": "M0103",
+          "courier": "R0103",
+          "finalCourier": "R0103",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M545.7 421.7 L561.7 421.7"
+        },
+        {
+          "assignment": "A0104",
+          "merchant": "M0104",
+          "courier": "R0101",
+          "finalCourier": "R0101",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M109.7 615.4 L125.7 615.4"
+        },
+        {
+          "assignment": "A0105",
+          "merchant": "M0105",
+          "courier": "R0107",
+          "finalCourier": "R0107",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M584.3 555.6 L600.3 555.6"
+        },
+        {
+          "assignment": "A0106",
+          "merchant": "M0106",
+          "courier": "R0106",
+          "finalCourier": "R0106",
+          "display": "inline",
+          "pointer": "stroke",
+          "d": "M490.8 316.0 L506.8 316.0"
+        }
+      ],
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outPins": [],
+      "pinClosePairs": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "pointer": "none",
+        "bg": "rgba(0, 0, 0, 0)",
+        "color": "rgb(51, 65, 85)",
+        "rect": {
+          "x": 817,
+          "y": 361,
+          "w": 212,
+          "h": 133
+        }
+      },
+      "detail": {
+        "title": "派单关系：骑手到商家",
+        "body": "派单关系：骑手到商家 对象 R0104 最终派单 M0101 → R0104；地图线 R0104 → M0101 表达骑手承接该商家，不作为骑行导航。M0101R0104 派单履约 ETA15 分钟 预计派单成本$19.90 接单 / 覆盖概率73%"
+      },
+      "finalRowText": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinal": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.83",
+      "map": {
+        "dataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "14.00",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "locate-assignment-control",
+          "mapCenter": "121.46166,31.23251",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "locating": "true",
+          "selectedAssignment": "A0101"
+        },
+        "className": "map-frame project-map-ready maplibre-ready topology locating focus-selected"
+      },
+      "controls": [
+        {
+          "id": "",
+          "action": "depots",
+          "text": "点位",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "routes",
+          "text": "线路",
+          "active": false
+        },
+        {
+          "id": "",
+          "action": "fit",
+          "text": "适配",
+          "active": true
+        },
+        {
+          "id": "",
+          "action": "locate",
+          "text": "定位",
+          "active": true
+        },
+        {
+          "id": "",
+          "action": "fullscreen",
+          "text": "全屏",
+          "active": false
+        },
+        {
+          "id": "zoom-in",
+          "action": "",
+          "text": "+",
+          "active": false
+        },
+        {
+          "id": "zoom-out",
+          "action": "",
+          "text": "−",
+          "active": false
+        },
+        {
+          "id": "recenter",
+          "action": "",
+          "text": "⌾",
+          "active": false
+        }
+      ]
+    }
+  ],
+  "generatedAt": "2026-06-23T17:41:28.538Z"
+}

@@ -166,3 +166,20 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 13: 企业级验收循环 6：最新页面视觉、性能和交互复核
+
+验证标准：在最新提交基础上重新打开页面，不依赖旧截图；覆盖 1280x720、1024x720、窄屏等视口，运行完整 10 秒推理，检查地图线、点位密度、天气卡片、右侧详情、收益量化、ReasonGraph、底部表格、刷新位置、刷新地图、缩放、拖拽、图层模式、线路/点位/定位/适配/全屏按钮。若发现视觉拥挤、按钮失效、卡顿、路线错配、天气遮挡或业务解释不合理，必须继续修复。
+
+完成记录：
+- 已用 Playwright CLI 重新打开 `http://127.0.0.1:8768/`，不复用旧截图；覆盖预览态、缩放后刷新位置、完整 10 秒推理、线路/点位/图层/适配/定位、路线点击详情、1024 视口和窄屏视口。
+- 初始审计 `goal/goal-9/task13-audit.json` 中 `failureCount=0`，但人工目视 `goal/goal-9/task13-final-overview-1280.png` 发现总览态普通派单线偏细偏淡，容易和底图道路/虚线混淆。
+- 已优化总览派单线：统一为美团运营绿系，不再使用蓝/黄等多色路线；总览普通线提升到 `stroke-width: 1.75`、`opacity: .72`，选中线提升到 `2.05`、`.84`，保持专业克制但更清楚。
+- 已补回归测试：锁定绿色 route palette，禁止回退到旧蓝/黄多色路线，并锁定总览线条强度。
+- 修复后审计通过：`goal/goal-9/task13-audit-after-fix.json` 中 `failureCount=0`，路线/视觉/箭头均为 6，商家/骑手均为 6，`hitAreas=0`，无重复骑手、无 route mismatch、收益量化完整。
+- 响应式复测通过：`goal/goal-9/task13-responsive-audit-after-fix.json` 中 1024 与窄屏均无滚动溢出，路线/商家/骑手/箭头数量一致，天气卡片不拦截点击，旧 hit-area 为 0。
+- 已保存视觉证据：`goal/goal-9/task13-final-overview-1280-after-fix.png`、`goal/goal-9/task13-final-1024-after-fix.png`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。

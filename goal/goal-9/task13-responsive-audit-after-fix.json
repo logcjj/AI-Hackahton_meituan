@@ -1,0 +1,108 @@
+{
+  "1024": {
+    "viewport": {
+      "w": 1024,
+      "h": 720
+    },
+    "scale": "0.8000",
+    "scroll": {
+      "w": 1024,
+      "h": 720
+    },
+    "counts": {
+      "routes": 6,
+      "visuals": 6,
+      "arrows": 6,
+      "hitAreas": 0,
+      "merchants": 6,
+      "couriers": 6
+    },
+    "kpi": {
+      "runtime": "00:00:10",
+      "benefitBatch": "￥5.25",
+      "benefitMonth": "￥1,751,087"
+    },
+    "finalRow": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+    "weather": {
+      "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+      "rect": {
+        "x": 654,
+        "y": 289,
+        "w": 170,
+        "h": 106
+      },
+      "pointer": "none"
+    },
+    "map": {
+      "dataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "fit-control",
+        "mapCenter": "121.46200,31.22900",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "false",
+        "selectedAssignment": "A0101"
+      },
+      "className": "map-frame project-map-ready maplibre-ready topology assignment-overview"
+    },
+    "routeMismatch": []
+  },
+  "mobile": {
+    "viewport": {
+      "w": 390,
+      "h": 844
+    },
+    "scale": "0.3047",
+    "scroll": {
+      "w": 390,
+      "h": 844
+    },
+    "counts": {
+      "routes": 6,
+      "visuals": 6,
+      "arrows": 6,
+      "hitAreas": 0,
+      "merchants": 6,
+      "couriers": 6
+    },
+    "kpi": {
+      "runtime": "00:00:10",
+      "benefitBatch": "￥5.25",
+      "benefitMonth": "￥1,751,087"
+    },
+    "finalRow": "★最终 AutoSolver选中方案100%12 分钟$179.006 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+    "weather": {
+      "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+      "rect": {
+        "x": 249,
+        "y": 110,
+        "w": 65,
+        "h": 40
+      },
+      "pointer": "none"
+    },
+    "map": {
+      "dataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "fit-control",
+        "mapCenter": "121.46200,31.22900",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "false",
+        "selectedAssignment": "A0101"
+      },
+      "className": "map-frame project-map-ready maplibre-ready topology assignment-overview"
+    },
+    "routeMismatch": []
+  }
+}
