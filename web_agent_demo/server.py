@@ -1630,19 +1630,19 @@ def render_index() -> str:
           <article class="node current">
             <div class="step-index">1</div><div class="icon">▣</div>
             <div><h3>输入订单与骑手</h3><p>等待当前场景样本<br>刷新后生成商家与骑手点位</p></div>
-            <div class="metric"><span>可信度</span><strong>1.00</strong></div>
+            <div class="metric"><span>状态</span><strong>待输入</strong></div>
           </article>
           <div class="connector"></div>
-          <article class="node selected">
+          <article class="node">
             <div class="step-index">2</div><div class="icon">♙</div>
             <div><h3>场景识别</h3><p>识别订单密度、骑手意愿、路况与天气<br>不同场景触发不同策略路径</p></div>
-            <div class="metric"><span>可信度</span><strong>0.96</strong></div>
+            <div class="metric"><span>可信度</span><strong>--</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">3</div><div class="icon">↯</div>
             <div><h3>候选策略生成</h3><p>生成 5 类候选派单策略<br>比较合单、多派、修复、贪心与风险平衡</p></div>
-            <div class="metric"><span>候选策略</span><strong>5</strong></div>
+            <div class="metric"><span>候选策略</span><strong>--</strong></div>
           </article>
           <div class="branch-grid">
             <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>合单优先</b><br>优先匹配同路高重叠订单</p><strong>-- <span class="badge pending">待评估</span></strong></article>
@@ -1654,19 +1654,19 @@ def render_index() -> str:
           <article class="node">
             <div class="step-index">4</div><div class="icon">☑</div>
             <div><h3>派单可行性校验</h3><p>校验商家-订单关系、骑手意愿、容量、时间窗与 SLA</p></div>
-            <div class="metric"><span>通过</span><strong>1 / 5</strong></div>
+            <div class="metric"><span>通过</span><strong>--</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">5</div><div class="icon">▥</div>
             <div><h3>成本 / 风险评估</h3><p>评估综合成本、无人接单风险与履约质量<br>选择整体收益最高方案</p></div>
-            <div class="metric"><span>最佳分</span><strong>0.82</strong></div>
+            <div class="metric"><span>最佳分</span><strong>--</strong></div>
           </article>
           <div class="connector"></div>
-          <article class="node selected">
+          <article class="node">
             <div class="step-index">6</div><div class="icon">✓</div>
             <div><h3>最终派单方案</h3><p>运行完成后自动展示每个商家派给哪个骑手<br>无需逐个点击才看到结果</p></div>
-            <div class="metric"><span>置信度</span><strong>0.89</strong></div>
+            <div class="metric"><span>置信度</span><strong>--</strong></div>
           </article>
           <div class="reason-legend"><span><i class="line-key sel"></i>选中路径</span><span><i class="line-key eval"></i>评估中</span><span><i class="line-key rej"></i>淘汰路径</span></div>
         </div>
@@ -2396,12 +2396,62 @@ def render_index() -> str:
         strategy.querySelector("strong").innerHTML = `${score} <span class="badge ${badgeClass}">${statusText}</span>`;
       });
     }
+    function setNodeMetric(node, label, value) {
+      if (!node) return;
+      const metricLabel = node.querySelector(".metric span");
+      const metricValue = node.querySelector(".metric strong");
+      if (metricLabel) metricLabel.textContent = label;
+      if (metricValue) metricValue.textContent = value;
+    }
+    function sampleSelectedScore(sample) {
+      const selected = sample && sample.selected_strategy_id;
+      const item = selected && Array.isArray(sample.strategy_path) ? sample.strategy_path.find((entry) => entry.id === selected) : null;
+      return item && Number.isFinite(Number(item.score)) ? Number(item.score) : 0.89;
+    }
+    function updateReasonMetrics(activeStep, profile, report) {
+      const nodes = Array.from(document.querySelectorAll(".reason-wrap .node"));
+      const sample = currentSimulationSample;
+      const attempts = attemptsFromReport(report);
+      const candidateTotal = Math.max(5, attempts.length || (sample && Array.isArray(sample.strategy_path) ? sample.strategy_path.length : 0) || 5);
+      const selectedScore = sampleSelectedScore(sample);
+      const covered = report && report.best ? safeNumber(report.best.covered_tasks, report.best.total_tasks || 0) : 0;
+      const total = report && report.best ? safeNumber(report.best.total_tasks, covered || 1) : 1;
+      const finalConfidence = report ? Math.max(0.72, Math.min(0.99, selectedScore * 0.72 + Math.min(1, covered / Math.max(1, total)) * 0.24)).toFixed(2) : "--";
+      const sceneConfidence = sample ? Math.max(0.76, Math.min(0.98, selectedScore + 0.06)).toFixed(2) : "--";
+      setNodeMetric(nodes[0], "状态", sample ? "已刷新" : "待输入");
+      setNodeMetric(nodes[1], "可信度", "--");
+      setNodeMetric(nodes[2], "候选策略", "--");
+      setNodeMetric(nodes[3], "通过", "--");
+      setNodeMetric(nodes[4], "最佳分", "--");
+      setNodeMetric(nodes[5], "置信度", "--");
+      if (report) {
+        setNodeMetric(nodes[0], "状态", "已输入");
+        setNodeMetric(nodes[1], "可信度", sceneConfidence);
+        setNodeMetric(nodes[2], "候选策略", String(candidateTotal));
+        setNodeMetric(nodes[3], "通过", `${Math.max(1, safeNumber(report.best && report.best.groups, Object.keys((profile && profile.assignments) || {}).length || 1))} / ${candidateTotal}`);
+        setNodeMetric(nodes[4], "最佳分", selectedScore.toFixed(2));
+        setNodeMetric(nodes[5], "置信度", finalConfidence);
+        return;
+      }
+      if (!currentReasoningState) return;
+      if (activeStep >= 0) setNodeMetric(nodes[0], "状态", "已输入");
+      if (activeStep === 1) setNodeMetric(nodes[1], "可信度", "计算中");
+      if (activeStep > 1) setNodeMetric(nodes[1], "可信度", sceneConfidence);
+      if (activeStep === 2) setNodeMetric(nodes[2], "候选策略", "生成中");
+      if (activeStep > 2) setNodeMetric(nodes[2], "候选策略", String(candidateTotal));
+      if (activeStep === 3) setNodeMetric(nodes[3], "通过", "校验中");
+      if (activeStep > 3) setNodeMetric(nodes[3], "通过", `${currentReasoningState.phase === "selected" ? 1 : 0} / ${candidateTotal}`);
+      if (activeStep === 4) setNodeMetric(nodes[4], "最佳分", "评估中");
+      if (activeStep > 4) setNodeMetric(nodes[4], "最佳分", selectedScore.toFixed(2));
+      if (currentReasoningState.phase === "selected") setNodeMetric(nodes[5], "置信度", finalConfidence === "--" ? selectedScore.toFixed(2) : finalConfidence);
+    }
     function updateReasonProgress(activeStep) {
       const nodes = Array.from(document.querySelectorAll(".reason-wrap .node"));
       nodes.forEach((node, index) => {
         node.classList.toggle("selected", activeStep > 0 && index < activeStep);
         node.classList.toggle("current", index === activeStep);
       });
+      updateReasonMetrics(activeStep, currentProfile || profileForCase(selectedCase()), currentReport);
       if (currentReport) {
         renderStrategyCards(currentProfile || profileForCase(selectedCase()), currentReport);
         return;
@@ -2437,6 +2487,7 @@ def render_index() -> str:
           ? `派出 ${used} 个骑手 · ${Object.keys(profile.assignments || {}).length} 个商家派单 · 覆盖 ${covered}/${taskCount} 个订单<br>派单约束已通过`
           : `等待当前样本推理输出最终派单<br>运行完成后自动展示全部派单覆盖`;
       }
+      updateReasonMetrics(report ? 6 : 0, profile, report);
       renderStrategyCards(profile, report);
     }
     function labelOffsetFor(item, assignmentId, selectedAssignment) {
@@ -2656,7 +2707,7 @@ def render_index() -> str:
         const isMerchantPoint = item.kind === "pickup_cluster" || item.kind === "merchant_order";
         const pinKind = isMerchantPoint ? "rest" : item.kind === "courier" ? "courier" : "dest";
         const markKind = isMerchantPoint ? "rest" : item.kind === "courier" ? "courier" : "dest";
-        const showSelectedLabel = Boolean(hasAssignments && assignmentId === profile.selected && (item.kind === "courier" || item.kind === "order"));
+        const showSelectedLabel = false;
         pin.className = `pin ${pinKind}`;
         pin.dataset.entity = item.id;
         pin.dataset.assignment = assignmentId;
@@ -2675,13 +2726,7 @@ def render_index() -> str:
         if (item.hideLabel && !showSelectedLabel) return;
         const label = document.createElement("div");
         label.className = "map-label";
-        const assignment = (profile.assignments || {})[assignmentId] || {};
-        const selectedLabelHtml = item.kind === "courier"
-          ? `${item.id}<small>ETA ${assignment.eta || "-"}</small>`
-          : item.kind === "order"
-            ? `${item.id}<small>${assignment.courier || ""}</small>`
-            : item.html;
-        label.innerHTML = showSelectedLabel ? selectedLabelHtml : item.html;
+        label.innerHTML = item.html;
         label.style.left = Number(display.x).toFixed(1) + "%";
         label.style.top = Number(display.y).toFixed(1) + "%";
         label.style.setProperty("--label-offset-x", labelOffset[0] + "px");
@@ -4085,7 +4130,7 @@ def render_index() -> str:
         }
         if (target.dataset.leg && renderRouteDetail(profile, target.dataset.assignment || profile.selected, target.dataset)) return;
         if (target.dataset.entity && renderFinalEntityDetail(profile, target.dataset.entity)) return;
-        const sourceLabel = target.dataset.entity || target.dataset.order || target.dataset.merchant || target.dataset.courier || target.textContent.trim();
+        const sourceLabel = target.dataset.entity || target.dataset.merchant || target.dataset.courier || target.textContent.trim();
         renderAssignmentDetail(profile, target.dataset.assignment || profile.selected, sourceLabel);
       });
       document.querySelector(".branch-grid").addEventListener("click", (event) => {

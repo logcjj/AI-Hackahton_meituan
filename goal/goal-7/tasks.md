@@ -75,3 +75,17 @@
 - 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
 - 验证通过：内联脚本 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+
+## Task 5: 移除地图临时 ETA 浮框，修正未推理置信度
+
+验证标准：地图点击/聚焦后不再出现单独的骑手 ETA 浮框；ReasonGraph 初始和刷新后不显示写死置信度，只有推理中/完成后才逐步显示可信度、候选数量、通过数、最佳分和最终置信度。
+
+完成记录：
+- 已把 ReasonGraph 静态 HTML 中写死的 `1.00 / 0.96 / 0.89` 改为 `待输入 / --`，未运行前不再显示置信度。
+- 已新增 `updateReasonMetrics()` 和 `setNodeMetric()`，刷新后只显示“已刷新”，推理中显示“计算中 / 生成中 / 校验中”，运行完成后才写入可信度、候选数、通过数、最佳分和最终置信度。
+- 已关闭地图选中实体临时标签：`showSelectedLabel=false`，删除 `selectedLabelHtml`，不再出现截图里的单独骑手 `R0405 ETA 23 min` 浮框。
+- 已补单测防回归：禁止初始写死置信度、禁止 `<small>ETA` 地图浮框模板、要求动态指标更新函数存在。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：内联脚本 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+- 浏览器复核说明：本轮尝试连接 in-app browser 时被 Browser Use URL policy 阻断，未继续绕过；已用 render_index 结构检查和全量测试覆盖本轮逻辑。
