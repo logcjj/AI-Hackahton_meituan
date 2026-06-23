@@ -1,0 +1,69 @@
+{
+  "task": "大型全面检查-debug循环 1",
+  "scope": "Task 1-3 after research, anchor pools, and 10 simulated scenarios",
+  "server_under_test": "http://127.0.0.1:8766/",
+  "static_checks": {
+    "py_compile": "passed",
+    "inline_js_node_check": "passed",
+    "tests_test_web_agent_demo": "passed: 13 tests"
+  },
+  "browser_initial_state": {
+    "scenario_option_count": 10,
+    "unique_option_texts": 10,
+    "unique_scenario_ids": 10,
+    "scene_button_count": 0,
+    "has_10_samples_text": false,
+    "has_samples_dot_text": false,
+    "has_current_sample_text": false,
+    "initial_entity_count": 0,
+    "initial_dispatch_line_count": 0,
+    "initial_detail_title": "等待运行派单推理"
+  },
+  "browser_refresh_state": {
+    "same_scene_positions_changed_after_second_refresh": true,
+    "preview_dispatch_line_count": 0,
+    "preview_selected_reason_nodes": 0,
+    "preview_rejected_reason_nodes": 0,
+    "sample_text_leak": false
+  },
+  "ten_scene_refresh_audit": [
+    {"scenario": "commerce_peak", "name": "商圈十字路口高峰", "merchants": 5, "couriers": 12, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "medium_parallel", "name": "中型并行派单", "merchants": 5, "couriers": 10, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "scarce_repair", "name": "骑手稀缺修复", "merchants": 5, "couriers": 8, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "rain_low_willingness", "name": "雨天低接单意愿", "merchants": 5, "couriers": 12, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "offpeak_greedy", "name": "低峰分散订单", "merchants": 5, "couriers": 11, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "event_mixed_pressure", "name": "活动混合压力", "merchants": 5, "couriers": 14, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "night_foodcourt", "name": "夜间商圈宵夜", "merchants": 5, "couriers": 8, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "campus_lunch_peak", "name": "校园午高峰", "merchants": 6, "couriers": 14, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "hospital_office_peak", "name": "医院写字楼午峰", "merchants": 4, "couriers": 11, "preview": true, "sample_text_leak": false, "dispatch_lines": 0},
+    {"scenario": "congestion_reassign", "name": "拥堵异常补单", "merchants": 6, "couriers": 10, "preview": true, "sample_text_leak": false, "dispatch_lines": 0}
+  ],
+  "map_button_audit": {
+    "depots": "toggles entity mute state",
+    "routes": "toggles route visibility state",
+    "fit": "resets routes and entity mute state",
+    "locate": "triggers locate state without JavaScript errors",
+    "fullscreen": "toggles fullscreen state",
+    "zoom_in_out": "clickable without JavaScript errors"
+  },
+  "one_full_reasoning_run": {
+    "runtime": "00:00:10",
+    "completion": "100%",
+    "status": "当前场景派单完成",
+    "selected_reason_nodes": 1,
+    "rejected_reason_nodes": 4,
+    "merchant_count": 5,
+    "courier_count": 11,
+    "dispatch_line_count": 5,
+    "dispatch_arrow_count": 5,
+    "assignment_count_on_pins": 5,
+    "detail_title": "派单总览：全部商家已自动连线",
+    "page_js_errors": []
+  },
+  "known_follow_up_risks": [
+    "The updated goal requires separate controls for refreshing merchant/courier positions and refreshing the map. The current UI still has one '刷新场景' entry, so Task 6 must split these semantics.",
+    "Task 4 still needs route-quality work: this audit confirms final lines exist, but does not claim road-following visual quality is complete.",
+    "Task 5 still needs To B map texture/icon/button visual polish; this audit only checks for functional blockers in the current state."
+  ],
+  "violations": []
+}
