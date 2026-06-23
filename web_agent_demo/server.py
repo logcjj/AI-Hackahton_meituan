@@ -1589,7 +1589,7 @@ def render_index() -> str:
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .38; z-index: 1; pointer-events: none; }
-    .route-svg { z-index: 6; pointer-events: none; }
+    .route-svg { z-index: 3; pointer-events: none; }
     .route-bundle-highlight,
     .route-bundle-candidate,
     .route-bundle-arrow { pointer-events: none; }
@@ -1721,7 +1721,7 @@ def render_index() -> str:
       position: absolute;
       left: 14px;
       top: 12px;
-      z-index: 4;
+      z-index: 12;
       width: auto;
       padding: 6px 8px;
       border: 1px solid rgba(71, 85, 105, .24);
@@ -1751,7 +1751,7 @@ def render_index() -> str:
       display: flex;
       gap: 5px;
       align-items: center;
-      z-index: 4;
+      z-index: 12;
       padding: 5px;
       border: 1px solid rgba(71, 85, 105, .22);
       border-radius: 10px;
@@ -1858,7 +1858,7 @@ def render_index() -> str:
     .map-frame.hide-entities .map-label { opacity: .12; pointer-events: none; }
     .map-frame.hide-entities .pin.active-assignment,
     .map-frame.hide-entities .map-label.active-assignment { opacity: .45; }
-    .map-entities { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+    .map-entities { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
     .pin { position: absolute; z-index: 3; width: 18px; height: 18px; transform: translate(-50%, -50%); cursor: pointer; }
     .pin.rest, .pin.merchant { z-index: 6; }
@@ -1866,7 +1866,7 @@ def render_index() -> str:
     .pin.dest { z-index: 4; }
     .pin .mark { width: 18px; height: 18px; box-shadow: 0 2px 7px rgba(15,23,42,.22); }
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
-    .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; gap: 1px; border: 1px solid rgba(71,85,105,.2); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 24px rgba(15,23,42,.14); }
+    .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 12; display: grid; gap: 1px; border: 1px solid rgba(71,85,105,.2); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 24px rgba(15,23,42,.14); }
     .zoom button { width: 38px; height: 35px; color: #334155; background: rgba(255,255,255,.9); border: 0; border-bottom: 1px solid rgba(100,116,139,.18); font-size: 20px; font-weight: 800; }
     .map-frame.zoomed .map-bg,
     .map-frame.zoomed .route-svg,
@@ -1885,7 +1885,7 @@ def render_index() -> str:
     .map-frame.hide-dispatch-routes .route-bundle-arrow { display: none; }
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
-      position: absolute; right: 14px; bottom: 13px; z-index: 4; width: 118px;
+      position: absolute; right: 14px; bottom: 13px; z-index: 12; width: 118px;
       background: rgba(255,255,255,.82); border: 1px solid rgba(71,85,105,.18); border-radius: 9px; padding: 7px 9px; font-size: 10px; color: #334155; box-shadow: 0 10px 22px rgba(15,23,42,.11); backdrop-filter: blur(8px);
     }
     .bar { height: 4px; background: linear-gradient(90deg, #d99a00 0 67%, rgba(100,116,139,.18) 67%); margin: 7px 0 9px; border-radius: 999px; }
@@ -1893,7 +1893,7 @@ def render_index() -> str:
       position: absolute;
       right: 18px;
       top: 56px;
-      z-index: 6;
+      z-index: 13;
       max-width: 260px;
       padding: 8px 10px;
       border: 1px solid rgba(15, 118, 110, .38);
@@ -2167,6 +2167,7 @@ def render_index() -> str:
     let semiRealMapStyle = "";
     let semiRealMapRegion = 0;
     let semiRealMapMoveMode = "";
+    let semiRealMapLiveSyncPending = false;
     const semiRealMapLayerSchema = "delivery_routes_optimization_maplibre_clone";
     const semiRealMapStyleUrl = "https://tiles.openfreemap.org/styles/positron";
     const semiRealMapBounds = {lngMin: 121.418, lngMax: 121.506, latMin: 31.204, latMax: 31.252};
@@ -2305,6 +2306,16 @@ def render_index() -> str:
       const lat = semiRealMapBounds.latMax - (y / 100) * (semiRealMapBounds.latMax - semiRealMapBounds.latMin);
       return [lng, lat];
     }
+    function screenNormToLngLat(point) {
+      if (!semiRealMap) return normalizedToLngLat(point);
+      const canvas = semiRealMap.getCanvas();
+      const width = canvas && canvas.clientWidth ? canvas.clientWidth : 1;
+      const height = canvas && canvas.clientHeight ? canvas.clientHeight : 1;
+      const x = Math.max(0, Math.min(100, safeNumber(Array.isArray(point) ? point[0] : point && point.x, 50))) / 100 * width;
+      const y = Math.max(0, Math.min(100, safeNumber(Array.isArray(point) ? point[1] : point && point.y, 50))) / 100 * height;
+      const lngLat = semiRealMap.unproject([x, y]);
+      return [lngLat.lng, lngLat.lat];
+    }
     function currentSemiRealMapRegion() {
       return semiRealMapRegions[semiRealMapRegion % semiRealMapRegions.length];
     }
@@ -2352,6 +2363,10 @@ def render_index() -> str:
           interactive: true,
           keyboard: false
         });
+        if (semiRealMap.dragPan) semiRealMap.dragPan.enable();
+        if (semiRealMap.scrollZoom) semiRealMap.scrollZoom.enable();
+        if (semiRealMap.doubleClickZoom) semiRealMap.doubleClickZoom.enable();
+        if (semiRealMap.touchZoomRotate) semiRealMap.touchZoomRotate.enable();
         semiRealMapStyle = semiRealMapStyleUrl;
         semiRealMap.on("load", () => {
           semiRealMapReady = true;
@@ -2360,6 +2375,7 @@ def render_index() -> str:
           syncSemiRealMapOverlay(currentProfile);
         });
         semiRealMap.on("styledata", hideSemiRealMapTextLayers);
+        semiRealMap.on("move", handleSemiRealMapMove);
         semiRealMap.on("moveend", handleSemiRealMapMoveEnd);
         semiRealMap.on("error", () => {
           semiRealMapReady = false;
@@ -2374,7 +2390,6 @@ def render_index() -> str:
     function resyncCurrentProfileToMapViewport(reason = "viewport") {
       const profile = currentProfile;
       if (!profile || !profile.dispatchMap || !semiRealMapReady) return;
-      resetRenderedMapAnchors(profile);
       updateMapScene(profile);
       const frame = document.querySelector(".map-frame");
       if (frame) {
@@ -2385,7 +2400,16 @@ def render_index() -> str:
           frame.dataset.mapCenter = `${center.lng.toFixed(5)},${center.lat.toFixed(5)}`;
         }
       }
-      publishDebugState();
+      if (reason !== "viewport-live") publishDebugState();
+    }
+    function handleSemiRealMapMove() {
+      if (!semiRealMapReady || semiRealMapMoveMode === "refresh-map") return;
+      if (semiRealMapLiveSyncPending) return;
+      semiRealMapLiveSyncPending = true;
+      window.requestAnimationFrame(() => {
+        semiRealMapLiveSyncPending = false;
+        resyncCurrentProfileToMapViewport("viewport-live");
+      });
     }
     function handleSemiRealMapMoveEnd() {
       if (!semiRealMapReady) return;
@@ -2402,8 +2426,11 @@ def render_index() -> str:
       if (!profile || !profile.dispatchMap) return;
       delete profile.dispatchMap.anchor_source;
       delete profile.dispatchMap.anchor_variant;
+      delete profile.dispatchMap.assignment_reconciled_variant;
       (profile.dispatchMap.entities || []).forEach((entity) => {
         delete entity.rendered_anchor_source;
+        delete entity.rendered_lnglat;
+        delete entity.rendered_safe_adjusted;
       });
     }
     function reanchorCurrentProfileToMapRegion() {
@@ -2542,6 +2569,7 @@ def render_index() -> str:
           anchors.push({
             x: center[0],
             y: center[1],
+            lnglat: screenNormToLngLat(center),
             roadDistance: nearestRoadDistance,
             roadEdgeScore: Math.abs(nearestRoadDistance - 2.8)
           });
@@ -2572,6 +2600,50 @@ def render_index() -> str:
       if (x < 22 && y > 68) return false; // zoom control exclusion zone
       if (x > 76 && y > 68) return false; // weather card exclusion zone
       return true;
+    }
+    function clampToMapSafeZone(point, kind) {
+      let x = Array.isArray(point) ? safeNumber(point[0], 50) : safeNumber(point && point.x, 50);
+      let y = Array.isArray(point) ? safeNumber(point[1], 50) : safeNumber(point && point.y, 50);
+      const minX = kind === "merchant" ? 13 : 9;
+      const maxX = kind === "merchant" ? 90 : 94;
+      const minY = kind === "merchant" ? 20 : 22;
+      const maxY = kind === "merchant" ? 82 : 80;
+      x = Math.max(minX, Math.min(maxX, x));
+      y = Math.max(minY, Math.min(maxY, y));
+      if (x < 32 && y < 30) y = 31;       // keep out of legend
+      if (x > 54 && y < 26) y = 28;       // keep out of toolbar
+      if (x < 22 && y > 68) x = 24;       // keep out of zoom controls
+      if (x > 76 && y > 68) x = 74;       // keep out of weather card
+      return {x, y, adjusted: Math.hypot(x - safeNumber(Array.isArray(point) ? point[0] : point && point.x, 50), y - safeNumber(Array.isArray(point) ? point[1] : point && point.y, 50)) > 0.1};
+    }
+    function projectEntityLngLatToScreen(entity) {
+      if (!entity || !Array.isArray(entity.rendered_lnglat) || !semiRealMap) return false;
+      const projected = lngLatToScreenNorm(entity.rendered_lnglat);
+      if (!projected) return false;
+      const kind = entity.kind === "merchant_order" || entity.kind === "pickup_cluster" ? "merchant" : "courier";
+      const safePoint = clampToMapSafeZone(projected, kind);
+      entity.x = Number(safePoint.x.toFixed(2));
+      entity.y = Number(safePoint.y.toFixed(2));
+      entity.rendered_safe_adjusted = safePoint.adjusted;
+      return true;
+    }
+    function syncRenderedAnchorsToViewport(profile) {
+      if (!profile || !profile.dispatchMap || !semiRealMapReady) return false;
+      let projected = 0;
+      (profile.dispatchMap.entities || []).forEach((entity) => {
+        if (projectEntityLngLatToScreen(entity)) projected += 1;
+      });
+      const roads = renderedMapRoadNetwork();
+      if (roads && roads.length) {
+        profile.dispatchMap.map_layers = {
+          ...(profile.dispatchMap.map_layers || {}),
+          roads,
+          anchor_source: "maplibre-rendered",
+          road_graph: "maplibre_rendered_road_graph",
+          layer_schema: semiRealMapLayerSchema
+        };
+      }
+      return projected > 0;
     }
     function diverseRenderedAnchor(candidates, used, seed, kind, minDistance, options = {}) {
       const normalized = (candidates || [])
@@ -2618,6 +2690,7 @@ def render_index() -> str:
         const slot = courierDistributionSlots[(index + slotOffset) % courierDistributionSlots.length];
         entity.x = Number(slot.x.toFixed(2));
         entity.y = Number(slot.y.toFixed(2));
+        entity.rendered_lnglat = screenNormToLngLat([entity.x, entity.y]);
         entity.rendered_anchor_source = "maplibre-road-slot-fallback";
         placed.push({x: entity.x, y: entity.y});
       });
@@ -2693,7 +2766,7 @@ def render_index() -> str:
         const ranked = couriers.map((courier) => {
           const load = courierLoad[courier.id] || 0;
           const distance = distance2D([merchant.x, merchant.y], [courier.x, courier.y]);
-          return {courier, score: distance + load * 16};
+          return {courier, score: distance + load * 4.5};
         }).sort((left, right) => left.score - right.score);
         const chosen = ranked[0] && ranked[0].courier;
         if (!chosen) return;
@@ -2715,9 +2788,14 @@ def render_index() -> str:
         && (profile.dispatchMap.stage === "simulation_final" || profile.dispatchMap.stage === "final")
         && profile.assignments
         && Object.keys(profile.assignments).length
+        && profile.dispatchMap.assignment_reconciled_variant !== profile.dispatchMap.anchor_variant
       );
       if (profile.dispatchMap.anchor_source === "maplibre-rendered") {
-        if (shouldReconcileAssignments()) reconcileDispatchPairsToVisibleMap(profile);
+        syncRenderedAnchorsToViewport(profile);
+        if (shouldReconcileAssignments()) {
+          reconcileDispatchPairsToVisibleMap(profile);
+          profile.dispatchMap.assignment_reconciled_variant = profile.dispatchMap.anchor_variant || "maplibre-rendered";
+        }
         return true;
       }
       const anchors = renderedMapAnchorsForProfile(profile);
@@ -2740,6 +2818,7 @@ def render_index() -> str:
         if (anchor) {
           entity.x = Number(anchor.x.toFixed(2));
           entity.y = Number(anchor.y.toFixed(2));
+          entity.rendered_lnglat = Array.isArray(anchor.lnglat) ? anchor.lnglat : screenNormToLngLat([entity.x, entity.y]);
           entity.rendered_anchor_source = "maplibre-building-or-landuse";
           usedMerchantAnchors.push({x: entity.x, y: entity.y});
         }
@@ -2757,6 +2836,7 @@ def render_index() -> str:
         if (anchor) {
           entity.x = Number(anchor.x.toFixed(2));
           entity.y = Number(anchor.y.toFixed(2));
+          entity.rendered_lnglat = Array.isArray(anchor.lnglat) ? anchor.lnglat : screenNormToLngLat([entity.x, entity.y]);
           entity.rendered_anchor_source = "maplibre-road";
           usedCourierAnchors.push({x: entity.x, y: entity.y});
         }
@@ -2771,7 +2851,10 @@ def render_index() -> str:
       };
       profile.dispatchMap.anchor_source = "maplibre-rendered";
       profile.dispatchMap.anchor_variant = currentSemiRealMapRegion().label;
-      if (shouldReconcileAssignments()) reconcileDispatchPairsToVisibleMap(profile);
+      if (shouldReconcileAssignments()) {
+        reconcileDispatchPairsToVisibleMap(profile);
+        profile.dispatchMap.assignment_reconciled_variant = profile.dispatchMap.anchor_variant || "maplibre-rendered";
+      }
       return true;
     }
     function assignmentEntries(profile) {
@@ -5150,7 +5233,7 @@ def render_index() -> str:
         const map = ensureSemiRealMap();
         if (map) {
           semiRealMapMoveMode = "zoom-in-control";
-          const targetZoom = Math.min(17, map.getZoom() + 0.55);
+          const targetZoom = Math.min(18.5, map.getZoom() + 0.85);
           frame.dataset.zoomLevel = targetZoom.toFixed(2);
           map.easeTo({zoom: targetZoom, duration: 360});
         }
@@ -5163,7 +5246,7 @@ def render_index() -> str:
         const map = ensureSemiRealMap();
         if (map) {
           semiRealMapMoveMode = "zoom-out-control";
-          const targetZoom = Math.max(11, map.getZoom() - 0.55);
+          const targetZoom = Math.max(10.5, map.getZoom() - 0.85);
           frame.dataset.zoomLevel = targetZoom.toFixed(2);
           map.easeTo({zoom: targetZoom, duration: 360});
         }
@@ -5213,6 +5296,12 @@ def render_index() -> str:
     function bindMapDragFallback() {
       const frame = document.querySelector(".map-frame");
       if (!frame || frame.dataset.dragFallbackBound === "true") return;
+      const map = ensureSemiRealMap();
+      if (map) {
+        frame.dataset.dragFallbackBound = "native-maplibre";
+        frame.dataset.dragPan = "native";
+        return;
+      }
       frame.dataset.dragFallbackBound = "true";
       frame.setAttribute("draggable", "true");
       let dragStart = null;

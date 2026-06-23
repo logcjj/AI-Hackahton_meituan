@@ -1,0 +1,83 @@
+{
+  "center": {
+    "lat": 31.231236,
+    "lng": 121.46723
+  },
+  "consoleErrorCount": 0,
+  "dragPan": "native",
+  "lastViewportSync": "viewport-live",
+  "maxEndpointDistance": 0.52,
+  "maxSegment": 44.6,
+  "overlaps": [],
+  "pins": {
+    "couriers": 5,
+    "merchants": 5,
+    "total": 10
+  },
+  "routeChecks": [
+    {
+      "assignment": "A0101",
+      "courier": "R0103",
+      "endDistance": 0.38,
+      "longLeg": "false",
+      "maxSegment": 44.6,
+      "merchant": "M0101",
+      "points": 5,
+      "startDistance": 0.17
+    },
+    {
+      "assignment": "A0102",
+      "courier": "R0110",
+      "endDistance": 0.52,
+      "longLeg": "false",
+      "maxSegment": 37.2,
+      "merchant": "M0102",
+      "points": 13,
+      "startDistance": 0.01
+    },
+    {
+      "assignment": "A0103",
+      "courier": "R0102",
+      "endDistance": 0.41,
+      "longLeg": "false",
+      "maxSegment": 35.3,
+      "merchant": "M0103",
+      "points": 7,
+      "startDistance": 0.38
+    },
+    {
+      "assignment": "A0104",
+      "courier": "R0104",
+      "endDistance": 0.42,
+      "longLeg": "false",
+      "maxSegment": 34.3,
+      "merchant": "M0104",
+      "points": 6,
+      "startDistance": 0.01
+    },
+    {
+      "assignment": "A0105",
+      "courier": "R0105",
+      "endDistance": 0.3,
+      "longLeg": "false",
+      "maxSegment": 33.7,
+      "merchant": "M0105",
+      "points": 6,
+      "startDistance": 0.14
+    }
+  ],
+  "routes": {
+    "arrows": 5,
+    "total": 5
+  },
+  "runtime": "00:00:10",
+  "status": "当前场景派单完成",
+  "textLayers": {
+    "hidden": 19,
+    "total": 19,
+    "visible": 0
+  },
+  "url": "http://127.0.0.1:8783/",
+  "zoom": 14.2,
+  "consoleErrors": []
+}

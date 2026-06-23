@@ -152,13 +152,32 @@
 - 已保存审计文件和截图：`goal/goal-8/task6-debug-cycle-2-audit.json`、`goal/goal-8/task6-debug-cycle-2-final.png`。
 - 浏览器页面 `error` 日志为空；没有发现 P0/P1/P2 问题，本轮无需修改业务代码。
 
-## Task 7: 完整业务语义与美团即时配送表达收敛
+## Task 7: MapLibre 地图交互与点线投影 P0 回归修复
+
+验证标准：放大缩小必须真实驱动 MapLibre 连续 zoom，连续点击累计变化明显；鼠标按压拖动地图必须改变中心点；骑手、商家和派单线必须使用同一 MapLibre 投影重绘，拖拽/缩放后不浮在旧位置；可见骑手/商家不得压到图例、工具条、缩放按钮、天气卡；最终每个商家默认都有贴合骑手和商家的派单线，不能七扭八歪或端点断开。
+
+完成记录：
+- 已把地图覆盖层从“旧 0-100 固定屏幕坐标”改为“MapLibre 经纬度锚点 + 当前视口投影”：商家/骑手首次锚定时保存 `rendered_lnglat`，拖拽和缩放时用 `map.project()` 重新计算点位和派单线。
+- 已启用 MapLibre 原生交互：`dragPan`、`scrollZoom`、`doubleClickZoom`、`touchZoomRotate` 开启；有 MapLibre 时不再绑定会 `preventDefault` 的旧拖拽兜底，`dragPan=native`。
+- 已增加 `move` 实时同步和 `moveend` 终态同步；缩放/拖动时只重投影覆盖层，不再重抽点位，避免“第一秒和第二秒路径不同”。
+- 已把图例、工具条、缩放按钮、天气卡的层级提升到点线之上，并新增安全区投影钳制，避免骑手/商家浮在按钮上。
+- 已把最终派单重配限制为每个地图区域首次最终态执行一次；后续缩放/拖动不再反复换骑手。
+- 已降低最终派单补全中的骑手负载惩罚，减少为了均衡负载而跨很远派给不合理骑手的长线。
+- 已更新回归测试，防止退回旧缩放步长、旧拖拽拦截和无经纬度投影的覆盖层。
+- 浏览器审计通过：运行 `00:00:10` 后 5 个商家、5 条主派单线、5 个箭头、5 个承接骑手；点位压控件 `overlaps=[]`；路线端点最大误差 `0.52`；MapLibre 文字图层 `19/19` 隐藏；连续缩放后 zoom 到 `14.20`；拖拽后中心变为 `121.467230,31.231236`；浏览器 error 日志为空。
+- 已保存审计与截图：`goal/goal-8/task7-map-interaction-audit.json`、`goal/goal-8/task7-map-interaction-final.png`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 8: 完整业务语义与美团即时配送表达收敛
 
 验证标准：所有文案、详情、图例、toast 和表格都围绕“商家派给骑手”而不是路线导航；商家、骑手、雨天、拥堵、合单、多派、无人接单风险等表达符合美团外卖/配送语境。
 
 完成记录：
 
-## Task 8: 最终验收、截图、审计与归档
+## Task 9: 最终验收、截图、审计与归档
 
 验证标准：完成最终最大 review，从 UI、代码、测试、安全、业务逻辑、交互可用性角度审计；保存最终截图和审计 JSON；全量测试通过；goal 标记完成。
 
