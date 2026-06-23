@@ -32,6 +32,16 @@
 验证标准：前端场景选择提供 10 个中文场景；每个场景有不同天气、密度、骑手供给、价格/意愿/风险特征；刷新不显示样本编号/总数。
 
 完成记录：
+- 已在 `web_agent_demo/server.py` 将仿真场景从 6 个扩展为 10 个：新增夜间商圈宵夜、校园午高峰、医院写字楼午峰、拥堵异常补单。
+- 已给新增场景绑定不同 `scene_type`、天气、密度、骑手供给、商家数量、意愿基线、交通压力和策略周期，避免所有场景走同一条推理链路。
+- 已扩展商家/骑手锚点标签，使 10 个场景都能从预设锚点池中抽样，继续保持商家不在道路中线、骑手贴近道路/路边。
+- 已强化 `tests/test_web_agent_demo.py`：精确断言 10 个中文场景、10 个唯一 case_id、100 个样本、天气/密度覆盖、每个场景至少 2 种策略分布、前端不显示样本总数/样本编号、场景按钮入口不存在。
+- 已生成审计文件：`goal/goal-8/task3-scenario-audit.json`，`violations=[]`。
+- 浏览器检查通过：当前代码在 `http://127.0.0.1:8766/` 动态加载 10 个中文场景，`.scene-button/.scene-strip` 数量为 0，没有 `10 samples`、`samples ·` 或当前样本文案。注意 `http://127.0.0.1:8765/` 当时有旧进程占用，仍显示旧版本，需要重启旧进程才能看到本任务改动。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
 
 ## 大型全面检查-debug循环 1
 

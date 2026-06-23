@@ -1,0 +1,129 @@
+{
+  "task": "Task 3: expand to 10 scenarios and bind scene characteristics",
+  "scenario_count": 10,
+  "sample_count": 100,
+  "unique_scene_ids": 10,
+  "unique_case_ids": 10,
+  "weather_coverage": [
+    "clear",
+    "event",
+    "rain"
+  ],
+  "density_coverage": [
+    "balanced",
+    "clustered",
+    "event_clustered",
+    "rain_clustered",
+    "scarce_spread",
+    "spread"
+  ],
+  "scenario_summary": [
+    {
+      "id": "commerce_peak",
+      "name": "商圈十字路口高峰",
+      "case_id": "large_seed301",
+      "weather": ["clear"],
+      "density_profile": ["clustered"],
+      "merchant_count_range": [5, 6],
+      "courier_count_range": [11, 14],
+      "selected_strategy_distribution": {"S1": 3, "S2": 7}
+    },
+    {
+      "id": "medium_parallel",
+      "name": "中型并行派单",
+      "case_id": "medium_seed201",
+      "weather": ["clear"],
+      "density_profile": ["balanced"],
+      "merchant_count_range": [4, 5],
+      "courier_count_range": [9, 12],
+      "selected_strategy_distribution": {"S1": 1, "S2": 9}
+    },
+    {
+      "id": "scarce_repair",
+      "name": "骑手稀缺修复",
+      "case_id": "scarce_couriers_seed401",
+      "weather": ["clear"],
+      "density_profile": ["scarce_spread"],
+      "merchant_count_range": [4, 6],
+      "courier_count_range": [7, 9],
+      "selected_strategy_distribution": {"S2": 1, "S3": 7, "S5": 2}
+    },
+    {
+      "id": "rain_low_willingness",
+      "name": "雨天低接单意愿",
+      "case_id": "low_willingness_seed501",
+      "weather": ["rain"],
+      "density_profile": ["rain_clustered"],
+      "merchant_count_range": [4, 6],
+      "courier_count_range": [10, 13],
+      "selected_strategy_distribution": {"S1": 1, "S2": 2, "S5": 7}
+    },
+    {
+      "id": "offpeak_greedy",
+      "name": "低峰分散订单",
+      "case_id": "high_noise_seed601",
+      "weather": ["clear"],
+      "density_profile": ["spread"],
+      "merchant_count_range": [3, 5],
+      "courier_count_range": [9, 11],
+      "selected_strategy_distribution": {"S2": 6, "S4": 4}
+    },
+    {
+      "id": "event_mixed_pressure",
+      "name": "活动混合压力",
+      "case_id": "large_seed302",
+      "weather": ["event"],
+      "density_profile": ["event_clustered"],
+      "merchant_count_range": [5, 6],
+      "courier_count_range": [12, 15],
+      "selected_strategy_distribution": {"S1": 1, "S2": 4, "S5": 5}
+    },
+    {
+      "id": "night_foodcourt",
+      "name": "夜间商圈宵夜",
+      "case_id": "night_foodcourt_seed701",
+      "weather": ["clear"],
+      "density_profile": ["clustered"],
+      "merchant_count_range": [4, 5],
+      "courier_count_range": [8, 11],
+      "selected_strategy_distribution": {"S1": 3, "S2": 6, "S3": 1}
+    },
+    {
+      "id": "campus_lunch_peak",
+      "name": "校园午高峰",
+      "case_id": "campus_lunch_seed801",
+      "weather": ["clear"],
+      "density_profile": ["balanced"],
+      "merchant_count_range": [5, 6],
+      "courier_count_range": [12, 14],
+      "selected_strategy_distribution": {"S1": 1, "S2": 8, "S3": 1}
+    },
+    {
+      "id": "hospital_office_peak",
+      "name": "医院写字楼午峰",
+      "case_id": "hospital_office_seed901",
+      "weather": ["event"],
+      "density_profile": ["event_clustered"],
+      "merchant_count_range": [4, 5],
+      "courier_count_range": [9, 11],
+      "selected_strategy_distribution": {"S1": 1, "S2": 3, "S3": 1, "S5": 5}
+    },
+    {
+      "id": "congestion_reassign",
+      "name": "拥堵异常补单",
+      "case_id": "congestion_reassign_seed1001",
+      "weather": ["event"],
+      "density_profile": ["scarce_spread"],
+      "merchant_count_range": [5, 6],
+      "courier_count_range": [7, 10],
+      "selected_strategy_distribution": {"S3": 5, "S5": 5}
+    }
+  ],
+  "anchor_model": "predefined_dispatch_anchor_pool_v1",
+  "frontend_constraints_checked": [
+    "Only case-select is used for scene selection; scene-button markup remains absent.",
+    "Simulation API still keeps sample_count for internal refresh logic, but rendered HTML does not expose sample count or sample index.",
+    "Every simulated scenario maps to a unique case_id and Chinese display name."
+  ],
+  "violations": []
+}

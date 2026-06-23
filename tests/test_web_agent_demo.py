@@ -359,7 +359,23 @@ class WebAgentDemoTest(unittest.TestCase):
         merchant_anchor_ids = {item["id"] for item in _MERCHANT_ANCHORS}
         courier_anchor_ids = {item["id"] for item in _COURIER_ANCHORS}
 
-        self.assertGreaterEqual(len(scenarios), 5)
+        expected_scenarios = {
+            "commerce_peak": "商圈十字路口高峰",
+            "medium_parallel": "中型并行派单",
+            "scarce_repair": "骑手稀缺修复",
+            "rain_low_willingness": "雨天低接单意愿",
+            "offpeak_greedy": "低峰分散订单",
+            "event_mixed_pressure": "活动混合压力",
+            "night_foodcourt": "夜间商圈宵夜",
+            "campus_lunch_peak": "校园午高峰",
+            "hospital_office_peak": "医院写字楼午峰",
+            "congestion_reassign": "拥堵异常补单",
+        }
+
+        self.assertEqual(len(scenarios), 10)
+        self.assertEqual({item["id"]: item["name"] for item in scenarios}, expected_scenarios)
+        self.assertEqual(len({item["id"] for item in scenarios}), 10)
+        self.assertEqual(len({item["case_id"] for item in scenarios}), 10)
         self.assertGreaterEqual(len(_MERCHANT_ANCHORS), 20)
         self.assertGreaterEqual(len(_COURIER_ANCHORS), 28)
         self.assertTrue(all(item["role"] == "merchant" for item in _MERCHANT_ANCHORS))
@@ -368,7 +384,14 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertTrue(all(float(item["curb_distance"]) <= 0.25 for item in _COURIER_ANCHORS))
         self.assertTrue(all(item["sample_count"] == 10 for item in scenarios))
         self.assertTrue(all(item["map_style"] == "baidu_like_simulated" for item in scenarios))
+        observed_weather = set()
+        observed_density = set()
+        observed_strategy_sets = set()
+        observed_scene_sizes = set()
         for scenario in scenarios:
+            scenario_weather = set()
+            scenario_density = set()
+            scenario_strategy_ids = set()
             for sample_index in range(10):
                 sample = build_simulated_scenario_sample(str(scenario["id"]), sample_index)
                 self.assertEqual(sample["stage"], "preview")
@@ -395,6 +418,12 @@ class WebAgentDemoTest(unittest.TestCase):
                 self.assertTrue(set(sample["map_layers"]["anchor_pools"]["courier_selected"]).issubset(courier_anchor_ids))
                 self.assertIn(sample["summary"]["weather"], {"clear", "rain", "event"})
                 self.assertIn("density_profile", sample["summary"])
+                observed_weather.add(sample["summary"]["weather"])
+                observed_density.add(sample["summary"]["density_profile"])
+                scenario_weather.add(sample["summary"]["weather"])
+                scenario_density.add(sample["summary"]["density_profile"])
+                scenario_strategy_ids.add(sample["selected_strategy_id"])
+                observed_scene_sizes.add((len(sample["merchants"]), len(sample["couriers"])))
                 self.assertTrue(all(not road["name_visible"] for road in sample["map_layers"]["roads"]))
                 merchant_points = [(float(item["x"]), float(item["y"])) for item in sample["merchants"]]
                 courier_points = [(float(item["x"]), float(item["y"])) for item in sample["couriers"]]
@@ -420,6 +449,14 @@ class WebAgentDemoTest(unittest.TestCase):
                     self.assertTrue(courier["on_road"])
                     self.assertLessEqual(float(courier["curb_distance"]), 0.25)
                     self.assertTrue(str(courier["anchor_road_id"]).startswith("R"))
+            self.assertEqual(len(scenario_weather), 1)
+            self.assertEqual(len(scenario_density), 1)
+            self.assertGreaterEqual(len(scenario_strategy_ids), 2)
+            observed_strategy_sets.add(tuple(sorted(scenario_strategy_ids)))
+        self.assertEqual(observed_weather, {"clear", "rain", "event"})
+        self.assertGreaterEqual(len(observed_density), 5)
+        self.assertGreaterEqual(len(observed_strategy_sets), 4)
+        self.assertGreaterEqual(len(observed_scene_sizes), 10)
 
     def test_simulated_refresh_uses_predefined_anchor_variants(self):
         from web_agent_demo.server import build_simulated_scenario_sample
@@ -455,7 +492,7 @@ class WebAgentDemoTest(unittest.TestCase):
         selected_by_scene = {}
         major_evaluated_by_scene = {}
 
-        self.assertEqual(len(samples), 60)
+        self.assertEqual(len(samples), 100)
         self.assertTrue({"S1", "S2", "S3", "S4", "S5"}.issubset(selected))
         for sample in samples:
             path = sample["strategy_path"]
