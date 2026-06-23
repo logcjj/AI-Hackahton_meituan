@@ -176,6 +176,18 @@
 验证标准：所有文案、详情、图例、toast 和表格都围绕“商家派给骑手”而不是路线导航；商家、骑手、雨天、拥堵、合单、多派、无人接单风险等表达符合美团外卖/配送语境。
 
 完成记录：
+- 已将顶部 KPI、页面标题、策略表头、右侧详情、路线详情和最终策略说明从英文/路线导航语义收敛为中文即时配送派单语义，突出“商家派给骑手”“无人接单风险”“履约时效”“接单意愿”。
+- 已移除旧 `.map-frame.zoomed` CSS 假缩放，覆盖层不再套用静态缩放；MapLibre 原生 zoom/drag 保持为真实地图交互。
+- 已修复经纬度投影同步逻辑：拖拽/缩放时点位由 `map.project()` 直接投影，不再被安全区二次钳制，避免骑手/商家漂到按钮上或和底图脱节。安全区只用于初次锚点选择。
+- 已重构派单线表达：绿色主线只画道路主路径 `roadCore`，骑手/商家到道路的最后连接使用同色细虚线端点连接，避免主线横穿楼块，同时保证每个商家默认能看出派给哪个骑手。
+- 已修复左侧 ReasonGraph 策略区拥挤问题：5 个策略由横向硬塞改为单列紧凑列表，移除底部重复图例，S1-S5 在 1280x720 下全部完整显示且不被遮挡。
+- 已更新回归测试，防止退回旧英文 To C/导航文案、旧 CSS 假缩放、旧投影钳制、旧横穿楼块的完整折线路线和旧 5 卡横排拥挤布局。
+- 已保存浏览器验收截图与审计：`goal/goal-8/task8-map-anchor-regression-final.png`、`goal/goal-8/task8-map-anchor-regression-overview.png`、`goal/goal-8/task8-road-core-route-overview.png`、`goal/goal-8/task8-left-route-final.png`、`goal/goal-8/task8-left-layout-final.png`、`goal/goal-8/task8-map-anchor-regression-audit.json`、`goal/goal-8/task8-final-layout-route-audit.json`。
+- 浏览器最终审计通过：`runtime=00:00:10`，MapLibre 文本图层 `19/19` 隐藏，`drag_pan=native`，策略卡 `all_inside=true`，点位与控件 `pin_overlaps=[]`，派单线数量等于箭头数量，路线均包含道路主路径与端点连接。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
 
 ## Task 9: 最终验收、截图、审计与归档
 
