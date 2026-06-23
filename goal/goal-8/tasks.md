@@ -119,6 +119,20 @@
 - 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 用户追加指出骑手压到按钮、线路七扭八歪、拖拽/缩放/刷新地图仍不合理，本轮继续作为 Task 6 企业级阻断项修复。
+- 已将页面外层改为固定 `1280x720` 企业看板并按实际视口等比缩放，避免窄窗口把中间地图压成 2px、按钮漂到左侧面板上。
+- 已修复最终派单线：主线包含骑手端点和商家端点，不再只靠端点辅助线补断点；最终渲染前按当前可见商家重建派单覆盖，保证每个商家都有明确承接骑手。
+- 已把派单补全限制在最终态，刷新地图/刷新位置后不再提前生成旧派单线，页面回到输入态。
+- 已修复骑手聚集：最终态只显示实际承接派单的骑手，并增加 `enforceCourierSeparation()` 防碰撞兜底；区域 B 复测后骑手最小间距 `4.55`，无近距离碰撞。
+- 已修复地图控件遮挡：商家/骑手锚点安全区排除图例、工具条、缩放按钮和天气卡；最终审计无点位压控件。
+- 已修复真实地图交互：缩放驱动 MapLibre `easeTo`，拖拽支持 mouse/pointer/touch/drag fallback，空白地图区域拖动后中心从 `121.462,31.229` 变为 `121.494061,31.240006`。
+- 已修复刷新地图语义：刷新地图切换配送区域/MapLibre center，并重新绑定新区域路网和点位；刷新后路线/箭头为 0，状态为等待推理。
+- 已保存最终浏览器审计与截图：`goal/goal-8/task6-enterprise-map-audit-final.json`、`goal/goal-8/task6-enterprise-map-final.png`。
+- 最终浏览器审计通过：区域 A `6/6` 商家连线、区域 B `6/6` 商家连线；刷新地图清空路线；端点距离均 `<0.2`；MapLibre 文字图层 `19/19` 隐藏；浏览器页面 error 日志为空。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
 
 ## 大型全面检查-debug循环 2
 

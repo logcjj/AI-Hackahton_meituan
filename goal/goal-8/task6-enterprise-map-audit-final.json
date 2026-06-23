@@ -1,0 +1,229 @@
+{
+  "passA": {
+    "arrowCount": 6,
+    "closePairs": 0,
+    "courierCount": 6,
+    "debug": {
+      "dom": {
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "pins": 12,
+        "routeArrows": 6,
+        "routeLinks": 6,
+        "status": "当前场景派单完成",
+        "strategyCards": 5,
+        "tableRows": 6
+      },
+      "region": "运营分析浅色区域 A",
+      "textLayers": {
+        "hidden": 19,
+        "total": 19,
+        "visible": 0
+      },
+      "viewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      }
+    },
+    "frame": {
+      "controlState": "all",
+      "dragFallbackBound": "true",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "selectedAssignment": "A0104",
+      "zoomLevel": "13.35"
+    },
+    "label": "region-a-run",
+    "merchantCount": 6,
+    "minCourier": 7.29,
+    "routeCount": 6,
+    "routes": [
+      {
+        "assignment": "A0101",
+        "courier": "R0103",
+        "end": 0.052,
+        "merchant": "M0101",
+        "start": 0.021
+      },
+      {
+        "assignment": "A0102",
+        "courier": "R0110",
+        "end": 0.058,
+        "merchant": "M0102",
+        "start": 0.057
+      },
+      {
+        "assignment": "A0103",
+        "courier": "R0102",
+        "end": 0.026,
+        "merchant": "M0103",
+        "start": 0.042
+      },
+      {
+        "assignment": "A0104",
+        "courier": "R0104",
+        "end": 0.041,
+        "merchant": "M0104",
+        "start": 0.01
+      },
+      {
+        "assignment": "A0105",
+        "courier": "R0101",
+        "end": 0.043,
+        "merchant": "M0105",
+        "start": 0.043
+      },
+      {
+        "assignment": "A0106",
+        "courier": "R0105",
+        "end": 0.016,
+        "merchant": "M0106",
+        "start": 0.029
+      }
+    ],
+    "runtime": "00:00:10",
+    "status": "当前场景派单完成"
+  },
+  "passRefresh": {
+    "arrowCount": 0,
+    "closePairs": 0,
+    "courierCount": 14,
+    "debug": {
+      "dom": {
+        "detailTitle": "场景输入：商圈十字路口高峰",
+        "pins": 20,
+        "routeArrows": 0,
+        "routeLinks": 0,
+        "status": "地图区域已刷新，等待推理",
+        "strategyCards": 5,
+        "tableRows": 6
+      },
+      "region": "运营分析浅色区域 B",
+      "textLayers": {
+        "hidden": 19,
+        "total": 19,
+        "visible": 0
+      },
+      "viewport": {
+        "center": {
+          "lat": 31.222,
+          "lng": 121.476
+        },
+        "zoom": 13.42
+      }
+    },
+    "frame": {
+      "controlState": "all",
+      "dragFallbackBound": "true",
+      "mapRegion": "运营分析浅色区域 B",
+      "mapStyle": "运营分析浅色图",
+      "zoomLevel": "13.35"
+    },
+    "label": "region-b-refresh",
+    "merchantCount": 6,
+    "minCourier": 4.55,
+    "routeCount": 0,
+    "routes": [],
+    "runtime": "00:00:10",
+    "status": "地图区域已刷新，等待推理"
+  },
+  "passB": {
+    "arrowCount": 6,
+    "closePairs": 0,
+    "courierCount": 6,
+    "debug": {
+      "dom": {
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "pins": 12,
+        "routeArrows": 6,
+        "routeLinks": 6,
+        "status": "当前场景派单完成",
+        "strategyCards": 5,
+        "tableRows": 6
+      },
+      "region": "运营分析浅色区域 B",
+      "textLayers": {
+        "hidden": 19,
+        "total": 19,
+        "visible": 0
+      },
+      "viewport": {
+        "center": {
+          "lat": 31.222,
+          "lng": 121.476
+        },
+        "zoom": 13.42
+      }
+    },
+    "frame": {
+      "controlState": "all",
+      "dragFallbackBound": "true",
+      "mapRegion": "运营分析浅色区域 B",
+      "mapStyle": "运营分析浅色图",
+      "selectedAssignment": "A0104",
+      "zoomLevel": "13.42"
+    },
+    "label": "region-b-run",
+    "merchantCount": 6,
+    "minCourier": 4.55,
+    "routeCount": 6,
+    "routes": [
+      {
+        "assignment": "A0101",
+        "courier": "R0110",
+        "end": 0.049,
+        "merchant": "M0101",
+        "start": 0
+      },
+      {
+        "assignment": "A0102",
+        "courier": "R0103",
+        "end": 0.066,
+        "merchant": "M0102",
+        "start": 0.028
+      },
+      {
+        "assignment": "A0103",
+        "courier": "R0101",
+        "end": 0.057,
+        "merchant": "M0103",
+        "start": 0.046
+      },
+      {
+        "assignment": "A0104",
+        "courier": "R0111",
+        "end": 0.054,
+        "merchant": "M0104",
+        "start": 0
+      },
+      {
+        "assignment": "A0105",
+        "courier": "R0108",
+        "end": 0.054,
+        "merchant": "M0105",
+        "start": 0
+      },
+      {
+        "assignment": "A0106",
+        "courier": "R0102",
+        "end": 0.049,
+        "merchant": "M0106",
+        "start": 0.053
+      }
+    ],
+    "runtime": "00:00:10",
+    "status": "当前场景派单完成"
+  },
+  "logs": [],
+  "checks": {
+    "regionARouted": true,
+    "regionASeparated": true,
+    "refreshClearsRoutes": true,
+    "regionBRouted": true,
+    "regionBSeparated": true,
+    "endpointsConnected": true,
+    "noConsoleErrors": true
+  }
+}
