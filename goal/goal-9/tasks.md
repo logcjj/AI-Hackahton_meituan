@@ -183,3 +183,19 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 14: 企业级验收循环 7：地图控制按钮语义和状态一致性
+
+验证标准：地图控制按钮必须符合业务语义；`线路` 和 `点位` 作为开关可以保持 active，`全屏` 作为模式开关可以保持 active 并切换文案；`适配`、`定位`、`刷新位置`、`刷新地图`、缩放等一次性动作不应留下误导性 active 状态。连续点击后，按钮状态、`map-frame.dataset`、实际图层显示和右侧详情必须一致，不得出现“按钮看起来关闭但地图仍处于定位态”或“适配按钮常亮”的问题。
+
+完成记录：
+- 已复现按钮状态问题并保存证据：`goal/goal-9/task14-button-audit-before.json`。复现结果显示 `定位` 第二次点击后按钮 `active=false` 但 `frame.dataset.locating=true`，`适配` 第一次点击后按钮会常亮，属于一次性动作和持久开关语义混用。
+- 已修复地图控制语义：新增 `isPersistentMapAction()`，只有 `点位`、`线路`、`全屏` 会保留 active；`适配`、`定位`、缩放、回中心都作为一次性动作处理。
+- 已修复定位态残留：新增 `clearLocatingStateSoon()`，`定位` 和回中心只短暂高亮路线，动画结束后自动清除 `.locating` 和 `dataset.locating=false`，按钮不再留下误导状态。
+- 已强化 `resetMapControlState()`：统一清理 `locating/routesHidden/entitiesMuted` dataset，并清理 `fit/locate/zoom/recenter` 的临时 active 状态。
+- 已补回归测试：锁定持久开关白名单、临时按钮清理函数、定位态自动清理，以及 reset 状态字段。
+- 修复后按钮审计通过：`goal/goal-9/task14-button-audit-after.json` 中 `failureCount=0`；连续点击 `定位`、`适配`、缩放、回中心、线路、点位、全屏后，按钮 active 状态与 `map-frame.dataset` 全部一致。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。

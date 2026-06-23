@@ -1,0 +1,635 @@
+[
+  {
+    "phase": "final",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "viewport-live",
+      "mapCenter": "121.46200,31.22900",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单总览：全部商家已自动连线"
+  },
+  {
+    "phase": "after-locate-1",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.99",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "viewport-live",
+      "mapCenter": "121.45938,31.22504",
+      "selectedAssignment": "A0104",
+      "locating": "true"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology locating focus-selected",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": true
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-locate-2",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "14.00",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "viewport-live",
+      "mapCenter": "121.45932,31.22495",
+      "selectedAssignment": "A0104",
+      "locating": "true"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology locating focus-selected",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-fit-1",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "manual-pan",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "false",
+      "entitiesMuted": "false",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": true
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-fit-2",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "fit-control",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "false",
+      "entitiesMuted": "false",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-routes-1",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "fit-control",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "true",
+      "entitiesMuted": "false",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview hide-dispatch-routes",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": true
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 6,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-routes-2",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "fit-control",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "false",
+      "entitiesMuted": "false",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-depots-1",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "fit-control",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "false",
+      "entitiesMuted": "true",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview hide-entities",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": true
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-depots-2",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "fit-control",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "false",
+      "entitiesMuted": "false",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-fullscreen-1",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "viewport-live",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "false",
+      "entitiesMuted": "false",
+      "fullscreen": "true",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "退出",
+        "active": true
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  },
+  {
+    "phase": "after-fullscreen-2",
+    "frameDataset": {
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "zoomLevel": "13.35",
+      "controlState": "all",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "lastViewportSync": "viewport-live",
+      "mapCenter": "121.46200,31.22900",
+      "locating": "false",
+      "routesHidden": "false",
+      "entitiesMuted": "false",
+      "fullscreen": "false",
+      "selectedAssignment": "A0104"
+    },
+    "frameClass": "map-frame project-map-ready maplibre-ready topology assignment-overview",
+    "controls": {
+      "routes": {
+        "text": "线路",
+        "active": false
+      },
+      "depots": {
+        "text": "点位",
+        "active": false
+      },
+      "fit": {
+        "text": "适配",
+        "active": false
+      },
+      "locate": {
+        "text": "定位",
+        "active": false
+      },
+      "fullscreen": {
+        "text": "全屏",
+        "active": false
+      },
+      "zoomIn": {
+        "text": "+",
+        "active": false
+      },
+      "zoomOut": {
+        "text": "−",
+        "active": false
+      },
+      "recenter": {
+        "text": "⌾",
+        "active": false
+      }
+    },
+    "counts": {
+      "routes": 6,
+      "hiddenRoutes": 0,
+      "pins": 12
+    },
+    "detailTitle": "派单详情：M0104"
+  }
+]

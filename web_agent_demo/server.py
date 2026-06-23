@@ -2260,8 +2260,11 @@ def render_index() -> str:
         frame.classList.remove("hide-entities", "hide-dispatch-routes", "hide-candidates", "locating");
         frame.dataset.zoomLevel = semiRealMap ? semiRealMap.getZoom().toFixed(2) : "1";
         frame.dataset.controlState = "all";
+        frame.dataset.locating = "false";
+        frame.dataset.routesHidden = "false";
+        frame.dataset.entitiesMuted = "false";
       }
-      document.querySelectorAll("[data-map-action], #zoom-in, #zoom-out").forEach((button) => button.classList.remove("active"));
+      document.querySelectorAll("[data-map-action], #zoom-in, #zoom-out, #recenter").forEach((button) => button.classList.remove("active"));
       const layerMode = $("layer-mode");
       if (layerMode) layerMode.value = "all";
     }
@@ -5410,6 +5413,22 @@ def render_index() -> str:
       showToast(mode === "selected" ? "已聚焦当前派单，其余关系降噪" : mode === "candidates" ? "已增强派单关系线，便于检查" : "显示全部派单图层");
     }
     function bindMapControls() {
+      const isPersistentMapAction = (action) => action === "depots" || action === "routes" || action === "fullscreen";
+      const clearTransientMapButtons = () => {
+        document.querySelectorAll('[data-map-action="fit"], [data-map-action="locate"], #zoom-in, #zoom-out, #recenter').forEach((node) => node.classList.remove("active"));
+      };
+      const clearLocatingStateSoon = (frame, delay = 760) => {
+        window.clearTimeout(clearLocatingStateSoon.timer);
+        clearLocatingStateSoon.timer = window.setTimeout(() => {
+          if (!frame) return;
+          frame.classList.remove("locating");
+          frame.dataset.locating = "false";
+          const locateButton = document.querySelector('[data-map-action="locate"]');
+          if (locateButton) locateButton.classList.remove("active");
+          const recenterButton = $("recenter");
+          if (recenterButton) recenterButton.classList.remove("active");
+        }, delay);
+      };
       $("expand-graph").addEventListener("click", (event) => {
         document.querySelector(".left-panel").classList.toggle("expanded");
         event.currentTarget.classList.toggle("active");
@@ -5420,7 +5439,11 @@ def render_index() -> str:
       document.querySelectorAll("[data-map-action]").forEach((button) => {
         button.addEventListener("click", () => {
           const action = button.dataset.mapAction;
-          button.classList.toggle("active");
+          if (isPersistentMapAction(action)) {
+            button.classList.toggle("active");
+          } else {
+            button.classList.remove("active");
+          }
           if (action === "depots") {
             const hidden = button.classList.contains("active");
             const frame = document.querySelector(".map-frame");
@@ -5465,6 +5488,7 @@ def render_index() -> str:
             } else {
               showToast("请先运行派单推理生成骑手位置");
             }
+            clearLocatingStateSoon(frame);
             return;
           }
           if (action === "fit") {
@@ -5476,7 +5500,7 @@ def render_index() -> str:
             frame.dataset.controlState = "all";
             $("zoom-in").classList.remove("active");
             $("zoom-out").classList.remove("active");
-            document.querySelectorAll('[data-map-action="depots"], [data-map-action="routes"]').forEach((node) => node.classList.remove("active"));
+            document.querySelectorAll('[data-map-action="depots"], [data-map-action="routes"], [data-map-action="fit"], [data-map-action="locate"], #recenter').forEach((node) => node.classList.remove("active"));
             const layerMode = $("layer-mode");
             if (layerMode) layerMode.value = "all";
             const map = ensureSemiRealMap();
@@ -5507,8 +5531,7 @@ def render_index() -> str:
       });
       $("zoom-in").addEventListener("click", () => {
         const frame = document.querySelector(".map-frame");
-        $("zoom-in").classList.add("active");
-        $("zoom-out").classList.remove("active");
+        clearTransientMapButtons();
         const map = ensureSemiRealMap();
         if (map) {
           semiRealMapMoveMode = "zoom-in-control";
@@ -5520,8 +5543,7 @@ def render_index() -> str:
       });
       $("zoom-out").addEventListener("click", () => {
         const frame = document.querySelector(".map-frame");
-        $("zoom-out").classList.add("active");
-        $("zoom-in").classList.remove("active");
+        clearTransientMapButtons();
         const map = ensureSemiRealMap();
         if (map) {
           semiRealMapMoveMode = "zoom-out-control";
@@ -5533,6 +5555,7 @@ def render_index() -> str:
       });
       $("recenter").addEventListener("click", () => {
         const frame = document.querySelector(".map-frame");
+        clearTransientMapButtons();
         frame.classList.add("locating");
         frame.dataset.locating = "true";
         const map = ensureSemiRealMap();
@@ -5547,6 +5570,7 @@ def render_index() -> str:
           updateMapScene(profile);
         }
         showToast("已回到当前派单关系中心");
+        clearLocatingStateSoon(frame);
       });
       const entityPinAtClientPoint = (event) => {
         if (!event || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return null;
