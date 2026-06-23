@@ -1286,8 +1286,8 @@ def render_index() -> str:
       letter-spacing: .04em;
     }
     .map-frame.tile-ready .map-bg { opacity: .12; mix-blend-mode: screen; pointer-events: none; }
-    .real-map { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .35s ease; background: #07121b; }
-    .map-frame.leaflet-ready .real-map { opacity: 1; }
+    .real-map { position: absolute; inset: 0; z-index: 0; opacity: 0; pointer-events: none; background: #07121b; }
+    .map-frame.leaflet-ready .real-map { opacity: 0; pointer-events: none; }
     .map-frame.leaflet-ready .map-bg { opacity: .16; mix-blend-mode: screen; pointer-events: none; }
     .map-frame.leaflet-ready .route-svg,
     .map-frame.leaflet-ready .map-entities { opacity: 1; pointer-events: auto; }
@@ -2680,6 +2680,8 @@ def render_index() -> str:
       const selectedScore = sampleSelectedScore(sample);
       const covered = report && report.best ? safeNumber(report.best.covered_tasks, report.best.total_tasks || 0) : 0;
       const total = report && report.best ? safeNumber(report.best.total_tasks, covered || 1) : 1;
+      const feasiblePassed = Math.max(0, Math.min(covered, total));
+      const feasibleTotal = Math.max(1, total);
       const finalConfidence = report ? Math.max(0.72, Math.min(0.99, selectedScore * 0.72 + Math.min(1, covered / Math.max(1, total)) * 0.24)).toFixed(2) : "--";
       const sceneConfidence = sample ? Math.max(0.76, Math.min(0.98, selectedScore + 0.06)).toFixed(2) : "--";
       setNodeMetric(nodes[0], "状态", sample ? "已刷新" : "待推理");
@@ -2692,7 +2694,7 @@ def render_index() -> str:
         setNodeMetric(nodes[0], "状态", "已输入");
         setNodeMetric(nodes[1], "可信度", sceneConfidence);
         setNodeMetric(nodes[2], "候选策略", String(candidateTotal));
-        setNodeMetric(nodes[3], "通过", `${Math.max(1, safeNumber(report.best && report.best.groups, Object.keys((profile && profile.assignments) || {}).length || 1))} / ${candidateTotal}`);
+        setNodeMetric(nodes[3], "通过", `${feasiblePassed} / ${feasibleTotal}`);
         setNodeMetric(nodes[4], "最佳分", selectedScore.toFixed(2));
         setNodeMetric(nodes[5], "置信度", finalConfidence);
         return;
@@ -3012,7 +3014,6 @@ def render_index() -> str:
         entityLayer.appendChild(label);
       });
       renderDispatchLinks(profile, entityPoints);
-      renderLeafletDispatchMap(profile, entityPoints);
       applyMapFocus(profile, profile.selected, profile.mapFocusMode === "focus");
     }
     function svgPoint(point) {

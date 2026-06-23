@@ -1,0 +1,19 @@
+{
+  "courierPins": 13,
+  "entityLayerOpacity": "1",
+  "feasibilityValid": true,
+  "feasibilityValue": "5 / 5",
+  "leafletMarkers": 0,
+  "leafletRoutes": 0,
+  "loadedTileCount": 15,
+  "merchantPins": 5,
+  "osrmRoutes": 5,
+  "realMapOpacity": "0",
+  "routeSvgOpacity": "1",
+  "runtime": "00:00:10",
+  "status": "当前样本派单完成",
+  "svgPins": 18,
+  "svgRoutes": 5,
+  "tileCount": 15,
+  "visibleOverviewRoutes": 5
+}

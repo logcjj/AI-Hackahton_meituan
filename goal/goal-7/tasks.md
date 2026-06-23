@@ -105,6 +105,18 @@
 - 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+
+## Task 11: 修复地图重复点位与叠层 bug
+
+验证标准：最终地图只显示一套商家/骑手业务点，不再同时出现 SVG 点和 Leaflet 点；派单线只保留一套 OSRM/SVG 业务线；初始状态仍有真实瓦片底图，运行 10 秒后 5 条派单关系默认全部可见。
+
+完成记录：
+- 已定位用户截图 bug 原因：`updateMapScene()` 同时渲染 SVG 业务点线和 Leaflet marker/route，导致地图上出现大小两套 `C/M` 点位和叠层错乱。
+- 已停用 Leaflet 覆盖层调用，保留 Carto/OpenStreetMap 瓦片底图与 SVG/OSRM 业务派单层；`real-map` 固定透明且不可交互，避免再次覆盖业务层。
+- 已补回归测试：禁止 `updateMapScene()` 调用 `renderLeafletDispatchMap(profile, entityPoints);`。
+- 已同步修复 ReasonGraph 数字 bug：可行性校验最终态改为 `covered_tasks / total_tasks`，不再把派单组数除以候选策略数，避免出现 `6 / 5`。
+- 浏览器最终审计通过：`runtime=00:00:10`、`tileCount=15`、`loadedTileCount=15`、`leafletMarkers=0`、`leafletRoutes=0`、`svgRoutes=5`、`osrmRoutes=5`、`visibleOverviewRoutes=5`、`routeSvgOpacity=1`、`entityLayerOpacity=1`、`feasibilityValue=5 / 5`。
+- 截图与审计产物：`goal/goal-7/task11-duplicate-layer-final.png`、`goal/goal-7/task11-duplicate-layer-audit.json`。
 - 浏览器自动点击限制说明：in-app browser 控制接口持续引用旧 tab，Chrome 的 AppleScript 执行 JS 被安全设置禁用，Computer Use 坐标点击不稳定；本轮已用 Chrome 可视初始状态、后端接口、HTML/JS 结构和全量测试完成可验证覆盖。
 
 ## Task 7: 修复策略分数提前泄露与派单线贴路问题
