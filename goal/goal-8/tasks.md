@@ -16,6 +16,16 @@
 验证标准：代码中存在明确的商家锚点、骑手锚点、道路节点和场景锚点选择规则；刷新同一场景时点位变化但仍落在合理锚点/路边；商家不在道路中间，骑手在道路或路边。
 
 完成记录：
+- 已在 `web_agent_demo/server.py` 新增显式锚点体系：`_MERCHANT_ANCHOR_BLUEPRINTS`、`_COURIER_ANCHOR_BLUEPRINTS`、`_MERCHANT_ANCHORS`、`_COURIER_ANCHORS`、`_select_scene_anchors()`。
+- 已把 `build_simulated_scenario_sample()` 从角度/半径自由散点改为按场景标签从预设锚点池抽样；同一场景不同 seed 会重抽锚点组合，但仍保留场景特征。
+- 已给每个商家、配送入口和骑手写入 `anchor_id`、`anchor_zone`、`anchor_road_id`、`anchor_role`、`curb_distance`；`map_layers.anchor_pools` 记录本次选中的锚点。
+- 已加入商家锚点安全距离后处理，防止商家点落在道路中线或交叉路中心；当前全局商家最小离路距离 `1.41`，骑手最大离路距离 `0.14`。
+- 已生成审计文件：`goal/goal-8/task2-anchor-audit.json`，覆盖当前 6 个场景各 10 个样本，`violations=[]`。
+- 已补回归测试：锚点池规模、商家/骑手 anchor 元数据、商家不在路中、骑手贴路、刷新 variant 改变锚点组合。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
 
 ## Task 3: 扩展为 10 个场景并绑定场景特征
 

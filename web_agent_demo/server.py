@@ -267,6 +267,185 @@ def _snap_to_dispatch_road(
     return _clamp_point(best_point[0] + side * (-dy / length) * curb, best_point[1] + side * (dx / length) * curb)
 
 
+def _distance_to_dispatch_road(point: tuple[float, float]) -> float:
+    return _nearest_dispatch_road_projection(point)["distance"]
+
+
+def _nearest_dispatch_road_projection(point: tuple[float, float]) -> dict[str, object]:
+    best_distance = float("inf")
+    best_point = point
+    best_segment = ((0.0, 0.0), (1.0, 0.0))
+    best_index = 0
+    for road_index, road in enumerate(_DISPATCH_ROADS):
+        for start, end in zip(road, road[1:]):
+            distance, _ = _project_to_segment(point, start, end)
+            if distance < best_distance:
+                best_distance = distance
+                _, projected = _project_to_segment(point, start, end)
+                best_point = projected
+                best_segment = (start, end)
+                best_index = road_index
+    return {
+        "distance": math.sqrt(best_distance),
+        "projected": best_point,
+        "segment": best_segment,
+        "road_id": f"R{best_index + 1:02d}",
+    }
+
+
+def _nearest_dispatch_road_id(point: tuple[float, float]) -> str:
+    best_distance = float("inf")
+    best_index = 0
+    for road_index, road in enumerate(_DISPATCH_ROADS):
+        for start, end in zip(road, road[1:]):
+            distance, _ = _project_to_segment(point, start, end)
+            if distance < best_distance:
+                best_distance = distance
+                best_index = road_index
+    return f"R{best_index + 1:02d}"
+
+
+_MERCHANT_ANCHOR_BLUEPRINTS = [
+    {"id": "MA-CBD-01", "point": (48.5, 41.5), "zone": "central_foodcourt", "tags": ["dense_commerce", "clustered", "rain_clustered", "event_clustered"]},
+    {"id": "MA-CBD-02", "point": (52.0, 43.5), "zone": "central_foodcourt", "tags": ["dense_commerce", "clustered", "rain_clustered", "event_clustered"]},
+    {"id": "MA-CBD-03", "point": (55.0, 39.0), "zone": "central_mall_edge", "tags": ["dense_commerce", "clustered", "event_mixed"]},
+    {"id": "MA-CBD-04", "point": (45.0, 47.0), "zone": "central_mall_edge", "tags": ["dense_commerce", "clustered", "medium_parallel"]},
+    {"id": "MA-CBD-05", "point": (58.0, 48.0), "zone": "office_food_street", "tags": ["dense_commerce", "medium_parallel", "event_mixed"]},
+    {"id": "MA-CBD-06", "point": (50.0, 35.5), "zone": "office_food_street", "tags": ["dense_commerce", "medium_parallel", "rain_clustered"]},
+    {"id": "MA-RAIN-01", "point": (49.0, 50.5), "zone": "rain_sheltered_block", "tags": ["low_willingness", "rain_clustered", "medium_parallel"]},
+    {"id": "MA-RAIN-02", "point": (55.5, 52.0), "zone": "rain_sheltered_block", "tags": ["low_willingness", "rain_clustered", "event_clustered"]},
+    {"id": "MA-RAIN-03", "point": (46.0, 55.5), "zone": "rain_sheltered_block", "tags": ["low_willingness", "rain_clustered"]},
+    {"id": "MA-MID-01", "point": (37.0, 44.0), "zone": "midtown_restaurant", "tags": ["medium_parallel", "balanced", "clustered"]},
+    {"id": "MA-MID-02", "point": (41.5, 52.0), "zone": "midtown_restaurant", "tags": ["medium_parallel", "balanced", "spread"]},
+    {"id": "MA-MID-03", "point": (61.5, 56.0), "zone": "midtown_restaurant", "tags": ["medium_parallel", "balanced", "event_mixed"]},
+    {"id": "MA-SPR-01", "point": (28.0, 67.0), "zone": "residential_edge", "tags": ["offpeak_balanced", "spread", "scarce_spread"]},
+    {"id": "MA-SPR-02", "point": (34.5, 73.0), "zone": "residential_edge", "tags": ["offpeak_balanced", "spread"]},
+    {"id": "MA-SPR-03", "point": (67.5, 68.0), "zone": "residential_edge", "tags": ["offpeak_balanced", "spread", "scarce_spread"]},
+    {"id": "MA-SPR-04", "point": (78.0, 55.0), "zone": "residential_edge", "tags": ["offpeak_balanced", "spread"]},
+    {"id": "MA-SCA-01", "point": (64.0, 33.0), "zone": "scarce_far_cluster", "tags": ["scarce_couriers", "scarce_spread", "event_mixed"]},
+    {"id": "MA-SCA-02", "point": (72.0, 39.0), "zone": "scarce_far_cluster", "tags": ["scarce_couriers", "scarce_spread"]},
+    {"id": "MA-SCA-03", "point": (82.0, 72.0), "zone": "scarce_far_cluster", "tags": ["scarce_couriers", "scarce_spread", "spread"]},
+    {"id": "MA-SCA-04", "point": (24.0, 56.0), "zone": "scarce_far_cluster", "tags": ["scarce_couriers", "scarce_spread"]},
+    {"id": "MA-EVT-01", "point": (59.0, 30.5), "zone": "event_gate_food", "tags": ["event_mixed", "event_clustered", "dense_commerce"]},
+    {"id": "MA-EVT-02", "point": (65.5, 36.0), "zone": "event_gate_food", "tags": ["event_mixed", "event_clustered"]},
+    {"id": "MA-EVT-03", "point": (53.5, 27.5), "zone": "event_gate_food", "tags": ["event_mixed", "event_clustered"]},
+    {"id": "MA-EVT-04", "point": (72.5, 47.0), "zone": "event_gate_food", "tags": ["event_mixed", "event_clustered", "low_willingness"]},
+]
+
+
+_COURIER_ANCHOR_BLUEPRINTS = [
+    {"id": "CA-CBD-01", "point": (43.0, 36.0), "zone": "central_ring", "tags": ["dense_commerce", "clustered", "medium_parallel"]},
+    {"id": "CA-CBD-02", "point": (55.0, 22.0), "zone": "central_ring", "tags": ["dense_commerce", "event_clustered"]},
+    {"id": "CA-CBD-03", "point": (59.0, 50.0), "zone": "central_ring", "tags": ["dense_commerce", "rain_clustered"]},
+    {"id": "CA-CBD-04", "point": (47.0, 45.0), "zone": "central_ring", "tags": ["dense_commerce", "medium_parallel"]},
+    {"id": "CA-CBD-05", "point": (39.0, 53.0), "zone": "central_ring", "tags": ["dense_commerce", "balanced"]},
+    {"id": "CA-MID-01", "point": (24.0, 35.0), "zone": "midtown_corridor", "tags": ["medium_parallel", "balanced", "spread"]},
+    {"id": "CA-MID-02", "point": (42.0, 35.0), "zone": "midtown_corridor", "tags": ["medium_parallel", "balanced"]},
+    {"id": "CA-MID-03", "point": (60.0, 31.0), "zone": "midtown_corridor", "tags": ["medium_parallel", "event_mixed"]},
+    {"id": "CA-MID-04", "point": (58.0, 52.0), "zone": "midtown_corridor", "tags": ["medium_parallel", "rain_clustered"]},
+    {"id": "CA-MID-05", "point": (77.0, 55.0), "zone": "midtown_corridor", "tags": ["medium_parallel", "scarce_spread"]},
+    {"id": "CA-RAIN-01", "point": (52.0, 31.0), "zone": "rain_standby", "tags": ["low_willingness", "rain_clustered"]},
+    {"id": "CA-RAIN-02", "point": (57.0, 45.0), "zone": "rain_standby", "tags": ["low_willingness", "rain_clustered"]},
+    {"id": "CA-RAIN-03", "point": (58.0, 60.0), "zone": "rain_standby", "tags": ["low_willingness", "rain_clustered", "spread"]},
+    {"id": "CA-RAIN-04", "point": (67.0, 45.0), "zone": "rain_standby", "tags": ["low_willingness", "event_clustered"]},
+    {"id": "CA-RAIN-05", "point": (42.0, 63.0), "zone": "rain_standby", "tags": ["low_willingness", "rain_clustered"]},
+    {"id": "CA-SPR-01", "point": (21.0, 66.0), "zone": "outer_loop", "tags": ["offpeak_balanced", "spread", "scarce_spread"]},
+    {"id": "CA-SPR-02", "point": (27.0, 77.0), "zone": "outer_loop", "tags": ["offpeak_balanced", "spread"]},
+    {"id": "CA-SPR-03", "point": (45.0, 86.0), "zone": "outer_loop", "tags": ["offpeak_balanced", "spread"]},
+    {"id": "CA-SPR-04", "point": (59.0, 82.0), "zone": "outer_loop", "tags": ["offpeak_balanced", "scarce_spread"]},
+    {"id": "CA-SPR-05", "point": (86.0, 81.0), "zone": "outer_loop", "tags": ["offpeak_balanced", "spread", "event_mixed"]},
+    {"id": "CA-SCA-01", "point": (70.0, 12.0), "zone": "scarce_remote", "tags": ["scarce_couriers", "scarce_spread"]},
+    {"id": "CA-SCA-02", "point": (80.0, 25.0), "zone": "scarce_remote", "tags": ["scarce_couriers", "event_mixed"]},
+    {"id": "CA-SCA-03", "point": (87.0, 39.0), "zone": "scarce_remote", "tags": ["scarce_couriers", "scarce_spread"]},
+    {"id": "CA-SCA-04", "point": (83.0, 52.0), "zone": "scarce_remote", "tags": ["scarce_couriers", "scarce_spread"]},
+    {"id": "CA-SCA-05", "point": (75.0, 35.0), "zone": "scarce_remote", "tags": ["scarce_couriers", "event_clustered"]},
+    {"id": "CA-EVT-01", "point": (64.0, 61.0), "zone": "event_buffer", "tags": ["event_mixed", "event_clustered"]},
+    {"id": "CA-EVT-02", "point": (75.0, 43.0), "zone": "event_buffer", "tags": ["event_mixed", "event_clustered"]},
+    {"id": "CA-EVT-03", "point": (52.0, 26.0), "zone": "event_buffer", "tags": ["event_mixed", "dense_commerce"]},
+    {"id": "CA-EVT-04", "point": (31.0, 30.0), "zone": "event_buffer", "tags": ["event_mixed", "medium_parallel"]},
+    {"id": "CA-EVT-05", "point": (72.0, 70.0), "zone": "event_buffer", "tags": ["event_mixed", "low_willingness"]},
+]
+
+
+def _materialize_anchor(blueprint: dict[str, object], role: str) -> dict[str, object]:
+    raw_point = blueprint["point"]
+    if not isinstance(raw_point, tuple):
+        raw_point = tuple(raw_point)  # type: ignore[arg-type]
+    if role == "merchant":
+        x, y = _snap_to_dispatch_road(raw_point, str(blueprint["id"]), 0.75, min_curb=3.1)
+        for _ in range(8):
+            nearest = _nearest_dispatch_road_projection((x, y))
+            if float(nearest["distance"]) >= 1.35:
+                break
+            projected = nearest["projected"]
+            segment = nearest["segment"]
+            px, py = projected
+            (sx, sy), (ex, ey) = segment
+            dx = ex - sx
+            dy = ey - sy
+            length = math.hypot(dx, dy) or 1.0
+            side = -1.0 if _unit_hash(blueprint["id"], salt="merchant-anchor-side") < 0.5 else 1.0
+            x, y = _clamp_point(px + side * (-dy / length) * 1.85, py + side * (dx / length) * 1.85)
+    else:
+        x, y = _snap_to_dispatch_road(raw_point, str(blueprint["id"]), 0.22, min_curb=0.03)
+    point = (x, y)
+    return {
+        "id": str(blueprint["id"]),
+        "role": role,
+        "x": x,
+        "y": y,
+        "raw_x": round(float(raw_point[0]), 1),
+        "raw_y": round(float(raw_point[1]), 1),
+        "zone": str(blueprint["zone"]),
+        "tags": list(blueprint["tags"]),
+        "road_id": _nearest_dispatch_road_id(point),
+        "curb_distance": round(_distance_to_dispatch_road(point), 2),
+    }
+
+
+_MERCHANT_ANCHORS = [_materialize_anchor(item, "merchant") for item in _MERCHANT_ANCHOR_BLUEPRINTS]
+_COURIER_ANCHORS = [_materialize_anchor(item, "courier") for item in _COURIER_ANCHOR_BLUEPRINTS]
+
+
+def _scene_anchor_tags(config: dict[str, object]) -> set[str]:
+    return {
+        str(config.get("id", "")),
+        str(config.get("scene_type", "")),
+        str(config.get("density_profile", "")),
+        str(config.get("weather", "")),
+    }
+
+
+def _anchor_match_score(anchor: dict[str, object], config: dict[str, object]) -> int:
+    anchor_tags = set(str(item) for item in anchor.get("tags", []))
+    return len(anchor_tags & _scene_anchor_tags(config))
+
+
+def _select_scene_anchors(config: dict[str, object], role: str, count: int, sample_key: object) -> list[dict[str, object]]:
+    anchors = _MERCHANT_ANCHORS if role == "merchant" else _COURIER_ANCHORS
+    center = config.get("center", (50.0, 50.0))
+    if not isinstance(center, tuple):
+        center = tuple(center)  # type: ignore[arg-type]
+    density_profile = str(config.get("density_profile", "balanced"))
+    center_weight = -0.025 if density_profile in {"spread", "scarce_spread"} else 0.045
+    matched = [anchor for anchor in anchors if _anchor_match_score(anchor, config) > 0]
+    candidates = matched if len(matched) >= count else anchors
+    ranked = sorted(
+        candidates,
+        key=lambda anchor: (
+            -_anchor_match_score(anchor, config),
+            _euclidean_distance((float(anchor["x"]), float(anchor["y"])), (float(center[0]), float(center[1]))) * center_weight
+            + _unit_hash(config.get("id", ""), sample_key, anchor["id"], salt=f"{role}-anchor") * 9.0,
+            str(anchor["id"]),
+        ),
+    )
+    selected = ranked[:count]
+    if len(selected) < count:
+        selected_ids = {str(anchor["id"]) for anchor in selected}
+        selected.extend([anchor for anchor in anchors if str(anchor["id"]) not in selected_ids][: count - len(selected)])
+    return selected
+
+
 def _simulated_dispatch_points(
     index: int,
     total: int,
@@ -630,32 +809,29 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
     config = _simulated_scenario_config(scenario_id)
     sample_index = int(sample_index) % 10
     sample_key = variant_seed or sample_index
-    center_x, center_y = config["center"]
     merchant_min, merchant_max = config["merchant_range"]
     courier_min, courier_max = config["courier_range"]
     density_profile = str(config.get("density_profile", "balanced"))
-    if density_profile == "clustered":
-        merchant_radius_scale = 0.42
-    elif density_profile in {"rain_clustered", "event_clustered"}:
-        merchant_radius_scale = 0.54
-    elif density_profile in {"spread", "scarce_spread"}:
-        merchant_radius_scale = 1.42
-    else:
-        merchant_radius_scale = 1.0
-    courier_radius_scale = 1.28 if density_profile in {"scarce_spread", "spread"} else 1.08 if density_profile == "rain_clustered" else 1.0
     merchant_count = int(merchant_min) + (sample_index + int(_unit_hash(config["id"], sample_key, salt="merchant-count") * 10)) % (int(merchant_max) - int(merchant_min) + 1)
     courier_count = int(courier_min) + int(_unit_hash(config["id"], sample_key, salt="courier-count") * (int(courier_max) - int(courier_min) + 1))
     map_layers = _simulated_map_layers(config, sample_index, variant_seed)
     traffic_level = sum(float(road["traffic_level"]) for road in map_layers["roads"][:4]) / 4
+    merchant_anchors = _select_scene_anchors(config, "merchant", merchant_count, sample_key)
+    courier_anchors = _select_scene_anchors(config, "courier", courier_count, sample_key)
+    map_layers["anchor_model"] = "predefined_dispatch_anchor_pool_v1"
+    map_layers["anchor_pools"] = {
+        "merchant_total": len(_MERCHANT_ANCHORS),
+        "courier_total": len(_COURIER_ANCHORS),
+        "merchant_selected": [anchor["id"] for anchor in merchant_anchors],
+        "courier_selected": [anchor["id"] for anchor in courier_anchors],
+        "scene_tags": sorted(_scene_anchor_tags(config)),
+    }
 
     merchants = []
-    for index in range(merchant_count):
-        angle = index / max(1, merchant_count) * math.tau + sample_index * 0.31 + _unit_hash(config["id"], sample_key, index, salt="merchant-angle") * 0.4
-        radius = (5.5 + (index % 3) * 4.2 + _unit_hash(config["id"], sample_key, index, salt="merchant-radius") * 4.8) * merchant_radius_scale
-        raw_point = (float(center_x) + math.cos(angle) * radius, float(center_y) + math.sin(angle) * radius * 0.78)
-        x, y = _snap_to_dispatch_road(_clamp_point(*raw_point), f"{config['id']}:{sample_key}:merchant:{index}", 3.6, min_curb=2.8)
+    for index, anchor in enumerate(merchant_anchors):
+        x, y = float(anchor["x"]), float(anchor["y"])
         order_count = 1 + ((sample_index + index) % 2)
-        demand = 0.48 + _unit_hash(config["id"], sample_key, index, salt="merchant-demand") * 0.47
+        demand = 0.48 + _unit_hash(config["id"], sample_key, anchor["id"], salt="merchant-demand") * 0.47
         merchant_id = f"M{sample_index + 1:02d}{index + 1:02d}"
         delivery_points = [
             {
@@ -664,6 +840,11 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
                 "label": f"商家 {index + 1}",
                 "x": x,
                 "y": y,
+                "anchor_id": anchor["id"],
+                "anchor_zone": anchor["zone"],
+                "anchor_road_id": anchor["road_id"],
+                "anchor_role": "merchant",
+                "curb_distance": anchor["curb_distance"],
                 "expected_eta_min": int(22 + demand * 18 + traffic_level * 10),
                 "expected_price": round(18 + demand * 18 + traffic_level * 8, 1),
                 "parent_merchant_id": merchant_id,
@@ -676,22 +857,25 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
                 "label": f"订单 {index + 1}",
                 "x": x,
                 "y": y,
+                "anchor_id": anchor["id"],
+                "anchor_zone": anchor["zone"],
+                "anchor_road_id": anchor["road_id"],
+                "anchor_role": "merchant",
+                "curb_distance": anchor["curb_distance"],
+                "on_road": False,
                 "order_count": order_count,
                 "expected_eta_min": int(22 + demand * 18 + traffic_level * 10),
                 "expected_price": round(18 + demand * 18 + traffic_level * 8, 1),
                 "demand_level": round(demand, 2),
-                "hotspot": "crossroad" if index < 3 else "nearby_block",
+                "hotspot": anchor["zone"],
                 "delivery_points": delivery_points,
             }
         )
 
     couriers = []
-    for index in range(courier_count):
-        angle = index / max(1, courier_count) * math.tau + sample_index * 0.17 + _unit_hash(config["id"], sample_key, index, salt="courier-angle") * 0.55
-        radius = (16 + (index % 4) * 4.5 + _unit_hash(config["id"], sample_key, index, salt="courier-radius") * 9) * courier_radius_scale
-        raw_point = (float(center_x) + math.cos(angle) * radius, float(center_y) + math.sin(angle) * radius * 0.88)
-        x, y = _snap_to_dispatch_road(_clamp_point(*raw_point), f"{config['id']}:{sample_key}:courier:{index}", 0.42, min_curb=0.02)
-        willingness = max(0.18, min(0.96, float(config["willingness_base"]) + (_unit_hash(config["id"], sample_key, index, salt="willingness") - 0.5) * 0.34 - traffic_level * 0.12))
+    for index, anchor in enumerate(courier_anchors):
+        x, y = float(anchor["x"]), float(anchor["y"])
+        willingness = max(0.18, min(0.96, float(config["willingness_base"]) + (_unit_hash(config["id"], sample_key, anchor["id"], salt="willingness") - 0.5) * 0.34 - traffic_level * 0.12))
         couriers.append(
             {
                 "id": f"R{sample_index + 1:02d}{index + 1:02d}",
@@ -699,6 +883,11 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
                 "label": f"骑手 {index + 1}",
                 "x": x,
                 "y": y,
+                "anchor_id": anchor["id"],
+                "anchor_zone": anchor["zone"],
+                "anchor_road_id": anchor["road_id"],
+                "anchor_role": "courier",
+                "curb_distance": anchor["curb_distance"],
                 "willingness": round(willingness, 2),
                 "capacity": 1,
                 "status": "available" if willingness >= 0.36 else "hesitant",
@@ -818,6 +1007,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
             "weather": str(config.get("weather", "clear")),
             "weather_label": _weather_label(config.get("weather", "clear")),
             "density_profile": density_profile,
+            "anchor_model": map_layers["anchor_model"],
             "avg_willingness": round(sum(float(item["willingness"]) for item in couriers) / max(1, len(couriers)), 2),
         },
     }

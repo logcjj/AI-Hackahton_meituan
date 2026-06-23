@@ -348,11 +348,24 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertGreater(len(rounded_y_steps), 3)
 
     def test_simulated_scenarios_generate_ten_samples_each(self):
-        from web_agent_demo.server import build_simulated_scenario_sample, list_simulated_scenarios
+        from web_agent_demo.server import (
+            _COURIER_ANCHORS,
+            _MERCHANT_ANCHORS,
+            build_simulated_scenario_sample,
+            list_simulated_scenarios,
+        )
 
         scenarios = list_simulated_scenarios()
+        merchant_anchor_ids = {item["id"] for item in _MERCHANT_ANCHORS}
+        courier_anchor_ids = {item["id"] for item in _COURIER_ANCHORS}
 
         self.assertGreaterEqual(len(scenarios), 5)
+        self.assertGreaterEqual(len(_MERCHANT_ANCHORS), 20)
+        self.assertGreaterEqual(len(_COURIER_ANCHORS), 28)
+        self.assertTrue(all(item["role"] == "merchant" for item in _MERCHANT_ANCHORS))
+        self.assertTrue(all(item["role"] == "courier" for item in _COURIER_ANCHORS))
+        self.assertTrue(all(float(item["curb_distance"]) >= 1.35 for item in _MERCHANT_ANCHORS))
+        self.assertTrue(all(float(item["curb_distance"]) <= 0.25 for item in _COURIER_ANCHORS))
         self.assertTrue(all(item["sample_count"] == 10 for item in scenarios))
         self.assertTrue(all(item["map_style"] == "baidu_like_simulated" for item in scenarios))
         for scenario in scenarios:
@@ -373,6 +386,13 @@ class WebAgentDemoTest(unittest.TestCase):
                 self.assertGreaterEqual(len(sample["map_layers"]["building_blocks"]), 36)
                 self.assertGreaterEqual(len(sample["map_layers"]["commerce_hotspots"]), 3)
                 self.assertGreaterEqual(len(sample["map_layers"]["intersections"]), 6)
+                self.assertEqual(sample["map_layers"]["anchor_model"], "predefined_dispatch_anchor_pool_v1")
+                self.assertEqual(sample["summary"]["anchor_model"], "predefined_dispatch_anchor_pool_v1")
+                self.assertIn("anchor_pools", sample["map_layers"])
+                self.assertEqual(len(sample["map_layers"]["anchor_pools"]["merchant_selected"]), len(sample["merchants"]))
+                self.assertEqual(len(sample["map_layers"]["anchor_pools"]["courier_selected"]), len(sample["couriers"]))
+                self.assertTrue(set(sample["map_layers"]["anchor_pools"]["merchant_selected"]).issubset(merchant_anchor_ids))
+                self.assertTrue(set(sample["map_layers"]["anchor_pools"]["courier_selected"]).issubset(courier_anchor_ids))
                 self.assertIn(sample["summary"]["weather"], {"clear", "rain", "event"})
                 self.assertIn("density_profile", sample["summary"])
                 self.assertTrue(all(not road["name_visible"] for road in sample["map_layers"]["roads"]))
@@ -381,12 +401,40 @@ class WebAgentDemoTest(unittest.TestCase):
                 self.assertGreater(len(set(merchant_points)), 2)
                 self.assertGreater(len(set(courier_points)), 5)
                 for merchant in sample["merchants"]:
+                    self.assertIn(merchant["anchor_id"], merchant_anchor_ids)
+                    self.assertEqual(merchant["anchor_role"], "merchant")
+                    self.assertFalse(merchant["on_road"])
+                    self.assertGreaterEqual(float(merchant["curb_distance"]), 1.35)
+                    self.assertTrue(str(merchant["anchor_road_id"]).startswith("R"))
                     delivery_points = merchant["delivery_points"]
                     self.assertEqual(len(delivery_points), 1)
                     for point in delivery_points:
                         self.assertEqual(point["kind"], "merchant_order")
                         self.assertEqual(point["parent_merchant_id"], merchant["id"])
                         self.assertEqual((point["x"], point["y"]), (merchant["x"], merchant["y"]))
+                        self.assertEqual(point["anchor_id"], merchant["anchor_id"])
+                        self.assertEqual(point["anchor_role"], "merchant")
+                for courier in sample["couriers"]:
+                    self.assertIn(courier["anchor_id"], courier_anchor_ids)
+                    self.assertEqual(courier["anchor_role"], "courier")
+                    self.assertTrue(courier["on_road"])
+                    self.assertLessEqual(float(courier["curb_distance"]), 0.25)
+                    self.assertTrue(str(courier["anchor_road_id"]).startswith("R"))
+
+    def test_simulated_refresh_uses_predefined_anchor_variants(self):
+        from web_agent_demo.server import build_simulated_scenario_sample
+
+        first = build_simulated_scenario_sample("commerce_peak", 0, "anchor-refresh-a")
+        second = build_simulated_scenario_sample("commerce_peak", 0, "anchor-refresh-b")
+        first_merchants = {item["anchor_id"] for item in first["merchants"]}
+        second_merchants = {item["anchor_id"] for item in second["merchants"]}
+        first_couriers = {item["anchor_id"] for item in first["couriers"]}
+        second_couriers = {item["anchor_id"] for item in second["couriers"]}
+
+        self.assertEqual(first["scenario_id"], second["scenario_id"])
+        self.assertNotEqual((first_merchants, first_couriers), (second_merchants, second_couriers))
+        self.assertTrue(first_merchants.issubset(set(first["map_layers"]["anchor_pools"]["merchant_selected"])))
+        self.assertTrue(second_merchants.issubset(set(second["map_layers"]["anchor_pools"]["merchant_selected"])))
 
         rain_sample = build_simulated_scenario_sample("rain_low_willingness", 0)
         self.assertEqual(rain_sample["summary"]["weather"], "rain")

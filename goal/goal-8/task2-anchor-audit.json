@@ -1,0 +1,157 @@
+{
+  "anchor_model": "predefined_dispatch_anchor_pool_v1",
+  "merchant_anchor_count": 24,
+  "courier_anchor_count": 30,
+  "global_min_merchant_curb_distance": 1.41,
+  "global_max_courier_curb_distance": 0.14,
+  "scenes": [
+    {
+      "id": "commerce_peak",
+      "name": "商圈十字路口高峰",
+      "merchant_variants": 10,
+      "courier_variants": 10,
+      "min_merchant_curb_distance": 1.44,
+      "max_courier_curb_distance": 0.14,
+      "sample0_merchants": [
+        "MA-CBD-04",
+        "MA-CBD-02",
+        "MA-CBD-01",
+        "MA-CBD-03",
+        "MA-MID-01"
+      ],
+      "sample0_couriers": [
+        "CA-CBD-01",
+        "CA-CBD-02",
+        "CA-CBD-05",
+        "CA-CBD-04",
+        "CA-EVT-03",
+        "CA-CBD-03",
+        "CA-RAIN-04",
+        "CA-MID-01"
+      ]
+    },
+    {
+      "id": "medium_parallel",
+      "name": "中型并行派单",
+      "merchant_variants": 10,
+      "courier_variants": 10,
+      "min_merchant_curb_distance": 1.41,
+      "max_courier_curb_distance": 0.14,
+      "sample0_merchants": [
+        "MA-MID-03",
+        "MA-MID-01",
+        "MA-MID-02",
+        "MA-CBD-04",
+        "MA-RAIN-01"
+      ],
+      "sample0_couriers": [
+        "CA-MID-01",
+        "CA-MID-02",
+        "CA-CBD-05",
+        "CA-MID-04",
+        "CA-CBD-04",
+        "CA-MID-05",
+        "CA-CBD-01",
+        "CA-MID-03"
+      ]
+    },
+    {
+      "id": "scarce_repair",
+      "name": "骑手稀缺修复",
+      "merchant_variants": 9,
+      "courier_variants": 10,
+      "min_merchant_curb_distance": 1.78,
+      "max_courier_curb_distance": 0.14,
+      "sample0_merchants": [
+        "MA-SCA-04",
+        "MA-SCA-03",
+        "MA-SCA-01",
+        "MA-SCA-02"
+      ],
+      "sample0_couriers": [
+        "CA-SCA-04",
+        "CA-SCA-01",
+        "CA-SCA-03",
+        "CA-SPR-04",
+        "CA-SPR-01",
+        "CA-MID-05",
+        "CA-SCA-05",
+        "CA-SCA-02"
+      ]
+    },
+    {
+      "id": "rain_low_willingness",
+      "name": "雨天低接单意愿",
+      "merchant_variants": 10,
+      "courier_variants": 10,
+      "min_merchant_curb_distance": 1.41,
+      "max_courier_curb_distance": 0.14,
+      "sample0_merchants": [
+        "MA-RAIN-03",
+        "MA-RAIN-02",
+        "MA-RAIN-01",
+        "MA-EVT-04"
+      ],
+      "sample0_couriers": [
+        "CA-RAIN-02",
+        "CA-RAIN-03",
+        "CA-RAIN-01",
+        "CA-RAIN-05",
+        "CA-MID-04",
+        "CA-CBD-03",
+        "CA-RAIN-04",
+        "CA-EVT-05"
+      ]
+    },
+    {
+      "id": "offpeak_greedy",
+      "name": "低峰分散订单",
+      "merchant_variants": 9,
+      "courier_variants": 10,
+      "min_merchant_curb_distance": 1.87,
+      "max_courier_curb_distance": 0.14,
+      "sample0_merchants": [
+        "MA-SPR-02",
+        "MA-SPR-03",
+        "MA-SPR-04",
+        "MA-SPR-01"
+      ],
+      "sample0_couriers": [
+        "CA-SPR-03",
+        "CA-SPR-02",
+        "CA-SPR-01",
+        "CA-SPR-05",
+        "CA-SPR-04",
+        "CA-RAIN-03",
+        "CA-MID-01",
+        "CA-MID-05"
+      ]
+    },
+    {
+      "id": "event_mixed_pressure",
+      "name": "活动混合压力",
+      "merchant_variants": 10,
+      "courier_variants": 10,
+      "min_merchant_curb_distance": 1.44,
+      "max_courier_curb_distance": 0.14,
+      "sample0_merchants": [
+        "MA-EVT-03",
+        "MA-EVT-04",
+        "MA-EVT-02",
+        "MA-EVT-01",
+        "MA-CBD-03"
+      ],
+      "sample0_couriers": [
+        "CA-EVT-02",
+        "CA-EVT-01",
+        "CA-MID-03",
+        "CA-SCA-05",
+        "CA-EVT-05",
+        "CA-CBD-02",
+        "CA-SCA-02",
+        "CA-EVT-03"
+      ]
+    }
+  ],
+  "violations": []
+}
