@@ -1,0 +1,48 @@
+{
+  "previewAudit": {
+    "courierPins": 13,
+    "hasDeliveryText": false,
+    "merchantPins": 5,
+    "merchantTexts": [
+      "M0101",
+      "M0102",
+      "M0103",
+      "M0104"
+    ],
+    "orderPins": 0,
+    "routeCount": 0,
+    "status": "已刷新样本 #01，等待推理"
+  },
+  "finalAudit": {
+    "courierPins": 13,
+    "detailTitle": "派单总览：全部商家已自动连线",
+    "hasDeliveryText": false,
+    "mapNote": "运行完成后，地图已自动展示 5 个商家分别派给哪个骑手；商家点同时代表该商家的 7 单。",
+    "merchantIds": [
+      "M0101",
+      "M0102",
+      "M0103",
+      "M0104",
+      "M0105"
+    ],
+    "merchantPins": 5,
+    "merchantToOrderRoutes": 0,
+    "orderPins": 0,
+    "pickupRoutes": 5,
+    "routeBundleLabels": 2,
+    "routeCount": 5,
+    "runtime": "00:00:10",
+    "status": "当前样本派单完成",
+    "stopLabels": 0
+  },
+  "hiddenAudit": {
+    "hiddenClass": true,
+    "toast": "派单关系线已隐藏，仅保留点位"
+  },
+  "clickAudit": {
+    "containsDeliveryTerms": false,
+    "detailText": "线路 R0102 → M0101，骑手到商家，道路折线节点 3 个。",
+    "detailTitle": "线路详情：骑手到商家",
+    "detailType": "route"
+  }
+}

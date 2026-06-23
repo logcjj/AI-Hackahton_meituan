@@ -59,3 +59,19 @@
 - JS 侧：提取内联脚本后 `node --check /tmp/autosolver-inline.js` 通过。
 - 测试侧：`python3 -m unittest` 全仓 58 个测试通过。
 - 剩余风险：当前仍是匿名模拟地图，不是接入真实地图瓦片；但符合“不显示真实路名/地址、模拟百度地图式层级”的约束。
+
+## Task 4: 合并商家与配送点，只展示派单关系
+
+验证标准：最终态地图不再显示独立配送点/订单端点，不显示绿色 O 或 D01/D02 类标签；每个商家点同时代表商家和订单点，运行完成后自动沿道路展示骑手到商家的派单关系线，并且点击商家、骑手、线路仍能打开中文业务详情。
+
+完成记录：
+- 已把官方回退地图和模拟最终地图统一为“商家 + 骑手”实体模型：`map_orders` 不再驱动地图实体，最终地图不再生成 `order` 点。
+- 已把模拟样本商家 ID 从 `O****` 改为 `M****`，商家点自身代表该商家的全部订单；内部 `delivery_points` 仅保留一个与商家同坐标的逻辑点。
+- 已删除商家到订单端点的线路渲染，`renderDispatchLinks()` 只生成 `courier-to-merchant` 派单线；`merchant-to-order`、`route-stop-label`、`long-delivery`、D01/D02 标签均已移除。
+- 已把右侧详情、总览、图例、toast 和按钮文案改成“商家派给骑手”的派单关系，不再展示配送点/订单端点/配送链路。
+- 已修复路线按钮：现在会隐藏/恢复全部派单关系线，而不是只处理旧配送端点线。
+- 浏览器真实验证通过：刷新态 `merchantPins=5`、`courierPins=13`、`orderPins=0`、`routeCount=0`；最终态 `runtime=00:00:10`、`routeCount=5`、`pickupRoutes=5`、`merchantToOrderRoutes=0`、`stopLabels=0`、`orderPins=0`；路线按钮 `hide-dispatch-routes=true`；点击线路打开“线路详情：骑手到商家”。
+- 截图与审计产物：`goal/goal-7/task4-final-map.png`、`goal/goal-7/task4-browser-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：内联脚本 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
