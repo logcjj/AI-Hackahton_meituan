@@ -1,0 +1,52 @@
+{
+  "map": {
+    "b": 507,
+    "h": 398,
+    "w": 724.40625,
+    "x": 309.796875,
+    "y": 109
+  },
+  "routeCount": 5,
+  "rows": [
+    {
+      "bottom": 599.6953125,
+      "text": "合单优先",
+      "visible": true
+    },
+    {
+      "bottom": 617.890625,
+      "text": "多派候选",
+      "visible": true
+    },
+    {
+      "bottom": 636.0859375,
+      "text": "局部修复",
+      "visible": true
+    },
+    {
+      "bottom": 654.28125,
+      "text": "贪心基线",
+      "visible": true
+    },
+    {
+      "bottom": 672.4765625,
+      "text": "风险平衡",
+      "visible": true
+    },
+    {
+      "bottom": 710.828125,
+      "text": "★最终 AutoSolver选中方案",
+      "visible": true
+    }
+  ],
+  "runtime": "00:00:10",
+  "status": "当前场景派单完成",
+  "table": {
+    "b": 717,
+    "h": 204,
+    "w": 726.40625,
+    "x": 308.796875,
+    "y": 513
+  },
+  "visibleRows": 6
+}
