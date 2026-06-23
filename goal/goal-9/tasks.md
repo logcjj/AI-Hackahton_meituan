@@ -136,3 +136,33 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 11: 企业级验收循环 5：全场景逐一运行一致性审计
+
+验证标准：页面下拉中的全部调度场景逐个运行 10 秒推理；每个场景都必须满足最终路线数、商家数、骑手数、箭头数、最终表格骑手数、ReasonGraph 派出骑手数一致；无重复最终骑手、无路线骑手错配、无最终线提前出现、收益量化完整、天气/路况文案与场景一致、页面无横纵滚动溢出、运行后无 console error。
+
+完成记录：
+- 已完成全场景逐一运行审计：页面下拉 10 个场景全部执行完整 10 秒派单推理，`failureCount=0`、`scenarioCount=10`。
+- 审计覆盖：最终路线数、可见路线数、商家点、骑手点、箭头数、底部最终方案骑手数、ReasonGraph “派出 N 个骑手”一致；无重复最终骑手、无路线骑手错配、无最终线提前出现、收益量化完整、天气/路况文案匹配场景。
+- 已保存证据：`goal/goal-9/task11-all-scenarios-audit.json`、`goal/goal-9/task11-all-scenarios-final.png`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 12: Chrome 实测修复重复黄线误导和天气卡片观感
+
+验证标准：在用户 Google Chrome 当前页面实测，最终派单业务线只能有一条可见线对应一个商家到最终承接骑手；透明点击层和箭头不得被当成额外黄线或错误派单关系；点击任意可见线/箭头/商家/骑手时右侧详情必须与最终答案一致；天气卡片在正常和窄视口下都必须是清晰浅色 To B 状态条，不能出现黑块、堆叠或遮挡地图主信息；补充自动化验证。
+
+完成记录：
+- 已在用户 Chrome 当前页面读取运行后 DOM：业务点击层的最终骑手没有重复，但页面仍存在 `dispatch-visual + route-click-target + dispatch-hit-area + dispatch-arrow` 多层同业务数据，容易被看成一个骑手被多条黄线连接。
+- 已移除冗余 `.dispatch-hit-area`：最终派单现在只生成一条可见业务线、一条中段点击目标和一个箭头；旧透明全路径命中层、样式、点击选择器和调试计数均清理。
+- 已调整路线点击入口：地图点击只识别 `.map-label`、`.pin`、`.dispatch-link`、`.dispatch-arrow`，避免旧透明 hit-area 参与任何详情判断。
+- 已优化天气卡片：移除拥挤的 `.weather-bar` 色条，改为更克制的浅色 To B 状态卡宽度、间距、阴影和行高，避免“黑块/一坨信息”的观感。
+- 已补回归测试：禁止 `dispatch-hit-area`、`dispatchHitAreaFor`、旧 hit-area 点击选择器和 `weather-bar` 回到页面。
+- Chrome 扩展在重启服务后拒绝执行 `127.0.0.1` reload，原因是浏览器 URL 策略拦截；未绕过该策略。已改用同端口实时服务 HTML 验证，证明手动刷新 Chrome 后会加载新页面。
+- 服务级审计通过：`goal/goal-9/task12-service-html-audit.json` 中 `failureCount=0`，确认 `dispatch-hit-area_present=false`、`dispatchHitAreaFor_present=false`、`weather-bar_present=false`、`route-click-target_present=true`、天气卡存在且点击选择器已清理。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。

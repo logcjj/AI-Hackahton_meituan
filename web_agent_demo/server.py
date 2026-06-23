@@ -1707,15 +1707,6 @@ def render_index() -> str:
     .dispatch-arrow { fill: #d99a00; opacity: .78; filter: drop-shadow(0 1px 1px rgba(68, 64, 60, .18)); pointer-events: auto; cursor: pointer; }
     .dispatch-arrow.overview-route { fill: #d99a00; opacity: .76; }
     .dispatch-arrow.active-assignment { opacity: 1; }
-    .dispatch-hit-area {
-      fill: none;
-      stroke: transparent;
-      stroke-width: 0;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      pointer-events: none;
-      cursor: default;
-    }
     .arrow { fill: var(--cyan); filter: drop-shadow(0 0 6px rgba(39,230,208,.75)); }
     @keyframes draw { to { stroke-dashoffset: 0; } }
     .map-legend {
@@ -1872,39 +1863,36 @@ def render_index() -> str:
     .map-frame.locating .dispatch-visual.primary { stroke-width: 6; }
     .map-frame.hide-candidates .dispatch-visual.secondary:not(.active-assignment),
     .map-frame.hide-candidates .dispatch-link.secondary:not(.active-assignment),
-    .map-frame.hide-candidates .dispatch-arrow.secondary:not(.active-assignment),
-    .map-frame.hide-candidates .dispatch-hit-area.secondary:not(.active-assignment) { display: none; }
+    .map-frame.hide-candidates .dispatch-arrow.secondary:not(.active-assignment) { display: none; }
     .map-frame.hide-dispatch-routes .dispatch-visual,
     .map-frame.hide-dispatch-routes .dispatch-link,
-    .map-frame.hide-dispatch-routes .dispatch-arrow,
-    .map-frame.hide-dispatch-routes .dispatch-hit-area { display: none; }
+    .map-frame.hide-dispatch-routes .dispatch-arrow { display: none; }
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
       position: absolute;
       right: 14px;
       bottom: 13px;
       z-index: 12;
-      width: 188px;
-      padding: 10px;
+      width: 212px;
+      padding: 9px 10px;
       border: 1px solid rgba(203, 213, 225, .9);
-      border-radius: 16px;
+      border-radius: 14px;
       background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,250,252,.98));
       color: #334155 !important;
-      box-shadow: 0 10px 24px rgba(15,23,42,.12);
+      box-shadow: 0 8px 18px rgba(15,23,42,.10);
       backdrop-filter: blur(12px);
       display: grid;
-      gap: 7px;
+      gap: 6px;
       pointer-events: none;
     }
     .weather-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .weather-title { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 850; color: #334155; letter-spacing: .02em; }
     .weather-title::before { content: ""; width: 7px; height: 7px; border-radius: 999px; background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.14); }
     .weather-badge { padding: 3px 8px; border-radius: 999px; background: #fff7ed; color: #b45309; border: 1px solid rgba(217,119,6,.2); font-size: 10px; font-weight: 850; white-space: nowrap; }
-    .weather-bar { height: 4px; background: linear-gradient(90deg, #d99a00 0 67%, rgba(100,116,139,.16) 67%); border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
     .weather-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .weather-line { display: grid; gap: 3px; min-width: 0; font-size: 10px; line-height: 1.2; color: #64748b; background: rgba(255,255,255,.78); border: 1px solid rgba(226,232,240,.86); border-radius: 10px; padding: 6px 7px; }
+    .weather-line { display: grid; gap: 3px; min-width: 0; font-size: 10px; line-height: 1.2; color: #64748b; background: rgba(255,255,255,.78); border: 1px solid rgba(226,232,240,.86); border-radius: 10px; padding: 5px 7px; }
     .weather-line strong { color: #0f172a; font-weight: 850; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .weather-impact { margin: 0; padding: 7px 8px; border: 1px solid rgba(226,232,240,.9); border-radius: 11px; background: rgba(248,250,252,.78); color: #475569; font-size: 10px; line-height: 1.32; }
+    .weather-impact { margin: 0; padding: 6px 8px; border: 1px solid rgba(226,232,240,.9); border-radius: 10px; background: rgba(248,250,252,.78); color: #475569; font-size: 10px; line-height: 1.28; }
     .toast {
       position: absolute;
       right: 18px;
@@ -2119,7 +2107,6 @@ def render_index() -> str:
           <div class="zoom"><button id="zoom-in" type="button" title="放大地图">+</button><button id="zoom-out" type="button" title="缩小地图">−</button><button id="recenter" type="button" title="回到派单总览">⌾</button></div>
           <div class="weather">
             <div class="weather-head"><span class="weather-title">气象与路况</span><strong class="weather-badge">待刷新</strong></div>
-            <div class="weather-bar"></div>
             <div class="weather-meta">
               <div class="weather-line"><span>天气</span><strong class="weather-state">等待场景</strong></div>
               <div class="weather-line"><span>履约影响</span><strong class="weather-impact-value">待评估</strong></div>
@@ -3786,9 +3773,7 @@ def render_index() -> str:
       const weatherLabel = summary && summary.weather_label ? summary.weather_label : weatherName === "rain" ? "雨天 · 路面湿滑" : weatherName === "event" ? "活动 · 局部管制" : "晴朗 · 正常履约";
       const label = traffic === "heavy" ? "拥堵" : traffic === "smooth" ? "畅通" : "缓行";
       const color = traffic === "heavy" ? "#dc2626" : traffic === "smooth" ? "#16a34a" : "#d97706";
-      const percent = traffic === "heavy" ? 86 : traffic === "smooth" ? 34 : 61;
       const trafficStrong = weather.querySelector(".weather-badge");
-      const bar = weather.querySelector(".weather-bar");
       const weatherStrong = weather.querySelector(".weather-state");
       const impactStrong = weather.querySelector(".weather-impact-value");
       const impactBody = weather.querySelector(".weather-impact");
@@ -3811,9 +3796,6 @@ def render_index() -> str:
         trafficStrong.style.color = color;
         trafficStrong.style.background = traffic === "heavy" ? "#fff1f2" : traffic === "smooth" ? "#ecfdf5" : "#fff7ed";
         trafficStrong.style.borderColor = traffic === "heavy" ? "rgba(244,63,94,.22)" : traffic === "smooth" ? "rgba(22,163,74,.22)" : "rgba(217,119,6,.2)";
-      }
-      if (bar) {
-        bar.style.background = `linear-gradient(90deg, ${color} 0 ${percent}%, rgba(100,116,139,.18) ${percent}% 100%)`;
       }
       if (weatherStrong) weatherStrong.textContent = weatherLabel;
       if (impactStrong) impactStrong.textContent = impactText;
@@ -4472,10 +4454,6 @@ def render_index() -> str:
       const length = routePolylineLength(route);
       return directDistance > directLimit || span > spanLimit || length > lengthLimit;
     }
-    function dispatchHitAreaFor(d, cls, assignmentId = "", meta = {}) {
-      if (!d) return "";
-      return `<path class="dispatch-hit-area ${cls}" data-assignment="${assignmentId}"${routeMetaAttributes(meta)} d="${d}"></path>`;
-    }
     function dispatchEndpointConnectorsFor(route, assignmentId = "", meta = {}, style = "") {
       const connectors = Array.isArray(route && route.endpointConnectors) ? route.endpointConnectors : [];
       const styleAttr = style ? ` style="${style}"` : "";
@@ -4579,7 +4557,6 @@ def render_index() -> str:
           return [
             `<path class="${pickupClass}" data-assignment="${assignment.id}" data-route-role="visual" data-courier="${escapeAttr(courierId)}" data-leg-index="${courierIndex}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
             dispatchRouteClickTargetFor(visiblePickupRoute, `${hitCls} pickup-leg${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta, routeStyle),
-            dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
             dispatchArrowFor(visiblePickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
           ].join("");
         });
@@ -4605,9 +4582,9 @@ def render_index() -> str:
         }
       }
       if (!hasDispatch) {
-        document.querySelectorAll(".map-label, .pin, .dispatch-visual, .dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
+        document.querySelectorAll(".map-label, .pin, .dispatch-visual, .dispatch-link, .dispatch-arrow").forEach((node) => {
           node.classList.remove("active-assignment", "selected", "focused", "primary");
-          if (node.classList.contains("dispatch-visual") || node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow") || node.classList.contains("dispatch-hit-area")) node.classList.add("secondary");
+          if (node.classList.contains("dispatch-visual") || node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow")) node.classList.add("secondary");
         });
         return;
       }
@@ -4619,7 +4596,7 @@ def render_index() -> str:
           node.classList.toggle("focused", focused && active);
         }
       });
-      document.querySelectorAll(".dispatch-visual, .dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
+      document.querySelectorAll(".dispatch-visual, .dispatch-link, .dispatch-arrow").forEach((node) => {
         const active = Boolean(hasDispatch && focused && node.dataset.assignment === selectedAssignment);
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
@@ -5588,7 +5565,7 @@ def render_index() -> str:
         return nearest ? nearest.pin : null;
       };
       document.querySelector(".map-frame").addEventListener("click", (event) => {
-        const target = event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow, .dispatch-hit-area");
+        const target = event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow");
         if (!target) return;
         const profile = currentProfile || profileForCase(selectedCase());
         if (!profile.assignments || Object.keys(profile.assignments).length === 0) {
@@ -5638,7 +5615,7 @@ def render_index() -> str:
       };
       const beginDrag = (event) => {
         if (event.button !== undefined && event.button !== 0) return;
-        if (event.target.closest(".toolbar, .map-legend, .zoom, .weather, .toast, .pin, .map-label, .dispatch-link, .dispatch-arrow, .dispatch-hit-area")) return;
+        if (event.target.closest(".toolbar, .map-legend, .zoom, .weather, .toast, .pin, .map-label, .dispatch-link, .dispatch-arrow")) return;
         dragStart = eventPoint(event);
         dragLast = dragStart;
         frame.classList.add("dragging-map");

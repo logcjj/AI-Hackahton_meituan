@@ -1,0 +1,1471 @@
+{
+  "failureCount": 0,
+  "failures": [],
+  "scenarioCount": 10,
+  "scenarioResults": [
+    {
+      "scenario": {
+        "index": 0,
+        "label": "商圈十字路口高峰",
+        "value": "large_seed301"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 6,
+        "courierPins": 13,
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "商圈十字路口高峰",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "商圈十字路口高峰",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0102"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$156.60",
+          "improvement": "+52.0%",
+          "benefitBatch": "￥4.24",
+          "benefitMonth": "￥1,413,750"
+        },
+        "routeCount": 6,
+        "visibleRouteCount": 6,
+        "visualCount": 6,
+        "arrowCount": 6,
+        "merchantPins": 6,
+        "courierPins": 6,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 6,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$156.606 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.84",
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0103M0102 → R0101M0103 → R0102M0104 → R0104M0105 → R0105M0106 → R0112 派单履约 ETA16 分钟平均 预计派单成本$156.60 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+52.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-5 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥4.24"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,413,750"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "selected",
+            "text": "S1 ✓合单优先同路高重叠订单合并派单密度 0.6 / 合单需求 1.50.84 已选中"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "rejected",
+            "text": "S5风险平衡低意愿与时间窗风险平衡-- 未采用"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%16.2 分钟$186.436 个骑手Low (中)0.84可行订单集中度高，合单后骑手占用更稳定"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%16.2 分钟$214.526 个骑手Med (中)0.73已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%16.2 分钟$295.476 个骑手Med (中)0.53已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%16.2 分钟$326.256 个骑手Med (中)0.48已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%16.2 分钟$301.156 个骑手Med (中)0.52已淘汰降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%12 分钟$156.606 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 1,
+        "label": "中型并行派单",
+        "value": "medium_seed201"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 4,
+        "courierPins": 10,
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "中型并行派单",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "中型并行派单",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0102"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$119.20",
+          "improvement": "+51.0%",
+          "benefitBatch": "￥3.10",
+          "benefitMonth": "￥1,550,816"
+        },
+        "routeCount": 4,
+        "visibleRouteCount": 4,
+        "visualCount": 4,
+        "arrowCount": 4,
+        "merchantPins": 4,
+        "courierPins": 4,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 4,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%13 分钟$119.204 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 4 个骑手 · 4 个商家派单 · 覆盖 4/4 个订单派单约束已通过 置信度0.90",
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 4 个骑手 运行完成后，地图已自动展示 4 个商家分别派给哪个骑手；商家点同时代表该商家的 6 单。M0101 → R0103M0102 → R0106M0103 → R0101M0104 → R0104 派单履约 ETA16 分钟平均 预计派单成本$119.20 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+51.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-4 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥3.10"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,550,816"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "selected",
+            "text": "S2 ✓多派候选单任务多骑手候选扩展候选竞争 0.5 / 骑手池 100.91 已选中"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "rejected",
+            "text": "S5风险平衡低意愿与时间窗风险平衡-- 未采用"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%14.8 分钟$186.254 个骑手Med (中)0.64已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%14.8 分钟$130.994 个骑手Low (中)0.91可行保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%14.8 分钟$220.744 个骑手Med (中)0.54已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%14.8 分钟$243.274 个骑手Med (中)0.49已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%14.8 分钟$229.234 个骑手Med (中)0.52已淘汰降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%13 分钟$119.204 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 2,
+        "label": "骑手稀缺修复",
+        "value": "scarce_couriers_seed401"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 6,
+        "courierPins": 9,
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "骑手稀缺修复",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "骑手稀缺修复",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0102"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$269.50",
+          "improvement": "+44.0%",
+          "benefitBatch": "￥5.29",
+          "benefitMonth": "￥1,764,583"
+        },
+        "routeCount": 6,
+        "visibleRouteCount": 6,
+        "visualCount": 6,
+        "arrowCount": 6,
+        "merchantPins": 6,
+        "courierPins": 6,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 6,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%16 分钟$269.506 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.95",
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0108M0102 → R0106M0103 → R0109M0104 → R0104M0105 → R0105M0106 → R0102 派单履约 ETA21 分钟平均 预计派单成本$269.50 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+44.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-5 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥5.29"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,764,583"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "selected",
+            "text": "S3 ✓局部修复从基线方案做局部修复稀缺 0.45 / 分散 1.00.96 已选中"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "rejected",
+            "text": "S5风险平衡低意愿与时间窗风险平衡-- 未采用"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%16.2 分钟$550.006 个骑手Med (中)0.49已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%16.2 分钟$456.786 个骑手Med (中)0.59已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%16.2 分钟$272.226 个骑手Low (中)0.91可行可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%16.2 分钟$481.256 个骑手Med (中)0.56已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%16.2 分钟$472.816 个骑手Med (中)0.57已淘汰降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%16 分钟$269.506 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 3,
+        "label": "雨天低接单意愿",
+        "value": "low_willingness_seed501"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 4,
+        "courierPins": 10,
+        "weather": {
+          "text": "气象与路况缓行 天气雨天 · 路面湿滑 履约影响接单意愿下降 调度建议：提高接单意愿权重，预留雨天 ETA 缓冲。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "雨天低接单意愿",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "雨天低接单意愿",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0102"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$168.50",
+          "improvement": "+49.0%",
+          "benefitBatch": "￥4.05",
+          "benefitMonth": "￥2,023,652"
+        },
+        "routeCount": 4,
+        "visibleRouteCount": 4,
+        "visualCount": 4,
+        "arrowCount": 4,
+        "merchantPins": 4,
+        "courierPins": 4,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 4,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%17 分钟$168.504 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 4 个骑手 · 4 个商家派单 · 覆盖 4/4 个订单派单约束已通过 置信度0.95",
+        "weather": {
+          "text": "气象与路况缓行 天气雨天 · 路面湿滑 履约影响接单意愿下降 调度建议：提高接单意愿权重，预留雨天 ETA 缓冲。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 4 个骑手 运行完成后，地图已自动展示 4 个商家分别派给哪个骑手；商家点同时代表该商家的 6 单。M0101 → R0107M0102 → R0109M0103 → R0105M0104 → R0104 派单履约 ETA21 分钟平均 预计派单成本$168.50 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+49.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-4 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥4.05"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥2,023,652"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "selected",
+            "text": "S5 ✓风险平衡低意愿与时间窗风险平衡低意愿 0.88 / 路况 0.720.96 已选中"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%14.8 分钟$255.304 个骑手Med (中)0.66已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%14.8 分钟$237.324 个骑手Med (中)0.71已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%14.8 分钟$324.044 个骑手Med (中)0.52已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%14.8 分钟$330.394 个骑手Med (中)0.51已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%14.8 分钟$170.204 个骑手Low (中)0.91可行降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%17 分钟$168.504 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 4,
+        "label": "低峰分散订单",
+        "value": "high_noise_seed601"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 3,
+        "courierPins": 9,
+        "weather": {
+          "text": "气象与路况畅通 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "低峰分散订单",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "低峰分散订单",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0102"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$111.20",
+          "improvement": "+12.0%",
+          "benefitBatch": "￥1.40",
+          "benefitMonth": "￥1,050,000"
+        },
+        "routeCount": 3,
+        "visibleRouteCount": 3,
+        "visualCount": 3,
+        "arrowCount": 3,
+        "merchantPins": 3,
+        "courierPins": 3,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 3,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%13 分钟$111.203 个骑手Low (低)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 3 个骑手 · 3 个商家派单 · 覆盖 3/3 个订单派单约束已通过 置信度0.87",
+        "weather": {
+          "text": "气象与路况畅通 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 3 个骑手 运行完成后，地图已自动展示 3 个商家分别派给哪个骑手；商家点同时代表该商家的 4 单。M0101 → R0109M0102 → R0107M0103 → R0101 派单履约 ETA17 分钟平均 预计派单成本$111.20 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+12.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-3 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥1.40"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,050,000"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "selected",
+            "text": "S4 ✓贪心基线最近/最低成本基线派单低峰稳定 0.59 / 风险 0.00.88 已选中"
+          },
+          {
+            "branch": "S5",
+            "status": "rejected",
+            "text": "S5风险平衡低意愿与时间窗风险平衡-- 未采用"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%14.1 分钟$202.183 个骑手Med (低)0.55已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%14.1 分钟$156.623 个骑手Med (低)0.71已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%14.1 分钟$226.943 个骑手Med (低)0.49已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%14.1 分钟$126.363 个骑手Low (低)0.88可行最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%14.1 分钟$264.763 个骑手Med (低)0.42已淘汰降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%13 分钟$111.203 个骑手Low (低)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 5,
+        "label": "活动混合压力",
+        "value": "large_seed302"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 6,
+        "courierPins": 15,
+        "weather": {
+          "text": "气象与路况拥堵 天气活动 · 局部管制 履约影响ETA 上浮 调度建议：提高近场骑手权重，避免跨区派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "活动混合压力",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "活动混合压力",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0106"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$225.20",
+          "improvement": "+48.0%",
+          "benefitBatch": "￥5.20",
+          "benefitMonth": "￥1,732,308"
+        },
+        "routeCount": 6,
+        "visibleRouteCount": 6,
+        "visualCount": 6,
+        "arrowCount": 6,
+        "merchantPins": 6,
+        "courierPins": 6,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 6,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%13 分钟$225.206 个骑手Low (高)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.87",
+        "weather": {
+          "text": "气象与路况拥堵 天气活动 · 局部管制 履约影响ETA 上浮 调度建议：提高近场骑手权重，避免跨区派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0103M0102 → R0111M0103 → R0102M0104 → R0104M0105 → R0112M0106 → R0107 派单履约 ETA21 分钟平均 预计派单成本$225.20 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+48.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-5 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥5.20"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,732,308"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "selected",
+            "text": "S5 ✓风险平衡低意愿与时间窗风险平衡低意愿 0.56 / 路况 0.870.88 已选中"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%16.2 分钟$288.726 个骑手Med (高)0.78已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%16.2 分钟$308.496 个骑手Med (高)0.73已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%16.2 分钟$351.886 个骑手Med (高)0.64已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%16.2 分钟$433.086 个骑手Med (高)0.52已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%16.2 分钟$255.916 个骑手Low (高)0.88可行降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%13 分钟$225.206 个骑手Low (高)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 6,
+        "label": "夜间商圈宵夜",
+        "value": "night_foodcourt_seed701"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 5,
+        "courierPins": 11,
+        "weather": {
+          "text": "气象与路况畅通 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "夜间商圈宵夜",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "夜间商圈宵夜",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0102"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$151.40",
+          "improvement": "+52.0%",
+          "benefitBatch": "￥4.10",
+          "benefitMonth": "￥1,757,321"
+        },
+        "routeCount": 5,
+        "visibleRouteCount": 5,
+        "visualCount": 5,
+        "arrowCount": 5,
+        "merchantPins": 5,
+        "courierPins": 5,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 5,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%13 分钟$151.405 个骑手Low (低)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 5 个骑手 · 5 个商家派单 · 覆盖 5/5 个订单派单约束已通过 置信度0.83",
+        "weather": {
+          "text": "气象与路况畅通 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 5 个骑手 运行完成后，地图已自动展示 5 个商家分别派给哪个骑手；商家点同时代表该商家的 7 单。M0101 → R0107M0102 → R0111M0103 → R0101M0104 → R0105M0105 → R0104 派单履约 ETA15 分钟平均 预计派单成本$151.40 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+52.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-5 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥4.10"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,757,321"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "selected",
+            "text": "S1 ✓合单优先同路高重叠订单合并派单密度 0.62 / 合单需求 1.40.82 已选中"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "rejected",
+            "text": "S5风险平衡低意愿与时间窗风险平衡-- 未采用"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%15.5 分钟$184.635 个骑手Med (低)0.82可行订单集中度高，合单后骑手占用更稳定"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%15.5 分钟$225.975 个骑手Med (低)0.67已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%15.5 分钟$315.425 个骑手Med (低)0.48已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%15.5 分钟$315.425 个骑手Med (低)0.48已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%15.5 分钟$296.865 个骑手Med (低)0.51已淘汰降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%13 分钟$151.405 个骑手Low (低)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 7,
+        "label": "校园午高峰",
+        "value": "campus_lunch_seed801"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 6,
+        "courierPins": 14,
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "校园午高峰",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "校园午高峰",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0106"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$166.30",
+          "improvement": "+51.0%",
+          "benefitBatch": "￥4.33",
+          "benefitMonth": "￥1,442,398"
+        },
+        "routeCount": 6,
+        "visibleRouteCount": 6,
+        "visualCount": 6,
+        "arrowCount": 6,
+        "merchantPins": 6,
+        "courierPins": 6,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 6,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%13 分钟$166.306 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.92",
+        "weather": {
+          "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 6 个骑手 运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。M0101 → R0105M0102 → R0111M0103 → R0102M0104 → R0104M0105 → R0112M0106 → R0108 派单履约 ETA16 分钟平均 预计派单成本$166.30 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+51.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-5 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥4.33"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,442,398"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "selected",
+            "text": "S2 ✓多派候选单任务多骑手候选扩展候选竞争 0.67 / 骑手池 140.94 已选中"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "rejected",
+            "text": "S5风险平衡低意愿与时间窗风险平衡-- 未采用"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%16.2 分钟$286.726 个骑手Med (中)0.58已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%16.2 分钟$176.916 个骑手Low (中)0.91可行保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%16.2 分钟$307.966 个骑手Med (中)0.54已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%16.2 分钟$339.396 个骑手Med (中)0.49已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%16.2 分钟$332.606 个骑手Med (中)0.50已淘汰降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%13 分钟$166.306 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 8,
+        "label": "医院写字楼午峰",
+        "value": "hospital_office_seed901"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 4,
+        "courierPins": 11,
+        "weather": {
+          "text": "气象与路况缓行 天气活动 · 局部管制 履约影响局部绕行 调度建议：绕开活动核心区，优先稳定履约。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "医院写字楼午峰",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "医院写字楼午峰",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0102"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$156.60",
+          "improvement": "+47.0%",
+          "benefitBatch": "￥3.47",
+          "benefitMonth": "￥1,735,896"
+        },
+        "routeCount": 4,
+        "visibleRouteCount": 4,
+        "visualCount": 4,
+        "arrowCount": 4,
+        "merchantPins": 4,
+        "courierPins": 4,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 4,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%13 分钟$156.604 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 4 个骑手 · 4 个商家派单 · 覆盖 4/4 个订单派单约束已通过 置信度0.87",
+        "weather": {
+          "text": "气象与路况缓行 天气活动 · 局部管制 履约影响局部绕行 调度建议：绕开活动核心区，优先稳定履约。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 4 个骑手 运行完成后，地图已自动展示 4 个商家分别派给哪个骑手；商家点同时代表该商家的 6 单。M0101 → R0110M0102 → R0109M0103 → R0105M0104 → R0107 派单履约 ETA20 分钟平均 预计派单成本$156.60 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+47.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-4 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥3.47"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,735,896"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "rejected",
+            "text": "S3局部修复从基线方案做局部修复-- 未采用"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "selected",
+            "text": "S5 ✓风险平衡低意愿与时间窗风险平衡低意愿 0.52 / 路况 0.740.87 已选中"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%14.8 分钟$252.584 个骑手Med (中)0.62已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%14.8 分钟$211.624 个骑手Med (中)0.74已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%14.8 分钟$279.644 个骑手Med (中)0.56已淘汰可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%14.8 分钟$295.474 个骑手Med (中)0.53已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%14.8 分钟$180.004 个骑手Low (中)0.87可行降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%13 分钟$156.604 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": {
+        "index": 9,
+        "label": "拥堵异常补单",
+        "value": "congestion_reassign_seed1001"
+      },
+      "preview": {
+        "routeCount": 0,
+        "merchantPins": 5,
+        "courierPins": 9,
+        "weather": {
+          "text": "气象与路况拥堵 天气活动 · 局部管制 履约影响ETA 上浮 调度建议：提高近场骑手权重，避免跨区派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        }
+      },
+      "final": {
+        "scenario": "拥堵异常补单",
+        "phase": "final",
+        "viewport": {
+          "w": 1280,
+          "h": 720
+        },
+        "bodyClass": "",
+        "selectedOption": "拥堵异常补单",
+        "scroll": {
+          "w": 1280,
+          "h": 720
+        },
+        "mapPanelActive": false,
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "selectedAssignment": "A0103"
+        },
+        "kpi": {
+          "runtime": "00:00:10",
+          "completion": "100%",
+          "unassigned": "0",
+          "cost": "$214.20",
+          "improvement": "+43.0%",
+          "benefitBatch": "￥4.04",
+          "benefitMonth": "￥1,731,316"
+        },
+        "routeCount": 5,
+        "visibleRouteCount": 5,
+        "visualCount": 5,
+        "arrowCount": 5,
+        "merchantPins": 5,
+        "courierPins": 5,
+        "duplicateCouriers": [],
+        "routeCourierMismatch": [],
+        "leakingPins": [],
+        "outOfMapPins": [],
+        "finalStrategyRiders": 5,
+        "finalStrategyCoverage": "100%",
+        "finalStrategyText": "★最终 AutoSolver选中方案100%13 分钟$214.205 个骑手Low (高)0.89已选中成本、风险、履约时效综合最优",
+        "reasonFinalText": "6✓ 最终派单方案派出 5 个骑手 · 5 个商家派单 · 覆盖 5/5 个订单派单约束已通过 置信度0.90",
+        "weather": {
+          "text": "气象与路况拥堵 天气活动 · 局部管制 履约影响ETA 上浮 调度建议：提高近场骑手权重，避免跨区派单。",
+          "oldRows": 0,
+          "pointer": "none"
+        },
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailText": "派单总览：全部商家已自动连线 对象 5 个骑手 运行完成后，地图已自动展示 5 个商家分别派给哪个骑手；商家点同时代表该商家的 7 单。M0101 → R0109M0102 → R0107M0103 → R0105M0104 → R0104M0105 → R0108 派单履约 ETA22 分钟平均 预计派单成本$214.20 接单 / 覆盖概率100%",
+        "compareRows": [
+          {
+            "label": "成本改进",
+            "value": "+43.0%"
+          },
+          {
+            "label": "ETA 改进",
+            "value": "-5 分钟"
+          },
+          {
+            "label": "无人接单风险下降",
+            "value": "-31%"
+          },
+          {
+            "label": "运营测算批次节约",
+            "value": "￥4.04"
+          },
+          {
+            "label": "单城月节约测算",
+            "value": "￥1,731,316"
+          }
+        ],
+        "strategyCards": [
+          {
+            "branch": "S1",
+            "status": "rejected",
+            "text": "S1合单优先同路高重叠订单合并派单-- 未采用"
+          },
+          {
+            "branch": "S2",
+            "status": "rejected",
+            "text": "S2多派候选单任务多骑手候选扩展-- 未采用"
+          },
+          {
+            "branch": "S3",
+            "status": "selected",
+            "text": "S3 ✓局部修复从基线方案做局部修复稀缺 0.24 / 分散 1.00.92 已选中"
+          },
+          {
+            "branch": "S4",
+            "status": "rejected",
+            "text": "S4贪心基线最近/最低成本基线派单-- 未采用"
+          },
+          {
+            "branch": "S5",
+            "status": "rejected",
+            "text": "S5风险平衡低意愿与时间窗风险平衡-- 未采用"
+          }
+        ],
+        "tableRows": [
+          {
+            "type": "strategy-candidate",
+            "text": "合单优先100%15.5 分钟$420.005 个骑手Med (高)0.51已淘汰合单收益不足或局部绕行偏大"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "多派候选100%15.5 分钟$345.485 个骑手Med (高)0.62已淘汰保留多个骑手候选，适合距离接近但资源占用更高"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "局部修复100%15.5 分钟$232.835 个骑手Low (高)0.91可行可修复高风险派单，但整体成本仍高于当前方案"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "贪心基线100%15.5 分钟$375.795 个骑手Med (高)0.57已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险"
+          },
+          {
+            "type": "strategy-candidate",
+            "text": "风险平衡100%15.5 分钟$240.675 个骑手Low (高)0.89已淘汰降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          },
+          {
+            "type": "final-strategy",
+            "text": "★最终 AutoSolver选中方案100%13 分钟$214.205 个骑手Low (高)0.89已选中成本、风险、履约时效综合最优"
+          }
+        ]
+      }
+    }
+  ],
+  "screenshots": [
+    "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-9/task11-all-scenarios-final.png"
+  ],
+  "generatedAt": "2026-06-23T17:19:16.513Z"
+}

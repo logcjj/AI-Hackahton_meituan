@@ -1,0 +1,15 @@
+{
+  "failureCount": 0,
+  "checks": {
+    "dispatch_hit_area_absent": true,
+    "dispatch_hit_area_function_absent": true,
+    "weather_bar_absent": true,
+    "route_click_target_present": true,
+    "weather_card_present": true,
+    "click_selector_clean": true
+  },
+  "notes": [
+    "Chrome extension blocked reload of 127.0.0.1; live service HTML was audited after restarting port 8768.",
+    "Each dispatch assignment now renders visual route + midpoint click target + arrow; transparent full-path hit-area is removed."
+  ]
+}
