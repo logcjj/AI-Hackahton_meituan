@@ -112,7 +112,7 @@ _DISPATCH_ROADS = [
 
 
 _SIMULATION_STRATEGIES = {
-    "S1": {"name": "合单优先", "label": "合单优先", "reason": "商圈订单密集，优先把同路订单组成派单包"},
+    "S1": {"name": "合单优先", "label": "合单优先", "reason": "商圈订单密集，优先把同路订单合并给同一骑手"},
     "S2": {"name": "多派候选", "label": "多派候选", "reason": "多个骑手距离接近，需要扩展候选后再筛选"},
     "S3": {"name": "局部修复", "label": "局部修复", "reason": "先得到可行派单，再修复高成本或绕行订单"},
     "S4": {"name": "贪心基线", "label": "贪心基线", "reason": "低峰期订单分散，最近可用骑手已足够稳定"},
@@ -901,7 +901,7 @@ def build_dispatch_assignment_map(case_id: str, report: dict[str, object] | None
             willingness,
             len(task_ids),
         )
-        add_entity(pickup_id, "pickup_cluster", f"{pickup_id} 订单组", index, pickup_point)
+        add_entity(pickup_id, "pickup_cluster", f"{pickup_id} 商家", index, pickup_point)
         display_couriers = couriers if index == 0 else couriers[:1]
         for courier_index, visible_courier in enumerate(display_couriers):
             courier_offset = (
@@ -921,7 +921,7 @@ def build_dispatch_assignment_map(case_id: str, report: dict[str, object] | None
                 "pickup": pickup_id,
                 "pickup_label": f"{pickup_id}：{task_key}",
                 "merchant": pickup_id,
-                "merchant_note": "输入文件不包含真实商家坐标；此处为由 task_id_list 推断的订单组/取餐簇。",
+                "merchant_note": "输入文件不包含真实商家坐标；此处为由 task_id_list 推断的商家取餐点。",
                 "courier": " + ".join(couriers),
                 "map_couriers": display_couriers,
                 "map_orders": display_task_ids,
@@ -1201,25 +1201,26 @@ def render_index() -> str:
     .line-key.rej { border-top: 2px dashed #a1a1a1; opacity: .7; }
     .scene-strip {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      padding: 8px 10px;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 6px;
+      padding: 7px 10px;
       border-bottom: 1px solid var(--stroke);
       background: rgba(4, 15, 26, .72);
     }
     .scene-button {
-      min-height: 50px;
+      min-height: 44px;
       text-align: left;
       color: #dcecff;
       background: linear-gradient(180deg, rgba(17, 43, 64, .94), rgba(8, 24, 39, .94));
       border: 1px solid rgba(55, 103, 133, .74);
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 7px 9px;
       cursor: pointer;
       box-shadow: inset 0 1px 0 rgba(138, 218, 255, .08);
+      min-width: 0;
     }
-    .scene-button strong { display: block; font-size: 12px; margin-bottom: 4px; }
-    .scene-button span { display: block; color: var(--muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .scene-button strong { display: block; font-size: 11px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .scene-button span { display: block; color: var(--muted); font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .scene-button.active {
       border-color: var(--cyan);
       background: linear-gradient(180deg, rgba(7, 67, 67, .98), rgba(6, 35, 45, .98));
@@ -1238,28 +1239,28 @@ def render_index() -> str:
     .map-panel.active .map-frame { min-height: 0; flex: 1; }
     .map-frame.topology {
       background:
-        radial-gradient(circle at 52% 42%, rgba(22, 73, 88, .22), transparent 30%),
-        linear-gradient(90deg, rgba(148,163,184,.035) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(148,163,184,.028) 1px, transparent 1px),
-        linear-gradient(180deg, #09141e 0%, #06111a 100%);
-      background-size: auto, 58px 58px, 58px 58px, auto;
+        radial-gradient(circle at 51% 43%, rgba(26, 67, 86, .18), transparent 32%),
+        linear-gradient(90deg, rgba(148,163,184,.026) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(148,163,184,.022) 1px, transparent 1px),
+        linear-gradient(180deg, #07111a 0%, #050d14 100%);
+      background-size: auto, 54px 54px, 54px 54px, auto;
     }
-    .map-frame.topology .map-bg { opacity: .98; filter: saturate(.72) contrast(1.02) brightness(.92); }
+    .map-frame.topology .map-bg { opacity: .96; filter: saturate(.72) contrast(1.12) brightness(.9); }
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .74; z-index: 0; }
     .route-svg { z-index: 2; pointer-events: auto; }
-    .district, .zone-block { fill: rgba(20, 35, 47, .52); stroke: rgba(124, 146, 162, .12); stroke-width: 1; }
-    .water { fill: rgba(17, 35, 50, .76); stroke: rgba(85, 116, 137, .24); }
+    .district, .zone-block { fill: rgba(20, 35, 47, .4); stroke: rgba(124, 146, 162, .1); stroke-width: 1; }
+    .water { fill: rgba(15, 32, 47, .68); stroke: rgba(85, 116, 137, .2); }
     .building-block {
-      fill: rgba(39, 56, 68, .56);
-      stroke: rgba(134, 154, 168, .16);
-      stroke-width: .8;
+      fill: rgba(39, 56, 68, .42);
+      stroke: rgba(134, 154, 168, .12);
+      stroke-width: .7;
       vector-effect: non-scaling-stroke;
     }
-    .building-block.commerce { fill: rgba(70, 72, 50, .58); stroke: rgba(255, 209, 45, .15); }
-    .building-block.office { fill: rgba(45, 66, 78, .6); }
-    .building-block.residential { fill: rgba(36, 54, 55, .58); }
+    .building-block.commerce { fill: rgba(72, 68, 45, .45); stroke: rgba(255, 209, 45, .12); }
+    .building-block.office { fill: rgba(45, 66, 78, .43); }
+    .building-block.residential { fill: rgba(36, 54, 55, .4); }
     .commerce-hotspot {
       fill: rgba(255, 154, 46, .12);
       stroke: rgba(255, 154, 46, .22);
@@ -1278,15 +1279,17 @@ def render_index() -> str:
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
     }
-    .road-base { stroke: rgba(1, 8, 14, .84); stroke-width: calc(var(--road-width, 8px) + 7px); }
-    .road-core { stroke: rgba(128, 146, 158, .7); stroke-width: var(--road-width, 6px); }
-    .road-core.arterial { stroke: rgba(151, 165, 174, .76); }
-    .road-core.secondary { stroke: rgba(110, 130, 144, .58); }
-    .road-core.service { stroke: rgba(80, 99, 113, .36); stroke-dasharray: 1 8; }
-    .traffic-band { stroke-width: var(--traffic-width, 2px); opacity: .9; }
-    .traffic-band.smooth { stroke: rgba(54, 230, 126, .38); }
-    .traffic-band.moderate { stroke: rgba(255, 209, 45, .5); stroke-dasharray: 18 11; }
-    .traffic-band.heavy { stroke: rgba(255, 91, 101, .62); stroke-dasharray: 12 8; }
+    .road-base { stroke: rgba(0, 5, 10, .82); stroke-width: calc(var(--road-width, 8px) + 4px); }
+    .road-base.secondary { stroke: rgba(0, 5, 10, .64); stroke-width: calc(var(--road-width, 6px) + 2px); }
+    .road-base.service { stroke: rgba(0, 5, 10, .42); stroke-width: calc(var(--road-width, 4px) + 1px); }
+    .road-core { stroke: rgba(137, 154, 164, .52); stroke-width: var(--road-width, 6px); }
+    .road-core.arterial { stroke: rgba(164, 175, 181, .62); }
+    .road-core.secondary { stroke: rgba(119, 137, 149, .44); }
+    .road-core.service { stroke: rgba(88, 105, 119, .28); stroke-dasharray: 1 9; }
+    .traffic-band { stroke-width: var(--traffic-width, 2px); opacity: .56; }
+    .traffic-band.smooth { stroke: rgba(54, 230, 126, .26); }
+    .traffic-band.moderate { stroke: rgba(255, 209, 45, .44); stroke-dasharray: 18 14; }
+    .traffic-band.heavy { stroke: rgba(255, 91, 101, .52); stroke-dasharray: 12 10; }
     .weather-rain-layer {
       pointer-events: none;
       opacity: .9;
@@ -1305,20 +1308,37 @@ def render_index() -> str:
     }
     .map-bg[data-weather="rain"] .road-core { filter: brightness(.86); }
     .map-bg[data-weather="rain"] .traffic-band.heavy { stroke: rgba(255, 91, 101, .78); }
-    body.sample-preview .traffic-band { opacity: .74; }
-    .dispatch-link { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 980; stroke-dashoffset: 980; animation: draw 1.45s ease-out forwards; pointer-events: stroke; cursor: pointer; }
-    .dispatch-link.primary { stroke: #20d4c7; stroke-width: 4.8; filter: drop-shadow(0 0 6px rgba(32,212,199,.42)); }
-    .dispatch-link.secondary { stroke: rgba(43, 222, 205, .64); stroke-width: 3.1; stroke-dasharray: none; filter: drop-shadow(0 0 4px rgba(32,212,199,.2)); opacity: .9; }
-    .dispatch-link.overview-route { stroke: var(--route-color, rgba(43, 222, 205, .76)); stroke-width: 3.55; opacity: .96; filter: drop-shadow(0 0 5px rgba(32,212,199,.24)); }
-    .dispatch-link.pickup-leg { stroke: rgba(32, 212, 199, .72); stroke-width: 3.6; filter: drop-shadow(0 0 5px rgba(32,212,199,.18)); }
-    .dispatch-link.pickup-leg.overview-route { stroke: rgba(255, 186, 58, .9); stroke-width: 4.1; }
-    .dispatch-link.delivery-leg { stroke: var(--route-color, rgba(118, 201, 76, .88)); stroke-width: 3.25; opacity: .92; }
-    .dispatch-link.delivery-leg.active-assignment { stroke-width: 4.8; opacity: 1; }
-    .dispatch-link.delivery-leg.overview-route { stroke: var(--route-color, rgba(118, 201, 76, .78)); stroke-width: 3.35; opacity: .88; }
-    .dispatch-link.active-assignment { stroke-width: 5.2; opacity: 1; filter: drop-shadow(0 0 8px rgba(32,212,199,.48)); stroke-dasharray: 980; }
-    .dispatch-link.pickup-leg.active-assignment { stroke-width: 4.1; filter: drop-shadow(0 0 7px rgba(230,152,74,.38)); }
-    .dispatch-arrow { fill: #20d4c7; opacity: .9; filter: drop-shadow(0 0 4px rgba(32,212,199,.45)); pointer-events: auto; cursor: pointer; }
-    .dispatch-arrow.overview-route { fill: var(--route-color, #20d4c7); opacity: .94; }
+    body.sample-preview .traffic-band { opacity: .32; }
+    .dispatch-link { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 980; stroke-dashoffset: 980; animation: draw 1.45s ease-out forwards; pointer-events: stroke; cursor: pointer; }
+    .dispatch-link.primary { stroke: #25ead8; stroke-width: 4.2; filter: drop-shadow(0 0 6px rgba(37,234,216,.36)); }
+    .dispatch-link.secondary { stroke: rgba(44, 229, 210, .5); stroke-width: 2.1; stroke-dasharray: none; filter: drop-shadow(0 0 3px rgba(32,212,199,.14)); opacity: .74; }
+    .dispatch-link.overview-route { stroke: rgba(44, 229, 210, .46); stroke-width: 2.25; opacity: .78; filter: drop-shadow(0 0 3px rgba(32,212,199,.16)); }
+    .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .72); stroke-width: 2.8; filter: drop-shadow(0 0 4px rgba(37,234,216,.18)); }
+    .dispatch-link.pickup-leg.overview-route { stroke: rgba(37, 234, 216, .56); stroke-width: 2.25; opacity: .68; stroke-dasharray: none; filter: drop-shadow(0 0 3px rgba(37,234,216,.12)); }
+    .dispatch-link.delivery-leg { stroke: rgba(196, 213, 222, .58); stroke-width: 2; opacity: .72; stroke-dasharray: 7 8; }
+    .dispatch-link.delivery-leg.active-assignment { stroke: rgba(37, 234, 216, .92); stroke-width: 3.4; opacity: .96; stroke-dasharray: none; }
+    .dispatch-link.delivery-leg.overview-route { stroke: rgba(206, 218, 226, .42); stroke-width: 1.85; opacity: .58; stroke-dasharray: 7 8; }
+    .dispatch-link.selected-overview {
+      stroke: #25ead8;
+      stroke-width: 3.1;
+      opacity: .9;
+      stroke-dasharray: none;
+      filter: drop-shadow(0 0 5px rgba(37,234,216,.28));
+    }
+    .dispatch-link.pickup-leg.selected-overview {
+      stroke: rgba(37, 234, 216, .68);
+      stroke-width: 2.55;
+      opacity: .76;
+    }
+    .dispatch-arrow.selected-overview {
+      fill: #25ead8;
+      opacity: .82;
+      filter: drop-shadow(0 0 5px rgba(37,234,216,.28));
+    }
+    .dispatch-link.active-assignment { stroke-width: 4.4; opacity: 1; filter: drop-shadow(0 0 7px rgba(37,234,216,.42)); stroke-dasharray: 980; }
+    .dispatch-link.pickup-leg.active-assignment { stroke-width: 4.2; filter: drop-shadow(0 0 7px rgba(37,234,216,.34)); }
+    .dispatch-arrow { fill: #25ead8; opacity: .72; filter: drop-shadow(0 0 4px rgba(37,234,216,.34)); pointer-events: auto; cursor: pointer; }
+    .dispatch-arrow.overview-route { fill: rgba(37, 234, 216, .74); opacity: .68; }
     .dispatch-arrow.active-assignment { opacity: 1; }
     .dispatch-hit-area {
       fill: none;
@@ -1334,26 +1354,25 @@ def render_index() -> str:
     .map-legend {
       position: absolute;
       left: 16px;
-      right: 178px;
-      bottom: 12px;
+      top: 14px;
       z-index: 4;
-      width: auto;
-      min-height: 38px;
-      padding: 7px 10px;
-      border: 1px solid var(--stroke);
-      border-radius: 7px;
-      background: rgba(5, 17, 29, .66);
-      backdrop-filter: blur(3px);
+      width: 138px;
+      padding: 12px 13px;
+      border: 1px solid rgba(49, 88, 117, .62);
+      border-radius: 8px;
+      background: rgba(4, 16, 27, .78);
+      box-shadow: 0 14px 34px rgba(0,0,0,.36), inset 0 1px 0 rgba(160,219,255,.08);
+      backdrop-filter: blur(5px);
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px 14px;
-      align-items: center;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
     }
-    .map-legend div { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 10px; color: rgba(220,236,255,.82); }
-    .mark { width: 20px; height: 20px; border-radius: 5px; display: inline-grid; place-items: center; font-size: 12px; font-weight: 900; }
+    .map-legend div { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 11px; color: rgba(220,236,255,.86); }
+    .mark { width: 18px; height: 18px; border-radius: 5px; display: inline-grid; place-items: center; font-size: 11px; font-weight: 900; }
     .mark.depot { background: #0f7ed3; color: #dff4ff; }
-    .mark.rest { background: #ffba3a; color: #1b0d00; border: 1px solid rgba(255,236,166,.82); border-radius: 50%; }
-    .mark.dest { background: #7bcc46; color: #0b1b09; border-radius: 50%; }
+    .mark.rest { background: #ff9d2e; color: #160a00; border: 1px solid rgba(255,236,166,.82); border-radius: 50%; }
+    .mark.dest { background: #7bcc46; color: #071906; border: 1px solid rgba(202, 255, 162, .75); border-radius: 50%; }
     .mark.courier { background: #032e36; color: var(--cyan); border: 1px solid var(--cyan); border-radius: 50%; }
     .toolbar {
       position: absolute;
@@ -1407,24 +1426,59 @@ def render_index() -> str:
     .map-frame.focus-selected .pin:not(.active-assignment) { opacity: .78; transform: translate(-50%, -50%) scale(.88); }
     .map-frame.focus-selected .pin.active-assignment { z-index: 5; opacity: 1; }
     .map-frame.focus-selected .pin.active-assignment .mark { box-shadow: 0 0 0 4px rgba(39,230,208,.16), 0 0 18px rgba(39,230,208,.55); }
-    .map-frame.focus-selected .dispatch-link.secondary:not(.active-assignment) { opacity: .86; stroke-width: 3; filter: drop-shadow(0 0 4px rgba(32,212,199,.18)); }
-    .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .82; fill: rgba(43,222,205,.82); }
+    .map-frame.focus-selected .dispatch-link.secondary:not(.active-assignment) { opacity: .28; stroke-width: 1.7; filter: none; }
+    .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .24; fill: rgba(43,222,205,.5); }
     .map-frame.assignment-overview .dispatch-link { stroke-dashoffset: 0; }
-    .map-frame.assignment-overview .dispatch-link.primary { stroke: var(--route-color, rgba(43, 222, 205, .78)); stroke-width: 3.7; opacity: .96; filter: drop-shadow(0 0 5px rgba(32,212,199,.22)); }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(255, 186, 58, .92); stroke-width: 4.1; opacity: .98; filter: drop-shadow(0 0 6px rgba(255,186,58,.22)); }
-    .map-frame.assignment-overview .dispatch-link.delivery-leg { stroke-width: 3.05; opacity: .74; stroke-dasharray: 13 9; }
-    .map-frame.assignment-overview .dispatch-arrow { opacity: .8; }
+    .map-frame.assignment-overview .dispatch-link.primary { stroke: rgba(37, 234, 216, .82); stroke-width: 3.35; opacity: .94; filter: drop-shadow(0 0 5px rgba(37,234,216,.24)); }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .58); stroke-width: 2.35; opacity: .72; filter: drop-shadow(0 0 3px rgba(37,234,216,.12)); }
+    .map-frame.assignment-overview .dispatch-link.delivery-leg { stroke: rgba(206, 218, 226, .38); stroke-width: 1.75; opacity: .5; stroke-dasharray: 7 8; }
+    .map-frame.assignment-overview .dispatch-arrow { opacity: .58; }
+    .map-frame.assignment-overview .dispatch-link.active-assignment { stroke: #25ead8; stroke-width: 4.15; opacity: 1; stroke-dasharray: 980; filter: drop-shadow(0 0 7px rgba(37,234,216,.42)); }
+    .map-frame.assignment-overview .dispatch-link.delivery-leg.active-assignment { stroke: rgba(37, 234, 216, .88); stroke-width: 3.15; opacity: .95; stroke-dasharray: none; }
+    .map-frame.assignment-overview .dispatch-arrow.active-assignment { opacity: .96; fill: #25ead8; }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup.active-assignment,
+    .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup {
+      stroke: rgba(206, 218, 226, .46);
+      stroke-width: 1.9;
+      opacity: .58;
+      stroke-dasharray: 7 8;
+      filter: none;
+    }
+    .map-frame.assignment-overview .dispatch-arrow.long-pickup.active-assignment,
+    .map-frame.assignment-overview .dispatch-arrow.long-pickup {
+      fill: rgba(206, 218, 226, .58);
+      opacity: .46;
+      filter: none;
+    }
+    .dispatch-link.long-delivery.active-assignment,
+    .dispatch-link.long-delivery,
+    .map-frame.assignment-overview .dispatch-link.delivery-leg.long-delivery.active-assignment,
+    .map-frame.assignment-overview .dispatch-link.delivery-leg.long-delivery {
+      stroke: rgba(206, 218, 226, .36);
+      stroke-width: 1.65;
+      opacity: .46;
+      stroke-dasharray: 8 9;
+      filter: none;
+    }
+    .dispatch-arrow.long-delivery.active-assignment,
+    .dispatch-arrow.long-delivery,
+    .map-frame.assignment-overview .dispatch-arrow.long-delivery.active-assignment,
+    .map-frame.assignment-overview .dispatch-arrow.long-delivery {
+      fill: rgba(206, 218, 226, .5);
+      opacity: .4;
+      filter: none;
+    }
     .map-frame.hide-entities .pin,
     .map-frame.hide-entities .map-label { opacity: .12; pointer-events: none; }
     .map-frame.hide-entities .pin.active-assignment,
     .map-frame.hide-entities .map-label.active-assignment { opacity: .45; }
     .map-entities { position: absolute; inset: 0; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
-    .pin { position: absolute; z-index: 3; width: 22px; height: 22px; transform: translate(-50%, -50%); cursor: pointer; }
+    .pin { position: absolute; z-index: 3; width: 18px; height: 18px; transform: translate(-50%, -50%); cursor: pointer; }
     .pin.rest { z-index: 6; }
     .pin.courier { z-index: 5; }
     .pin.dest { z-index: 4; }
-    .pin .mark { width: 22px; height: 22px; box-shadow: 0 0 12px rgba(0,0,0,.45); }
+    .pin .mark { width: 18px; height: 18px; box-shadow: 0 0 10px rgba(0,0,0,.42); }
     .pin.avoided .mark { box-shadow: 0 0 0 3px rgba(255,209,45,.16), 0 0 12px rgba(0,0,0,.45); }
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
     .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; }
@@ -1570,7 +1624,7 @@ def render_index() -> str:
             <div class="metric"><span>候选策略</span><strong>5</strong></div>
           </article>
           <div class="branch-grid">
-            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>合单优先</b><br>优先匹配高重叠订单组</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>合单优先</b><br>优先匹配同路高重叠订单</p><strong>-- <span class="badge pending">待评估</span></strong></article>
             <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>S2</h4><p><b>多派候选</b><br>为订单保留多个可接骑手</p><strong>-- <span class="badge pending">待评估</span></strong></article>
             <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>S3</h4><p><b>局部修复</b><br>从高风险派单中迭代修复</p><strong>-- <span class="badge pending">待评估</span></strong></article>
             <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>S4</h4><p><b>贪心基线</b><br>按最近和最低成本先验匹配</p><strong>-- <span class="badge pending">待评估</span></strong></article>
@@ -1614,8 +1668,8 @@ def render_index() -> str:
           <div class="toast" id="map-toast">地图图层已更新</div>
           <div class="toolbar"><select id="layer-mode"><option value="all">全部图层</option><option value="selected">最终派单</option><option value="candidates">候选派单</option></select><button data-map-action="depots">▧</button><button data-map-action="routes">☷</button><button data-map-action="fit">□</button><button data-map-action="locate">◎</button><button data-map-action="fullscreen">↗</button></div>
           <div class="map-legend">
-            <div><span class="mark depot">⌂</span>调度片区</div><div><span class="mark rest">♨</span>订单组</div><div><span class="mark dest">◎</span>订单</div><div><span class="mark courier">♞</span>骑手</div>
-            <div><i class="line-key sel"></i>最终派单连线</div><div><i class="line-key rej"></i>低噪展示线路</div><div><span class="mark courier">♞</span>骑手位置</div>
+            <div><span class="mark depot">D</span>仓库</div><div><span class="mark rest">R</span>商家</div><div><span class="mark dest">O</span>配送点</div><div><span class="mark courier">C</span>骑手</div>
+            <div><i class="line-key sel"></i>选中路线</div><div><i class="line-key rej"></i>候选路线</div><div><span class="mark courier">C</span>骑手位置</div>
           </div>
           <div class="map-entities" aria-live="polite"></div>
           <div class="zoom"><button id="zoom-in" type="button">+</button><button id="zoom-out" type="button">−</button><button id="recenter" type="button">⌾</button></div>
@@ -1677,6 +1731,7 @@ def render_index() -> str:
     let caseCatalog = {};
     let simulationCatalog = {};
     let currentSimulationSample = null;
+    let simulationSampleLoadPromise = null;
     const simulationSampleIndex = {};
     let simulationRefreshNonce = 0;
     const dynamicProfiles = {};
@@ -1769,14 +1824,16 @@ def render_index() -> str:
     }
     function assignmentForEntity(profile, entityId) {
       const entity = String(entityId || "").trim();
-      if (!entity || entity.startsWith("D")) return profile.selected || "A1";
+      if (!entity || entity.startsWith("D")) return "";
       for (const [assignmentId, assignment] of assignmentEntries(profile)) {
         if (assignment.pickup === entity) return assignmentId;
         if (assignment.merchant === entity || String(assignment.merchant || "").startsWith(entity + "：")) return assignmentId;
         if ((assignment.orders || []).includes(entity)) return assignmentId;
+        if ((assignment.map_orders || []).includes(entity)) return assignmentId;
+        if ((assignment.map_couriers || []).includes(entity)) return assignmentId;
         if (courierTokens(assignment.courier).includes(entity)) return assignmentId;
       }
-      return profile.selected || "A1";
+      return "";
     }
     function assignmentForOrder(profile, orderId) {
       const assignmentId = assignmentForEntity(profile, orderId);
@@ -1805,6 +1862,30 @@ def render_index() -> str:
         };
       });
       return assignments;
+    }
+    function preferredAssignmentIdForMap(mapPayload, assignments) {
+      const entries = Object.entries(assignments || {});
+      if (!entries.length) return "";
+      const entityById = {};
+      (mapPayload.entities || []).forEach((entity) => {
+        entityById[entity.id] = entity;
+      });
+      const scoreFor = ([assignmentId, assignment]) => {
+        const pickup = entityById[assignment.pickup] || {};
+        const courierId = (assignment.map_couriers && assignment.map_couriers[0]) || courierTokens(assignment.courier)[0] || "";
+        const courier = entityById[courierId] || {};
+        const px = safeNumber(pickup.x, 50);
+        const py = safeNumber(pickup.y, 50);
+        const cx = safeNumber(courier.x, px);
+        const cy = safeNumber(courier.y, py);
+        const centerPenalty = Math.abs(px - 54) * 0.75 + Math.abs(py - 47) * 0.9;
+        const edgePenalty = (px < 16 || px > 86 ? 24 : 0) + (py < 16 || py > 86 ? 20 : 0);
+        const pickupDistance = Math.hypot(px - cx, py - cy) * 1.55;
+        const orderWeight = Math.min(3, safeNumber(assignment.orderCount, (assignment.orders || []).length || 1)) * 16;
+        const routeCount = (assignment.map_orders || assignment.orders || []).length * 4;
+        return [orderWeight + routeCount - centerPenalty - edgePenalty - pickupDistance, assignmentId];
+      };
+      return entries.map(scoreFor).sort((left, right) => right[0] - left[0])[0][1];
     }
     function updatePreviewKpis(mapPayload, profile) {
       const assignments = mapPayload.assignments || [];
@@ -1947,7 +2028,7 @@ def render_index() -> str:
       return {
         case_id: sample.case_id,
         status: "simulation_ok",
-        wall_time_s: 1,
+        wall_time_s: 10,
         features: {
           tasks: totalTasks,
           couriers: (sample.couriers || []).length,
@@ -1993,6 +2074,7 @@ def render_index() -> str:
       ].join("");
     }
     function resetDecisionPanelForSimulationPreview(sample) {
+      setDetailContext("sample-preview", "", "", "");
       $("detail-title").textContent = `样本 ${sampleNumberLabel(sample)} 已刷新`;
       $("detail-courier").textContent = "-";
       $("detail-merchant").innerHTML = `${sample.name}：已生成 <code>${(sample.merchants || []).length}</code> 个订单点和 <code>${(sample.couriers || []).length}</code> 个骑手点，等待运行派单推理。`;
@@ -2058,6 +2140,8 @@ def render_index() -> str:
       showToast(`已生成 ${sample.name} ${sampleNumberLabel(sample)} 的订单与骑手点位`);
     }
     async function refreshSimulationSample() {
+      if (simulationSampleLoadPromise) return simulationSampleLoadPromise;
+      simulationSampleLoadPromise = (async () => {
       const scenarioId = selectedScenarioId();
       const previous = Object.prototype.hasOwnProperty.call(simulationSampleIndex, scenarioId) ? simulationSampleIndex[scenarioId] : -1;
       const nextSample = (previous + 1) % 10;
@@ -2069,6 +2153,13 @@ def render_index() -> str:
       const payload = await res.json();
       if (!res.ok || payload.status !== "ok") throw new Error(payload.error || "sample refresh failed");
       applySimulationSample(payload.sample);
+      return payload.sample;
+      })();
+      try {
+        return await simulationSampleLoadPromise;
+      } finally {
+        simulationSampleLoadPromise = null;
+      }
     }
     async function loadSimulationScenario(scenarioId) {
       if (!scenarioId) return false;
@@ -2085,7 +2176,7 @@ def render_index() -> str:
       document.body.classList.remove("sample-preview");
       const profile = currentProfile || profileForCase(selectedCase());
       profile.assignments = normalizeAssignmentsFromMap(mapPayload);
-      profile.selected = Object.keys(profile.assignments)[0] || "A1";
+      profile.selected = preferredAssignmentIdForMap(mapPayload, profile.assignments) || Object.keys(profile.assignments)[0] || "A1";
       profile.mapFocusMode = "overview";
       profile.dispatchMap = mapPayload;
       if (mapPayload.total_tasks) profile.totalTasks = mapPayload.total_tasks;
@@ -2110,6 +2201,7 @@ def render_index() -> str:
       frame.classList.remove("assignment-overview");
       frame.removeAttribute("data-selected-assignment");
       document.body.classList.remove("sample-preview");
+      setDetailContext("waiting", "", "", "");
       $("detail-title").textContent = "等待运行派单推理";
       $("detail-courier").textContent = "-";
       $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新</code> 生成样本；运行派单推理后，系统会按当前样本的商家、订单、骑手意愿、价格和路况生成最终派单关系。";
@@ -2144,7 +2236,7 @@ def render_index() -> str:
       const kindOrder = ["pickup_cluster", "merchant_order", "courier", "order"];
       kindOrder.forEach((kind) => {
         profile.dispatchMap.entities.filter((entity) => entity.kind === kind).forEach((entity) => {
-          const text = kind === "pickup_cluster" || kind === "merchant_order" ? "订单点" : kind === "courier" ? "骑手" : "订单";
+          const text = kind === "pickup_cluster" || kind === "merchant_order" ? "商家" : kind === "courier" ? "骑手" : "配送点";
           const label = entity.label || text;
           labels.push({id: entity.id, html: `${entity.id}<small>${label}</small>`, kind: entity.kind, x: entity.x, y: entity.y, hideLabel: Boolean(entity.hideLabel)});
         });
@@ -2152,7 +2244,7 @@ def render_index() -> str:
       return labels;
     }
     const strategyBranchCatalog = [
-      {id: "S1", title: "合单优先", desc: "高重叠订单组成合单候选", names: ["disjoint_then_multidispatch", "pair_potential_matching", "scarce_k2_column_search", "scarce_bundle_mcf_enum"]},
+      {id: "S1", title: "合单优先", desc: "同路高重叠订单合并派单", names: ["disjoint_then_multidispatch", "pair_potential_matching", "scarce_k2_column_search", "scarce_bundle_mcf_enum"]},
       {id: "S2", title: "多派候选", desc: "单任务多骑手候选扩展", names: ["single_task_multidispatch"]},
       {id: "S3", title: "局部修复", desc: "从基线方案做局部修复", names: ["sparse_cover", "low_global_column_search", "low_column_search"]},
       {id: "S4", title: "贪心基线", desc: "最近/最低成本基线派单", names: ["greedy_baseline", "fallback_official_greedy"]},
@@ -2333,7 +2425,7 @@ def render_index() -> str:
       if (nodes[3]) nodes[3].querySelector("p").innerHTML = `校验商家-订单匹配、骑手容量、时间窗<br>拒绝高成本或无人接单风险方案`;
       if (nodes[5]) {
         nodes[5].querySelector("p").innerHTML = report
-          ? `派出 ${used} 个骑手 · ${Object.keys(profile.assignments || {}).length} 个派单包 · 覆盖 ${covered}/${taskCount} 个订单<br>派单约束已通过`
+          ? `派出 ${used} 个骑手 · ${Object.keys(profile.assignments || {}).length} 个商家派单 · 覆盖 ${covered}/${taskCount} 个订单<br>派单约束已通过`
           : `等待当前样本推理输出最终派单<br>运行完成后自动展示全部派单覆盖`;
       }
       renderStrategyCards(profile, report);
@@ -2408,19 +2500,20 @@ def render_index() -> str:
       const roadBaseHtml = sortedRoads.map((road) => {
         const d = layerPath(road.points);
         const type = ["arterial", "secondary", "service"].includes(road.type) ? road.type : "service";
-        const width = Math.max(2.2, safeNumber(road.width, 4.2));
-        return `<path class="road-base ${type}" data-road="${escapeAttr(road.id)}" style="--road-width:${(width + 2.8).toFixed(1)}px" d="${d}"></path>`;
+        const width = Math.max(1.2, safeNumber(road.width, 4.2) * (type === "arterial" ? 0.54 : type === "secondary" ? 0.48 : 0.42));
+        const casing = type === "arterial" ? 1.4 : type === "secondary" ? 1 : 0.4;
+        return `<path class="road-base ${type}" data-road="${escapeAttr(road.id)}" style="--road-width:${(width + casing).toFixed(1)}px" d="${d}"></path>`;
       }).join("");
       const roadCoreHtml = sortedRoads.map((road) => {
         const d = layerPath(road.points);
         const type = ["arterial", "secondary", "service"].includes(road.type) ? road.type : "service";
-        const width = Math.max(2.2, safeNumber(road.width, 4.2));
+        const width = Math.max(1.1, safeNumber(road.width, 4.2) * (type === "arterial" ? 0.54 : type === "secondary" ? 0.48 : 0.42));
         return `<path class="road-core ${type}" data-road="${escapeAttr(road.id)}" style="--road-width:${width.toFixed(1)}px" d="${d}"></path>`;
       }).join("");
       const trafficHtml = sortedRoads.filter((road) => road.type !== "service").map((road) => {
         const d = layerPath(road.points);
         const traffic = ["heavy", "moderate", "smooth"].includes(road.traffic) ? road.traffic : "smooth";
-        const width = Math.max(1.6, safeNumber(road.width, 4) * 0.36);
+        const width = Math.max(0.75, safeNumber(road.width, 4) * 0.16);
         return `<path class="traffic-band ${traffic}" data-traffic="${traffic}" data-road="${escapeAttr(road.id)}" style="--traffic-width:${width.toFixed(1)}px" d="${d}"></path>`;
       }).join("");
       const intersectionHtml = intersections.map((item) => {
@@ -2437,9 +2530,10 @@ def render_index() -> str:
           }).join("")}</g>`
         : "";
       svg.innerHTML = [
-        `<defs><pattern id="anonymous-grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(148,163,184,.075)" stroke-width="1"/></pattern></defs>`,
+        `<defs><pattern id="anonymous-grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(148,163,184,.07)" stroke-width="1"/></pattern><pattern id="fine-street-mesh" width="132" height="96" patternUnits="userSpaceOnUse"><path d="M-16 26H148M18 -10V110M-22 74H126M82 -8V104M4 96L132 18M-26 8L96 94M38 0L118 62M-12 46L64 112" fill="none" stroke="rgba(122,151,168,.22)" stroke-width="1.05" stroke-linecap="round"/></pattern></defs>`,
         `<rect x="0" y="0" width="980" height="640" fill="#07121b"></rect>`,
-        `<rect x="0" y="0" width="980" height="640" fill="url(#anonymous-grid)" opacity=".34"></rect>`,
+        `<rect x="0" y="0" width="980" height="640" fill="url(#anonymous-grid)" opacity=".28"></rect>`,
+        `<rect x="0" y="0" width="980" height="640" fill="url(#fine-street-mesh)" opacity=".42"></rect>`,
         `<path class="water" d="M0 546 C128 503 188 570 304 536 C412 504 470 573 582 536 C684 502 758 558 862 526 C922 508 956 510 980 496 L980 640 L0 640 Z" opacity=".48"></path>`,
         districtHtml,
         blockHtml,
@@ -2553,6 +2647,7 @@ def render_index() -> str:
         const isMerchantPoint = item.kind === "pickup_cluster" || item.kind === "merchant_order";
         const pinKind = isMerchantPoint ? "rest" : item.kind === "courier" ? "courier" : "dest";
         const markKind = isMerchantPoint ? "rest" : item.kind === "courier" ? "courier" : "dest";
+        const showSelectedLabel = Boolean(hasAssignments && assignmentId === profile.selected && (item.kind === "courier" || item.kind === "order"));
         pin.className = `pin ${pinKind}`;
         pin.dataset.entity = item.id;
         pin.dataset.assignment = assignmentId;
@@ -2565,13 +2660,19 @@ def render_index() -> str:
         pin.style.left = Number(display.x).toFixed(1) + "%";
         pin.style.top = Number(display.y).toFixed(1) + "%";
         pin.title = hasAssignments ? "点击聚焦 " + item.id + " 的派单链路" : "点击查看 " + item.id + " 的样本详情";
-        pin.innerHTML = `<span class="mark ${markKind}">${isMerchantPoint ? "♨" : item.kind === "courier" ? "♞" : "◎"}</span>`;
+        pin.innerHTML = `<span class="mark ${markKind}">${isMerchantPoint ? "R" : item.kind === "courier" ? "C" : "O"}</span>`;
         entityLayer.appendChild(pin);
 
-        if (item.hideLabel) return;
+        if (item.hideLabel && !showSelectedLabel) return;
         const label = document.createElement("div");
         label.className = "map-label";
-        label.innerHTML = item.html;
+        const assignment = (profile.assignments || {})[assignmentId] || {};
+        const selectedLabelHtml = item.kind === "courier"
+          ? `${item.id}<small>ETA ${assignment.eta || "-"}</small>`
+          : item.kind === "order"
+            ? `${item.id}<small>${assignment.courier || ""}</small>`
+            : item.html;
+        label.innerHTML = showSelectedLabel ? selectedLabelHtml : item.html;
         label.style.left = Number(display.x).toFixed(1) + "%";
         label.style.top = Number(display.y).toFixed(1) + "%";
         label.style.setProperty("--label-offset-x", labelOffset[0] + "px");
@@ -2739,6 +2840,13 @@ def render_index() -> str:
         return list;
       }, []);
     }
+    function roadTerminalRoute(start, startSnap, coreRoute, endSnap, end) {
+      const startPoint = startSnap && startSnap.point ? startSnap.point : start;
+      const endPoint = endSnap && endSnap.point ? endSnap.point : end;
+      const startConnector = distance2D(start, startPoint) <= 3.8 ? [start, startPoint] : [startPoint];
+      const endConnector = distance2D(end, endPoint) <= 3.8 ? [endPoint, end] : [endPoint];
+      return compactRoutePoints([...startConnector, ...(coreRoute || []), ...endConnector]);
+    }
     function roadNodeKey(point) {
       return `${safeNumber(point[0], 0).toFixed(2)},${safeNumber(point[1], 0).toFixed(2)}`;
     }
@@ -2778,11 +2886,21 @@ def render_index() -> str:
           const b = graph.segments[right];
           if (a.roadIndex === b.roadIndex) continue;
           const intersection = segmentIntersection(a.start, a.end, b.start, b.end);
-          if (!intersection) continue;
-          addRoadGraphEdge(graph, intersection, a.start);
-          addRoadGraphEdge(graph, intersection, a.end);
-          addRoadGraphEdge(graph, intersection, b.start);
-          addRoadGraphEdge(graph, intersection, b.end);
+          if (intersection) {
+            addRoadGraphEdge(graph, intersection, a.start);
+            addRoadGraphEdge(graph, intersection, a.end);
+            addRoadGraphEdge(graph, intersection, b.start);
+            addRoadGraphEdge(graph, intersection, b.end);
+            continue;
+          }
+          const transfer = closestSegmentPair(a.start, a.end, b.start, b.end);
+          if (transfer && transfer.distance <= 3.2) {
+            addRoadGraphEdge(graph, transfer.fromPoint, transfer.toPoint);
+            addRoadGraphEdge(graph, transfer.fromPoint, a.start);
+            addRoadGraphEdge(graph, transfer.fromPoint, a.end);
+            addRoadGraphEdge(graph, transfer.toPoint, b.start);
+            addRoadGraphEdge(graph, transfer.toPoint, b.end);
+          }
         }
       }
       const connectSnap = (snap) => {
@@ -2842,25 +2960,25 @@ def render_index() -> str:
       if (!startSnap || !endSnap) return [start, end];
       const graphRoute = shortestRoadGraphPath(buildRoadGraph(mapLayers, startSnap, endSnap));
       if (graphRoute.length >= 2) {
-        return compactRoutePoints([start, ...graphRoute, end]);
+        return roadTerminalRoute(start, startSnap, graphRoute, endSnap, end);
       }
       if (startSnap.road === endSnap.road) {
-        return compactRoutePoints([start, ...chainAlongRoad(startSnap, endSnap), end]);
+        return roadTerminalRoute(start, startSnap, chainAlongRoad(startSnap, endSnap), endSnap, end);
       }
       const connector = connectorRoadBetween(startSnap.road, endSnap.road, mapLayers);
-      if (connector && connector.road && connector.first && connector.second) {
+      if (connector && connector.road && connector.first && connector.second && connector.first.distance <= 7 && connector.second.distance <= 7) {
         const startChain = chainBetweenRoadPoints(startSnap.road, startSnap.point, connector.first.fromPoint);
         const middleChain = chainBetweenRoadPoints(connector.road, connector.first.toPoint, connector.second.fromPoint);
         const endChain = chainBetweenRoadPoints(endSnap.road, connector.second.toPoint, endSnap.point);
-        return compactRoutePoints([start, ...startChain, connector.first.toPoint, ...middleChain, connector.second.fromPoint, ...endChain, end]);
+        return roadTerminalRoute(start, startSnap, [...startChain, connector.first.toPoint, ...middleChain, connector.second.fromPoint, ...endChain], endSnap, end);
       }
-      if (connector && connector.direct) {
+      if (connector && connector.direct && connector.direct.distance <= 7) {
         const startChain = chainBetweenRoadPoints(startSnap.road, startSnap.point, connector.direct.fromPoint);
         const endChain = chainBetweenRoadPoints(endSnap.road, connector.direct.toPoint, endSnap.point);
-        return compactRoutePoints([start, ...startChain, connector.direct.toPoint, ...endChain, end]);
+        return roadTerminalRoute(start, startSnap, [...startChain, connector.direct.toPoint, ...endChain], endSnap, end);
       }
       const hub = routeHubBetween(startSnap.point, endSnap.point, mapLayers);
-      return compactRoutePoints([start, startSnap.point, hub, endSnap.point, end]);
+      return roadTerminalRoute(start, startSnap, [startSnap.point, hub, endSnap.point], endSnap, end);
     }
     function dispatchPathFor(points) {
       const usable = points.filter(Boolean);
@@ -2872,6 +2990,26 @@ def render_index() -> str:
         segments.push(`L${x.toFixed(1)} ${y.toFixed(1)}`);
       });
       return segments.join(" ");
+    }
+    function routePolylineLength(points) {
+      const usable = (points || []).filter(Boolean);
+      return usable.slice(1).reduce((sum, point, index) => sum + distance2D(usable[index], point), 0);
+    }
+    function routeSpan(points) {
+      const usable = (points || []).filter(Boolean);
+      if (!usable.length) return 0;
+      const xs = usable.map((point) => safeNumber(point[0], 0));
+      const ys = usable.map((point) => safeNumber(point[1], 0));
+      return Math.hypot(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    }
+    function longRouteClass(start, end, route, thresholds = {}) {
+      const directLimit = safeNumber(thresholds.direct, 24);
+      const spanLimit = safeNumber(thresholds.span, 36);
+      const lengthLimit = safeNumber(thresholds.length, 46);
+      const directDistance = distance2D(start, end);
+      const span = routeSpan(route);
+      const length = routePolylineLength(route);
+      return directDistance > directLimit || span > spanLimit || length > lengthLimit;
     }
     function dispatchHitAreaFor(d, cls, assignmentId = "", meta = {}) {
       if (!d) return "";
@@ -2899,6 +3037,41 @@ def render_index() -> str:
       const styleAttr = style ? ` style="${style}"` : "";
       return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}"${routeMetaAttributes(meta)}${styleAttr} points="${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
     }
+    function overviewAssignmentIdForRoutes(assignments, entityPoints, mapLayers, selectedAssignment) {
+      const scored = (assignments || []).map((assignment) => {
+        const couriers = assignment.map_couriers || courierTokens(assignment.courier);
+        const orders = assignment.map_orders || assignment.orders || [];
+        const courierPoint = entityPoints[couriers[0]];
+        const pickupPoint = entityPoints[assignment.pickup];
+        if (!courierPoint || !pickupPoint) return {id: assignment.id, score: -Infinity};
+        const pickupDistance = distance2D(courierPoint, pickupPoint);
+        const pickupRoute = roadFollowingRoute(courierPoint, pickupPoint, mapLayers);
+        const pickupIsShort = !longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 21, span: 34, length: 44});
+        const deliveryScores = orders.map((order) => entityPoints[order]).filter(Boolean).map((orderPoint) => {
+          const deliveryRoute = roadFollowingRoute(pickupPoint, orderPoint, mapLayers);
+          const longDelivery = longRouteClass(pickupPoint, orderPoint, deliveryRoute, {direct: 24, span: 36, length: 48});
+          return {
+            distance: distance2D(pickupPoint, orderPoint),
+            length: routePolylineLength(deliveryRoute),
+            short: !longDelivery
+          };
+        });
+        const shortDeliveryCount = deliveryScores.filter((item) => item.short).length;
+        const shortestDelivery = deliveryScores.length ? Math.min(...deliveryScores.map((item) => item.distance)) : 30;
+        const shortestRoute = deliveryScores.length ? Math.min(...deliveryScores.map((item) => item.length)) : 40;
+        const shortLegCount = (pickupIsShort ? 1 : 0) + shortDeliveryCount;
+        const centerPenalty = Math.abs(safeNumber(pickupPoint[0], 50) - 52) * 0.45 + Math.abs(safeNumber(pickupPoint[1], 50) - 48) * 0.55;
+        const selectedBonus = assignment.id === selectedAssignment ? 4 : 0;
+        const shortPickupBonus = pickupIsShort ? 14 : 0;
+        const deliveryBonus = shortDeliveryCount * 22 - shortestDelivery * 0.42 - shortestRoute * 0.18;
+        const noShortLegPenalty = shortLegCount > 0 ? 0 : 160;
+        return {
+          id: assignment.id,
+          score: selectedBonus + shortPickupBonus + deliveryBonus - pickupDistance * 0.28 - centerPenalty - noShortLegPenalty
+        };
+      }).filter((item) => item.id);
+      return scored.sort((left, right) => right.score - left.score)[0]?.id || selectedAssignment;
+    }
     function renderDispatchLinks(profile, entityPoints) {
       const svg = document.querySelector(".route-svg");
       if (!svg) return;
@@ -2907,9 +3080,10 @@ def render_index() -> str:
         return;
       }
       const focusMode = profile.mapFocusMode === "focus";
-      const selectedAssignment = focusMode ? (profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "") : "";
+      const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
-      const routePalette = ["#26dccd", "#55d68a", "#ffcf4a", "#5fb8ff", "#ff9d57", "#c3e56d", "#7de3ff", "#f2b76a"];
+      const overviewAssignmentId = focusMode ? selectedAssignment : overviewAssignmentIdForRoutes(profile.dispatchMap.assignments, entityPoints, mapLayers, selectedAssignment);
+      const routePalette = ["#25ead8", "#37d6c8", "#51e5d1", "#7de3ff", "#40c7bc", "#67f0dc", "#8fd9ff", "#2bcfbe"];
       const pathHtml = profile.dispatchMap.assignments.map((assignment, index) => {
         const couriers = assignment.map_couriers || courierTokens(assignment.courier);
         const orders = assignment.map_orders || assignment.orders || [];
@@ -2918,38 +3092,48 @@ def render_index() -> str:
         const orderPoints = orders.map((order) => entityPoints[order]).filter(Boolean);
         if (!pickupPoint || courierPoints.length === 0) return "";
         const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
+        const isRecommendedOverview = Boolean(!focusMode && assignment.id === overviewAssignmentId);
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
         const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
         const deliveryRoutes = orderPoints.map((orderPoint) => roadFollowingRoute(pickupPoint, orderPoint, mapLayers));
         const pickupRoute = roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers);
         const pickupD = dispatchPathFor(pickupRoute);
+        const longPickup = longRouteClass(courierPoints[0], pickupPoint, pickupRoute, {direct: 21, span: 34, length: 44});
+        const pickupClass = `${cls} pickup-leg${isRecommendedOverview && !longPickup ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`;
         const pickupMeta = {
           merchant: assignment.pickup,
           courier: couriers[0],
           leg: "courier-to-merchant",
-          "route-points": pickupRoute.length
+          "route-points": pickupRoute.length,
+          "route-length": routePolylineLength(pickupRoute).toFixed(1),
+          "long-leg": longPickup ? "true" : "false"
         };
         const arrowCls = isActive ? "primary" : "secondary overview-route";
         const routeParts = [
-          `<path class="${cls} pickup-leg" data-assignment="${assignment.id}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
-          dispatchHitAreaFor(pickupD, "pickup-leg", assignment.id, pickupMeta)
+          `<path class="${pickupClass}" data-assignment="${assignment.id}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
+          dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta)
         ];
         if (!deliveryRoutes.length) {
-          routeParts.push(dispatchArrowFor(pickupRoute, arrowCls, assignment.id, isActive, routeStyle, pickupMeta));
+          routeParts.push(dispatchArrowFor(pickupRoute, `${arrowCls}${isRecommendedOverview && !longPickup ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta));
         }
         deliveryRoutes.forEach((deliveryRoute, orderIndex) => {
           const deliveryD = dispatchPathFor(deliveryRoute);
           if (!deliveryD) return;
+          const orderPoint = orderPoints[orderIndex] || pickupPoint;
+          const longDelivery = longRouteClass(pickupPoint, orderPoint, deliveryRoute, {direct: 24, span: 36, length: 48});
+          const deliveryClass = `${cls} delivery-leg${isRecommendedOverview && !longDelivery ? " selected-overview" : ""}${longDelivery ? " long-delivery" : ""}`;
           const deliveryMeta = {
             merchant: assignment.pickup,
             courier: couriers[0],
             order: orders[orderIndex] || "",
             leg: "merchant-to-order",
-            "route-points": deliveryRoute.length
+            "route-points": deliveryRoute.length,
+            "route-length": routePolylineLength(deliveryRoute).toFixed(1),
+            "long-leg": longDelivery ? "true" : "false"
           };
-          routeParts.push(`<path class="${cls} delivery-leg" data-assignment="${assignment.id}"${routeMetaAttributes(deliveryMeta)} style="${routeStyle}" d="${deliveryD}"></path>`);
-          routeParts.push(dispatchHitAreaFor(deliveryD, "delivery-leg", assignment.id, deliveryMeta));
-          routeParts.push(dispatchArrowFor(deliveryRoute, arrowCls, assignment.id, isActive, routeStyle, deliveryMeta));
+          routeParts.push(`<path class="${deliveryClass}" data-assignment="${assignment.id}"${routeMetaAttributes(deliveryMeta)} style="${routeStyle}" d="${deliveryD}"></path>`);
+          routeParts.push(dispatchHitAreaFor(deliveryD, `delivery-leg${longDelivery ? " long-delivery" : ""}`, assignment.id, deliveryMeta));
+          routeParts.push(dispatchArrowFor(deliveryRoute, `${arrowCls}${isRecommendedOverview && !longDelivery ? " selected-overview" : ""}${longDelivery ? " long-delivery" : ""}`, assignment.id, isActive, routeStyle, deliveryMeta));
         });
         return routeParts.join("");
       }).join("");
@@ -2981,7 +3165,7 @@ def render_index() -> str:
         return;
       }
       document.querySelectorAll(".map-label, .pin").forEach((node) => {
-        const active = Boolean(focused && node.dataset.assignment === selectedAssignment);
+        const active = Boolean(hasDispatch && focused && node.dataset.assignment === selectedAssignment);
         node.classList.toggle("active-assignment", active);
         if (node.classList.contains("map-label")) {
           node.classList.toggle("selected", active);
@@ -2989,7 +3173,7 @@ def render_index() -> str:
         }
       });
       document.querySelectorAll(".dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
-        const active = Boolean(focused && node.dataset.assignment === selectedAssignment);
+        const active = Boolean(hasDispatch && focused && node.dataset.assignment === selectedAssignment);
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
         node.classList.toggle("secondary", !active);
@@ -3374,7 +3558,7 @@ def render_index() -> str:
       $("detail-courier").textContent = `${courierSet.size} 个骑手`;
       $("detail-merchant").innerHTML = `运行完成后，地图已自动展示 <code>${assignments.length}</code> 个商家 → 骑手取餐链路，以及 <code>${totalOrders}</code> 条商家 → 订单配送链路；不需要逐个点击才连线。`;
       const chips = assignments.slice(0, 7).map((assignment) => `<span class="chip">${assignment.pickup || assignment.merchant} → ${assignment.courier}</span>`);
-      if (assignments.length > chips.length) chips.push(`<span class="chip">+${assignments.length - chips.length} 个派单包</span>`);
+      if (assignments.length > chips.length) chips.push(`<span class="chip">+${assignments.length - chips.length} 个商家</span>`);
       $("detail-orders").innerHTML = chips.join("");
       $("detail-eta").textContent = avgEta ? `${avgEta} min 平均` : "-";
       $("right-cost").textContent = money(totalCost);
@@ -3387,7 +3571,7 @@ def render_index() -> str:
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
       if (rows[0]) rows[0].textContent = `${coverage}%`;
-      if (rows[1]) rows[1].textContent = `${assignments.length} 个派单包`;
+      if (rows[1]) rows[1].textContent = `${assignments.length} 个商家`;
       if (rows[2]) rows[2].textContent = avgEta ? `${avgEta} min` : "-";
       if (rows[3]) rows[3].textContent = assignments.some((assignment) => assignment.risk === "High") ? "High" : assignments.some((assignment) => assignment.risk === "Medium") ? "Medium" : "Low";
       if (rows[4]) rows[4].textContent = profile.utilization;
@@ -3404,7 +3588,7 @@ def render_index() -> str:
       $("detail-title").textContent = sourceLabel ? "派单详情：" + sourceLabel : `派单详情：${assignment.pickup || assignment.merchant || resolvedAssignment} → ${assignment.courier}`;
       $("detail-courier").textContent = assignment.courier;
       const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
-      $("detail-merchant").innerHTML = `订单组 <code>${assignment.merchant}</code> 共 ${orderCount} 单，最终派给 ${assignment.courier}`;
+      $("detail-merchant").innerHTML = `商家 <code>${assignment.merchant}</code> 共 ${orderCount} 单，最终派给 ${assignment.courier}`;
       $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
       $("detail-eta").textContent = assignment.eta;
       $("right-cost").textContent = assignment.cost;
@@ -3627,8 +3811,19 @@ def render_index() -> str:
       updateReasonSummary(profile, report);
       updateReasonProgress(6);
     }
+    const DEMO_REASONING_TARGET_MS = 10000;
+    const DEMO_REASONING_PHASE_DELAYS = {
+      bootstrap: 650,
+      perception: 1050,
+      candidates: 1050,
+      perStrategy: 1150,
+      finalReview: 650
+    };
     function wait(ms) {
       return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+    function waitUntilElapsed(startedAt, targetMs) {
+      return wait(Math.max(0, targetMs - (Date.now() - startedAt)));
     }
     function yieldUi() {
       return new Promise((resolve) => {
@@ -3641,10 +3836,26 @@ def render_index() -> str:
         }
       });
     }
+    async function ensureSimulationSampleReady() {
+      if (currentSimulationSample) return true;
+      if (!selectedScenarioId()) return false;
+      try {
+        setStatus("正在生成当前场景样本", true);
+        await refreshSimulationSample();
+        return Boolean(currentSimulationSample);
+      } catch (error) {
+        console.error(error);
+        setStatus("样本生成失败，尝试使用后端求解器", false);
+        showToast("样本生成失败，将尝试后端求解器");
+        return false;
+      }
+    }
     async function runCurrentSimulationSample() {
       const sample = currentSimulationSample;
       if (!sample) return false;
+      if (document.body.classList.contains("reasoning")) return true;
       try {
+        const reasoningStartedAt = Date.now();
         currentReport = null;
         const profile = currentProfile || profileForCase(sample.case_id || selectedCase());
         currentProfile = profile;
@@ -3658,13 +3869,13 @@ def render_index() -> str:
         updateReasonSummary(profile, null);
         setReasoningState(sample, -1, false);
         updateReasonProgress(0);
-        await wait(170);
+        await wait(DEMO_REASONING_PHASE_DELAYS.bootstrap);
         updateReasonProgress(1);
         setStatus(`识别 ${sample.name} 的订单密度、骑手意愿和路况风险`, true);
-        await wait(210);
+        await wait(DEMO_REASONING_PHASE_DELAYS.perception);
         updateReasonProgress(2);
         setStatus(`生成候选派单策略：${sample.seed}`, true);
-        await wait(210);
+        await wait(DEMO_REASONING_PHASE_DELAYS.candidates);
         const evaluationOrder = reasoningOrderForSample(sample);
         for (let index = 0; index < evaluationOrder.length; index += 1) {
           const branchId = evaluationOrder[index];
@@ -3672,10 +3883,14 @@ def render_index() -> str:
           setReasoningState(sample, index, false);
           updateReasonProgress(index < 2 ? 3 : 4);
           setStatus(`评估策略 ${branchId}${branch ? " · " + branch.title : ""}：${sample.seed}`, true);
+          await wait(DEMO_REASONING_PHASE_DELAYS.perStrategy);
           await yieldUi();
         }
         setReasoningState(sample, evaluationOrder.length, true);
         updateReasonProgress(5);
+        setStatus(`最终选择 ${sample.selected_strategy_id}：复核成本、风险和接单概率`, true);
+        await wait(DEMO_REASONING_PHASE_DELAYS.finalReview);
+        await waitUntilElapsed(reasoningStartedAt, DEMO_REASONING_TARGET_MS);
         setStatus(`最终选择 ${sample.selected_strategy_id}：生成当前样本派单线`, true);
         await yieldUi();
         if (routeSvg) routeSvg.innerHTML = "";
@@ -3697,6 +3912,8 @@ def render_index() -> str:
     }
     async function streamRun() {
       if (currentRun) currentRun.close();
+      if (document.body.classList.contains("reasoning")) return;
+      await ensureSimulationSampleReady();
       if (await runCurrentSimulationSample()) return;
       applyScene(selectedCase());
       document.body.classList.remove("pending-run");

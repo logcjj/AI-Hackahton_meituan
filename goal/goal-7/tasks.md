@@ -1,0 +1,61 @@
+# Tasks
+
+## Task 1: 视觉审计并修复核心路线问题
+
+验证标准：运行完成后不再出现巨大青色斜线横穿地图；长距离骑手取餐段低噪显示；所有商家派单关系仍自动可见。
+
+完成记录：
+- 已对比参考图 `/Users/logcjj/Desktop/ae864de6-3c5c-4d85-9aae-2431a6d6737a.png` 和用户打回截图 `/var/folders/96/7y9tr62n4rzfg3flff0_pk780000gn/T/codex-clipboard-0cdd8a75-01fa-4ff6-9dc0-5e687430a152.png`，确认核心问题是默认高亮路线把长取餐/长配送段渲染成跨屏青色主线。
+- 已修改 `renderDispatchLinks()`：总览态 `focusMode=false` 时不再给任何单条 assignment 加 `primary/active-assignment`，只有点击聚焦或选择“最终派单”时才高亮。
+- 已新增 `routePolylineLength()`、`routeSpan()`、`longRouteClass()`，并给长距离取餐段和配送段添加 `long-pickup` / `long-delivery` 类，强制灰色虚线低噪展示。
+- 已修改 `applyMapFocus()`：只有 `focused=true` 时才给 pin、label、route 添加 active 状态，避免运行完成默认总览出现刺眼主路线。
+- 已补测试断言，防止恢复到旧的默认高亮逻辑。
+- 浏览器真实点击通过：刷新后 5 个商家、14 个骑手、0 条路线；运行后显示 `00:00:10`，生成 12 条线路、5 条取餐段、7 条配送段，默认 `activeRoutes=0`、`primaryRoutes=0`、`longPickup=4`、`longDelivery=3`。
+- 截图产物：`goal/goal-7/task1-final-map.png`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py`。
+- 验证通过：内联脚本 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`。
+
+## Task 2: 贴近参考图重做地图视觉层级
+
+验证标准：中央地图在暗色道路、建筑片区、商圈点位、图例和路线层级上明显接近参考图，而不是普通抽象 SVG。
+
+完成记录：
+- 已把场景按钮区从两行大卡片压缩成单行 6 个紧凑场景按钮，地图高度从上一版约 440px 提升到约 509px，更接近参考图的中央地图占比，同时保留用户要求的场景选择功能。
+- 已提高匿名导航底图的路网和建筑层级：增强 fine-street-mesh、道路 core/casing、建筑片区、路况色带和水域/街区块对比度，使地图不再像黑底上的几条粗线。
+- 已强化总览态商家 → 骑手派单关系线：短取餐段用克制青色实线，长段仍由 `long-pickup` 灰色虚线覆盖降噪。
+- 已新增 `selected-overview`：默认推荐 assignment 的短履约段显示为参考图式选中路线束，但不使用 `active-assignment/primary`，不会触发跨屏高亮；长取餐/长配送不会被选中高亮。
+- 浏览器真实点击通过：刷新 → 运行派单推理耗时约 10.2 秒，显示 `00:00:10`；最终态生成 12 条线路、5 个商家、13 个骑手、7 个配送点，`activeRoutes=0`、`primaryRoutes=0`、`selectedOverview=3`、`selectedOverviewLong=0`。
+- 截图产物：`goal/goal-7/task2-final-map.png`、`goal/goal-7/task2-selected-overview-map.png`。
+- 严格视觉评审记录：`goal/goal-7/task2-visual-verdict.json`，当前分数 82/100，结论为核心错误已修复但仍需 Task 3 做全按钮回归和最终视觉复核。
+- 验证通过：内联脚本 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`。
+
+## Task 3: 浏览器严格功能与视觉回归检查
+
+验证标准：刷新、运行、场景切换、图层、路线点击、实体点击均可用；浏览器截图和 DOM 审计证明视觉和逻辑都达标。
+
+完成记录：
+- 已使用 in-app browser 真实执行最终页面流程：刷新样本、运行派单推理、等待约 10 秒、验证最终派单地图。
+- 已验证最终态：`runtime=00:00:10`，`routeCount=12`，`merchantPins=5`，`courierPins=14`，`orderPins=7`，`selectedOverview=3`，`selectedOverviewLong=0`，`activeRoutes=0`，`primaryRoutes=0`。
+- 已验证 preview 态：切换到雨天低接单意愿后 `routeCount=0`，`rainStreaks=76`，`detailType=sample-preview`，不会残留上一次表格/路线详情状态。
+- 已修复审计发现的状态清理问题：`resetDecisionPanelForSimulationPreview()` 和 `clearDispatchResult()` 会重置 `setDetailContext()`，避免右侧 detailType 残留。
+- 已修复推荐路线束消失问题：新增 `overviewAssignmentIdForRoutes()`，总览态基于真实道路路径和 `longRouteClass()` 选择至少有短履约段的 assignment 做 `selected-overview`，不会高亮长取餐/长配送段。
+- 已完成全按钮审计：场景切换、刷新、运行、图层 selected/all、点位弱化、配送线隐藏/恢复、定位、适配、放大、缩小、全屏、路线点击、策略卡点击、表格行点击均有可验证状态变化。
+- 浏览器审计产物：`goal/goal-7/task3-browser-audit.json`，`violations=[]`，页面 console error 数为 0。
+- 截图产物：`goal/goal-7/task3-final-map.png`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`。
+- 验证通过：内联脚本 `node --check /tmp/autosolver-inline.js`。
+
+## 大型全面检查-debug循环
+
+验证标准：前三个 task 完成后，必须进行一次完整 debug 循环，包括单测、JS 语法、浏览器真实点击、截图/视觉评审；发现问题继续修复，直到没有 P0/P1/P2 问题。
+
+完成记录：
+- 已完成大型全面检查-debug循环。
+- 视觉侧：最终截图 `goal/goal-7/task3-final-map.png` 相比用户打回截图已移除跨屏大青线，保留短推荐路线束，长路线低噪灰化，地图高度和底图层级更接近参考图。
+- 功能侧：浏览器 18 步真实点击审计通过，`violations=[]`。
+- 代码侧：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py web_agent_demo/delivery_routes_clone.py web_agent_demo/reasongraph_clone.py` 通过。
+- JS 侧：提取内联脚本后 `node --check /tmp/autosolver-inline.js` 通过。
+- 测试侧：`python3 -m unittest` 全仓 58 个测试通过。
+- 剩余风险：当前仍是匿名模拟地图，不是接入真实地图瓦片；但符合“不显示真实路名/地址、模拟百度地图式层级”的约束。
