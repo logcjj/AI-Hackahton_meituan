@@ -1239,71 +1239,55 @@ def render_index() -> str:
     .map-panel.active .map-frame { min-height: 0; flex: 1; }
     .map-frame.topology {
       background:
-        radial-gradient(circle at 50% 43%, rgba(39, 94, 113, .22), transparent 34%),
-        radial-gradient(circle at 68% 66%, rgba(101, 75, 32, .12), transparent 28%),
-        linear-gradient(90deg, rgba(148,163,184,.022) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(148,163,184,.018) 1px, transparent 1px),
-        linear-gradient(180deg, #07111a 0%, #040b12 100%);
-      background-size: auto, 54px 54px, 54px 54px, auto;
+        radial-gradient(circle at 52% 42%, rgba(50, 92, 112, .14), transparent 36%),
+        linear-gradient(90deg, rgba(148,163,184,.016) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(148,163,184,.014) 1px, transparent 1px),
+        linear-gradient(180deg, #08121b 0%, #040a11 100%);
+      background-size: auto, 56px 56px, 56px 56px, auto;
     }
-    .map-frame.topology .map-bg { opacity: .98; filter: saturate(.68) contrast(1.18) brightness(.82); }
+    .map-frame.topology .map-bg { opacity: .96; filter: saturate(.58) contrast(1.08) brightness(.78); }
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .74; z-index: 0; }
     .route-svg { z-index: 2; pointer-events: auto; }
     .route-bundle-highlight,
     .route-bundle-candidate,
-    .route-bundle-arrow,
-    .route-bundle-label { pointer-events: none; }
+    .route-bundle-arrow { pointer-events: none; }
     .route-bundle-highlight {
       fill: none;
-      stroke: #27e6d0;
-      stroke-width: 3.35;
+      stroke: rgba(103, 232, 249, .46);
+      stroke-width: 2.2;
       stroke-linecap: round;
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
-      filter: drop-shadow(0 0 8px rgba(39, 230, 208, .48));
-      opacity: .88;
+      filter: none;
+      opacity: .42;
     }
     .route-bundle-candidate {
       fill: none;
-      stroke: rgba(219, 226, 230, .58);
-      stroke-width: 1.8;
+      stroke: rgba(181, 195, 206, .32);
+      stroke-width: 1.15;
       stroke-dasharray: 5 8;
       stroke-linecap: round;
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
-      opacity: .55;
+      opacity: .3;
     }
-    .route-bundle-arrow { fill: #27e6d0; opacity: .76; filter: drop-shadow(0 0 4px rgba(39, 230, 208, .34)); }
-    .route-bundle-label rect {
-      fill: rgba(3, 31, 38, .84);
-      stroke: rgba(39, 230, 208, .72);
-      stroke-width: 1;
-      rx: 4;
-      filter: drop-shadow(0 5px 10px rgba(0,0,0,.3));
-    }
-    .route-bundle-label text {
-      fill: #cffff8;
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 800;
-    }
-    .route-bundle-label .sub { fill: #9fded8; font-size: 8px; font-weight: 600; }
-    .district, .zone-block { fill: rgba(20, 35, 47, .4); stroke: rgba(124, 146, 162, .1); stroke-width: 1; }
-    .water { fill: rgba(15, 32, 47, .68); stroke: rgba(85, 116, 137, .2); }
+    .route-bundle-arrow { fill: rgba(103, 232, 249, .52); opacity: .38; filter: none; }
+    .district, .zone-block { fill: rgba(24, 36, 47, .3); stroke: rgba(124, 146, 162, .075); stroke-width: 1; }
+    .water { fill: rgba(11, 24, 35, .62); stroke: rgba(85, 116, 137, .14); }
     .building-block {
-      fill: rgba(34, 48, 58, .36);
-      stroke: rgba(126, 145, 158, .1);
+      fill: rgba(36, 48, 58, .25);
+      stroke: rgba(126, 145, 158, .075);
       stroke-width: .7;
       vector-effect: non-scaling-stroke;
     }
-    .building-block.commerce { fill: rgba(64, 58, 39, .36); stroke: rgba(255, 209, 45, .1); }
-    .building-block.office { fill: rgba(39, 58, 69, .34); }
-    .building-block.residential { fill: rgba(32, 48, 50, .34); }
+    .building-block.commerce { fill: rgba(70, 57, 32, .26); stroke: rgba(255, 209, 45, .08); }
+    .building-block.office { fill: rgba(39, 56, 67, .24); }
+    .building-block.residential { fill: rgba(32, 47, 50, .22); }
     .commerce-hotspot {
-      fill: rgba(255, 154, 46, .12);
-      stroke: rgba(255, 154, 46, .22);
+      fill: rgba(255, 174, 66, .085);
+      stroke: rgba(255, 174, 66, .16);
       stroke-width: 1.1;
       filter: blur(.2px);
     }
@@ -1312,24 +1296,24 @@ def render_index() -> str:
       stroke: rgba(190, 214, 231, .32);
       stroke-width: 1;
     }
-    .intersection-node.busy { stroke: rgba(255, 209, 45, .7); fill: rgba(70, 51, 19, .72); }
+    .intersection-node.busy { stroke: rgba(255, 209, 45, .48); fill: rgba(70, 51, 19, .55); }
     .road-base, .road-core, .traffic-band, .road-major, .road-minor, .road-service {
       fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
     }
-    .road-base { stroke: rgba(0, 5, 10, .76); stroke-width: calc(var(--road-width, 8px) + 3px); }
-    .road-base.secondary { stroke: rgba(0, 5, 10, .58); stroke-width: calc(var(--road-width, 6px) + 1.5px); }
-    .road-base.service { stroke: rgba(0, 5, 10, .42); stroke-width: calc(var(--road-width, 4px) + 1px); }
-    .road-core { stroke: rgba(118, 134, 144, .42); stroke-width: var(--road-width, 6px); }
-    .road-core.arterial { stroke: rgba(146, 156, 162, .48); }
-    .road-core.secondary { stroke: rgba(104, 122, 133, .34); }
-    .road-core.service { stroke: rgba(82, 98, 110, .2); stroke-dasharray: 1 10; }
-    .traffic-band { stroke-width: var(--traffic-width, 2px); opacity: .44; }
-    .traffic-band.smooth { stroke: rgba(54, 230, 126, .26); }
-    .traffic-band.moderate { stroke: rgba(255, 209, 45, .44); stroke-dasharray: 18 14; }
-    .traffic-band.heavy { stroke: rgba(255, 91, 101, .52); stroke-dasharray: 12 10; }
+    .road-base { stroke: rgba(0, 4, 9, .62); stroke-width: calc(var(--road-width, 8px) + 2px); }
+    .road-base.secondary { stroke: rgba(0, 4, 9, .5); stroke-width: calc(var(--road-width, 6px) + 1.2px); }
+    .road-base.service { stroke: rgba(0, 4, 9, .34); stroke-width: calc(var(--road-width, 4px) + .6px); }
+    .road-core { stroke: rgba(126, 139, 148, .34); stroke-width: var(--road-width, 6px); }
+    .road-core.arterial { stroke: rgba(154, 162, 168, .42); }
+    .road-core.secondary { stroke: rgba(109, 125, 135, .28); }
+    .road-core.service { stroke: rgba(87, 101, 112, .14); stroke-dasharray: 1 12; }
+    .traffic-band { stroke-width: var(--traffic-width, 2px); opacity: .34; }
+    .traffic-band.smooth { stroke: rgba(54, 230, 126, .18); }
+    .traffic-band.moderate { stroke: rgba(255, 209, 45, .32); stroke-dasharray: 18 16; }
+    .traffic-band.heavy { stroke: rgba(255, 91, 101, .42); stroke-dasharray: 12 12; }
     .weather-rain-layer {
       pointer-events: none;
       opacity: .9;
@@ -1350,32 +1334,32 @@ def render_index() -> str:
     .map-bg[data-weather="rain"] .traffic-band.heavy { stroke: rgba(255, 91, 101, .78); }
     body.sample-preview .traffic-band { opacity: .32; }
     .dispatch-link { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 980; stroke-dashoffset: 980; animation: draw 1.45s ease-out forwards; pointer-events: stroke; cursor: pointer; }
-    .dispatch-link.primary { stroke: #25ead8; stroke-width: 4.2; filter: drop-shadow(0 0 6px rgba(37,234,216,.36)); }
-    .dispatch-link.secondary { stroke: rgba(44, 229, 210, .38); stroke-width: 1.95; stroke-dasharray: none; filter: drop-shadow(0 0 3px rgba(32,212,199,.12)); opacity: .62; }
-    .dispatch-link.overview-route { stroke: rgba(44, 229, 210, .32); stroke-width: 1.95; opacity: .55; filter: drop-shadow(0 0 2px rgba(32,212,199,.1)); }
-    .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .72); stroke-width: 2.8; filter: drop-shadow(0 0 4px rgba(37,234,216,.18)); }
-    .dispatch-link.pickup-leg.overview-route { stroke: rgba(37, 234, 216, .42); stroke-width: 2.05; opacity: .5; stroke-dasharray: none; filter: drop-shadow(0 0 2px rgba(37,234,216,.1)); }
+    .dispatch-link.primary { stroke: #6ee7f0; stroke-width: 3.3; filter: drop-shadow(0 0 4px rgba(103,232,249,.24)); }
+    .dispatch-link.secondary { stroke: rgba(103, 232, 249, .34); stroke-width: 1.45; stroke-dasharray: none; filter: none; opacity: .54; }
+    .dispatch-link.overview-route { stroke: rgba(103, 232, 249, .3); stroke-width: 1.45; opacity: .48; filter: none; }
+    .dispatch-link.pickup-leg { stroke: rgba(103, 232, 249, .56); stroke-width: 2.1; filter: none; }
+    .dispatch-link.pickup-leg.overview-route { stroke: rgba(103, 232, 249, .36); stroke-width: 1.55; opacity: .5; stroke-dasharray: none; filter: none; }
     .dispatch-link.selected-overview {
-      stroke: #25ead8;
-      stroke-width: 2.4;
-      opacity: .58;
+      stroke: #9be8f1;
+      stroke-width: 1.9;
+      opacity: .5;
       stroke-dasharray: none;
-      filter: drop-shadow(0 0 4px rgba(37,234,216,.18));
+      filter: none;
     }
     .dispatch-link.pickup-leg.selected-overview {
-      stroke: rgba(37, 234, 216, .5);
-      stroke-width: 2.2;
-      opacity: .52;
+      stroke: rgba(155, 232, 241, .44);
+      stroke-width: 1.75;
+      opacity: .48;
     }
     .dispatch-arrow.selected-overview {
-      fill: #25ead8;
-      opacity: .82;
-      filter: drop-shadow(0 0 5px rgba(37,234,216,.28));
+      fill: #9be8f1;
+      opacity: .58;
+      filter: none;
     }
-    .dispatch-link.active-assignment { stroke-width: 4.4; opacity: 1; filter: drop-shadow(0 0 7px rgba(37,234,216,.42)); stroke-dasharray: 980; }
-    .dispatch-link.pickup-leg.active-assignment { stroke-width: 4.2; filter: drop-shadow(0 0 7px rgba(37,234,216,.34)); }
-    .dispatch-arrow { fill: #25ead8; opacity: .72; filter: drop-shadow(0 0 4px rgba(37,234,216,.34)); pointer-events: auto; cursor: pointer; }
-    .dispatch-arrow.overview-route { fill: rgba(37, 234, 216, .74); opacity: .68; }
+    .dispatch-link.active-assignment { stroke-width: 3.4; opacity: .96; filter: drop-shadow(0 0 4px rgba(103,232,249,.28)); stroke-dasharray: 980; }
+    .dispatch-link.pickup-leg.active-assignment { stroke-width: 3.2; filter: drop-shadow(0 0 4px rgba(103,232,249,.22)); }
+    .dispatch-arrow { fill: #9be8f1; opacity: .58; filter: none; pointer-events: auto; cursor: pointer; }
+    .dispatch-arrow.overview-route { fill: rgba(155, 232, 241, .62); opacity: .48; }
     .dispatch-arrow.active-assignment { opacity: 1; }
     .dispatch-hit-area {
       fill: none;
@@ -1393,12 +1377,12 @@ def render_index() -> str:
       left: 16px;
       top: 14px;
       z-index: 4;
-      width: 112px;
-      padding: 9px 10px;
-      border: 1px solid rgba(49, 88, 117, .62);
+      width: 106px;
+      padding: 8px 9px;
+      border: 1px solid rgba(62, 92, 112, .48);
       border-radius: 8px;
-      background: rgba(4, 16, 27, .62);
-      box-shadow: 0 14px 34px rgba(0,0,0,.36), inset 0 1px 0 rgba(160,219,255,.08);
+      background: rgba(5, 15, 24, .58);
+      box-shadow: 0 12px 30px rgba(0,0,0,.28), inset 0 1px 0 rgba(160,219,255,.06);
       backdrop-filter: blur(5px);
       display: flex;
       flex-direction: column;
@@ -1406,11 +1390,11 @@ def render_index() -> str:
       align-items: stretch;
     }
     .map-legend div { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 10px; color: rgba(220,236,255,.82); }
-    .mark { width: 16px; height: 16px; border-radius: 5px; display: inline-grid; place-items: center; font-size: 10px; font-weight: 900; }
+    .mark { width: 14px; height: 14px; border-radius: 5px; display: inline-grid; place-items: center; font-size: 9px; font-weight: 900; }
     .mark.depot { background: #0f7ed3; color: #dff4ff; }
-    .mark.rest { background: #ff9d2e; color: #160a00; border: 1px solid rgba(255,236,166,.82); border-radius: 50%; }
+    .mark.rest { background: #f6b64b; color: #1c1001; border: 1px solid rgba(255,236,166,.7); border-radius: 50%; }
     .mark.dest { background: #7bcc46; color: #071906; border: 1px solid rgba(202, 255, 162, .75); border-radius: 50%; }
-    .mark.courier { background: #032e36; color: var(--cyan); border: 1px solid var(--cyan); border-radius: 50%; }
+    .mark.courier { background: #082c34; color: #9be8f1; border: 1px solid rgba(155,232,241,.72); border-radius: 50%; }
     .toolbar {
       position: absolute;
       top: 8px;
@@ -1491,12 +1475,12 @@ def render_index() -> str:
     .map-frame.hide-entities .map-label.active-assignment { opacity: .45; }
     .map-entities { position: absolute; inset: 0; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
-    .pin { position: absolute; z-index: 3; width: 16px; height: 16px; transform: translate(-50%, -50%); cursor: pointer; }
+    .pin { position: absolute; z-index: 3; width: 14px; height: 14px; transform: translate(-50%, -50%); cursor: pointer; }
     .pin.rest { z-index: 6; }
     .pin.courier { z-index: 5; }
     .pin.dest { z-index: 4; }
-    .pin .mark { width: 16px; height: 16px; box-shadow: 0 0 8px rgba(0,0,0,.38); }
-    .pin.avoided .mark { box-shadow: 0 0 0 3px rgba(255,209,45,.16), 0 0 12px rgba(0,0,0,.45); }
+    .pin .mark { width: 14px; height: 14px; box-shadow: 0 0 6px rgba(0,0,0,.34); }
+    .pin.avoided .mark { box-shadow: 0 0 0 2px rgba(255,209,45,.12), 0 0 10px rgba(0,0,0,.38); }
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
     .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; }
     .zoom button { width: 36px; height: 35px; color: #fff; background: rgba(7, 23, 37, .9); border: 1px solid var(--stroke-2); font-size: 22px; }
@@ -1512,8 +1496,7 @@ def render_index() -> str:
     .map-frame.hide-dispatch-routes .dispatch-hit-area,
     .map-frame.hide-dispatch-routes .route-bundle-highlight,
     .map-frame.hide-dispatch-routes .route-bundle-candidate,
-    .map-frame.hide-dispatch-routes .route-bundle-arrow,
-    .map-frame.hide-dispatch-routes .route-bundle-label { display: none; }
+    .map-frame.hide-dispatch-routes .route-bundle-arrow { display: none; }
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
       position: absolute; right: 20px; bottom: 16px; z-index: 4; width: 138px;
@@ -1630,19 +1613,19 @@ def render_index() -> str:
           <article class="node current">
             <div class="step-index">1</div><div class="icon">▣</div>
             <div><h3>输入订单与骑手</h3><p>等待当前场景样本<br>刷新后生成商家与骑手点位</p></div>
-            <div class="metric"><span>状态</span><strong>待输入</strong></div>
+            <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">2</div><div class="icon">♙</div>
             <div><h3>场景识别</h3><p>识别订单密度、骑手意愿、路况与天气<br>不同场景触发不同策略路径</p></div>
-            <div class="metric"><span>可信度</span><strong>--</strong></div>
+            <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">3</div><div class="icon">↯</div>
             <div><h3>候选策略生成</h3><p>生成 5 类候选派单策略<br>比较合单、多派、修复、贪心与风险平衡</p></div>
-            <div class="metric"><span>候选策略</span><strong>--</strong></div>
+            <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="branch-grid">
             <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>合单优先</b><br>优先匹配同路高重叠订单</p><strong>-- <span class="badge pending">待评估</span></strong></article>
@@ -1654,19 +1637,19 @@ def render_index() -> str:
           <article class="node">
             <div class="step-index">4</div><div class="icon">☑</div>
             <div><h3>派单可行性校验</h3><p>校验商家-订单关系、骑手意愿、容量、时间窗与 SLA</p></div>
-            <div class="metric"><span>通过</span><strong>--</strong></div>
+            <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">5</div><div class="icon">▥</div>
             <div><h3>成本 / 风险评估</h3><p>评估综合成本、无人接单风险与履约质量<br>选择整体收益最高方案</p></div>
-            <div class="metric"><span>最佳分</span><strong>--</strong></div>
+            <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">6</div><div class="icon">✓</div>
             <div><h3>最终派单方案</h3><p>运行完成后自动展示每个商家派给哪个骑手<br>无需逐个点击才看到结果</p></div>
-            <div class="metric"><span>置信度</span><strong>--</strong></div>
+            <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="reason-legend"><span><i class="line-key sel"></i>选中路径</span><span><i class="line-key eval"></i>评估中</span><span><i class="line-key rej"></i>淘汰路径</span></div>
         </div>
@@ -1689,8 +1672,8 @@ def render_index() -> str:
           <div class="toast" id="map-toast">地图图层已更新</div>
           <div class="toolbar"><select id="layer-mode"><option value="all">全部图层</option><option value="selected">最终派单</option><option value="candidates">候选派单</option></select><button data-map-action="depots">▧</button><button data-map-action="routes">☷</button><button data-map-action="fit">□</button><button data-map-action="locate">◎</button><button data-map-action="fullscreen">↗</button></div>
           <div class="map-legend">
-            <div><span class="mark depot">D</span>仓库</div><div><span class="mark rest">R</span>商家</div><div><span class="mark courier">C</span>骑手</div>
-            <div><i class="line-key sel"></i>选中路线</div><div><i class="line-key rej"></i>候选路线</div><div><span class="mark courier">C</span>骑手位置</div>
+            <div><span class="mark rest">M</span>商家订单</div><div><span class="mark courier">C</span>骑手位置</div>
+            <div><i class="line-key sel"></i>派单关系</div><div><i class="line-key rej"></i>长距离低噪</div>
           </div>
           <div class="map-entities" aria-live="polite"></div>
           <div class="zoom"><button id="zoom-in" type="button">+</button><button id="zoom-out" type="button">−</button><button id="recenter" type="button">⌾</button></div>
@@ -2418,12 +2401,12 @@ def render_index() -> str:
       const total = report && report.best ? safeNumber(report.best.total_tasks, covered || 1) : 1;
       const finalConfidence = report ? Math.max(0.72, Math.min(0.99, selectedScore * 0.72 + Math.min(1, covered / Math.max(1, total)) * 0.24)).toFixed(2) : "--";
       const sceneConfidence = sample ? Math.max(0.76, Math.min(0.98, selectedScore + 0.06)).toFixed(2) : "--";
-      setNodeMetric(nodes[0], "状态", sample ? "已刷新" : "待输入");
-      setNodeMetric(nodes[1], "可信度", "--");
-      setNodeMetric(nodes[2], "候选策略", "--");
-      setNodeMetric(nodes[3], "通过", "--");
-      setNodeMetric(nodes[4], "最佳分", "--");
-      setNodeMetric(nodes[5], "置信度", "--");
+      setNodeMetric(nodes[0], "状态", sample ? "已刷新" : "待推理");
+      setNodeMetric(nodes[1], "状态", "待推理");
+      setNodeMetric(nodes[2], "状态", "待推理");
+      setNodeMetric(nodes[3], "状态", "待推理");
+      setNodeMetric(nodes[4], "状态", "待推理");
+      setNodeMetric(nodes[5], "状态", "待推理");
       if (report) {
         setNodeMetric(nodes[0], "状态", "已输入");
         setNodeMetric(nodes[1], "可信度", sceneConfidence);
@@ -2590,11 +2573,11 @@ def render_index() -> str:
           }).join("")}</g>`
         : "";
       svg.innerHTML = [
-        `<defs><pattern id="anonymous-grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(148,163,184,.07)" stroke-width="1"/></pattern><pattern id="fine-street-mesh" width="132" height="96" patternUnits="userSpaceOnUse"><path d="M-16 26H148M18 -10V110M-22 74H126M82 -8V104M4 96L132 18M-26 8L96 94M38 0L118 62M-12 46L64 112" fill="none" stroke="rgba(122,151,168,.22)" stroke-width="1.05" stroke-linecap="round"/></pattern></defs>`,
+        `<defs><pattern id="anonymous-grid" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M56 0H0V56" fill="none" stroke="rgba(148,163,184,.05)" stroke-width="1"/></pattern><pattern id="fine-street-mesh" width="132" height="96" patternUnits="userSpaceOnUse"><path d="M-16 26H148M18 -10V110M-22 74H126M82 -8V104M4 96L132 18M-26 8L96 94M38 0L118 62M-12 46L64 112" fill="none" stroke="rgba(122,151,168,.115)" stroke-width=".9" stroke-linecap="round"/></pattern></defs>`,
         `<rect x="0" y="0" width="980" height="640" fill="#07121b"></rect>`,
-        `<rect x="0" y="0" width="980" height="640" fill="url(#anonymous-grid)" opacity=".28"></rect>`,
-        `<rect x="0" y="0" width="980" height="640" fill="url(#fine-street-mesh)" opacity=".42"></rect>`,
-        `<path class="water" d="M0 546 C128 503 188 570 304 536 C412 504 470 573 582 536 C684 502 758 558 862 526 C922 508 956 510 980 496 L980 640 L0 640 Z" opacity=".48"></path>`,
+        `<rect x="0" y="0" width="980" height="640" fill="url(#anonymous-grid)" opacity=".2"></rect>`,
+        `<rect x="0" y="0" width="980" height="640" fill="url(#fine-street-mesh)" opacity=".24"></rect>`,
+        `<path class="water" d="M0 546 C128 503 188 570 304 536 C412 504 470 573 582 536 C684 502 758 558 862 526 C922 508 956 510 980 496 L980 640 L0 640 Z" opacity=".34"></path>`,
         districtHtml,
         blockHtml,
         hotspotHtml,
@@ -2720,7 +2703,7 @@ def render_index() -> str:
         pin.style.left = Number(display.x).toFixed(1) + "%";
         pin.style.top = Number(display.y).toFixed(1) + "%";
         pin.title = hasAssignments ? "点击聚焦 " + item.id + " 的派单链路" : "点击查看 " + item.id + " 的样本详情";
-        pin.innerHTML = `<span class="mark ${markKind}">${isMerchantPoint ? "R" : "C"}</span>`;
+        pin.innerHTML = `<span class="mark ${markKind}">${isMerchantPoint ? "M" : "C"}</span>`;
         entityLayer.appendChild(pin);
 
         if (item.hideLabel && !showSelectedLabel) return;
@@ -3109,20 +3092,6 @@ def render_index() -> str:
       const rightY = y2 - Math.sin(angle + 0.52) * size;
       return `<polygon class="route-bundle-arrow" points="${x2.toFixed(1)},${y2.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
     }
-    function routeBundleLabel(point, title, subtitle, offsetIndex = 0) {
-      const [x, y] = svgPoint(point || [50, 50]);
-      const dx = offsetIndex % 2 === 0 ? 10 : -114;
-      const dy = offsetIndex % 3 === 0 ? -42 : 14;
-      const lx = Math.max(8, Math.min(866, x + dx));
-      const ly = Math.max(16, Math.min(588, y + dy));
-      return [
-        `<g class="route-bundle-label" transform="translate(${lx.toFixed(1)} ${ly.toFixed(1)})">`,
-        `<rect width="92" height="36"></rect>`,
-        `<text x="8" y="14">${escapeAttr(title)}</text>`,
-        `<text class="sub" x="8" y="27">${escapeAttr(subtitle)}</text>`,
-        `</g>`
-      ].join("");
-    }
     function uniqueRouteStops(rawStops) {
       return (rawStops || []).filter((item) => item && item.point).reduce((list, item) => {
         const exists = list.some((existing) => distance2D(existing.point, item.point) < 5.2);
@@ -3188,14 +3157,7 @@ def render_index() -> str:
           const d = dispatchPathFor(route || []);
           return d ? `<path class="route-bundle-candidate" data-bundle-candidate="${escapeAttr(item.assignment.id)}" d="${d}"></path>` : "";
         });
-      const labels = selected.slice(0, 2).map((item, index) => {
-        const labelPoint = item.pickupPoint;
-        const eta = item.assignment.eta || `${item.assignment.eta_min || "-"} min`;
-        const courier = item.couriers[0] || item.assignment.courier || item.assignment.id;
-        return routeBundleLabel(labelPoint, `商家 ${item.assignment.pickup}`, `派给 ${courier} · ${eta}`, index);
-      });
-      const stopLabels = [];
-      return [...candidatePaths, ...selectedPickupPaths, ...labels, ...stopLabels].join("");
+      return [...candidatePaths, ...selectedPickupPaths].join("");
     }
     function overviewAssignmentIdForRoutes(assignments, entityPoints, mapLayers, selectedAssignment) {
       const scored = (assignments || []).map((assignment) => {
@@ -3259,7 +3221,7 @@ def render_index() -> str:
         ];
         return routeParts.join("");
       }).join("");
-      const bundleOverlay = renderReferenceRouteBundle(profile.dispatchMap.assignments, entityPoints, mapLayers, overviewAssignmentId);
+      const bundleOverlay = focusMode ? renderReferenceRouteBundle(profile.dispatchMap.assignments, entityPoints, mapLayers, overviewAssignmentId) : "";
       svg.innerHTML = pathHtml + bundleOverlay;
     }
     function applyMapFocus(profile, assignmentId, focusMap = true) {
@@ -4102,7 +4064,7 @@ def render_index() -> str:
             showToast(expanded ? "演示视图已进入地图聚焦模式" : "演示视图已退出地图聚焦模式");
             return;
           }
-          showToast("仓库、商家与骑手图层可见");
+          showToast("商家与骑手图层可见");
         });
       });
       $("zoom-in").addEventListener("click", () => {

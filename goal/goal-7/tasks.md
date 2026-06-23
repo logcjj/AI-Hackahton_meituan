@@ -89,3 +89,20 @@
 - 验证通过：内联脚本 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
 - 浏览器复核说明：本轮尝试连接 in-app browser 时被 Browser Use URL policy 阻断，未继续绕过；已用 render_index 结构检查和全量测试覆盖本轮逻辑。
+
+## Task 6: 专业化地图与调度工作台视觉返工
+
+验证标准：页面不再显得粗糙或拥挤；地图更像 To B 调度工作台的匿名导航底图，商家点、骑手点、派单线、候选线、图例、右侧详情都有清晰层级；运行前不展示结果，运行后自动展示每个商家派给骑手且不遮挡地图主体；所有按钮和点击交互继续可用。
+
+完成记录：
+- 已重启本地 `127.0.0.1:8765` 服务，确认 Chrome 初始页加载的是当前代码而不是旧进程；初始状态不再显示旧置信度、旧 ETA 浮框、旧仓库/配送点图例和最终派单线。
+- 已降低匿名地图底图噪声：压低网格、建筑块、商圈热区、道路和路况色带的亮度与饱和度，减少发光感，使地图更接近 To B 调度后台。
+- 已压低派单线视觉权重：总览态只展示真实 assignment 派单线，不再额外叠加路线束 overlay；聚焦态才显示参考路线束，避免运行完成后一堆重复线条显乱。
+- 已把商家点改成更明确的 `M`，骑手点保留 `C`；图例改为“商家订单 / 骑手位置 / 派单关系 / 长距离低噪”，并移除“仓库、配送点、订单组、选中路线、候选路线”等不符合当前派单语义的旧文案。
+- 已删除残留的 `route-bundle-label` / `routeBundleLabel` 逻辑，防止地图再出现“商家 Mxxxx / 派给 Rxxxx · ETA”类浮框。
+- 已补测试断言：未推理阶段不出现 `可信度 --` / `置信度 --`，页面不出现仓库、配送点、订单组和 ETA 浮框，且总览 route bundle 只在 focusMode 下启用。
+- 已完成接口级验证：雨天低接单意愿样本生成 `weather=rain`、76 条雨层、策略 `S5`；商圈高峰生成集中商家和策略 `S1`；骑手稀缺生成分散商家和策略 `S3`；所有商家订单点与商家同坐标，所有 assignment 都有 route。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+- 浏览器自动点击限制说明：in-app browser 控制接口持续引用旧 tab，Chrome 的 AppleScript 执行 JS 被安全设置禁用，Computer Use 坐标点击不稳定；本轮已用 Chrome 可视初始状态、后端接口、HTML/JS 结构和全量测试完成可验证覆盖。
