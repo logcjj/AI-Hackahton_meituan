@@ -1,0 +1,141 @@
+{
+  "initial": {
+    "routes": [
+      {
+        "assignment": "A0101",
+        "merchant": "M0101",
+        "courier": "R0104",
+        "pe": "stroke"
+      },
+      {
+        "assignment": "A0102",
+        "merchant": "M0102",
+        "courier": "R0113",
+        "pe": "stroke"
+      },
+      {
+        "assignment": "A0103",
+        "merchant": "M0103",
+        "courier": "R0112",
+        "pe": "stroke"
+      },
+      {
+        "assignment": "A0104",
+        "merchant": "M0104",
+        "courier": "R0102",
+        "pe": "stroke"
+      },
+      {
+        "assignment": "A0105",
+        "merchant": "M0105",
+        "courier": "R0109",
+        "pe": "stroke"
+      }
+    ],
+    "routeCount": 5,
+    "merchantPins": 5,
+    "courierPins": 5,
+    "duplicateCouriers": [],
+    "routeSvgZ": "5",
+    "mapEntitiesZ": "4",
+    "weather": {
+      "text": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+      "bg": "linear-gradient(rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96))",
+      "color": "rgb(51, 65, 85)",
+      "rect": {
+        "x": 829,
+        "y": 335,
+        "w": 176,
+        "h": 159
+      },
+      "oldRows": 0
+    }
+  },
+  "routeClick": [
+    {
+      "assignment": "A0101",
+      "merchant": "M0101",
+      "courier": "R0104",
+      "pe": "stroke",
+      "isRoute": true,
+      "hasMerchant": true,
+      "hasCourier": true,
+      "detail": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0104\n最终派单 M0101 → R0104；地图线 R0104 → M0101 表达骑手承接该商家，不作为骑行导航。\nM0101\nR0104\n派单履约 ETA\n17 分钟\n预计派单成本\n$26.60\n接单 / 覆盖概率\n65%\n▣ 决策依据\n该线属于最终派单 A0101：商家 M0101 派给骑手 R0104。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S1 · 合单优先；风险 Medium；接单概率 65%。\n证据\n▧ 场景输入\n3 节点\n◎ 派单对象\n骑手到商家\n◷ ETA / 时效\n17 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+53.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n批次节约\n￥5.00\n单城月节约估算\n￥3,000,000"
+    },
+    {
+      "assignment": "A0102",
+      "merchant": "M0102",
+      "courier": "R0113",
+      "pe": "stroke",
+      "isRoute": true,
+      "hasMerchant": true,
+      "hasCourier": true,
+      "detail": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0113\n最终派单 M0102 → R0113；地图线 R0113 → M0102 表达骑手承接该商家，不作为骑行导航。\nM0102\nR0113\n派单履约 ETA\n18 分钟\n预计派单成本\n$36.20\n接单 / 覆盖概率\n61%\n▣ 决策依据\n该线属于最终派单 A0102：商家 M0102 派给骑手 R0113。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S1 · 合单优先；风险 Medium；接单概率 61%。\n证据\n▧ 场景输入\n3 节点\n◎ 派单对象\n骑手到商家\n◷ ETA / 时效\n18 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+53.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n批次节约\n￥5.00\n单城月节约估算\n￥3,000,000"
+    },
+    {
+      "assignment": "A0103",
+      "merchant": "M0103",
+      "courier": "R0112",
+      "pe": "stroke",
+      "isRoute": true,
+      "hasMerchant": true,
+      "hasCourier": true,
+      "detail": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0112\n最终派单 M0103 → R0112；地图线 R0112 → M0103 表达骑手承接该商家，不作为骑行导航。\nM0103\nR0112\n派单履约 ETA\n14 分钟\n预计派单成本\n$18.70\n接单 / 覆盖概率\n74%\n▣ 决策依据\n该线属于最终派单 A0103：商家 M0103 派给骑手 R0112。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S1 · 合单优先；风险 Medium；接单概率 74%。\n证据\n▧ 场景输入\n3 节点\n◎ 派单对象\n骑手到商家\n◷ ETA / 时效\n14 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+53.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n批次节约\n￥5.00\n单城月节约估算\n￥3,000,000"
+    },
+    {
+      "assignment": "A0104",
+      "merchant": "M0104",
+      "courier": "R0102",
+      "pe": "stroke",
+      "isRoute": true,
+      "hasMerchant": true,
+      "hasCourier": true,
+      "detail": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0102\n最终派单 M0104 → R0102；地图线 R0102 → M0104 表达骑手承接该商家，不作为骑行导航。\nM0104\nR0102\n派单履约 ETA\n18 分钟\n预计派单成本\n$36.80\n接单 / 覆盖概率\n61%\n▣ 决策依据\n该线属于最终派单 A0104：商家 M0104 派给骑手 R0102。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S1 · 合单优先；风险 Medium；接单概率 61%。\n证据\n▧ 场景输入\n3 节点\n◎ 派单对象\n骑手到商家\n◷ ETA / 时效\n18 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+53.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n批次节约\n￥5.00\n单城月节约估算\n￥3,000,000"
+    },
+    {
+      "assignment": "A0105",
+      "merchant": "M0105",
+      "courier": "R0109",
+      "pe": "stroke",
+      "isRoute": true,
+      "hasMerchant": true,
+      "hasCourier": true,
+      "detail": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0109\n最终派单 M0105 → R0109；地图线 R0109 → M0105 表达骑手承接该商家，不作为骑行导航。\nM0105\nR0109\n派单履约 ETA\n19 分钟\n预计派单成本\n$32.40\n接单 / 覆盖概率\n72%\n▣ 决策依据\n该线属于最终派单 A0105：商家 M0105 派给骑手 R0109。\n派单线证据来自当前地图路网；采样节点 3 个，端点贴合校验 0 段。\n派单策略：S1 · 合单优先；风险 Medium；接单概率 72%。\n证据\n▧ 场景输入\n3 节点\n◎ 派单对象\n骑手到商家\n◷ ETA / 时效\n19 分钟\n△ 接单风险\nMedium\n相对贪心基线\n成本改进\n+53.0%\nETA 改进\n-4 分钟\n无人接单风险下降\n-31%\n批次节约\n￥5.00\n单城月节约估算\n￥3,000,000"
+    }
+  ],
+  "pinClick": [
+    {
+      "id": "M0101",
+      "kind": "merchant_order",
+      "cls": "pin merchant",
+      "ok": true,
+      "title": "商家派单：M0101",
+      "detail": "↯\n派单决策解释\n商家派单：M0101\n对象 派给 R0104\n该商家共 1 单，最终由 R0104 承接。\nM0101 · 1单\n派单履约 ETA\n17 min\n预计派单成本\n$26.60\n接单 / 覆盖概率\n65%\n▣ 决策依据\n派单对象：M0101 → R0104，覆盖该商家 1 单。\n时效目标：41 分钟；预计派单成本 $26.60。\n策略依据：S1 · 合单优先；风险等级 Medium；接单概率 65%。\n证据\n▧ 场景输入\n65%\n◎ 派单对象\nR0104\n◷ ETA / 时效\n41 分钟\n△ 接单风险"
+    },
+    {
+      "id": "M0102",
+      "kind": "merchant_order",
+      "cls": "pin merchant",
+      "ok": true,
+      "title": "商家派单：M0102",
+      "detail": "↯\n派单决策解释\n商家派单：M0102\n对象 派给 R0113\n该商家共 2 单，最终由 R0113 承接。\nM0102 · 2单\n派单履约 ETA\n18 min\n预计派单成本\n$36.20\n接单 / 覆盖概率\n61%\n▣ 决策依据\n派单对象：M0102 → R0113，覆盖该商家 2 单。\n时效目标：43 分钟；预计派单成本 $36.20。\n策略依据：S1 · 合单优先；风险等级 Medium；接单概率 61%。\n证据\n▧ 场景输入\n61%\n◎ 派单对象\nR0113\n◷ ETA / 时效\n43 分钟\n△ 接单风险"
+    },
+    {
+      "id": "M0103",
+      "kind": "merchant_order",
+      "cls": "pin merchant",
+      "ok": true,
+      "title": "商家派单：M0103",
+      "detail": "↯\n派单决策解释\n商家派单：M0103\n对象 派给 R0112\n该商家共 1 单，最终由 R0112 承接。\nM0103 · 1单\n派单履约 ETA\n14 min\n预计派单成本\n$18.70\n接单 / 覆盖概率\n74%\n▣ 决策依据\n派单对象：M0103 → R0112，覆盖该商家 1 单。\n时效目标：38 分钟；预计派单成本 $18.70。\n策略依据：S1 · 合单优先；风险等级 Medium；接单概率 74%。\n证据\n▧ 场景输入\n74%\n◎ 派单对象\nR0112\n◷ ETA / 时效\n38 分钟\n△ 接单风险"
+    },
+    {
+      "id": "M0104",
+      "kind": "merchant_order",
+      "cls": "pin merchant",
+      "ok": true,
+      "title": "商家派单：M0104",
+      "detail": "↯\n派单决策解释\n商家派单：M0104\n对象 派给 R0102\n该商家共 2 单，最终由 R0102 承接。\nM0104 · 2单\n派单履约 ETA\n18 min\n预计派单成本\n$36.80\n接单 / 覆盖概率\n61%\n▣ 决策依据\n派单对象：M0104 → R0102，覆盖该商家 2 单。\n时效目标：43 分钟；预计派单成本 $36.80。\n策略依据：S1 · 合单优先；风险等级 Medium；接单概率 61%。\n证据\n▧ 场景输入\n61%\n◎ 派单对象\nR0102\n◷ ETA / 时效\n43 分钟\n△ 接单风险"
+    }
+  ],
+  "errors": []
+}

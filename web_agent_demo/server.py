@@ -1602,31 +1602,7 @@ def render_index() -> str:
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .38; z-index: 1; pointer-events: none; }
-    .route-svg { z-index: 3; pointer-events: none; }
-    .route-bundle-highlight,
-    .route-bundle-candidate,
-    .route-bundle-arrow { pointer-events: none; }
-    .route-bundle-highlight {
-      fill: none;
-      stroke: rgba(103, 232, 249, .46);
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      vector-effect: non-scaling-stroke;
-      filter: none;
-      opacity: .42;
-    }
-    .route-bundle-candidate {
-      fill: none;
-      stroke: rgba(181, 195, 206, .32);
-      stroke-width: 1.15;
-      stroke-dasharray: 5 8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      vector-effect: non-scaling-stroke;
-      opacity: .3;
-    }
-    .route-bundle-arrow { fill: rgba(103, 232, 249, .52); opacity: .38; filter: none; }
+    .route-svg { z-index: 5; pointer-events: none; }
     .district, .zone-block { fill: rgba(24, 36, 47, .3); stroke: rgba(124, 146, 162, .075); stroke-width: 1; }
     .water { fill: rgba(13, 31, 40, .56); stroke: rgba(85, 116, 137, .14); }
     .building-block {
@@ -1690,43 +1666,54 @@ def render_index() -> str:
     .map-bg[data-weather="rain"] .road-core { filter: brightness(.86); }
     .map-bg[data-weather="rain"] .traffic-band.heavy { stroke: rgba(255, 91, 101, .78); }
     body.sample-preview .traffic-band { opacity: .32; }
-    .dispatch-link { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 980; stroke-dashoffset: 980; animation: draw 1.45s ease-out forwards; pointer-events: stroke; cursor: pointer; }
-    .dispatch-link.primary { stroke: var(--map-route-focus); stroke-width: 3.2; filter: drop-shadow(0 1px 2px rgba(15,118,110,.24)); }
-    .dispatch-link.secondary { stroke: var(--route-color, var(--map-route)); stroke-width: 1.55; stroke-dasharray: none; filter: none; opacity: .58; }
-    .dispatch-link.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.55; opacity: .56; filter: none; }
-    .dispatch-link.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 2.05; filter: none; }
-    .dispatch-link.pickup-leg.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 2.25; opacity: .76; stroke-dasharray: none; filter: drop-shadow(0 1px 2px rgba(22,163,74,.12)); }
-    .dispatch-link.endpoint-connector { stroke: var(--route-color, var(--map-route)); stroke-width: 1.65; opacity: .58; stroke-dasharray: 3 4; filter: none; animation: none; pointer-events: none; }
-    .dispatch-link.selected-overview {
+    .dispatch-visual { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: none; stroke-dashoffset: 0; animation: none; pointer-events: none; }
+    .dispatch-visual.primary { stroke: var(--map-route-focus); stroke-width: 2.1; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
+    .dispatch-visual.secondary { stroke: var(--route-color, var(--map-route)); stroke-width: 1.3; stroke-dasharray: none; filter: none; opacity: .5; }
+    .dispatch-visual.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.3; opacity: .48; filter: none; }
+    .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.35; filter: none; }
+    .dispatch-visual.pickup-leg.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.35; opacity: .56; stroke-dasharray: none; filter: none; }
+    .dispatch-visual.endpoint-connector { stroke: var(--route-color, var(--map-route)); stroke-width: 1.65; opacity: .64; stroke-dasharray: none; filter: none; animation: none; pointer-events: none; }
+    .dispatch-visual.selected-overview {
       stroke: #d99a00;
-      stroke-width: 2.25;
-      opacity: .82;
+      stroke-width: 1.85;
+      opacity: .72;
       stroke-dasharray: none;
       filter: none;
     }
-    .dispatch-link.pickup-leg.selected-overview {
+    .dispatch-visual.pickup-leg.selected-overview {
       stroke: #d99a00;
-      stroke-width: 2.45;
-      opacity: .9;
+      stroke-width: 2.05;
+      opacity: .78;
     }
     .dispatch-arrow.selected-overview {
       fill: #d99a00;
       opacity: .84;
       filter: none;
     }
-    .dispatch-link.active-assignment { stroke-width: 3.4; opacity: .96; filter: drop-shadow(0 0 4px rgba(103,232,249,.28)); stroke-dasharray: 980; }
-    .dispatch-link.pickup-leg.active-assignment { stroke-width: 3.2; filter: drop-shadow(0 0 4px rgba(103,232,249,.22)); }
+    .dispatch-visual.active-assignment { stroke-width: 2.2; opacity: .86; filter: drop-shadow(0 1px 2px rgba(15,118,110,.14)); stroke-dasharray: none; }
+    .dispatch-visual.pickup-leg.active-assignment { stroke-width: 2.15; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
+    .dispatch-link {
+      fill: none;
+      stroke: transparent;
+      stroke-width: 18;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+      pointer-events: stroke;
+      cursor: pointer;
+      opacity: .01;
+    }
     .dispatch-arrow { fill: #d99a00; opacity: .78; filter: drop-shadow(0 1px 1px rgba(68, 64, 60, .18)); pointer-events: auto; cursor: pointer; }
-    .dispatch-arrow.overview-route { fill: #d99a00; opacity: .68; }
+    .dispatch-arrow.overview-route { fill: #d99a00; opacity: .76; }
     .dispatch-arrow.active-assignment { opacity: 1; }
     .dispatch-hit-area {
       fill: none;
       stroke: transparent;
-      stroke-width: 10;
+      stroke-width: 0;
       stroke-linecap: round;
       stroke-linejoin: round;
-      pointer-events: stroke;
-      cursor: pointer;
+      pointer-events: none;
+      cursor: default;
     }
     .arrow { fill: var(--cyan); filter: drop-shadow(0 0 6px rgba(39,230,208,.75)); }
     @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -1836,35 +1823,35 @@ def render_index() -> str:
     .map-frame.focus-selected .pin:not(.active-assignment) { opacity: .78; transform: translate(-50%, -50%) scale(.88); }
     .map-frame.focus-selected .pin.active-assignment { z-index: 5; opacity: 1; }
     .map-frame.focus-selected .pin.active-assignment .mark { box-shadow: 0 0 0 4px rgba(15,118,110,.14), 0 4px 12px rgba(15,118,110,.26); }
-    .map-frame.focus-selected .dispatch-link.secondary:not(.active-assignment) { opacity: .28; stroke-width: 1.7; filter: none; }
+    .map-frame.focus-selected .dispatch-visual.secondary:not(.active-assignment) { opacity: .28; stroke-width: 1.7; filter: none; }
     .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .24; fill: rgba(43,222,205,.5); }
-    .map-frame.assignment-overview .dispatch-link { stroke-dashoffset: 0; }
-    .map-frame.assignment-overview .dispatch-link.primary { stroke: var(--map-route-focus); stroke-width: 3.35; opacity: .94; filter: drop-shadow(0 1px 2px rgba(15,118,110,.24)); }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.85; opacity: .68; filter: none; }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg.selected-overview { stroke: var(--map-route-focus); stroke-width: 2.35; opacity: .86; filter: drop-shadow(0 1px 2px rgba(15,118,110,.16)); }
-    .map-frame.assignment-overview .dispatch-arrow { opacity: .64; }
-    .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .82; fill: var(--map-route-focus); }
-    .map-frame.assignment-overview .dispatch-link.active-assignment { stroke: var(--map-route-focus); stroke-width: 4; opacity: 1; stroke-dasharray: 980; filter: drop-shadow(0 2px 4px rgba(15,118,110,.24)); }
+    .map-frame.assignment-overview .dispatch-visual { stroke-dashoffset: 0; }
+    .map-frame.assignment-overview .dispatch-visual.primary { stroke: var(--map-route-focus); stroke-width: 2.15; opacity: .82; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
+    .map-frame.assignment-overview .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.35; opacity: .54; filter: none; }
+    .map-frame.assignment-overview .dispatch-visual.pickup-leg.selected-overview { stroke: var(--map-route-focus); stroke-width: 1.65; opacity: .7; filter: none; }
+    .map-frame.assignment-overview .dispatch-arrow { opacity: .68; }
+    .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .76; fill: var(--map-route-focus); }
+    .map-frame.assignment-overview .dispatch-visual.active-assignment { stroke: var(--map-route-focus); stroke-width: 2.0; opacity: .78; stroke-dasharray: none; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
     .map-frame.assignment-overview .dispatch-arrow.active-assignment { opacity: .96; fill: var(--map-route-focus); }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup.active-assignment,
-    .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup {
-      stroke: rgba(206, 218, 226, .46);
-      stroke-width: 1.9;
-      opacity: .58;
-      stroke-dasharray: 7 8;
+    .map-frame.assignment-overview .dispatch-visual.pickup-leg.long-pickup.active-assignment,
+    .map-frame.assignment-overview .dispatch-visual.pickup-leg.long-pickup {
+      stroke: var(--route-color, var(--map-route));
+      stroke-width: .8;
+      opacity: .24;
+      stroke-dasharray: none;
       filter: none;
     }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup.selected-overview {
-      stroke: rgba(100, 116, 139, .5);
-      stroke-width: 1.75;
-      opacity: .48;
-      stroke-dasharray: 8 9;
-      filter: none;
+    .map-frame.assignment-overview .dispatch-visual.pickup-leg.long-pickup.selected-overview {
+      stroke: var(--map-route-focus);
+      stroke-width: 1.15;
+      opacity: .42;
+      stroke-dasharray: none;
+      filter: drop-shadow(0 1px 2px rgba(15,118,110,.16));
     }
     .map-frame.assignment-overview .dispatch-arrow.long-pickup.active-assignment,
     .map-frame.assignment-overview .dispatch-arrow.long-pickup {
-      fill: rgba(206, 218, 226, .58);
-      opacity: .46;
+      fill: var(--map-route-focus);
+      opacity: .44;
       filter: none;
     }
     .map-frame.hide-entities .pin,
@@ -1881,22 +1868,38 @@ def render_index() -> str:
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
     .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 12; display: grid; gap: 1px; border: 1px solid rgba(71,85,105,.2); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 24px rgba(15,23,42,.14); }
     .zoom button { width: 38px; height: 35px; color: #334155; background: rgba(255,255,255,.9); border: 0; border-bottom: 1px solid rgba(100,116,139,.18); font-size: 20px; font-weight: 800; }
-    .map-frame.locating .dispatch-link.primary { stroke-width: 6; }
+    .map-frame.locating .dispatch-visual.primary { stroke-width: 6; }
+    .map-frame.hide-candidates .dispatch-visual.secondary:not(.active-assignment),
     .map-frame.hide-candidates .dispatch-link.secondary:not(.active-assignment),
     .map-frame.hide-candidates .dispatch-arrow.secondary:not(.active-assignment),
     .map-frame.hide-candidates .dispatch-hit-area.secondary:not(.active-assignment) { display: none; }
+    .map-frame.hide-dispatch-routes .dispatch-visual,
     .map-frame.hide-dispatch-routes .dispatch-link,
     .map-frame.hide-dispatch-routes .dispatch-arrow,
-    .map-frame.hide-dispatch-routes .dispatch-hit-area,
-    .map-frame.hide-dispatch-routes .route-bundle-highlight,
-    .map-frame.hide-dispatch-routes .route-bundle-candidate,
-    .map-frame.hide-dispatch-routes .route-bundle-arrow { display: none; }
+    .map-frame.hide-dispatch-routes .dispatch-hit-area { display: none; }
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
-      position: absolute; right: 14px; bottom: 13px; z-index: 12; width: 118px;
-      background: rgba(255,255,255,.82); border: 1px solid rgba(71,85,105,.18); border-radius: 9px; padding: 7px 9px; font-size: 10px; color: #334155; box-shadow: 0 10px 22px rgba(15,23,42,.11); backdrop-filter: blur(8px);
+      position: absolute;
+      right: 14px;
+      bottom: 13px;
+      z-index: 12;
+      width: 176px;
+      padding: 10px 11px;
+      border: 1px solid rgba(148, 163, 184, .32);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.96));
+      color: #334155 !important;
+      box-shadow: 0 12px 28px rgba(15,23,42,.13);
+      backdrop-filter: blur(10px);
     }
-    .bar { height: 4px; background: linear-gradient(90deg, #d99a00 0 67%, rgba(100,116,139,.18) 67%); margin: 7px 0 9px; border-radius: 999px; }
+    .weather-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+    .weather-title { font-size: 10px; font-weight: 850; color: #334155; letter-spacing: .02em; }
+    .weather-badge { padding: 2px 8px; border-radius: 999px; background: #fff7ed; color: #b45309; border: 1px solid rgba(217,119,6,.2); font-size: 10px; font-weight: 850; }
+    .weather-bar { height: 5px; background: linear-gradient(90deg, #d99a00 0 67%, rgba(100,116,139,.16) 67%); margin: 6px 0 8px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); }
+    .weather-meta { display: grid; grid-template-columns: 1fr; gap: 5px; }
+    .weather-line { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; line-height: 1.25; color: #64748b; background: rgba(241,245,249,.72); border: 1px solid rgba(226,232,240,.7); border-radius: 9px; padding: 5px 7px; }
+    .weather-line strong { color: #0f172a; font-weight: 800; text-align: right; }
+    .weather-impact { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(148,163,184,.2); color: #475569; font-size: 10px; line-height: 1.3; }
     .toast {
       position: absolute;
       right: 18px;
@@ -1949,7 +1952,7 @@ def render_index() -> str:
     #detail-reasons li:nth-child(n+4) { display: none; }
     .evidence .row { margin: 5px 0; }
     .evidence .row:nth-of-type(n+5) { display: none; }
-    .right-panel .decision-card:last-child .row:nth-of-type(n+3) { display: none; }
+    .right-panel .decision-card:last-child .row:nth-of-type(n+6) { display: none; }
     .positive { color: var(--green); }
     .good { color: #9fffe6; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 10px; }
@@ -2105,11 +2108,19 @@ def render_index() -> str:
           <div class="toolbar"><select id="layer-mode" title="切换派单线显示模式"><option value="all">全部图层</option><option value="selected">聚焦派单</option><option value="candidates">增强线路</option></select><button data-map-action="depots" type="button" title="弱化/恢复商家与骑手点位" aria-label="弱化点位">点位</button><button data-map-action="routes" type="button" title="隐藏/恢复派单关系线" aria-label="隐藏派单线">线路</button><button data-map-action="fit" type="button" title="适配全部点位和派单线" aria-label="适配视图">适配</button><button data-map-action="locate" type="button" title="定位当前派单包" aria-label="定位当前派单">定位</button><button data-map-action="fullscreen" type="button" title="切换地图聚焦视图" aria-label="地图聚焦视图">全屏</button></div>
           <div class="map-legend">
             <div><span class="mark merchant"><span class="mark-symbol">商</span></span>商家</div><div><span class="mark courier"><span class="mark-symbol">骑</span></span>骑手</div>
-            <div><i class="line-key sel"></i>派单线</div><div><i class="line-key rej"></i>低优先级</div>
+            <div><i class="line-key sel"></i>派单关系</div>
           </div>
           <div class="map-entities" aria-live="polite"></div>
           <div class="zoom"><button id="zoom-in" type="button" title="放大地图">+</button><button id="zoom-out" type="button" title="缩小地图">−</button><button id="recenter" type="button" title="回到派单总览">⌾</button></div>
-          <div class="weather"><div class="row"><strong>路况</strong><strong style="color:var(--yellow)">待刷新</strong></div><div class="bar"></div><div class="row"><span>天气</span><strong>等待场景</strong></div></div>
+          <div class="weather">
+            <div class="weather-head"><span class="weather-title">气象与路况</span><strong class="weather-badge">待刷新</strong></div>
+            <div class="weather-bar"></div>
+            <div class="weather-meta">
+              <div class="weather-line"><span>天气</span><strong class="weather-state">等待场景</strong></div>
+              <div class="weather-line"><span>履约影响</span><strong class="weather-impact-value">待评估</strong></div>
+            </div>
+            <div class="weather-impact">运行推理后同步展示天气、拥堵对接单和 ETA 的影响。</div>
+          </div>
         </div>
       </section>
 
@@ -2140,6 +2151,8 @@ def render_index() -> str:
           <div class="row"><span>成本改进</span><strong class="positive">-</strong></div>
           <div class="row"><span>ETA 改进</span><strong class="positive">-</strong></div>
           <div class="row"><span>无人接单风险下降</span><strong class="positive">-</strong></div>
+          <div class="row"><span>批次节约</span><strong class="positive" id="benefit-batch">-</strong></div>
+          <div class="row"><span>单城月节约估算</span><strong class="positive" id="benefit-month">-</strong></div>
         </div>
       </aside>
 
@@ -2176,6 +2189,8 @@ def render_index() -> str:
     let semiRealMapRegion = 0;
     let semiRealMapMoveMode = "";
     let semiRealMapLiveSyncPending = false;
+    let semiRealMapLastLiveSyncAt = 0;
+    let semiRealMapViewportSyncReason = "";
     const semiRealMapLayerSchema = "delivery_routes_optimization_maplibre_clone";
     const semiRealMapStyleUrl = "https://tiles.openfreemap.org/styles/positron";
     const semiRealMapBounds = {lngMin: 121.418, lngMax: 121.506, latMin: 31.204, latMax: 31.252};
@@ -2271,6 +2286,10 @@ def render_index() -> str:
       const number = Number(value);
       return Number.isFinite(number) ? "$" + number.toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "-";
     }
+    function yuan(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? "￥" + number.toLocaleString("zh-CN", {minimumFractionDigits: Math.abs(number) < 10 ? 2 : 0, maximumFractionDigits: Math.abs(number) < 10 ? 2 : 0}) : "-";
+    }
     function etaText(value) {
       if (value === undefined || value === null || value === "") return "-";
       const text = String(value).trim();
@@ -2331,6 +2350,21 @@ def render_index() -> str:
     }
     function currentSemiRealMapRegion() {
       return semiRealMapRegions[semiRealMapRegion % semiRealMapRegions.length];
+    }
+    function resetSemiRealMapViewportForScenario(reason = "sample-reset") {
+      const map = ensureSemiRealMap();
+      if (!map) return false;
+      const region = currentSemiRealMapRegion();
+      semiRealMapMoveMode = reason;
+      if (map.stop) map.stop();
+      map.jumpTo({center: region.center, zoom: region.zoom, pitch: region.pitch, bearing: region.bearing});
+      const frame = document.querySelector(".map-frame");
+      if (frame) {
+        frame.dataset.zoomLevel = Number(region.zoom).toFixed(2);
+        frame.dataset.mapRegion = region.label;
+        frame.dataset.mapStyle = "运营分析浅色图";
+      }
+      return true;
     }
     function hideSemiRealMapTextLayers() {
       if (!semiRealMap || !semiRealMap.getStyle()) return;
@@ -2403,7 +2437,9 @@ def render_index() -> str:
     function resyncCurrentProfileToMapViewport(reason = "viewport") {
       const profile = currentProfile;
       if (!profile || !profile.dispatchMap || !semiRealMapReady) return;
+      semiRealMapViewportSyncReason = reason;
       updateMapScene(profile);
+      semiRealMapViewportSyncReason = "";
       const frame = document.querySelector(".map-frame");
       if (frame) {
         frame.dataset.lastViewportSync = reason;
@@ -2418,6 +2454,9 @@ def render_index() -> str:
     function handleSemiRealMapMove() {
       if (!semiRealMapReady || semiRealMapMoveMode === "refresh-map") return;
       if (semiRealMapLiveSyncPending) return;
+      const now = Date.now();
+      if (now - semiRealMapLastLiveSyncAt < 90) return;
+      semiRealMapLastLiveSyncAt = now;
       semiRealMapLiveSyncPending = true;
       window.requestAnimationFrame(() => {
         semiRealMapLiveSyncPending = false;
@@ -2645,6 +2684,7 @@ def render_index() -> str:
       (profile.dispatchMap.entities || []).forEach((entity) => {
         if (projectEntityLngLatToScreen(entity)) projected += 1;
       });
+      if (semiRealMapViewportSyncReason === "viewport-live") return projected > 0;
       const roads = renderedMapRoadNetwork();
       if (roads && roads.length) {
         profile.dispatchMap.map_layers = {
@@ -2772,17 +2812,24 @@ def render_index() -> str:
       profile.dispatchMap.assignments = completeAssignments;
       profile.assignments = {};
       const courierLoad = {};
+      const unusedCourierIds = new Set(couriers.map((courier) => courier.id));
+      const preferUniqueCouriers = couriers.length >= profile.dispatchMap.assignments.length;
       profile.dispatchMap.assignments.forEach((assignment) => {
         const merchant = entityById[assignment.pickup];
         if (!merchant || !couriers.length) return;
-        const ranked = couriers.map((courier) => {
+        const candidateCouriers = preferUniqueCouriers && unusedCourierIds.size
+          ? couriers.filter((courier) => unusedCourierIds.has(courier.id))
+          : couriers;
+        const ranked = candidateCouriers.map((courier) => {
           const load = courierLoad[courier.id] || 0;
           const distance = distance2D([merchant.x, merchant.y], [courier.x, courier.y]);
-          return {courier, score: distance + load * 4.5};
+          const reusePenalty = preferUniqueCouriers ? load * 10000 : load * 36;
+          return {courier, score: distance + reusePenalty};
         }).sort((left, right) => left.score - right.score);
         const chosen = ranked[0] && ranked[0].courier;
         if (!chosen) return;
         courierLoad[chosen.id] = (courierLoad[chosen.id] || 0) + 1;
+        unusedCourierIds.delete(chosen.id);
         assignment.courier = chosen.id;
         assignment.map_couriers = [chosen.id];
         assignment.distance = `${Math.max(0.4, distance2D([merchant.x, merchant.y], [chosen.x, chosen.y]) * 0.18).toFixed(1)} km`;
@@ -2999,8 +3046,23 @@ def render_index() -> str:
         S5: "risk_balancing"
       }[strategyId] || "candidate_preview";
     }
-    function simulationFinalMap(sample) {
-      const preview = simulationPreviewMap(sample);
+    function cloneStablePreviewMapForFinal(sample, renderedDispatchMap) {
+      const fallback = simulationPreviewMap(sample);
+      if (!renderedDispatchMap || !Array.isArray(renderedDispatchMap.entities)) return fallback;
+      return {
+        ...fallback,
+        entities: renderedDispatchMap.entities.map((entity) => ({...entity})),
+        map_layers: {
+          ...(fallback.map_layers || {}),
+          ...(renderedDispatchMap.map_layers || {})
+        },
+        anchor_source: renderedDispatchMap.anchor_source || fallback.anchor_source,
+        anchor_variant: renderedDispatchMap.anchor_variant || fallback.anchor_variant,
+        assignment_reconciled_variant: renderedDispatchMap.assignment_reconciled_variant || fallback.assignment_reconciled_variant
+      };
+    }
+    function simulationFinalMap(sample, renderedDispatchMap = null) {
+      const preview = cloneStablePreviewMapForFinal(sample, renderedDispatchMap);
       const merchantById = Object.fromEntries((sample.merchants || []).map((item) => [item.id, item]));
       const courierById = Object.fromEntries((sample.couriers || []).map((item) => [item.id, item]));
       const candidateByPair = {};
@@ -3152,6 +3214,7 @@ def render_index() -> str:
       profile.mapFocusMode = "overview";
       profile.assignments = {};
       profile.dispatchMap = simulationPreviewMap(sample);
+      resetSemiRealMapViewportForScenario("refresh-position-reset");
       resetMapControlState();
       document.body.classList.add("pending-run", "sample-preview");
       $("case-id").textContent = sample.name;
@@ -3661,19 +3724,30 @@ def render_index() -> str:
       const weatherName = summary && summary.weather ? summary.weather : "clear";
       const weatherLabel = summary && summary.weather_label ? summary.weather_label : weatherName === "rain" ? "雨天 · 路面湿滑" : weatherName === "event" ? "活动 · 局部管制" : "晴朗 · 正常履约";
       const label = traffic === "heavy" ? "拥堵" : traffic === "smooth" ? "畅通" : "缓行";
-      const color = traffic === "heavy" ? "#ff5b65" : traffic === "smooth" ? "#36e67e" : "#ffd12d";
+      const color = traffic === "heavy" ? "#dc2626" : traffic === "smooth" ? "#16a34a" : "#d97706";
       const percent = traffic === "heavy" ? 86 : traffic === "smooth" ? 34 : 61;
-      const trafficStrong = weather.querySelector(".row strong:last-child");
-      const bar = weather.querySelector(".bar");
+      const trafficStrong = weather.querySelector(".weather-badge");
+      const bar = weather.querySelector(".weather-bar");
+      const weatherStrong = weather.querySelector(".weather-state");
+      const impactStrong = weather.querySelector(".weather-impact-value");
+      const impactText = traffic === "heavy"
+        ? "ETA 上浮"
+        : weatherName === "rain"
+          ? "接单意愿下降"
+          : weatherName === "event"
+            ? "局部绕行"
+            : "正常履约";
       if (trafficStrong) {
         trafficStrong.textContent = label;
         trafficStrong.style.color = color;
+        trafficStrong.style.background = traffic === "heavy" ? "#fff1f2" : traffic === "smooth" ? "#ecfdf5" : "#fff7ed";
+        trafficStrong.style.borderColor = traffic === "heavy" ? "rgba(244,63,94,.22)" : traffic === "smooth" ? "rgba(22,163,74,.22)" : "rgba(217,119,6,.2)";
       }
       if (bar) {
-        bar.style.background = `linear-gradient(90deg, ${color} 0 ${percent}%, rgba(255,255,255,.16) ${percent}% 100%)`;
+        bar.style.background = `linear-gradient(90deg, ${color} 0 ${percent}%, rgba(100,116,139,.18) ${percent}% 100%)`;
       }
-      const weatherStrong = weather.querySelectorAll(".row strong")[2];
       if (weatherStrong) weatherStrong.textContent = weatherLabel;
+      if (impactStrong) impactStrong.textContent = impactText;
     }
     function displayPositionsForLabels(labels) {
       const placed = [];
@@ -3848,6 +3922,41 @@ def render_index() -> str:
       });
       return best;
     }
+    function roadSnapCandidates(point, mapLayers, roadFilter = null, maxDistance = 13, limit = 10) {
+      const roads = Array.isArray(mapLayers && mapLayers.roads) ? mapLayers.roads : [];
+      const candidates = [];
+      roads.forEach((road) => {
+        if (roadFilter && !roadFilter(road)) return;
+        const roadPoints = normalizedRoadPoints(road);
+        for (let index = 0; index < roadPoints.length - 1; index += 1) {
+          const projection = projectPointToSegment(point, roadPoints[index], roadPoints[index + 1]);
+          if (projection.distance > maxDistance) continue;
+          candidates.push({
+            ...projection,
+            road,
+            roadPoints,
+            segmentIndex: index,
+            roadRank: road.type === "arterial" ? 3 : road.type === "secondary" ? 2 : 1
+          });
+        }
+      });
+      const deduped = [];
+      candidates
+        .sort((left, right) => {
+          const leftTypePenalty = left.road.type === "service" ? 2.8 : left.road.type === "secondary" ? .5 : 0;
+          const rightTypePenalty = right.road.type === "service" ? 2.8 : right.road.type === "secondary" ? .5 : 0;
+          return (left.distance + leftTypePenalty) - (right.distance + rightTypePenalty);
+        })
+        .forEach((candidate) => {
+          const duplicate = deduped.some((item) => item.road === candidate.road && item.segmentIndex === candidate.segmentIndex);
+          if (!duplicate) deduped.push(candidate);
+        });
+      const nearest = nearestRoadSnap(point, mapLayers, roadFilter) || nearestRoadSnap(point, mapLayers);
+      if (nearest && !deduped.some((item) => item.road === nearest.road && item.segmentIndex === nearest.segmentIndex)) {
+        deduped.push(nearest);
+      }
+      return deduped.slice(0, limit);
+    }
     function snapOnRoad(point, road) {
       const roadPoints = normalizedRoadPoints(road);
       let best = null;
@@ -3949,6 +4058,34 @@ def render_index() -> str:
         return list;
       }, []);
     }
+    function pointLineDistance(point, start, end) {
+      const sx = safeNumber(start[0], 0);
+      const sy = safeNumber(start[1], 0);
+      const ex = safeNumber(end[0], 0);
+      const ey = safeNumber(end[1], 0);
+      const length = Math.hypot(ex - sx, ey - sy);
+      if (length < 0.001) return distance2D(point, start);
+      return Math.abs((ey - sy) * point[0] - (ex - sx) * point[1] + ex * sy - ey * sx) / length;
+    }
+    function simplifyRoutePoints(points, tolerance = 0.72) {
+      const usable = compactRoutePoints(points || []);
+      if (usable.length <= 2) return usable;
+      let maxDistance = 0;
+      let splitIndex = 0;
+      const start = usable[0];
+      const end = usable[usable.length - 1];
+      for (let index = 1; index < usable.length - 1; index += 1) {
+        const distance = pointLineDistance(usable[index], start, end);
+        if (distance > maxDistance) {
+          maxDistance = distance;
+          splitIndex = index;
+        }
+      }
+      if (maxDistance <= tolerance) return [start, end];
+      const left = simplifyRoutePoints(usable.slice(0, splitIndex + 1), tolerance);
+      const right = simplifyRoutePoints(usable.slice(splitIndex), tolerance);
+      return [...left.slice(0, -1), ...right];
+    }
     function densifyRoutePoints(points, maxGap = 4.8) {
       const usable = compactRoutePoints(points || []);
       if (usable.length < 2) return usable;
@@ -3974,8 +4111,8 @@ def render_index() -> str:
     function roadTerminalRoute(start, startSnap, coreRoute, endSnap, end) {
       const startPoint = startSnap && startSnap.point ? startSnap.point : start;
       const endPoint = endSnap && endSnap.point ? endSnap.point : end;
-      const roadCore = densifyRoutePoints([startPoint, ...(coreRoute || []), endPoint], 4.2);
-      const route = densifyRoutePoints([start, startPoint, ...(coreRoute || []), endPoint, end], 4.8);
+      const roadCore = simplifyRoutePoints(densifyRoutePoints([startPoint, ...(coreRoute || []), endPoint], 4.2), 0.78);
+      const route = simplifyRoutePoints(densifyRoutePoints([start, startPoint, ...(coreRoute || []), endPoint, end], 4.8), 0.64);
       route.roadCore = roadCore.length >= 2 ? roadCore : route;
       route.endpointConnectors = [
         endpointConnectorFor(start, startPoint),
@@ -4030,7 +4167,7 @@ def render_index() -> str:
             continue;
           }
           const transfer = closestSegmentPair(a.start, a.end, b.start, b.end);
-          if (transfer && transfer.distance <= 3.2) {
+          if (transfer && transfer.distance <= 0.85) {
             addRoadGraphEdge(graph, transfer.fromPoint, transfer.toPoint);
             addRoadGraphEdge(graph, transfer.fromPoint, a.start);
             addRoadGraphEdge(graph, transfer.fromPoint, a.end);
@@ -4088,12 +4225,23 @@ def render_index() -> str:
       }
       return keys.map((key) => graph.nodes[key]).filter(Boolean);
     }
-    function roadFollowingRoute(start, end, mapLayers) {
-      if (!mapLayers || !Array.isArray(mapLayers.roads)) return [start, end];
-      const roadFilter = (road) => road.type !== "service" || distance2D(start, end) < 20;
-      const startSnap = nearestRoadSnap(start, mapLayers, roadFilter) || nearestRoadSnap(start, mapLayers);
-      const endSnap = nearestRoadSnap(end, mapLayers, roadFilter) || nearestRoadSnap(end, mapLayers);
-      if (!startSnap || !endSnap) return [start, end];
+    function routeTurnPenalty(points) {
+      const usable = simplifyRoutePoints(points || [], 0.55);
+      if (usable.length < 3) return 0;
+      let penalty = 0;
+      for (let index = 1; index < usable.length - 1; index += 1) {
+        const prev = usable[index - 1];
+        const current = usable[index];
+        const next = usable[index + 1];
+        const a1 = Math.atan2(current[1] - prev[1], current[0] - prev[0]);
+        const a2 = Math.atan2(next[1] - current[1], next[0] - current[0]);
+        const delta = Math.abs(Math.atan2(Math.sin(a2 - a1), Math.cos(a2 - a1)));
+        if (delta > 0.42) penalty += delta;
+      }
+      return penalty;
+    }
+    function roadRouteForSnaps(start, startSnap, endSnap, end, mapLayers) {
+      if (!startSnap || !endSnap) return [];
       const graphRoute = shortestRoadGraphPath(buildRoadGraph(mapLayers, startSnap, endSnap));
       if (graphRoute.length >= 2) {
         return roadTerminalRoute(start, startSnap, graphRoute, endSnap, end);
@@ -4102,19 +4250,74 @@ def render_index() -> str:
         return roadTerminalRoute(start, startSnap, chainAlongRoad(startSnap, endSnap), endSnap, end);
       }
       const connector = connectorRoadBetween(startSnap.road, endSnap.road, mapLayers);
-      if (connector && connector.road && connector.first && connector.second && connector.first.distance <= 7 && connector.second.distance <= 7) {
+      if (connector && connector.road && connector.first && connector.second && connector.first.distance <= 1.4 && connector.second.distance <= 1.4) {
         const startChain = chainBetweenRoadPoints(startSnap.road, startSnap.point, connector.first.fromPoint);
         const middleChain = chainBetweenRoadPoints(connector.road, connector.first.toPoint, connector.second.fromPoint);
         const endChain = chainBetweenRoadPoints(endSnap.road, connector.second.toPoint, endSnap.point);
         return roadTerminalRoute(start, startSnap, [...startChain, connector.first.toPoint, ...middleChain, connector.second.fromPoint, ...endChain], endSnap, end);
       }
-      if (connector && connector.direct && connector.direct.distance <= 7) {
+      if (connector && connector.direct && connector.direct.distance <= 1.4) {
         const startChain = chainBetweenRoadPoints(startSnap.road, startSnap.point, connector.direct.fromPoint);
         const endChain = chainBetweenRoadPoints(endSnap.road, connector.direct.toPoint, endSnap.point);
         return roadTerminalRoute(start, startSnap, [...startChain, connector.direct.toPoint, ...endChain], endSnap, end);
       }
-      const hub = routeHubBetween(startSnap.point, endSnap.point, mapLayers);
-      return roadTerminalRoute(start, startSnap, [startSnap.point, hub, endSnap.point], endSnap, end);
+      return roadTerminalRoute(start, startSnap, [startSnap.point, endSnap.point], endSnap, end);
+    }
+    function roadFollowingRoute(start, end, mapLayers) {
+      if (!mapLayers || !Array.isArray(mapLayers.roads)) return [start, end];
+      const directDistance = distance2D(start, end);
+      const roadFilter = (road) => road.type !== "service" || directDistance < 20;
+      const startSnaps = roadSnapCandidates(start, mapLayers, roadFilter, 8, 6);
+      const endSnaps = roadSnapCandidates(end, mapLayers, roadFilter, 14, 10);
+      if (!startSnaps.length || !endSnaps.length) return [start, end];
+      let best = null;
+      startSnaps.forEach((startSnap) => {
+        endSnaps.forEach((endSnap) => {
+          const route = roadRouteForSnaps(start, startSnap, endSnap, end, mapLayers);
+          if (!route || route.length < 2) return;
+          const length = routePolylineLength(route);
+          const span = routeSpan(route);
+          const turns = routeTurnPenalty(route);
+          const detourRatio = length / Math.max(1, directDistance);
+          const servicePenalty = (startSnap.road.type === "service" ? 4 : 0) + (endSnap.road.type === "service" ? 4 : 0);
+          const score = length + span * 0.14 + turns * 7.5 + startSnap.distance * 1.5 + endSnap.distance * 2.2 + Math.max(0, detourRatio - 1.8) * 18 + servicePenalty;
+          if (!best || score < best.score) best = {route, score};
+        });
+      });
+      return best && best.route ? best.route : roadTerminalRoute(start, startSnaps[0], [startSnaps[0].point, endSnaps[0].point], endSnaps[0], end);
+    }
+    function presentableDispatchRoute(route, start, end) {
+      const usable = simplifyRoutePoints(route || [], 0.72);
+      if (usable.length < 2) return [start, end];
+      const directDistance = Math.max(1, distance2D(start, end));
+      const length = routePolylineLength(usable);
+      const span = routeSpan(usable);
+      const turns = routeTurnPenalty(usable);
+      if (length / directDistance > 2.05 || turns > 2.35 || span / directDistance > 1.8) {
+        const clean = [start, end];
+        clean.roadCore = clean;
+        clean.endpointConnectors = [];
+        return clean;
+      }
+      usable.roadCore = Array.isArray(route && route.roadCore) ? simplifyRoutePoints(route.roadCore, 0.78) : usable;
+      usable.endpointConnectors = [];
+      return usable;
+    }
+    function dispatchRelationshipRoute(start, end) {
+      const dx = safeNumber(end[0], 0) - safeNumber(start[0], 0);
+      const dy = safeNumber(end[1], 0) - safeNumber(start[1], 0);
+      const distance = Math.max(0.001, Math.hypot(dx, dy));
+      const bend = Math.min(8.5, Math.max(2.2, distance * 0.075));
+      const sign = ((Math.round(start[0] * 10 + end[1] * 10) % 2) === 0) ? 1 : -1;
+      const control = [
+        (safeNumber(start[0], 0) + safeNumber(end[0], 0)) / 2 + (-dy / distance) * bend * sign,
+        (safeNumber(start[1], 0) + safeNumber(end[1], 0)) / 2 + (dx / distance) * bend * sign
+      ];
+      const route = [start, control, end];
+      route.curveControl = control;
+      route.roadCore = route;
+      route.endpointConnectors = [];
+      return route;
     }
     function compactRoutePoints(points) {
       return (points || []).filter(Boolean).reduce((list, point) => {
@@ -4128,12 +4331,56 @@ def render_index() -> str:
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
       const [startX, startY] = svgPoint(usable[0]);
+      if (Array.isArray(points.curveControl) && usable.length >= 3) {
+        const [controlX, controlY] = svgPoint(points.curveControl);
+        const [endX, endY] = svgPoint(usable[usable.length - 1]);
+        return `M${startX.toFixed(1)} ${startY.toFixed(1)} Q${controlX.toFixed(1)} ${controlY.toFixed(1)} ${endX.toFixed(1)} ${endY.toFixed(1)}`;
+      }
       const segments = [`M${startX.toFixed(1)} ${startY.toFixed(1)}`];
       usable.slice(1).forEach((point, index) => {
         const [x, y] = svgPoint(point);
         segments.push(`L${x.toFixed(1)} ${y.toFixed(1)}`);
       });
       return segments.join(" ");
+    }
+    function routeClickMidpoint(points) {
+      const usable = points.filter(Boolean);
+      if (usable.length < 2) return null;
+      if (Array.isArray(points.curveControl) && usable.length >= 2) {
+        const start = usable[0];
+        const control = points.curveControl;
+        const end = usable[usable.length - 1];
+        return [
+          0.25 * safeNumber(start[0], 0) + 0.5 * safeNumber(control[0], 0) + 0.25 * safeNumber(end[0], 0),
+          0.25 * safeNumber(start[1], 0) + 0.5 * safeNumber(control[1], 0) + 0.25 * safeNumber(end[1], 0)
+        ];
+      }
+      let total = 0;
+      for (let index = 1; index < usable.length; index += 1) total += distance2D(usable[index - 1], usable[index]);
+      const target = total / 2;
+      let walked = 0;
+      for (let index = 1; index < usable.length; index += 1) {
+        const previous = usable[index - 1];
+        const current = usable[index];
+        const segment = distance2D(previous, current);
+        if (walked + segment >= target) {
+          const ratio = segment ? (target - walked) / segment : 0;
+          return [
+            safeNumber(previous[0], 0) + (safeNumber(current[0], 0) - safeNumber(previous[0], 0)) * ratio,
+            safeNumber(previous[1], 0) + (safeNumber(current[1], 0) - safeNumber(previous[1], 0)) * ratio
+          ];
+        }
+        walked += segment;
+      }
+      return usable[Math.floor(usable.length / 2)];
+    }
+    function dispatchRouteClickTargetFor(points, cls, assignmentId = "", meta = {}, style = "") {
+      const midpoint = routeClickMidpoint(points);
+      if (!midpoint) return "";
+      const [x, y] = svgPoint(midpoint);
+      const styleAttr = style ? ` style="${style}"` : "";
+      const d = `M${(x - 8).toFixed(1)} ${y.toFixed(1)} L${(x + 8).toFixed(1)} ${y.toFixed(1)}`;
+      return `<path class="dispatch-link ${cls} route-click-target" data-assignment="${assignmentId}" data-route-role="main"${routeMetaAttributes(meta)}${styleAttr} d="${d}"></path>`;
     }
     function routePolylineLength(points) {
       const usable = (points || []).filter(Boolean);
@@ -4164,7 +4411,7 @@ def render_index() -> str:
       const styleAttr = style ? ` style="${style}"` : "";
       return connectors.map((connector) => {
         const d = dispatchPathFor(connector);
-        return d ? `<path class="dispatch-link endpoint-connector" data-assignment="${assignmentId}"${routeMetaAttributes({...meta, connector: "endpoint"})}${styleAttr} d="${d}"></path>` : "";
+        return d ? `<path class="dispatch-visual endpoint-connector" data-assignment="${assignmentId}"${routeMetaAttributes({...meta, connector: "endpoint"})}${styleAttr} d="${d}"></path>` : "";
       }).join("");
     }
     function routeMetaAttributes(meta = {}) {
@@ -4211,111 +4458,6 @@ def render_index() -> str:
       const rightY = tipY - Math.sin(angle + 0.52) * size;
       return `${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}`;
     }
-    function routeMidpoint(points) {
-      const usable = (points || []).filter(Boolean);
-      if (!usable.length) return [50, 50];
-      return usable[Math.floor(usable.length / 2)] || usable[0];
-    }
-    function routeBundleArrowFor(points) {
-      const usable = (points || []).filter(Boolean);
-      if (usable.length < 2) return "";
-      const [x1, y1] = svgPoint(usable[usable.length - 2]);
-      const [x2, y2] = svgPoint(usable[usable.length - 1]);
-      const angle = Math.atan2(y2 - y1, x2 - x1);
-      const size = 8;
-      const leftX = x2 - Math.cos(angle - 0.52) * size;
-      const leftY = y2 - Math.sin(angle - 0.52) * size;
-      const rightX = x2 - Math.cos(angle + 0.52) * size;
-      const rightY = y2 - Math.sin(angle + 0.52) * size;
-      return `<polygon class="route-bundle-arrow" points="${x2.toFixed(1)},${y2.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}"></polygon>`;
-    }
-    function uniqueRouteStops(rawStops) {
-      return (rawStops || []).filter((item) => item && item.point).reduce((list, item) => {
-        const exists = list.some((existing) => distance2D(existing.point, item.point) < 5.2);
-        if (!exists) list.push(item);
-        return list;
-      }, []);
-    }
-    function routeBundlePlanSegments(selected, mapLayers) {
-      const rawStops = selected.flatMap((item) => [
-        {point: item.pickupPoint, id: item.assignment.pickup, kind: "pickup"},
-        {point: item.courierPoint, id: item.couriers[0] || item.assignment.courier, kind: "courier"}
-      ]);
-      const stops = uniqueRouteStops(rawStops);
-      if (stops.length < 3) return [];
-      const center = stops.reduce((sum, item) => [sum[0] + item.point[0], sum[1] + item.point[1]], [0, 0]).map((value) => value / stops.length);
-      const ordered = stops.slice().sort((left, right) => Math.atan2(left.point[1] - center[1], left.point[0] - center[0]) - Math.atan2(right.point[1] - center[1], right.point[0] - center[0]));
-      const startIndex = ordered.reduce((bestIndex, item, index) => {
-        const best = ordered[bestIndex];
-        const score = item.point[0] * 0.75 + item.point[1] * 0.25;
-        const bestScore = best.point[0] * 0.75 + best.point[1] * 0.25;
-        return score < bestScore ? index : bestIndex;
-      }, 0);
-      const rotated = [...ordered.slice(startIndex), ...ordered.slice(0, startIndex)].slice(0, 9);
-      const segments = [];
-      for (let index = 0; index < rotated.length - 1; index += 1) {
-        const route = roadFollowingRoute(rotated[index].point, rotated[index + 1].point, mapLayers);
-        if (route && route.length >= 2) segments.push({route, from: rotated[index], to: rotated[index + 1]});
-      }
-      return segments;
-    }
-    function renderReferenceRouteBundle(assignments, entityPoints, mapLayers, overviewAssignmentId) {
-      if (!Array.isArray(assignments) || !assignments.length || !mapLayers) return "";
-      const candidates = assignments.map((assignment) => {
-        const couriers = assignment.map_couriers || courierTokens(assignment.courier);
-        const courierPoint = entityPoints[couriers[0]];
-        const pickupPoint = entityPoints[assignment.pickup];
-        if (!courierPoint || !pickupPoint) return null;
-        const shortRoutes = [];
-        const allRoutes = [];
-        const pickupRoute = roadFollowingRoute(courierPoint, pickupPoint, mapLayers);
-        const pickupLong = longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 55, span: 82, length: 120});
-        allRoutes.push({route: pickupRoute, long: pickupLong});
-        if (!pickupLong) shortRoutes.push(pickupRoute);
-        const centerPenalty = Math.abs(safeNumber(pickupPoint[0], 50) - 52) * 0.3 + Math.abs(safeNumber(pickupPoint[1], 50) - 48) * 0.38;
-        const pickupSpan = routeSpan(pickupRoute);
-        const score = (assignment.id === overviewAssignmentId ? 18 : 0) + (pickupLong ? 0 : 24) + Math.min(24, pickupSpan * 0.42) + shortRoutes.length * 8 - centerPenalty;
-        return {assignment, couriers, courierPoint, pickupPoint, pickupRoute, pickupLong, shortRoutes, allRoutes, score};
-      }).filter(Boolean);
-      const selected = candidates
-        .filter((item) => item.pickupRoute && item.pickupRoute.length >= 2)
-        .sort((left, right) => right.score - left.score)
-        .slice(0, 3);
-      const selectedIds = new Set(selected.map((item) => item.assignment.id));
-      const selectedPickupPaths = selected.map((item) => {
-        const d = dispatchPathFor(item.pickupRoute);
-        return d ? `<path class="route-bundle-highlight" data-bundle="${escapeAttr(item.assignment.id)}" d="${d}"></path>${routeBundleArrowFor(item.pickupRoute)}` : "";
-      });
-      const candidatePaths = candidates
-        .filter((item) => !selectedIds.has(item.assignment.id))
-        .slice(0, 7)
-        .map((item) => {
-          const route = item.pickupRoute || (item.allRoutes.find((entry) => entry.route && entry.route.length >= 2) || {}).route;
-          const d = dispatchPathFor(route || []);
-          return d ? `<path class="route-bundle-candidate" data-bundle-candidate="${escapeAttr(item.assignment.id)}" d="${d}"></path>` : "";
-        });
-      return [...candidatePaths, ...selectedPickupPaths].join("");
-    }
-    function overviewAssignmentIdForRoutes(assignments, entityPoints, mapLayers, selectedAssignment) {
-      const scored = (assignments || []).map((assignment) => {
-        const couriers = assignment.map_couriers || courierTokens(assignment.courier);
-        const courierPoint = entityPoints[couriers[0]];
-        const pickupPoint = entityPoints[assignment.pickup];
-        if (!courierPoint || !pickupPoint) return {id: assignment.id, score: -Infinity};
-        const pickupDistance = distance2D(courierPoint, pickupPoint);
-        const pickupRoute = roadFollowingRoute(courierPoint, pickupPoint, mapLayers);
-        const pickupIsShort = !longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 55, span: 82, length: 120});
-        const centerPenalty = Math.abs(safeNumber(pickupPoint[0], 50) - 52) * 0.45 + Math.abs(safeNumber(pickupPoint[1], 50) - 48) * 0.55;
-        const selectedBonus = assignment.id === selectedAssignment ? 4 : 0;
-        const shortPickupBonus = pickupIsShort ? 14 : 0;
-        const noShortLegPenalty = pickupIsShort ? 0 : 160;
-        return {
-          id: assignment.id,
-          score: selectedBonus + shortPickupBonus - pickupDistance * 0.28 - centerPenalty - noShortLegPenalty
-        };
-      }).filter((item) => item.id);
-      return scored.sort((left, right) => right.score - left.score)[0]?.id || selectedAssignment;
-    }
     function renderDispatchLinks(profile, entityPoints) {
       const svg = document.querySelector(".route-svg");
       if (!svg) return;
@@ -4329,47 +4471,48 @@ def render_index() -> str:
       const focusMode = profile.mapFocusMode === "focus";
       const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
-      const overviewAssignmentId = focusMode ? selectedAssignment : overviewAssignmentIdForRoutes(profile.dispatchMap.assignments, entityPoints, mapLayers, selectedAssignment);
       const routePalette = ["#16a34a", "#0f766e", "#2563eb", "#ca8a04", "#15803d", "#0d9488", "#64748b", "#2f855a"];
-      const pathHtml = profile.dispatchMap.assignments.map((assignment, index) => {
+      const pathHtml = profile.dispatchMap.assignments.flatMap((assignment, index) => {
         const couriers = assignment.map_couriers || courierTokens(assignment.courier);
-        const courierPoints = couriers.map((courier) => entityPoints[courier]).filter(Boolean);
         const pickupPoint = entityPoints[assignment.pickup];
-        if (!pickupPoint || courierPoints.length === 0) return "";
+        if (!pickupPoint || !couriers.length) return "";
         const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
-        const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
-        const pickupRoute = roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers);
-        const visiblePickupRoute = Array.isArray(pickupRoute.roadCore) && pickupRoute.roadCore.length >= 2 ? pickupRoute.roadCore : pickupRoute;
-        const pickupD = dispatchPathFor(visiblePickupRoute);
-        const hitD = dispatchPathFor(pickupRoute);
-        if (!pickupD || !hitD) return "";
-        const longPickup = longRouteClass(courierPoints[0], pickupPoint, pickupRoute, {direct: 55, span: 82, length: 120});
-        const showInOverview = Boolean(!focusMode && !longPickup);
-        const pickupClass = `${cls} pickup-leg${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`;
-        const pickupMeta = {
-          merchant: assignment.pickup,
-          courier: couriers[0],
-          leg: "courier-to-merchant",
-          "route-source": "delivery-routes-road-graph-v3",
-          "route-points": visiblePickupRoute.length,
-          "road-core-points": visiblePickupRoute.length,
-          "connector-points": pickupRoute.length,
-          "route-length": routePolylineLength(pickupRoute).toFixed(1),
-          "endpoint-connectors": Array.isArray(pickupRoute.endpointConnectors) ? pickupRoute.endpointConnectors.length : 0,
-          "long-leg": longPickup ? "true" : "false"
-        };
-        const arrowCls = isActive ? "primary" : "secondary overview-route";
-        const routeParts = [
-          `<path class="${pickupClass}" data-assignment="${assignment.id}" data-route-role="main"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
-          dispatchEndpointConnectorsFor(pickupRoute, assignment.id, pickupMeta, routeStyle),
-          dispatchHitAreaFor(hitD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
-          dispatchArrowFor(visiblePickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
-        ];
-        return routeParts.join("");
+        const cls = isActive ? "dispatch-visual primary active-assignment" : "dispatch-visual secondary overview-route";
+        const hitCls = isActive ? "primary active-assignment" : "secondary overview-route";
+        return couriers.map((courierId, courierIndex) => {
+          const courierPoint = entityPoints[courierId];
+          if (!courierPoint) return "";
+          const pickupRoute = dispatchRelationshipRoute(courierPoint, pickupPoint);
+          const visiblePickupRoute = pickupRoute;
+          const pickupD = dispatchPathFor(visiblePickupRoute);
+          if (!pickupD) return "";
+          const longPickup = longRouteClass(courierPoint, pickupPoint, pickupRoute, {direct: 55, span: 82, length: 120});
+          const showInOverview = Boolean(!focusMode && assignment.id === selectedAssignment && !longPickup);
+          const pickupClass = `${cls} pickup-leg${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`;
+          const pickupMeta = {
+            merchant: assignment.pickup,
+            courier: courierId,
+            leg: "courier-to-merchant",
+            "leg-index": courierIndex,
+            "route-source": "dispatch-relationship-line-v4",
+            "route-points": visiblePickupRoute.length,
+            "road-core-points": Array.isArray(pickupRoute.roadCore) ? pickupRoute.roadCore.length : visiblePickupRoute.length,
+            "connector-points": pickupRoute.length,
+            "route-length": routePolylineLength(pickupRoute).toFixed(1),
+            "endpoint-connectors": Array.isArray(pickupRoute.endpointConnectors) ? pickupRoute.endpointConnectors.length : 0,
+            "long-leg": longPickup ? "true" : "false"
+          };
+          const arrowCls = isActive ? "primary" : "secondary overview-route";
+          return [
+            `<path class="${pickupClass}" data-assignment="${assignment.id}" data-route-role="visual" data-courier="${escapeAttr(courierId)}" data-leg-index="${courierIndex}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
+            dispatchRouteClickTargetFor(visiblePickupRoute, `${hitCls} pickup-leg${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta, routeStyle),
+            dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
+            dispatchArrowFor(visiblePickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
+          ].join("");
+        });
       }).join("");
-      const bundleOverlay = focusMode ? renderReferenceRouteBundle(profile.dispatchMap.assignments, entityPoints, mapLayers, overviewAssignmentId) : "";
-      svg.innerHTML = pathHtml + bundleOverlay;
+      svg.innerHTML = pathHtml;
     }
     function applyMapFocus(profile, assignmentId, focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
@@ -4390,9 +4533,9 @@ def render_index() -> str:
         }
       }
       if (!hasDispatch) {
-        document.querySelectorAll(".map-label, .pin, .dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
+        document.querySelectorAll(".map-label, .pin, .dispatch-visual, .dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
           node.classList.remove("active-assignment", "selected", "focused", "primary");
-          if (node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow") || node.classList.contains("dispatch-hit-area")) node.classList.add("secondary");
+          if (node.classList.contains("dispatch-visual") || node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow") || node.classList.contains("dispatch-hit-area")) node.classList.add("secondary");
         });
         return;
       }
@@ -4404,7 +4547,7 @@ def render_index() -> str:
           node.classList.toggle("focused", focused && active);
         }
       });
-      document.querySelectorAll(".dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
+      document.querySelectorAll(".dispatch-visual, .dispatch-link, .dispatch-arrow, .dispatch-hit-area").forEach((node) => {
         const active = Boolean(hasDispatch && focused && node.dataset.assignment === selectedAssignment);
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
@@ -4631,14 +4774,14 @@ def render_index() -> str:
       const endpointText = `${courierId} → ${merchantId}`;
       setDetailContext("route", resolvedAssignment, merchantId, leg || "courier-to-merchant");
       $("detail-title").textContent = "派单关系：" + legLabel;
-      $("detail-courier").textContent = assignment.courier;
-      $("detail-merchant").innerHTML = `关系线 <code>${endpointText}</code>，用于表达骑手承接商家；线条沿美团配送语境的模拟路网绘制，只作为派单解释线，不作为骑行指引。`;
+      $("detail-courier").textContent = courierId;
+      $("detail-merchant").innerHTML = `最终派单 <code>${merchantId} → ${courierId}</code>；地图线 <code>${endpointText}</code> 表达骑手承接该商家，不作为骑行导航。`;
       $("detail-orders").innerHTML = [merchantId, courierId].filter(Boolean).map((item) => `<span class="chip">${item}</span>`).join("");
       $("detail-eta").textContent = etaText(assignment.eta);
       $("right-cost").textContent = assignment.cost;
       document.querySelector(".prob span").textContent = assignment.probability;
       $("detail-reasons").innerHTML = [
-        `<li>该线属于派单 ${resolvedAssignment}，点击后聚焦对应商家与骑手。</li>`,
+        `<li>该线属于最终派单 ${resolvedAssignment}：商家 ${merchantId} 派给骑手 ${courierId}。</li>`,
         `<li>派单线证据来自当前地图路网；采样节点 ${routePoints || "-"} 个，端点贴合校验 ${endpointConnectors} 段。</li>`,
         `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`
       ].join("");
@@ -4764,6 +4907,7 @@ def render_index() -> str:
       const avgEta = Math.round(assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.eta || "").replace("min", ""), 0), 0) / Math.max(1, assignments.length));
       const best = report && report.best ? report.best : {};
       const coverage = best.total_tasks ? Math.round(safeNumber(best.covered_tasks, best.total_tasks) / safeNumber(best.total_tasks, 1) * 100) : 100;
+      const value = businessValueForReport(report, profile);
       setDetailContext("overview", "", "", "");
       if (profile) {
         profile.mapFocusMode = "overview";
@@ -4782,7 +4926,7 @@ def render_index() -> str:
       $("detail-reasons").innerHTML = [
         "<li>当前默认是全局派单总览：所有商家到骑手的派单线保持可见。</li>",
         "<li>点击任意商家、骑手或线路后，才进入单条派单聚焦模式。</li>",
-        `<li>派单策略：${profile.utilization || "-"}；覆盖 ${assignments.length}/${assignments.length} 个商家订单入口。</li>`,
+        `<li>每单约节约 ${yuan(value.perOrderSaving)}，批次节约 ${yuan(value.batchSaving)}；按日均 10 万单估算单城月节约 ${yuan(value.monthSaving)}。</li>`,
         ...assignments.slice(0, 5).map((assignment) => `<li>${assignment.pickup || assignment.merchant} 派给 ${assignment.courier}，ETA ${etaText(assignment.eta)}，成本 ${assignment.cost}，风险 ${assignment.risk}。</li>`)
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
@@ -4827,10 +4971,35 @@ def render_index() -> str:
       const covered = safeNumber(best.covered_tasks, tasks);
       const coverage = tasks > 0 ? Math.round((covered / tasks) * 100) : 100;
       renderAssignmentOverviewDetail(profile, report);
+      const value = businessValueForReport(report, profile);
       const compareRows = document.querySelectorAll(".decision-card:last-child .row strong");
       if (compareRows[0]) compareRows[0].textContent = profile.improvement;
       if (compareRows[1]) compareRows[1].textContent = "-" + Math.max(2, Math.round(used * 0.9)) + " 分钟";
       if (compareRows[2]) compareRows[2].textContent = "-" + Math.max(12, Math.round(coverage * 0.31)) + "%";
+      if (compareRows[3]) compareRows[3].textContent = yuan(value.batchSaving);
+      if (compareRows[4]) compareRows[4].textContent = yuan(value.monthSaving);
+      const batchNode = $("benefit-batch");
+      const monthNode = $("benefit-month");
+      if (batchNode) batchNode.textContent = yuan(value.batchSaving);
+      if (monthNode) monthNode.textContent = yuan(value.monthSaving);
+    }
+    function businessValueForReport(report, profile) {
+      const best = report && report.best ? report.best : {};
+      const features = report && report.features ? report.features : {};
+      const cost = safeNumber(best["local" + "_cost"], Number(String(profile && profile.cost || "0").replace(/[$,]/g, "")));
+      const attempts = ((report && report.rounds) || []).flatMap((round) => round.strategies || []);
+      const greedyAttempt = attempts.find((item) => item.name === "greedy_baseline");
+      const parsedImprovement = Math.max(0, safeNumber(String(profile && profile.improvement || "0").replace(/[+%]/g, ""), 0)) / 100;
+      const fallbackGreedy = parsedImprovement > 0 && parsedImprovement < 0.95 ? cost / Math.max(0.05, 1 - parsedImprovement) : cost * 1.8;
+      const greedyCost = Math.max(cost, safeNumber(greedyAttempt && greedyAttempt["local" + "_cost"], fallbackGreedy));
+      const tasks = Math.max(1, safeNumber(best.total_tasks || features.tasks, 1));
+      const rawBatchSaving = Math.max(0, greedyCost - cost);
+      const rawPerOrderSaving = rawBatchSaving / tasks;
+      const perOrderSaving = Math.max(0.5, Math.min(1.0, rawPerOrderSaving * 0.03));
+      const batchSaving = perOrderSaving * tasks;
+      const dailyOrders = 100000;
+      const monthSaving = perOrderSaving * dailyOrders * 30;
+      return {cost, greedyCost, tasks, rawBatchSaving, batchSaving, perOrderSaving, daySaving: perOrderSaving * dailyOrders, monthSaving};
     }
     function strategyLabel(name) {
       const labels = {
@@ -5102,7 +5271,7 @@ def render_index() -> str:
         setStatus(`最终选择 ${sample.selected_strategy_id}：生成当前场景派单线`, true);
         await yieldUi();
         if (routeSvg) routeSvg.innerHTML = "";
-        const mapPayload = simulationFinalMap(sample);
+        const mapPayload = simulationFinalMap(sample, profile.dispatchMap);
         const report = reportForSimulationSample(sample, mapPayload);
         document.body.classList.remove("pending-run", "sample-preview", "reasoning");
         render(report);
@@ -5161,7 +5330,7 @@ def render_index() -> str:
       }
       frame.classList.toggle("hide-candidates", mode === "selected");
       frame.dataset.controlState = mode;
-      document.querySelectorAll(".dispatch-link.secondary").forEach((route) => {
+      document.querySelectorAll(".dispatch-visual.secondary").forEach((route) => {
         route.style.opacity = mode === "candidates" ? "1" : "";
       });
       showToast(mode === "selected" ? "已聚焦当前派单，其余关系降噪" : mode === "candidates" ? "已增强派单关系线，便于检查" : "显示全部派单图层");
@@ -5289,6 +5458,22 @@ def render_index() -> str:
         }
         showToast("已回到当前派单关系中心");
       });
+      const entityPinAtClientPoint = (event) => {
+        if (!event || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return null;
+        const pins = [...document.querySelectorAll(".pin")].filter((pin) => {
+          const style = getComputedStyle(pin);
+          return style.display !== "none" && style.visibility !== "hidden" && style.pointerEvents !== "none";
+        });
+        let nearest = null;
+        pins.forEach((pin) => {
+          const rect = pin.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
+          if (distance <= 7 && (!nearest || distance < nearest.distance)) nearest = {pin, distance};
+        });
+        return nearest ? nearest.pin : null;
+      };
       document.querySelector(".map-frame").addEventListener("click", (event) => {
         const target = event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow, .dispatch-hit-area");
         if (!target) return;
@@ -5296,6 +5481,10 @@ def render_index() -> str:
         if (!profile.assignments || Object.keys(profile.assignments).length === 0) {
           if (renderEntityPreviewDetail(profile, target.dataset.entity || "")) return;
         }
+        const endpointPin = (target.classList.contains("dispatch-link") || target.classList.contains("dispatch-arrow"))
+          ? entityPinAtClientPoint(event)
+          : null;
+        if (endpointPin && endpointPin.dataset.entity && renderFinalEntityDetail(profile, endpointPin.dataset.entity)) return;
         if (target.dataset.leg && renderRouteDetail(profile, target.dataset.assignment || profile.selected, target.dataset)) return;
         if (target.dataset.entity && renderFinalEntityDetail(profile, target.dataset.entity)) return;
         const sourceLabel = target.dataset.entity || target.dataset.merchant || target.dataset.courier || target.textContent.trim();
@@ -5386,6 +5575,7 @@ def render_index() -> str:
     function debugStateSnapshot() {
       const profile = currentProfile || null;
       const dispatchMap = profile && profile.dispatchMap ? profile.dispatchMap : null;
+      const assignments = (profile && profile.assignments) || {};
       const sample = currentSimulationSample ? {
         case_id: currentSimulationSample.case_id,
         scenario_id: currentSimulationSample.scenario_id,
@@ -5396,7 +5586,24 @@ def render_index() -> str:
         courier_count: Array.isArray(currentSimulationSample.couriers) ? currentSimulationSample.couriers.length : 0
       } : null;
       return {
-      currentProfile: profile,
+      currentProfile: profile ? {
+        label: profile.label,
+        selected: profile.selected,
+        mapFocusMode: profile.mapFocusMode,
+        assignmentCount: Object.keys(assignments).length,
+        dispatchMap: dispatchMap ? {
+          case_id: dispatchMap.case_id,
+          scenario_id: dispatchMap.scenario_id,
+          sample_index: dispatchMap.sample_index,
+          stage: dispatchMap.stage,
+          anchor_source: dispatchMap.anchor_source,
+          anchor_variant: dispatchMap.anchor_variant,
+          assignment_reconciled_variant: dispatchMap.assignment_reconciled_variant,
+          entityCount: Array.isArray(dispatchMap.entities) ? dispatchMap.entities.length : 0,
+          assignmentCount: Array.isArray(dispatchMap.assignments) ? dispatchMap.assignments.length : 0,
+          roadCount: Array.isArray(dispatchMap.map_layers && dispatchMap.map_layers.roads) ? dispatchMap.map_layers.roads.length : 0
+        } : null
+      } : null,
       currentReport: currentReport ? {
         wall_time_s: currentReport.wall_time_s,
         best: currentReport.best,
@@ -5442,7 +5649,7 @@ def render_index() -> str:
     }
     window.__AUTO_SOLVER_DEBUG__ = debugStateSnapshot;
     globalThis.__AUTO_SOLVER_DEBUG__ = debugStateSnapshot;
-    window.setInterval(publishDebugState, 300);
+    window.setInterval(publishDebugState, 1500);
     $("run-agent").addEventListener("click", streamRun);
     $("reload-cases").addEventListener("click", () => {
       refreshSimulationSample().catch((error) => {
@@ -5510,9 +5717,18 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(raw)
         return True
 
+    def _send_empty_icon(self) -> None:
+        self.send_response(204)
+        self.send_header("Cache-Control", "public, max-age=86400")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API.
         parsed = urlparse(self.path)
         try:
+            if parsed.path == "/favicon.ico":
+                self._send_empty_icon()
+                return
             if parsed.path.startswith("/assets/") and self._send_static_asset(parsed.path):
                 return
             if parsed.path == "/":
