@@ -106,3 +106,19 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
 - 浏览器自动点击限制说明：in-app browser 控制接口持续引用旧 tab，Chrome 的 AppleScript 执行 JS 被安全设置禁用，Computer Use 坐标点击不稳定；本轮已用 Chrome 可视初始状态、后端接口、HTML/JS 结构和全量测试完成可验证覆盖。
+
+## Task 7: 修复策略分数提前泄露与派单线贴路问题
+
+验证标准：候选策略未被评估前不显示最终分数、证据或置信度；当前评估策略只显示计算中；已评估策略才逐步显示分数与状态。派单线主路径必须沿模拟道路走，骑手/商家到道路的短连接不能作为刺眼主路线穿过道路或楼宇。
+
+完成记录：
+- 已修复候选策略卡片分数提前泄露：初始、刷新、推理中未评估策略均只显示 `--`，当前评估策略显示 `-- 计算中`，不会提前显示最终分数、rank 或证据。
+- 已调整最终态策略卡片：卡面只突出最终选中的策略分值与核心证据，未采用策略显示 `-- 未采用`，完整证据仍保留在点击策略卡后的右侧详情里，避免最终页面像调试评分面板。
+- 已重构派单路线端点处理：`roadTerminalRoute()` 主路径只保留道路吸附点和道路图路径；骑手/商家到路边的短连接由 `endpoint-connector` 低透明虚线单独渲染，避免端点直线成为刺眼主路线。
+- 已降低地图总览态路线噪声：所有商家派给骑手的关系仍自动渲染，但默认只突出推荐/短距离关系，其他派单线低噪展示，点击后仍可查看完整线路详情。
+- 浏览器中途审计通过：推理约 3.6 秒时只有当前策略显示 `-- 计算中`，`revealed=[]`，`routeCount=0`，没有提前出现最终路线。
+- 浏览器最终审计通过：`scoreCards=["S1"]`，未采用策略卡面无分值；`routeCount=6`、`selectedOverview=1`、`mutedOverview=11`、`endpointConnectors=4`、`activeRoutes=0`、`primaryRoutes=0`。
+- 严格视觉评审反馈已纳入本轮二次修复：减少全量评分暴露和满屏青色派单线，最终截图更新为 `goal/goal-7/task7-final-browser-v2.png`，审计文件为 `goal/goal-7/task7-browser-audit-v2.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。

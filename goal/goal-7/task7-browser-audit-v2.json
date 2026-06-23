@@ -1,0 +1,52 @@
+{
+  "activeRoutes": 0,
+  "bodyClass": "",
+  "cards": [
+    {
+      "branch": "S1",
+      "evidence": "密度 0.84 / 合单需求 1.5",
+      "rank": "1",
+      "status": "selected",
+      "text": "S1 ✓\n\n合单优先\n同路高重叠订单合并派单\n密度 0.84 / 合单需求 1.5\n\n0.88 已选中"
+    },
+    {
+      "branch": "S2",
+      "evidence": "候选竞争 0.66 / 骑手池 11",
+      "rank": "2",
+      "status": "rejected",
+      "text": "S2\n\n多派候选\n单任务多骑手候选扩展\n\n-- 未采用"
+    },
+    {
+      "branch": "S3",
+      "evidence": "稀缺 0.22 / 分散 0.15",
+      "rank": "3",
+      "status": "rejected",
+      "text": "S3\n\n局部修复\n从基线方案做局部修复\n\n-- 未采用"
+    },
+    {
+      "branch": "S4",
+      "evidence": "低峰稳定 0.0 / 风险 0.55",
+      "rank": "5",
+      "status": "rejected",
+      "text": "S4\n\n贪心基线\n最近/最低成本基线派单\n\n-- 未采用"
+    },
+    {
+      "branch": "S5",
+      "evidence": "低意愿 0.2 / 路况 0.61",
+      "rank": "4",
+      "status": "rejected",
+      "text": "S5\n\n风险平衡\n低意愿与时间窗风险平衡\n\n-- 未采用"
+    }
+  ],
+  "endpointConnectors": 4,
+  "evidenceOnCard": [
+    "S1"
+  ],
+  "mutedOverview": 11,
+  "primaryRoutes": 0,
+  "routeCount": 6,
+  "scoreCards": [
+    "S1"
+  ],
+  "selectedOverview": 1
+}

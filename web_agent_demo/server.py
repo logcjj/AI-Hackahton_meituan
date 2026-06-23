@@ -1338,7 +1338,8 @@ def render_index() -> str:
     .dispatch-link.secondary { stroke: rgba(103, 232, 249, .34); stroke-width: 1.45; stroke-dasharray: none; filter: none; opacity: .54; }
     .dispatch-link.overview-route { stroke: rgba(103, 232, 249, .3); stroke-width: 1.45; opacity: .48; filter: none; }
     .dispatch-link.pickup-leg { stroke: rgba(103, 232, 249, .56); stroke-width: 2.1; filter: none; }
-    .dispatch-link.pickup-leg.overview-route { stroke: rgba(103, 232, 249, .36); stroke-width: 1.55; opacity: .5; stroke-dasharray: none; filter: none; }
+    .dispatch-link.pickup-leg.overview-route { stroke: rgba(103, 232, 249, .24); stroke-width: 1.15; opacity: .26; stroke-dasharray: none; filter: none; }
+    .dispatch-link.endpoint-connector { stroke: rgba(155, 232, 241, .2); stroke-width: 1.1; opacity: .34; stroke-dasharray: 3 4; filter: none; animation: none; pointer-events: none; }
     .dispatch-link.selected-overview {
       stroke: #9be8f1;
       stroke-width: 1.9;
@@ -1347,9 +1348,9 @@ def render_index() -> str:
       filter: none;
     }
     .dispatch-link.pickup-leg.selected-overview {
-      stroke: rgba(155, 232, 241, .44);
-      stroke-width: 1.75;
-      opacity: .48;
+      stroke: rgba(155, 232, 241, .72);
+      stroke-width: 2.35;
+      opacity: .76;
     }
     .dispatch-arrow.selected-overview {
       fill: #9be8f1;
@@ -1451,8 +1452,10 @@ def render_index() -> str:
     .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .24; fill: rgba(43,222,205,.5); }
     .map-frame.assignment-overview .dispatch-link { stroke-dashoffset: 0; }
     .map-frame.assignment-overview .dispatch-link.primary { stroke: rgba(37, 234, 216, .82); stroke-width: 3.35; opacity: .94; filter: drop-shadow(0 0 5px rgba(37,234,216,.24)); }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .58); stroke-width: 2.35; opacity: .72; filter: drop-shadow(0 0 3px rgba(37,234,216,.12)); }
-    .map-frame.assignment-overview .dispatch-arrow { opacity: .58; }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .3); stroke-width: 1.35; opacity: .34; filter: none; }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg.selected-overview { stroke: rgba(155, 232, 241, .82); stroke-width: 2.45; opacity: .8; filter: drop-shadow(0 0 4px rgba(155,232,241,.16)); }
+    .map-frame.assignment-overview .dispatch-arrow { opacity: .34; }
+    .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .82; }
     .map-frame.assignment-overview .dispatch-link.active-assignment { stroke: #25ead8; stroke-width: 4.15; opacity: 1; stroke-dasharray: 980; filter: drop-shadow(0 0 7px rgba(37,234,216,.42)); }
     .map-frame.assignment-overview .dispatch-arrow.active-assignment { opacity: .96; fill: #25ead8; }
     .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup.active-assignment,
@@ -1577,7 +1580,7 @@ def render_index() -> str:
     #run-agent.running { opacity: .72; }
     .left-panel.expanded .reason-wrap { overflow-y: auto; }
     .left-panel.expanded .node, .left-panel.expanded .strategy { box-shadow: 0 0 15px rgba(39, 230, 208, .16), inset 0 1px 0 rgba(146, 225, 255, .05); }
-    body.pending-run .strategy .badge { display: none; }
+    body.pending-run:not(.reasoning) .strategy .badge { display: none; }
     body.pending-run .strategy.best { border-color: rgba(135, 152, 166, .35); box-shadow: none; background: linear-gradient(180deg, rgba(16, 32, 47, .96), rgba(8, 20, 34, .96)); }
     body.pending-run .star { display: none; }
     body.pending-run:not(.sample-preview) .pin { display: none; }
@@ -2357,13 +2360,17 @@ def render_index() -> str:
         const isEvaluating = !hasReport && (reasoningStatus === "evaluating" || (!reasoningState && evaluatingBranch === branch.id));
         const rejected = hasReport ? (!isBest && branchAttempts.length > 0) : reasoningStatus === "rejected";
         const pending = !hasReport && !isBest && !isEvaluating && !rejected;
-        const reasoningScore = reasoningState && reasoningState.scores ? reasoningState.scores[branch.id] : NaN;
-        const score = Number.isFinite(reasoningScore)
-          ? Math.max(0.32, Math.min(0.99, reasoningScore)).toFixed(2)
-          : bestAttempt
+        const revealStrategyData = Boolean(hasReport || reasoningStatus === "selected" || reasoningStatus === "rejected");
+        const showScoreOnCard = Boolean(isBest || isEvaluating || !hasReport && reasoningStatus === "rejected");
+        const showEvidenceOnCard = Boolean(isBest || !hasReport && reasoningStatus === "rejected");
+        const reasoningScore = showScoreOnCard && reasoningState && reasoningState.scores ? reasoningState.scores[branch.id] : NaN;
+        const reportScore = showScoreOnCard && bestAttempt
           ? Math.max(0.32, Math.min(0.96, (Number.isFinite(bestCost) ? bestCost : localCostOf(bestAttempt)) / Math.max(localCostOf(bestAttempt, 1), 1))).toFixed(2)
           : "--";
-        const statusText = isBest ? "已选中" : isEvaluating ? "评估中" : rejected ? "已淘汰" : hasReport ? "未触发" : "待评估";
+        const score = Number.isFinite(reasoningScore)
+          ? Math.max(0.32, Math.min(0.99, reasoningScore)).toFixed(2)
+          : reportScore;
+        const statusText = isBest ? "已选中" : isEvaluating ? "计算中" : rejected ? "未采用" : hasReport ? "未触发" : "待评估";
         const badgeClass = isBest ? "accepted" : isEvaluating ? "evaluating" : rejected ? "" : "pending";
         strategy.classList.toggle("best", isBest);
         strategy.classList.toggle("evaluating", isEvaluating);
@@ -2371,10 +2378,10 @@ def render_index() -> str:
         strategy.classList.toggle("pending", pending);
         strategy.dataset.reasoningStatus = hasReport ? (isBest ? "selected" : rejected ? "rejected" : "not-tried") : (reasoningStatus || (isEvaluating ? "evaluating" : "pending"));
         strategy.dataset.reasoningOrder = reasoningState && Array.isArray(reasoningState.order) ? String(reasoningState.order.indexOf(branch.id) + 1 || "") : "";
-        strategy.dataset.strategyRank = sampleItem.rank ? String(sampleItem.rank) : "";
-        strategy.dataset.strategyEvidence = sampleItem.evidence || "";
+        strategy.dataset.strategyRank = revealStrategyData && sampleItem.rank ? String(sampleItem.rank) : "";
+        strategy.dataset.strategyEvidence = revealStrategyData && sampleItem.evidence ? sampleItem.evidence : "";
         strategy.querySelector("h4").textContent = branch.id + (isBest ? " ✓" : "");
-        const evidence = sampleItem.evidence ? `<span class="evidence">${escapeAttr(sampleItem.evidence)}</span>` : "";
+        const evidence = showEvidenceOnCard && sampleItem.evidence ? `<span class="evidence">${escapeAttr(sampleItem.evidence)}</span>` : "";
         strategy.querySelector("p").innerHTML = `<b>${branch.title}</b><br>${branch.desc}${evidence}`;
         strategy.querySelector("strong").innerHTML = `${score} <span class="badge ${badgeClass}">${statusText}</span>`;
       });
@@ -2877,12 +2884,21 @@ def render_index() -> str:
         return list;
       }, []);
     }
+    function endpointConnectorFor(entityPoint, roadPoint) {
+      if (!entityPoint || !roadPoint) return [];
+      const distance = distance2D(entityPoint, roadPoint);
+      if (distance <= 0.28 || distance > 2.4) return [];
+      return compactRoutePoints([entityPoint, roadPoint]);
+    }
     function roadTerminalRoute(start, startSnap, coreRoute, endSnap, end) {
       const startPoint = startSnap && startSnap.point ? startSnap.point : start;
       const endPoint = endSnap && endSnap.point ? endSnap.point : end;
-      const startConnector = distance2D(start, startPoint) <= 3.8 ? [start, startPoint] : [startPoint];
-      const endConnector = distance2D(end, endPoint) <= 3.8 ? [endPoint, end] : [endPoint];
-      return compactRoutePoints([...startConnector, ...(coreRoute || []), ...endConnector]);
+      const route = compactRoutePoints([startPoint, ...(coreRoute || []), endPoint]);
+      route.endpointConnectors = [
+        endpointConnectorFor(start, startPoint),
+        endpointConnectorFor(end, endPoint)
+      ].filter((connector) => connector.length >= 2);
+      return route;
     }
     function roadNodeKey(point) {
       return `${safeNumber(point[0], 0).toFixed(2)},${safeNumber(point[1], 0).toFixed(2)}`;
@@ -3052,6 +3068,13 @@ def render_index() -> str:
       if (!d) return "";
       return `<path class="dispatch-hit-area ${cls}" data-assignment="${assignmentId}"${routeMetaAttributes(meta)} d="${d}"></path>`;
     }
+    function dispatchEndpointConnectorsFor(route, assignmentId = "", meta = {}) {
+      const connectors = Array.isArray(route && route.endpointConnectors) ? route.endpointConnectors : [];
+      return connectors.map((connector) => {
+        const d = dispatchPathFor(connector);
+        return d ? `<path class="dispatch-link endpoint-connector" data-assignment="${assignmentId}"${routeMetaAttributes({...meta, connector: "endpoint"})} d="${d}"></path>` : "";
+      }).join("");
+    }
     function routeMetaAttributes(meta = {}) {
       return Object.entries(meta)
         .filter(([, value]) => value !== undefined && value !== null && value !== "")
@@ -3215,6 +3238,7 @@ def render_index() -> str:
         };
         const arrowCls = isActive ? "primary" : "secondary overview-route";
         const routeParts = [
+          dispatchEndpointConnectorsFor(pickupRoute, assignment.id, pickupMeta),
           `<path class="${pickupClass}" data-assignment="${assignment.id}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
           dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
           dispatchArrowFor(pickupRoute, `${arrowCls}${isRecommendedOverview && !longPickup ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
