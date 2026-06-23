@@ -1,0 +1,1640 @@
+{
+  "failureCount": 0,
+  "failures": [],
+  "screenshots": [
+    "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-9/task10-1280x720.png",
+    "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-9/task10-1024x720.png",
+    "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-9/task10-rain-scenario.png"
+  ],
+  "observations": [
+    {
+      "label": "1280x720:initial",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "pending-run",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图"
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "--",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "routeCount": 0,
+      "visibleRouteCount": 0,
+      "visualCount": 0,
+      "arrowCount": 0,
+      "merchantPins": 0,
+      "courierPins": 0,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况待刷新 天气等待场景 履约影响待评估 运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 0,
+      "finalStrategyText": "",
+      "reasonFinalText": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "mapPanelActive": false,
+      "detailTitle": "等待运行派单推理",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "-"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "-"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "-"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:zoomed",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "pending-run",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "14.26",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图"
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "--",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "routeCount": 0,
+      "visibleRouteCount": 0,
+      "visualCount": 0,
+      "arrowCount": 0,
+      "merchantPins": 0,
+      "courierPins": 0,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况待刷新 天气等待场景 履约影响待评估 运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 0,
+      "finalStrategyText": "",
+      "reasonFinalText": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "mapPanelActive": false,
+      "detailTitle": "等待运行派单推理",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "-"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "-"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "-"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:after-refresh-position",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "pending-run sample-preview",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900"
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "6",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "routeCount": 0,
+      "visibleRouteCount": 0,
+      "visualCount": 0,
+      "arrowCount": 0,
+      "merchantPins": 6,
+      "courierPins": 14,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 0,
+      "finalStrategyText": "",
+      "reasonFinalText": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "mapPanelActive": false,
+      "detailTitle": "场景输入：商圈十字路口高峰",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "-"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "-"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "-"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:final",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900",
+        "selectedAssignment": "A0105"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$163.70",
+        "improvement": "+51.0%",
+        "benefitBatch": "￥4.26",
+        "benefitMonth": "￥1,419,847"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$163.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+51.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥4.26"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,419,847"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:route-clicks",
+      "clickResults": [
+        {
+          "expected": {
+            "merchant": "M0101",
+            "courier": "R0104"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0104 最终派单 M0101 → R0104；地图线 R0104 → M0101 表达骑手承接该商家，不作为骑行导航。M0101R0104 派单履约 ETA17 分钟 预计派单成本$26.30 接单 / 覆盖概率53%"
+        },
+        {
+          "expected": {
+            "merchant": "M0102",
+            "courier": "R0108"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0108 最终派单 M0102 → R0108；地图线 R0108 → M0102 表达骑手承接该商家，不作为骑行导航。M0102R0108 派单履约 ETA15 分钟 预计派单成本$27.70 接单 / 覆盖概率53%"
+        },
+        {
+          "expected": {
+            "merchant": "M0103",
+            "courier": "R0103"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0103 最终派单 M0103 → R0103；地图线 R0103 → M0103 表达骑手承接该商家，不作为骑行导航。M0103R0103 派单履约 ETA17 分钟 预计派单成本$26.20 接单 / 覆盖概率64%"
+        },
+        {
+          "expected": {
+            "merchant": "M0104",
+            "courier": "R0101"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0101 最终派单 M0104 → R0101；地图线 R0101 → M0104 表达骑手承接该商家，不作为骑行导航。M0104R0101 派单履约 ETA18 分钟 预计派单成本$37.00 接单 / 覆盖概率59%"
+        },
+        {
+          "expected": {
+            "merchant": "M0105",
+            "courier": "R0107"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0107 最终派单 M0105 → R0107；地图线 R0107 → M0105 表达骑手承接该商家，不作为骑行导航。M0105R0107 派单履约 ETA15 分钟 预计派单成本$20.20 接单 / 覆盖概率63%"
+        },
+        {
+          "expected": {
+            "merchant": "M0106",
+            "courier": "R0106"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0106 最终派单 M0106 → R0106；地图线 R0106 → M0106 表达骑手承接该商家，不作为骑行导航。M0106R0106 派单履约 ETA14 分钟 预计派单成本$26.30 接单 / 覆盖概率52%"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:routes-hidden",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900",
+        "selectedAssignment": "A0106",
+        "routesHidden": "true"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$163.70",
+        "improvement": "+51.0%",
+        "benefitBatch": "￥4.26",
+        "benefitMonth": "￥1,419,847"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 0,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$163.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单关系：骑手到商家",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+51.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥4.26"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,419,847"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:selected-layer",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "selected",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900",
+        "selectedAssignment": "A0106",
+        "routesHidden": "false",
+        "entitiesMuted": "false"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$163.70",
+        "improvement": "+51.0%",
+        "benefitBatch": "￥4.26",
+        "benefitMonth": "￥1,419,847"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 1,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "selected",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$163.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单关系：骑手到商家",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+51.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥4.26"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,419,847"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:located",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "14.00",
+        "controlState": "candidates",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46166,31.23251",
+        "selectedAssignment": "A0106",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "true"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$163.70",
+        "improvement": "+51.0%",
+        "benefitBatch": "￥4.26",
+        "benefitMonth": "￥1,419,847"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "candidates",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$163.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单详情：M0106",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+51.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥4.26"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,419,847"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:fit",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "fit-control",
+        "mapCenter": "121.46200,31.22900",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "false",
+        "selectedAssignment": "A0106"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$163.70",
+        "improvement": "+51.0%",
+        "benefitBatch": "￥4.26",
+        "benefitMonth": "￥1,419,847"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$163.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单详情：M0106",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+51.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥4.26"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,419,847"
+        }
+      ]
+    },
+    {
+      "label": "1280x720:after-drag",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "manual-pan",
+        "mapCenter": "121.47446,31.23033",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "false",
+        "fullscreen": "false",
+        "selectedAssignment": "A0106"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$163.70",
+        "improvement": "+51.0%",
+        "benefitBatch": "￥4.26",
+        "benefitMonth": "￥1,419,847"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [
+        {
+          "entity": "M0104",
+          "assignment": "A0104",
+          "cls": "pin merchant",
+          "x": 305.9140625,
+          "y": 382.8203125,
+          "display": "block"
+        }
+      ],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$163.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单详情：M0106",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+51.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥4.26"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,419,847"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:initial",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "pending-run",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图"
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "--",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "routeCount": 0,
+      "visibleRouteCount": 0,
+      "visualCount": 0,
+      "arrowCount": 0,
+      "merchantPins": 0,
+      "courierPins": 0,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况待刷新 天气等待场景 履约影响待评估 运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 0,
+      "finalStrategyText": "",
+      "reasonFinalText": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "mapPanelActive": false,
+      "detailTitle": "等待运行派单推理",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "-"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "-"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "-"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:zoomed",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "pending-run",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "14.26",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图"
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "--",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "routeCount": 0,
+      "visibleRouteCount": 0,
+      "visualCount": 0,
+      "arrowCount": 0,
+      "merchantPins": 0,
+      "courierPins": 0,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况待刷新 天气等待场景 履约影响待评估 运行推理后同步展示天气、拥堵对接单和 ETA 的影响。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 0,
+      "finalStrategyText": "",
+      "reasonFinalText": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "mapPanelActive": false,
+      "detailTitle": "等待运行派单推理",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "-"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "-"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "-"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:after-refresh-position",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "pending-run sample-preview",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900"
+      },
+      "kpi": {
+        "runtime": "--:--:--",
+        "completion": "--",
+        "unassigned": "6",
+        "cost": "--",
+        "improvement": "--",
+        "benefitBatch": "-",
+        "benefitMonth": "-"
+      },
+      "routeCount": 0,
+      "visibleRouteCount": 0,
+      "visualCount": 0,
+      "arrowCount": 0,
+      "merchantPins": 6,
+      "courierPins": 12,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 0,
+      "finalStrategyText": "",
+      "reasonFinalText": "6✓ 最终派单方案等待当前场景推理输出最终派单运行完成后自动展示全部派单覆盖 状态待推理",
+      "mapPanelActive": false,
+      "detailTitle": "场景输入：商圈十字路口高峰",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "-"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "-"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "-"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:final",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900",
+        "selectedAssignment": "A0105"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$191.70",
+        "improvement": "+53.0%",
+        "benefitBatch": "￥5.40",
+        "benefitMonth": "￥1,801,436"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$191.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+53.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥5.40"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,801,436"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:route-clicks",
+      "clickResults": [
+        {
+          "expected": {
+            "merchant": "M0101",
+            "courier": "R0104"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0104 最终派单 M0101 → R0104；地图线 R0104 → M0101 表达骑手承接该商家，不作为骑行导航。M0101R0104 派单履约 ETA16 分钟 预计派单成本$26.90 接单 / 覆盖概率51%"
+        },
+        {
+          "expected": {
+            "merchant": "M0102",
+            "courier": "R0108"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0108 最终派单 M0102 → R0108；地图线 R0108 → M0102 表达骑手承接该商家，不作为骑行导航。M0102R0108 派单履约 ETA14 分钟 预计派单成本$24.60 接单 / 覆盖概率72%"
+        },
+        {
+          "expected": {
+            "merchant": "M0103",
+            "courier": "R0103"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0103 最终派单 M0103 → R0103；地图线 R0103 → M0103 表达骑手承接该商家，不作为骑行导航。M0103R0103 派单履约 ETA18 分钟 预计派单成本$31.20 接单 / 覆盖概率77%"
+        },
+        {
+          "expected": {
+            "merchant": "M0104",
+            "courier": "R0101"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0101 最终派单 M0104 → R0101；地图线 R0101 → M0104 表达骑手承接该商家，不作为骑行导航。M0104R0101 派单履约 ETA17 分钟 预计派单成本$34.90 接单 / 覆盖概率77%"
+        },
+        {
+          "expected": {
+            "merchant": "M0105",
+            "courier": "R0107"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0107 最终派单 M0105 → R0107；地图线 R0107 → M0105 表达骑手承接该商家，不作为骑行导航。M0105R0107 派单履约 ETA18 分钟 预计派单成本$33.80 接单 / 覆盖概率53%"
+        },
+        {
+          "expected": {
+            "merchant": "M0106",
+            "courier": "R0106"
+          },
+          "title": "派单关系：骑手到商家",
+          "ok": true,
+          "text": "派单关系：骑手到商家 对象 R0106 最终派单 M0106 → R0106；地图线 R0106 → M0106 表达骑手承接该商家，不作为骑行导航。M0106R0106 派单履约 ETA19 分钟 预计派单成本$40.30 接单 / 覆盖概率79%"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:routes-hidden",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900",
+        "selectedAssignment": "A0106",
+        "routesHidden": "true"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$191.70",
+        "improvement": "+53.0%",
+        "benefitBatch": "￥5.40",
+        "benefitMonth": "￥1,801,436"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 0,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$191.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单关系：骑手到商家",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+53.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥5.40"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,801,436"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:selected-layer",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "selected",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46200,31.22900",
+        "selectedAssignment": "A0106",
+        "routesHidden": "false",
+        "entitiesMuted": "false"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$191.70",
+        "improvement": "+53.0%",
+        "benefitBatch": "￥5.40",
+        "benefitMonth": "￥1,801,436"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 1,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "selected",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$191.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单关系：骑手到商家",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+53.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥5.40"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,801,436"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:located",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "14.00",
+        "controlState": "candidates",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "viewport-live",
+        "mapCenter": "121.46166,31.23251",
+        "selectedAssignment": "A0106",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "true"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$191.70",
+        "improvement": "+53.0%",
+        "benefitBatch": "￥5.40",
+        "benefitMonth": "￥1,801,436"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "candidates",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$191.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单详情：M0106",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+53.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥5.40"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,801,436"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:fit",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "fit-control",
+        "mapCenter": "121.46200,31.22900",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "false",
+        "selectedAssignment": "A0106"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$191.70",
+        "improvement": "+53.0%",
+        "benefitBatch": "￥5.40",
+        "benefitMonth": "￥1,801,436"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$191.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单详情：M0106",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+53.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥5.40"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,801,436"
+        }
+      ]
+    },
+    {
+      "label": "1024x720:after-drag",
+      "viewport": {
+        "w": 1024,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1024,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "lastViewportSync": "manual-pan",
+        "mapCenter": "121.47426,31.23032",
+        "routesHidden": "false",
+        "entitiesMuted": "false",
+        "locating": "false",
+        "fullscreen": "false",
+        "selectedAssignment": "A0106"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$191.70",
+        "improvement": "+53.0%",
+        "benefitBatch": "￥5.40",
+        "benefitMonth": "￥1,801,436"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [
+        {
+          "entity": "M0104",
+          "assignment": "A0104",
+          "cls": "pin merchant",
+          "x": 246.9875030517578,
+          "y": 306.2562561035156,
+          "display": "block"
+        }
+      ],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况缓行 天气晴朗 · 正常履约 履约影响正常履约 调度建议：按常规成本与时效权重派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%12 分钟$191.706 个骑手Low (中)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.82",
+      "mapPanelActive": false,
+      "detailTitle": "派单详情：M0106",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+53.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥5.40"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥1,801,436"
+        }
+      ]
+    },
+    {
+      "label": "rain-scenario:final",
+      "viewport": {
+        "w": 1280,
+        "h": 720
+      },
+      "bodyClass": "",
+      "scroll": {
+        "w": 1280,
+        "h": 720,
+        "x": 0,
+        "y": 0
+      },
+      "frameDataset": {
+        "dragFallbackBound": "native-maplibre",
+        "dragPan": "native",
+        "zoomLevel": "13.35",
+        "controlState": "all",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "selectedAssignment": "A0106"
+      },
+      "kpi": {
+        "runtime": "00:00:10",
+        "completion": "100%",
+        "unassigned": "0",
+        "cost": "$351.60",
+        "improvement": "+52.0%",
+        "benefitBatch": "￥9.00",
+        "benefitMonth": "￥3,000,000"
+      },
+      "routeCount": 6,
+      "visibleRouteCount": 6,
+      "visualCount": 6,
+      "arrowCount": 6,
+      "merchantPins": 6,
+      "courierPins": 6,
+      "duplicateCouriers": [],
+      "routeCourierMismatch": [],
+      "outOfMapPins": [],
+      "leakingPins": [],
+      "weather": {
+        "text": "气象与路况拥堵 天气雨天 · 路面湿滑 履约影响ETA 上浮 调度建议：提高近场骑手权重，避免跨区派单。",
+        "oldRows": 0,
+        "pointer": "none",
+        "grid": "80px 80px"
+      },
+      "selectedLayer": "all",
+      "finalStrategyRiders": 6,
+      "finalStrategyText": "★最终 AutoSolver选中方案100%17 分钟$351.606 个骑手Low (高)0.89已选中成本、风险、履约时效综合最优",
+      "reasonFinalText": "6✓ 最终派单方案派出 6 个骑手 · 6 个商家派单 · 覆盖 6/6 个订单派单约束已通过 置信度0.95",
+      "mapPanelActive": false,
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "compareRows": [
+        {
+          "label": "成本改进",
+          "value": "+52.0%"
+        },
+        {
+          "label": "ETA 改进",
+          "value": "-5 分钟"
+        },
+        {
+          "label": "无人接单风险下降",
+          "value": "-31%"
+        },
+        {
+          "label": "运营测算批次节约",
+          "value": "￥9.00"
+        },
+        {
+          "label": "单城月节约测算",
+          "value": "￥3,000,000"
+        }
+      ]
+    }
+  ],
+  "generatedAt": "2026-06-23T17:10:33.703Z"
+}

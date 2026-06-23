@@ -2942,6 +2942,32 @@ def render_index() -> str:
     function finalCourierForAssignment(assignment) {
       return finalCourierTokensForAssignment(assignment)[0] || "";
     }
+    function assignmentStatsForProfile(profile) {
+      const assignments = Object.values((profile && profile.assignments) || {});
+      const courierSet = new Set(assignments.map((assignment) => finalCourierForAssignment(assignment)).filter(Boolean));
+      const orderCount = assignments.reduce((sum, assignment) => sum + safeNumber(assignment.orderCount, (assignment.orders || []).length || 1), 0);
+      const totalCost = assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.cost || "0").replace(/[$,]/g, ""), 0), 0);
+      return {
+        assignments,
+        merchantCount: assignments.length,
+        courierCount: courierSet.size,
+        orderCount,
+        totalCost
+      };
+    }
+    function syncReportMetricsFromAssignments(report, profile) {
+      if (!report || !report.best || !profile || !profile.assignments || !Object.keys(profile.assignments).length) return;
+      const stats = assignmentStatsForProfile(profile);
+      report.best.groups = stats.merchantCount;
+      report.best.used_couriers = stats.courierCount;
+      report.best.covered_tasks = stats.merchantCount;
+      report.best.total_tasks = stats.merchantCount;
+      report.best.order_tasks = stats.orderCount;
+      if (report.features) {
+        report.features.tasks = stats.merchantCount;
+        report.features.orders = stats.orderCount;
+      }
+    }
     function assignmentForEntity(profile, entityId) {
       const entity = String(entityId || "").trim();
       if (!entity || entity.startsWith("D")) return "";
@@ -3303,6 +3329,7 @@ def render_index() -> str:
       profile.dispatchMap = mapPayload;
       if (mapPayload.stage === "simulation_final" || mapPayload.stage === "final") {
         reconcileDispatchPairsToVisibleMap(profile);
+        syncReportMetricsFromAssignments(currentReport, profile);
       }
       resetMapControlState();
       if (mapPayload.total_tasks) profile.totalTasks = mapPayload.total_tasks;

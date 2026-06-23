@@ -119,3 +119,20 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 10: 企业级验收循环 4：性能、响应式、按钮语义和业务一致性终检
+
+验证标准：在最新提交基础上重新跑一轮不依赖旧证据的浏览器验收；覆盖桌面与窄屏视口、刷新位置、刷新地图、缩放、拖拽、运行 10 秒推理、线路/点位/定位/适配/全屏/图层模式按钮、路线/商家/骑手/策略/表格点击；运行完成后不能有重复骑手、错误黄线、JS error、明显卡顿、按钮状态与实际图层不一致、右侧详情和表格业务口径不一致、收益量化缺失或天气卡片遮挡/黑块。
+
+完成记录：
+- 初始 Task 10 审计发现真实业务一致性问题：地图最终重配后使用唯一骑手，但 ReasonGraph 最终节点和底部最终方案行仍沿用重配前的 `used_couriers`，导致截图中出现地图 5/6 个骑手、表格却显示 3/4 个骑手的矛盾。
+- 已修复 report 指标同步：新增 `assignmentStatsForProfile(profile)` 与 `syncReportMetricsFromAssignments(report, profile)`，在 `simulation_final/final` 地图 payload 应用并完成 `reconcileDispatchPairsToVisibleMap(profile)` 后，把 `groups`、`used_couriers`、`covered_tasks`、`total_tasks`、`order_tasks` 和 `features` 回写为最终 assignments 的真实数据。
+- 已补回归测试：锁定 `report.best.used_couriers = stats.courierCount`、`report.best.groups = stats.merchantCount`、`report.best.order_tasks = stats.orderCount`，防止地图、ReasonGraph 和表格再次口径分裂。
+- 已用 Playwright CLI 重新跑企业审计，覆盖 `1280x720`、`1024x720` 和 `雨天低接单意愿` 场景；流程包含初始态、缩放后刷新位置、10 秒推理、逐线点击、线路/点位/图层/定位/适配/全屏、拖拽和雨天业务文案。
+- 审计通过：`goal/goal-9/task10-enterprise-audit.json` 中 `failureCount=0`、`failures=[]`。
+- 审计证明：三个最终场景的 `routeCount`、`courierPins`、最终表格 `finalStrategyRiders` 和 ReasonGraph `派出 N 个骑手` 完全一致；无重复最终骑手、无路线骑手错配、无可见点位泄漏到地图容器外。
+- 已保存视觉证据：`goal/goal-9/task10-1280x720.png`、`goal/goal-9/task10-1024x720.png`、`goal/goal-9/task10-rain-scenario.png`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
