@@ -1,0 +1,85 @@
+{
+  "body": {
+    "overflow": "hidden",
+    "scrollH": 720,
+    "scrollW": 1280
+  },
+  "courierPins": 10,
+  "density": "rain_clustered",
+  "finalDetail": {
+    "text": "↯\n派单决策解释\n策略对比：★最终 AutoSolver选中方案\n对象 已选中\n该行是 AutoSolver 最终采纳方案，用于和贪心、合单、多派、修复、风险平衡策略做业务对比。 对应策略 S5。\n★最终 AutoSolver选中方案\n100%\n17 min\n$346.10\n派单履约 ETA\n17 min\n预计派单成本\n$346.10\n接单 / 覆盖概率\n89%\n▣ 决策依据\n该行是 AutoSolver 最终采纳方案，用于和贪心、合单、多派、修复、风险平衡策略做业务对比。\n覆盖率：100%；ETA：17 min；成本：$346.10。\n风险：Low；状态：已选中。\n业务解释：成本、风险、ETA 综合最优。\n证据\n▧ 场景输入\n100%\n◎ 派单对象\n$346.10\n◷ ETA / 时效\n17 min\n△ 接单风险\nLow\n▣ 策略/负载\nS5\n相对贪心基线\n成本改进\n+53.0%\nETA 改进\n-3 min\n无人接单风险下降\n-31%",
+    "title": "策略对比：★最终 AutoSolver选中方案",
+    "type": "table-row"
+  },
+  "frameClass": "map-frame tile-ready topology focus-selected",
+  "frameDataset": {
+    "controlState": "all",
+    "selectedAssignment": "A0202",
+    "zoomLevel": "1"
+  },
+  "hasSampleText": false,
+  "kpiCuts": [],
+  "merchantPins": 5,
+  "pinKinds": [
+    "merchant_order",
+    "courier"
+  ],
+  "routeArrowDetail": {
+    "assignment": "A0202",
+    "leg": "courier-to-merchant",
+    "text": "↯\n派单决策解释\n派单关系：骑手到商家\n对象 R0205\n关系线 R0205 → M0202，用于表达骑手承接商家；线条沿稳定调度路网绘制，不作为真实导航指令。\nM0202\nR0205\n派单履约 ETA\n29 min\n预计派单成本\n$65.50\n接单 / 覆盖概率\n45%\n▣ 决策依据\n该线属于派单 A0202，点击后聚焦对应商家与骑手。\n折线节点 4 个，采用稳定调度线，避免运行后路径跳变。\n派单策略：S5 · 风险平衡；风险 Medium；接单概率 45%。\n证据\n▧ 场景输入\n4 节点\n◎ 派单对象\n骑手到商家\n◷ ETA / 时效\n29 min\n△ 接单风险\nMedium\n▣ 策略/负载\nA0202\n相对贪心基线\n成本改进\n+53.0%\nETA 改进\n-3 min\n无人接单风险下降\n-31%",
+    "title": "派单关系：骑手到商家",
+    "type": "route"
+  },
+  "routeCount": 5,
+  "routeHitAreaPointer": "stroke",
+  "runtime": "00:00:10",
+  "sceneButtonCount": 0,
+  "selectedOverview": 1,
+  "selectedScenario": "雨天低接单意愿",
+  "status": "当前场景派单完成",
+  "tableRows": [
+    {
+      "branch": "S1",
+      "status": "已淘汰",
+      "text": "合单优先100%15.5 min$480.695 个骑手Med (中)0.72已淘汰合单收益不足或局部绕行偏大",
+      "type": "strategy-candidate"
+    },
+    {
+      "branch": "S2",
+      "status": "已淘汰",
+      "text": "多派候选100%15.5 min$474.115 个骑手Med (中)0.73已淘汰保留多个骑手候选，适合距离接近但资源占用更高",
+      "type": "strategy-candidate"
+    },
+    {
+      "branch": "S3",
+      "status": "已淘汰",
+      "text": "局部修复100%15.5 min$449.485 个骑手Med (中)0.77已淘汰可修复高风险派单，但整体成本仍高于当前方案",
+      "type": "strategy-candidate"
+    },
+    {
+      "branch": "S4",
+      "status": "已淘汰",
+      "text": "贪心基线100%15.5 min$736.385 个骑手Med (中)0.47已淘汰最近骑手优先，作为业务基线但容易放大无人接单风险",
+      "type": "strategy-candidate"
+    },
+    {
+      "branch": "S5",
+      "status": "可行",
+      "text": "风险平衡100%15.5 min$384.565 个骑手Low (中)0.90可行降低低意愿/天气风险，但会牺牲部分成本或 ETA",
+      "type": "strategy-candidate"
+    },
+    {
+      "branch": "S5",
+      "status": "已选中",
+      "text": "★最终 AutoSolver选中方案100%17 min$346.103 个骑手Low (中)0.89已选中成本、风险、ETA 综合最优",
+      "type": "final-strategy"
+    }
+  ],
+  "viewport": {
+    "h": 720,
+    "w": 1280
+  },
+  "violations": [],
+  "weather": "rain"
+}

@@ -106,6 +106,26 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
 
+## Task 13: 调度工作台整体可用性整理
+
+验证标准：页面固定在一个视口内，不出现整页滚动；场景选择只保留一个入口且不显示样本总数/编号；点击商家、骑手、线路时右侧详情语义合理；下方方案表表达策略对比而不是候选流水账；地图缩放、隐藏点位、隐藏线路、适配、全屏等按钮都有可见效果；顶部 KPI 不被截断。
+
+完成记录：
+- 已把页面固定为 `100vw/100vh` 工作台布局，`body` 和 `.dashboard` 禁止整页滚动，顶部 KPI 压缩后在 1280x720 审计下无截断。
+- 已移除重复场景按钮，只保留顶部 `调度场景` 下拉选择；选项不再显示 `samples`、样本总数或当前编号。
+- 已清理初始和刷新状态：未推理时不显示最终派单线、最终指标或策略结果；刷新雨天低接单意愿场景后只展示商家和骑手输入点。
+- 已把商家点 DOM 语义从 `rest` 修正为 `merchant`，补充 `data-kind`，点击商家、骑手、派单线、策略卡、方案表都会进入对应中文业务详情。
+- 已重写表格点击详情，去掉“表格行类型”等调试话术；下方方案表固定表达五类策略对比和最终 AutoSolver 方案。
+- 已修复地图工具按钮：放大/缩小、隐藏派单线、弱化点位、适配视图、定位、全屏、图层模式都有可见 DOM 状态变化；`适配` 会恢复点位、线路、缩放和图层选择。
+- 已修复路线点击准确性：派单箭头从终点移动到路线最长路段中段，避免被商家/骑手点覆盖；透明命中层改为沿线 `pointer-events: stroke`，减少点到相邻路线。
+- 已修复右侧细节显示问题：最终方案 ETA 不再出现 `min min`，策略详情不再出现双句号，接单概率标题改为更通用的“接单 / 覆盖概率”。
+- 浏览器最终审计通过：`runtime=00:00:10`、雨天场景 `weather=rain`、`merchantPins=5`、`routeCount=5`、`sceneButtonCount=0`、`hasSampleText=false`、`kpiCuts=[]`、`violations=[]`。
+- 审计与截图产物：`goal/goal-7/task13-browser-audit.json`、`goal/goal-7/task13-final-ui.png`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+
 ## Task 11: 修复地图重复点位与叠层 bug
 
 验证标准：最终地图只显示一套商家/骑手业务点，不再同时出现 SVG 点和 Leaflet 点；派单线只保留一套 OSRM/SVG 业务线；初始状态仍有真实瓦片底图，运行 10 秒后 5 条派单关系默认全部可见。

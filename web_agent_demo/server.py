@@ -1019,8 +1019,9 @@ def render_index() -> str:
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      min-width: 1580px;
-      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
       color: var(--text);
       background:
         radial-gradient(circle at 28% 0%, rgba(27, 136, 210, .14), transparent 32%),
@@ -1028,7 +1029,7 @@ def render_index() -> str:
       font-family: "Aptos", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
     button, select { font: inherit; }
-    .dashboard { width: min(1790px, calc(100vw - 8px)); margin: 0 auto; padding: 4px 0; }
+    .dashboard { width: 100vw; height: 100vh; margin: 0; padding: 4px; display: flex; flex-direction: column; overflow: hidden; }
     .topbar, .panel {
       background: linear-gradient(180deg, rgba(10, 27, 43, .98), rgba(4, 17, 29, .98));
       border: 1px solid var(--stroke);
@@ -1036,30 +1037,31 @@ def render_index() -> str:
       box-shadow: 0 18px 46px rgba(0, 0, 0, .42), inset 0 1px 0 rgba(117, 210, 255, .06);
     }
     .topbar {
-      height: 78px;
+      height: 72px;
+      flex: 0 0 72px;
       display: grid;
-      grid-template-columns: 430px 160px 160px 210px 190px 180px 1fr;
+      grid-template-columns: minmax(260px, 1.25fr) minmax(116px, .5fr) minmax(112px, .48fr) minmax(142px, .58fr) minmax(120px, .48fr) minmax(128px, .5fr) minmax(190px, .8fr);
       overflow: hidden;
     }
-    .brand, .kpi { border-right: 1px solid var(--stroke-2); padding: 13px 22px; min-width: 0; overflow: hidden; }
-    .brand { display: grid; grid-template-columns: 48px 1fr; gap: 15px; align-items: center; }
+    .brand, .kpi { border-right: 1px solid var(--stroke-2); padding: 10px 12px; min-width: 0; overflow: hidden; }
+    .brand { display: grid; grid-template-columns: 42px 1fr; gap: 12px; align-items: center; }
     .logo {
-      width: 46px;
-      height: 46px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       background: conic-gradient(from 20deg, #33dcff 0 12%, transparent 12% 24%, #2dd4ff 24% 38%, transparent 38% 51%, #4ae7d6 51% 66%, transparent 66% 78%, #2898ff 78% 92%, transparent 92%);
       position: relative;
       filter: drop-shadow(0 0 12px rgba(39, 230, 208, .35));
     }
-    .logo:after { content: ""; position: absolute; inset: 13px; border-radius: 50%; background: var(--panel); border: 1px solid rgba(115, 221, 255, .32); }
-    .brand h1 { margin: 0; font-size: 24px; letter-spacing: -.03em; line-height: 1.05; }
+    .logo:after { content: ""; position: absolute; inset: 11px; border-radius: 50%; background: var(--panel); border: 1px solid rgba(115, 221, 255, .32); }
+    .brand h1 { margin: 0; font-size: 21px; letter-spacing: -.03em; line-height: 1.05; }
     .brand p, .kpi label, .mini, .muted { color: var(--muted); }
-    .brand p { margin: 5px 0 0; font-size: 14px; white-space: nowrap; }
-    .kpi label { display: block; font-size: 12px; margin-bottom: 6px; }
-    .kpi strong { display: block; font-size: 18px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    #case-id { font-size: 15px; }
-    .kpi .green { color: var(--green); font-size: 22px; }
-    .rate { display: flex; align-items: center; gap: 18px; }
+    .brand p { margin: 4px 0 0; font-size: 12px; white-space: nowrap; }
+    .kpi label { display: block; font-size: 10px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .kpi strong { display: block; font-size: 16px; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #case-id { font-size: 13px; }
+    .kpi .green { color: var(--green); font-size: 19px; }
+    .rate { display: flex; align-items: center; gap: 10px; }
     .ring {
       width: 32px; height: 32px; border-radius: 50%;
       background: conic-gradient(var(--blue) 0 100%, rgba(255,255,255,.1) 0);
@@ -1067,18 +1069,21 @@ def render_index() -> str:
       position: relative;
     }
     .ring:after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: #071725; }
-    .spark { width: 100%; height: 42px; margin-top: -2px; }
+    .spark { width: 100%; height: 30px; margin-top: -2px; }
     .spark polyline { fill: none; stroke: #40e47a; stroke-width: 2.2; filter: drop-shadow(0 0 7px rgba(54,230,126,.45)); }
     .main-grid {
       margin-top: 6px;
       display: grid;
-      grid-template-columns: 520px minmax(850px, 1fr) 300px;
-      grid-template-rows: 610px 236px;
+      flex: 1 1 auto;
+      min-height: 0;
+      grid-template-columns: minmax(340px, 24vw) minmax(0, 1fr) minmax(260px, 19vw);
+      grid-template-rows: minmax(0, 1fr) 176px;
       gap: 6px;
+      overflow: hidden;
     }
-    .left-panel { grid-column: 1; grid-row: 1 / span 2; padding: 0 16px 18px; }
+    .left-panel { grid-column: 1; grid-row: 1 / span 2; padding: 0 14px 14px; overflow: hidden; }
     .map-panel { grid-column: 2; grid-row: 1; padding: 0; overflow: hidden; display: flex; flex-direction: column; position: relative; }
-    .right-panel { grid-column: 3; grid-row: 1 / span 2; padding: 0 12px 16px; }
+    .right-panel { grid-column: 3; grid-row: 1 / span 2; padding: 0 10px 10px; overflow: hidden; display: flex; flex-direction: column; }
     .table-panel { grid-column: 2; grid-row: 2; padding: 0; overflow: hidden; }
     .panel-head {
       height: 38px;
@@ -1100,16 +1105,16 @@ def render_index() -> str:
       font-size: 11px;
     }
     .panel-head .spacer, .toolbar .spacer { flex: 1; }
-    .reason-wrap { position: relative; height: calc(100% - 38px); padding-top: 12px; }
+    .reason-wrap { position: relative; height: calc(100% - 38px); padding-top: 10px; overflow: hidden; }
     .node {
-      width: 410px;
+      width: calc(100% - 54px);
       margin-left: 46px;
-      min-height: 60px;
+      min-height: 54px;
       display: grid;
       grid-template-columns: 32px 1fr 76px;
       gap: 10px;
       align-items: center;
-      padding: 10px 12px;
+      padding: 9px 11px;
       border: 1px solid var(--stroke-2);
       border-radius: 7px;
       background: linear-gradient(180deg, rgba(14, 35, 54, .96), rgba(8, 25, 40, .96));
@@ -1134,8 +1139,8 @@ def render_index() -> str:
       font-family: var(--mono);
       box-shadow: 0 0 13px rgba(40, 168, 255, .35);
     }
-    .node h3, .strategy h4 { margin: 0 0 5px; font-size: 14px; }
-    .node p, .strategy p, .tiny { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .node h3, .strategy h4 { margin: 0 0 4px; font-size: 13px; }
+    .node p, .strategy p, .tiny { margin: 0; color: var(--muted); font-size: 10.5px; line-height: 1.3; }
     .node .icon {
       width: 27px; height: 27px; border-radius: 8px;
       display: grid; place-items: center;
@@ -1147,7 +1152,7 @@ def render_index() -> str:
     .metric strong { color: var(--green); display: block; font-size: 19px; font-family: var(--mono); }
     .metric span { display: block; color: var(--muted); font-size: 11px; margin-bottom: 2px; }
     .connector {
-      height: 11px;
+      height: 8px;
       width: 2px;
       margin-left: 32px;
       background: linear-gradient(var(--stroke-2), var(--cyan));
@@ -1155,7 +1160,7 @@ def render_index() -> str:
       position: relative;
     }
     .connector:after { content: ""; position: absolute; bottom: -1px; left: -3px; width: 8px; height: 8px; border-right: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan); transform: rotate(45deg); }
-    .branch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 10px 0 14px 10px; position: relative; }
+    .branch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 8px 0 12px 10px; position: relative; }
     .branch-grid:before {
       content: "";
       position: absolute;
@@ -1168,11 +1173,11 @@ def render_index() -> str:
       pointer-events: none;
     }
     .strategy {
-      min-height: 106px;
+      min-height: 92px;
       border: 1px solid rgba(135, 152, 166, .35);
       background: linear-gradient(180deg, rgba(16, 32, 47, .96), rgba(8, 20, 34, .96));
       border-radius: 7px;
-      padding: 9px 8px;
+      padding: 8px 7px;
       position: relative;
       z-index: 2;
       cursor: pointer;
@@ -1193,41 +1198,6 @@ def render_index() -> str:
     .line-key.sel { background: var(--green); box-shadow: 0 0 8px var(--green); }
     .line-key.eval { border-top: 2px dotted var(--blue); }
     .line-key.rej { border-top: 2px dashed #a1a1a1; opacity: .7; }
-    .scene-strip {
-      position: absolute;
-      top: 46px;
-      left: 198px;
-      right: 236px;
-      z-index: 5;
-      display: flex;
-      gap: 5px;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      pointer-events: none;
-    }
-    .scene-button {
-      min-height: 27px;
-      min-width: 0;
-      flex: 1 1 0;
-      text-align: left;
-      color: #dcecff;
-      background: rgba(7, 24, 38, .74);
-      border: 1px solid rgba(66, 111, 138, .56);
-      border-radius: 6px;
-      padding: 4px 7px;
-      cursor: pointer;
-      box-shadow: 0 8px 22px rgba(0,0,0,.28), inset 0 1px 0 rgba(138, 218, 255, .08);
-      backdrop-filter: blur(5px);
-      pointer-events: auto;
-    }
-    .scene-button strong { display: block; font-size: 9px; margin-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .scene-button span { display: block; color: var(--muted); font-size: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .scene-button.active {
-      border-color: var(--cyan);
-      background: linear-gradient(180deg, rgba(7, 67, 67, .98), rgba(6, 35, 45, .98));
-      box-shadow: 0 0 18px rgba(39, 230, 208, .26), inset 0 1px 0 rgba(167, 255, 240, .13);
-    }
     .map-frame { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #0a121b; }
     .map-panel.active {
       position: fixed;
@@ -1436,10 +1406,10 @@ def render_index() -> str:
     .dispatch-hit-area {
       fill: none;
       stroke: transparent;
-      stroke-width: 18;
+      stroke-width: 10;
       stroke-linecap: round;
       stroke-linejoin: round;
-      pointer-events: bounding-box;
+      pointer-events: stroke;
       cursor: pointer;
     }
     .arrow { fill: var(--cyan); filter: drop-shadow(0 0 6px rgba(39,230,208,.75)); }
@@ -1464,7 +1434,7 @@ def render_index() -> str:
     .map-legend div { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 10px; color: rgba(220,236,255,.82); }
     .mark { width: 14px; height: 14px; border-radius: 5px; display: inline-grid; place-items: center; font-size: 9px; font-weight: 900; }
     .mark.depot { background: #0f7ed3; color: #dff4ff; }
-    .mark.rest { background: #f6b64b; color: #1c1001; border: 1px solid rgba(255,236,166,.7); border-radius: 50%; }
+    .mark.rest, .mark.merchant { background: #f6b64b; color: #1c1001; border: 1px solid rgba(255,236,166,.7); border-radius: 50%; }
     .mark.dest { background: #7bcc46; color: #071906; border: 1px solid rgba(202, 255, 162, .75); border-radius: 50%; }
     .mark.courier { background: #082c34; color: #9be8f1; border: 1px solid rgba(155,232,241,.72); border-radius: 50%; }
     .toolbar {
@@ -1477,6 +1447,7 @@ def render_index() -> str:
       z-index: 4;
     }
     .toolbar button { width: 32px; height: 29px; padding: 0; }
+    .toolbar button[disabled] { opacity: .42; cursor: not-allowed; }
     .toolbar button.active, .zoom button.active, .panel-head button.active {
       border-color: var(--cyan);
       color: var(--cyan);
@@ -1550,7 +1521,7 @@ def render_index() -> str:
     .map-entities { position: absolute; inset: 0; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
     .pin { position: absolute; z-index: 3; width: 14px; height: 14px; transform: translate(-50%, -50%); cursor: pointer; }
-    .pin.rest { z-index: 6; }
+    .pin.rest, .pin.merchant { z-index: 6; }
     .pin.courier { z-index: 5; }
     .pin.dest { z-index: 4; }
     .pin .mark { width: 14px; height: 14px; box-shadow: 0 0 6px rgba(0,0,0,.34); }
@@ -1558,7 +1529,10 @@ def render_index() -> str:
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
     .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 4; display: grid; }
     .zoom button { width: 36px; height: 35px; color: #fff; background: rgba(7, 23, 37, .9); border: 1px solid var(--stroke-2); font-size: 22px; }
-    .map-frame.zoomed .map-bg, .map-frame.zoomed .route-svg { transform: scale(1.08); transform-origin: 52% 46%; }
+    .map-frame.zoomed .tile-map,
+    .map-frame.zoomed .map-bg,
+    .map-frame.zoomed .route-svg,
+    .map-frame.zoomed .map-entities { transform: scale(1.16); transform-origin: 52% 46%; }
     .map-frame.zoomed .pin { transform: translate(-50%, -50%) scale(1.04); }
     .map-frame.zoomed .map-label { transform: translate(calc(-50% + var(--label-offset-x, 0px)), calc(-50% + var(--label-offset-y, 0px))) scale(1.04); }
     .map-frame.locating .dispatch-link.primary { stroke-width: 6; }
@@ -1599,25 +1573,26 @@ def render_index() -> str:
       border: 1px solid var(--stroke-2);
       background: rgba(8, 24, 38, .72);
       border-radius: 9px;
-      margin: 12px 0;
-      padding: 13px;
+      margin: 6px 0;
+      padding: 9px;
+      min-height: 0;
     }
-    .decision-card h3 { margin: 0 0 12px; font-size: 15px; }
+    .decision-card h3 { margin: 0 0 8px; font-size: 13px; }
     .assignment-detail {
       border-color: rgba(39, 230, 208, .58);
       box-shadow: inset 0 1px 0 rgba(167, 255, 240, .08);
     }
     .assignment-detail code { color: var(--cyan); font-family: var(--mono); }
-    .divider { border-top: 1px solid var(--stroke-2); margin: 10px 0 14px; }
-    .chips { display: flex; gap: 8px; margin: 8px 0 14px; }
-    .chip { background: rgba(45, 230, 159, .42); color: #d9fff8; border-radius: 4px; padding: 5px 10px; font-family: var(--mono); font-size: 12px; }
-    .row { display: flex; justify-content: space-between; gap: 14px; margin: 13px 0; font-size: 13px; }
+    .divider { border-top: 1px solid var(--stroke-2); margin: 8px 0 10px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; max-height: 54px; overflow: hidden; }
+    .chip { background: rgba(45, 230, 159, .32); color: #d9fff8; border-radius: 4px; padding: 4px 7px; font-family: var(--mono); font-size: 10px; }
+    .row { display: flex; justify-content: space-between; gap: 10px; margin: 9px 0; font-size: 12px; }
     .row strong { color: #f7fbff; font-weight: 700; }
     .prob { width: 38px; height: 38px; border-radius: 50%; background: conic-gradient(var(--green) 0 83%, rgba(255,255,255,.1) 83%); display: grid; place-items: center; color: #cffff3; font-size: 10px; position: relative; margin-left: auto; }
     .prob:after { content: ""; position: absolute; inset: 5px; border-radius: 50%; background: #081826; }
     .prob span { position: relative; z-index: 2; color: #d8fff8; font-family: var(--mono); }
-    ul { margin: 8px 0 0 18px; padding: 0; color: #d7e6f0; font-size: 12px; line-height: 1.75; }
-    .evidence .row { margin: 9px 0; }
+    ul { margin: 6px 0 0 16px; padding: 0; color: #d7e6f0; font-size: 11px; line-height: 1.45; }
+    .evidence .row { margin: 7px 0; }
     .positive { color: var(--green); }
     .good { color: #9fffe6; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11px; }
@@ -1629,7 +1604,7 @@ def render_index() -> str:
       font-weight: 700;
     }
     td {
-      padding: 6px 8px;
+      padding: 5px 7px;
       color: #aebdcc;
       border: 1px solid rgba(51, 80, 101, .62);
       background: rgba(10, 22, 34, .75);
@@ -1646,8 +1621,9 @@ def render_index() -> str:
     .star { color: var(--yellow); font-size: 18px; margin-right: 8px; }
     .status-ok { color: var(--green); }
     .status-bad { color: #ff777f; }
-    .controls { display: flex; gap: 8px; align-items: center; }
-    #case-select { max-width: 134px; }
+    .controls { display: flex; gap: 7px; align-items: center; min-width: 0; }
+    .scene-select-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    #case-select { max-width: 240px; min-width: 172px; }
     #run-agent.running { opacity: .72; }
     .left-panel.expanded .reason-wrap { overflow-y: auto; }
     .left-panel.expanded .node, .left-panel.expanded .strategy { box-shadow: 0 0 15px rgba(39, 230, 208, .16), inset 0 1px 0 rgba(146, 225, 255, .05); }
@@ -1730,13 +1706,7 @@ def render_index() -> str:
       </aside>
 
       <section class="panel map-panel" aria-label="实时派单地图">
-        <div class="panel-head"><span>←</span> 实时派单地图 <span class="spacer"></span><div class="controls"><select id="case-select"><option value="large_seed301">large_seed301</option></select><button id="reload-cases">刷新</button><button id="run-agent">运行派单推理</button><span class="mini" id="status">就绪</span></div></div>
-        <div class="scene-strip" aria-label="选择调度场景">
-          <button class="scene-button active" data-case="large_seed301"><strong>商圈十字路口高峰</strong><span>38 个订单 · 18 个骑手 · 合单密集</span></button>
-          <button class="scene-button" data-case="medium_seed201"><strong>中型并行派单</strong><span>配对匹配 · 合单优先推理</span></button>
-          <button class="scene-button" data-case="scarce_couriers_seed401"><strong>骑手稀缺商圈</strong><span>资源占用 · 接单风险约束</span></button>
-          <button class="scene-button" data-case="low_willingness_seed501"><strong>雨天低接单意愿</strong><span>低意愿搜索 · 无人接单风险</span></button>
-        </div>
+        <div class="panel-head"><span>←</span> 实时派单地图 <span class="spacer"></span><div class="controls"><label class="scene-select-label" for="case-select">调度场景</label><select id="case-select"><option value="large_seed301">large_seed301</option></select><button id="reload-cases" type="button">刷新场景</button><button id="run-agent" type="button">运行派单推理</button><span class="mini" id="status">就绪</span></div></div>
         <div class="map-frame">
           <div id="tile-map" class="tile-map" aria-label="open source raster street map"></div>
           <div id="real-map" class="real-map" aria-label="open source street map"></div>
@@ -1746,14 +1716,14 @@ def render_index() -> str:
           <svg class="route-svg" viewBox="0 0 980 640" preserveAspectRatio="none" aria-label="dispatch assignment overlay">
           </svg>
           <div class="toast" id="map-toast">地图图层已更新</div>
-          <div class="toolbar"><select id="layer-mode"><option value="all">全部图层</option><option value="selected">最终派单</option><option value="candidates">候选派单</option></select><button data-map-action="depots">▧</button><button data-map-action="routes">☷</button><button data-map-action="fit">□</button><button data-map-action="locate">◎</button><button data-map-action="fullscreen">↗</button></div>
+          <div class="toolbar"><select id="layer-mode" title="切换派单线显示模式"><option value="all">全部图层</option><option value="selected">聚焦派单</option><option value="candidates">增强线路</option></select><button data-map-action="depots" type="button" title="弱化/恢复商家与骑手点位" aria-label="弱化点位">点</button><button data-map-action="routes" type="button" title="隐藏/恢复派单关系线" aria-label="隐藏派单线">线</button><button data-map-action="fit" type="button" title="适配全部点位和派单线" aria-label="适配视图">适</button><button data-map-action="locate" type="button" title="定位当前派单包" aria-label="定位当前派单">定</button><button data-map-action="fullscreen" type="button" title="切换地图聚焦视图" aria-label="地图聚焦视图">↗</button></div>
           <div class="map-legend">
-            <div><span class="mark rest">M</span>商家订单</div><div><span class="mark courier">C</span>骑手位置</div>
+            <div><span class="mark merchant">M</span>商家订单</div><div><span class="mark courier">C</span>骑手位置</div>
             <div><i class="line-key sel"></i>派单关系</div><div><i class="line-key rej"></i>长距离低噪</div>
           </div>
           <div class="map-entities" aria-live="polite"></div>
-          <div class="zoom"><button id="zoom-in" type="button">+</button><button id="zoom-out" type="button">−</button><button id="recenter" type="button">⌾</button></div>
-          <div class="weather"><div class="row"><strong>路况</strong><strong style="color:var(--yellow)">待刷新</strong></div><div class="bar"></div><div class="row"><span>天气</span><strong>等待场景样本</strong></div></div>
+          <div class="zoom"><button id="zoom-in" type="button" title="放大地图">+</button><button id="zoom-out" type="button" title="缩小地图">−</button><button id="recenter" type="button" title="回到派单总览">⌾</button></div>
+          <div class="weather"><div class="row"><strong>路况</strong><strong style="color:var(--yellow)">待刷新</strong></div><div class="bar"></div><div class="row"><span>天气</span><strong>等待场景</strong></div></div>
         </div>
       </section>
 
@@ -1761,29 +1731,29 @@ def render_index() -> str:
         <div class="panel-head"><span class="dot">↯</span> 派单决策解释</div>
         <div class="decision-card assignment-detail">
           <h3 id="detail-title">等待运行派单推理</h3><div class="divider"></div>
-          <h3>骑手 <span class="good" id="detail-courier">-</span></h3>
+          <h3>对象 <span class="good" id="detail-courier">-</span></h3>
           <div class="row"><span id="detail-merchant">等待运行派单推理</span></div><div class="chips" id="detail-orders"></div>
           <div class="row"><span>派单履约 ETA</span><strong id="detail-eta">-</strong></div>
           <div class="row"><span>预计派单成本</span><strong id="right-cost">-</strong></div>
-          <div class="row"><span>骑手接单概率</span><div class="prob"><span>--</span></div></div>
+          <div class="row"><span>接单 / 覆盖概率</span><div class="prob"><span>--</span></div></div>
         </div>
         <div class="decision-card">
           <h3 class="good">▣ 决策依据</h3>
-          <ul id="detail-reasons"><li>刷新后展示当前样本的商家与骑手点位。</li><li>运行推理后自动展示所有最终派单连线。</li><li>点击商家、骑手或线路可查看具体解释。</li></ul>
+          <ul id="detail-reasons"><li>刷新后展示当前场景的商家与骑手点位。</li><li>运行推理后自动展示所有最终派单连线。</li><li>点击商家、骑手或线路可查看具体解释。</li></ul>
         </div>
         <div class="decision-card evidence">
           <h3>证据</h3>
-          <div class="row"><span>▧ 商家-订单匹配度</span><strong>72%</strong></div>
-          <div class="row"><span>◎ 派单履约距离</span><strong>18.7 km</strong></div>
-          <div class="row"><span>◷ 时间窗匹配</span><strong class="good">Good</strong></div>
-          <div class="row"><span>△ 无人接单风险</span><strong class="good">Low</strong></div>
-          <div class="row"><span>▣ 骑手利用率</span><strong>78%</strong></div>
+          <div class="row"><span>▧ 场景输入</span><strong>-</strong></div>
+          <div class="row"><span>◎ 派单对象</span><strong>-</strong></div>
+          <div class="row"><span>◷ ETA / 时效</span><strong class="good">-</strong></div>
+          <div class="row"><span>△ 接单风险</span><strong class="good">-</strong></div>
+          <div class="row"><span>▣ 策略/负载</span><strong>-</strong></div>
         </div>
         <div class="decision-card">
           <h3>相对贪心基线</h3>
-          <div class="row"><span>成本改进</span><strong class="positive">+68.7%</strong></div>
-          <div class="row"><span>ETA 改进</span><strong class="positive">-6 min</strong></div>
-          <div class="row"><span>无人接单风险下降</span><strong class="positive">-31%</strong></div>
+          <div class="row"><span>成本改进</span><strong class="positive">-</strong></div>
+          <div class="row"><span>ETA 改进</span><strong class="positive">-</strong></div>
+          <div class="row"><span>无人接单风险下降</span><strong class="positive">-</strong></div>
         </div>
       </aside>
 
@@ -1792,11 +1762,9 @@ def render_index() -> str:
         <table>
           <thead><tr><th>Strategy</th><th>Coverage</th><th>ETA (Avg)</th><th>Expected Cost</th><th>Rider Usage</th><th>Risk (Missed Delivery)</th><th>Score</th><th>Status</th><th>Key Insight</th></tr></thead>
           <tbody>
-            <tr><td>贪心基线</td><td>100%</td><td>18.1 min</td><td>$2,108.40</td><td>8 个骑手</td><td>High (14.2%)</td><td>0.41</td><td class="status-bad">已淘汰</td><td>商家-骑手匹配弱，空闲骑手占用过高</td></tr>
-            <tr><td><b>合单优先</b></td><td><b>100%</b></td><td><b>12.6 min</b></td><td><b>$687.30</b></td><td><b>6 个骑手</b></td><td>Low (4.1%)</td><td><b>0.82</b></td><td class="status-ok">可行</td><td><b>订单重叠度高，骑手负载更均衡</b></td></tr>
-            <tr><td>多派候选</td><td>100%</td><td>13.8 min</td><td>$1,245.60</td><td>9 个骑手</td><td>Med (7.8%)</td><td>0.58</td><td class="status-bad">已淘汰</td><td>拆单过多，骑手固定占用成本偏高</td></tr>
-            <tr><td>局部修复</td><td>100%</td><td>13.2 min</td><td>$1,012.70</td><td>7 个骑手</td><td>Med (6.3%)</td><td>0.66</td><td class="status-bad">已淘汰</td><td>相对贪心有改善，但成本仍高于当前最优</td></tr>
-            <tr class="emphasis"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>100%</b></td><td><b>12.3 min</b></td><td><b id="table-cost">$657.10</b></td><td><b>6 个骑手</b></td><td><b>Low (4.0%)</b></td><td><b>0.89</b></td><td><b>已选中</b></td><td><b>成本、风险、ETA 综合最优</b></td></tr>
+            <tr data-row-type="empty-state"><td>场景输入</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">待刷新</td><td>选择场景后刷新，地图只显示商家与骑手点位</td></tr>
+            <tr data-row-type="empty-state"><td>策略评估</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>待运行</td><td>运行约 10 秒后逐步评估候选策略</td></tr>
+            <tr data-row-type="empty-state"><td>最终派单</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-bad">未生成</td><td>完成后自动显示所有商家派给哪个骑手</td></tr>
           </tbody>
         </table>
       </section>
@@ -1877,7 +1845,11 @@ def render_index() -> str:
     }
     function resetMapControlState() {
       const frame = document.querySelector(".map-frame");
-      if (frame) frame.classList.remove("hide-entities", "hide-dispatch-routes", "hide-candidates", "zoomed", "locating");
+      if (frame) {
+        frame.classList.remove("hide-entities", "hide-dispatch-routes", "hide-candidates", "zoomed", "locating");
+        frame.dataset.zoomLevel = "1";
+        frame.dataset.controlState = "all";
+      }
       document.querySelectorAll("[data-map-action], #zoom-in").forEach((button) => button.classList.remove("active"));
       const layerMode = $("layer-mode");
       if (layerMode) layerMode.value = "all";
@@ -1890,9 +1862,6 @@ def render_index() -> str:
       const select = $("case-select");
       const option = select && select.selectedOptions && select.selectedOptions[0];
       return (option && option.dataset && option.dataset.scenario) || (currentSimulationSample && currentSimulationSample.scenario_id) || "commerce_peak";
-    }
-    function sampleNumberLabel(sample) {
-      return "#" + String((sample && Number.isFinite(Number(sample.sample_index)) ? Number(sample.sample_index) : 0) + 1).padStart(2, "0");
     }
     function money(value) {
       const number = Number(value);
@@ -2221,7 +2190,7 @@ def render_index() -> str:
         map_layers: sample.map_layers,
         total_tasks: merchantEntities.length,
         total_couriers: courierEntities.length,
-        note: "刷新样本仅展示商家与骑手点位；运行推理后才生成最终派单线。"
+        note: "刷新场景仅展示商家与骑手点位；运行推理后才生成最终派单线。"
       };
     }
     function strategyRuntimeName(strategyId) {
@@ -2254,7 +2223,7 @@ def render_index() -> str:
           pickup: assignment.merchant_id,
           pickup_label: assignment.merchant_id,
           merchant: assignment.merchant_id,
-          merchant_note: `商家点位位于道路边/建筑边；最终派给 ${assignment.courier_id}。`,
+          merchant_note: `该商家位于可停靠街区边界，最终派给 ${assignment.courier_id}。`,
           courier: assignment.courier_id,
           map_couriers: [assignment.courier_id],
           map_orders: [],
@@ -2268,9 +2237,9 @@ def render_index() -> str:
           distance: `${safeNumber(candidate.distance, 0).toFixed(1)} km`,
           risk: assignment.risk || candidate.risk || "Medium",
           reason: assignment.reason || [
-            `当前样本策略：${sample.selected_strategy && sample.selected_strategy.label ? sample.selected_strategy.label : sample.selected_strategy_id}`,
+            `策略路径：${sample.selected_strategy && sample.selected_strategy.label ? sample.selected_strategy.label : sample.selected_strategy_id}`,
             `骑手 ${assignment.courier_id} 接单意愿 ${Math.round(safeNumber(courier.willingness, probability) * 100)}%。`,
-            `该派单来自刷新样本 ${sample.seed}，不是写死路线。`
+            "该派单由当前场景的商家位置、骑手意愿、价格和路况共同生成。"
           ]
         };
       });
@@ -2311,7 +2280,7 @@ def render_index() -> str:
         },
         rounds: [{
           round: 1,
-          reason: "current refreshed simulation sample",
+        reason: "current refreshed dispatch scene",
           strategies: strategyPath.map((item) => ({
             name: strategyRuntimeName(item.id),
             ["local" + "_cost"]: Math.max(1, totalCost / Math.max(safeNumber(item.score, 0.58), 0.3)),
@@ -2329,28 +2298,32 @@ def render_index() -> str:
     function renderSimulationPreviewTable(sample) {
       const tbody = document.querySelector(".table-panel tbody");
       if (!tbody) return;
-      const rows = (sample.candidates || []).slice(0, 5).map((candidate) => {
-        const probability = Math.round(safeNumber(candidate.accept_probability, 0) * 100);
-        return `<tr data-row-type="preview-candidate" data-merchant="${escapeAttr(candidate.merchant_id)}" data-courier="${escapeAttr(candidate.courier_id)}" data-cost="${escapeAttr(money(candidate.cost))}" data-eta="${escapeAttr(String(candidate.eta_min))}" data-risk="${escapeAttr(candidate.risk)}" data-probability="${probability}%"><td>${candidate.merchant_id} → ${candidate.courier_id}</td><td>预览</td><td>${candidate.eta_min} min</td><td>${money(candidate.cost)}</td><td>1 个骑手</td><td>${candidate.risk}</td><td>${probability}%</td><td class="status-ok">候选</td><td>刷新样本候选，运行推理后才判定是否采用</td></tr>`;
+      const strategyRows = (sample.strategy_path || []).slice(0, 5).map((strategy) => {
+        const label = strategyBranchCatalog.find((item) => item.id === strategy.id) || {title: strategy.id};
+        return `<tr data-row-type="preview-strategy" data-branch="${escapeAttr(strategy.id)}" data-status="待评估"><td>${strategy.id} · ${label.title}</td><td>待推理</td><td>-</td><td>-</td><td>-</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>待评估</td><td>${label.desc || "运行后进入策略链路评估"}</td></tr>`;
       });
       tbody.innerHTML = [
-        `<tr class="emphasis" data-row-type="sample-summary" data-scenario="${escapeAttr(sample.scenario_id || "")}" data-sample="${escapeAttr(String(sample.sample_index || 0))}"><td><b>${sample.name} ${sampleNumberLabel(sample)}</b></td><td>${(sample.merchants || []).length} 个商家</td><td>-</td><td>-</td><td>${(sample.couriers || []).length} 个骑手</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>预览</td><td>已刷新样本，当前只展示点位，不展示最终派单线</td></tr>`,
-        ...rows
+        `<tr class="emphasis" data-row-type="scene-summary" data-scenario="${escapeAttr(sample.scenario_id || "")}"><td><b>${sample.name}</b></td><td>${(sample.merchants || []).length} 个商家</td><td>-</td><td>-</td><td>${(sample.couriers || []).length} 个骑手</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>待推理</td><td>当前只展示点位；运行后输出最终派单关系</td></tr>`,
+        ...strategyRows
       ].join("");
     }
     function resetDecisionPanelForSimulationPreview(sample) {
       setDetailContext("sample-preview", "", "", "");
-      $("detail-title").textContent = `样本 ${sampleNumberLabel(sample)} 已刷新`;
+      $("detail-title").textContent = `场景输入：${sample.name}`;
       $("detail-courier").textContent = "-";
-      $("detail-merchant").innerHTML = `${sample.name}：已生成 <code>${(sample.merchants || []).length}</code> 个商家点和 <code>${(sample.couriers || []).length}</code> 个骑手点，等待运行派单推理。`;
-      $("detail-orders").innerHTML = (sample.merchants || []).slice(0, 6).map((merchant) => `<span class="chip">${merchant.id}</span>`).join("");
+      $("detail-merchant").innerHTML = `已生成 <code>${(sample.merchants || []).length}</code> 个商家点和 <code>${(sample.couriers || []).length}</code> 个骑手点；当前仅展示输入，不提前生成派单结果。`;
+      $("detail-orders").innerHTML = [
+        `<span class="chip">商家 ${(sample.merchants || []).length}</span>`,
+        `<span class="chip">骑手 ${(sample.couriers || []).length}</span>`,
+        `<span class="chip">路况 ${sample.summary ? sample.summary.traffic : "-"}</span>`
+      ].join("");
       $("detail-eta").textContent = "-";
       $("right-cost").textContent = "-";
       document.querySelector(".prob span").textContent = "--";
       $("detail-reasons").innerHTML = [
-        `<li>刷新只切换当前场景的 deterministic sample：${sample.seed}。</li>`,
-        "<li>当前阶段只展示商家点和骑手位置，不展示最终派单线。</li>",
-        "<li>点击运行派单推理后，左侧策略链路会基于该样本选择策略。</li>",
+        "<li>刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。</li>",
+        "<li>运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。</li>",
+        "<li>点击地图上的商家或骑手可查看候选信息，不显示内部编号。</li>",
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
       if (rows[0]) rows[0].textContent = `${(sample.merchants || []).length} 个商家`;
@@ -2384,7 +2357,7 @@ def render_index() -> str:
       profile.dispatchMap = simulationPreviewMap(sample);
       resetMapControlState();
       document.body.classList.add("pending-run", "sample-preview");
-      $("case-id").textContent = `${sample.name} ${sampleNumberLabel(sample)}`;
+      $("case-id").textContent = sample.name;
       $("runtime").textContent = "--:--:--";
       $("completion-rate").textContent = "--";
       $("unassigned").textContent = String((sample.merchants || []).length);
@@ -2399,11 +2372,8 @@ def render_index() -> str:
       renderSimulationPreviewTable(sample);
       updateReasonSummary(profile, null);
       updateReasonProgress(0);
-      document.querySelectorAll(".scene-button").forEach((button) => {
-        button.classList.toggle("active", button.dataset.scenario === sample.scenario_id);
-      });
-      setStatus(`已刷新样本 ${sampleNumberLabel(sample)}，等待推理`, false);
-      showToast(`已生成 ${sample.name} ${sampleNumberLabel(sample)} 的商家与骑手点位`);
+      setStatus("场景已刷新，等待推理", false);
+      showToast(`已生成 ${sample.name} 的商家与骑手点位`);
     }
     async function refreshSimulationSample() {
       if (simulationSampleLoadPromise) return simulationSampleLoadPromise;
@@ -2473,14 +2443,14 @@ def render_index() -> str:
       setDetailContext("waiting", "", "", "");
       $("detail-title").textContent = "等待运行派单推理";
       $("detail-courier").textContent = "-";
-      $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新</code> 生成样本；运行派单推理后，系统会按当前样本的商家、骑手意愿、价格和路况生成最终派单关系。";
+      $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新场景</code> 生成输入；运行派单推理后，系统会按商家、骑手意愿、价格和路况生成最终派单关系。";
       $("detail-orders").innerHTML = "";
       $("detail-eta").textContent = "-";
       $("right-cost").textContent = "-";
       document.querySelector(".prob span").textContent = "--";
       $("detail-reasons").innerHTML = [
         "<li>初始状态只展示场景入口，不展示最终派单线。</li>",
-        "<li>刷新后生成当前场景样本，只显示商家点和骑手点。</li>",
+        "<li>刷新后生成当前场景输入，只显示商家点和骑手点。</li>",
         "<li>运行推理完成后自动显示每个商家派给哪个骑手。</li>"
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
@@ -2491,8 +2461,8 @@ def render_index() -> str:
       const tbody = document.querySelector(".table-panel tbody");
       if (tbody) {
         tbody.innerHTML = [
-          `<tr data-row-type="empty-state"><td>场景已选择</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">就绪</td><td>已选择 ${profile.label}，等待刷新样本或运行推理</td></tr>`,
-          `<tr data-row-type="empty-state"><td>样本候选</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>输入</td><td>候选关系由商家位置、骑手位置、接单意愿、价格和路况共同生成</td></tr>`,
+          `<tr data-row-type="empty-state"><td>场景已选择</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">就绪</td><td>已选择 ${profile.label}，等待刷新场景或运行推理</td></tr>`,
+          `<tr data-row-type="empty-state"><td>候选输入</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>输入</td><td>候选关系由商家位置、骑手位置、接单意愿、价格和路况共同生成</td></tr>`,
           `<tr data-row-type="empty-state"><td>派单结果</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-bad">待运行</td><td>运行完成后自动展示全部商家与骑手派单线</td></tr>`
         ].join("");
       }
@@ -2751,7 +2721,7 @@ def render_index() -> str:
       if (nodes[5]) {
         nodes[5].querySelector("p").innerHTML = report
           ? `派出 ${used} 个骑手 · ${Object.keys(profile.assignments || {}).length} 个商家派单 · 覆盖 ${covered}/${taskCount} 个订单<br>派单约束已通过`
-          : `等待当前样本推理输出最终派单<br>运行完成后自动展示全部派单覆盖`;
+          : `等待当前场景推理输出最终派单<br>运行完成后自动展示全部派单覆盖`;
       }
       updateReasonMetrics(report ? 6 : 0, profile, report);
       renderStrategyCards(profile, report);
@@ -2972,11 +2942,12 @@ def render_index() -> str:
         const labelOffset = labelOffsetFor(item, assignmentId, profile.selected);
         const pin = document.createElement("div");
         const isMerchantPoint = item.kind === "pickup_cluster" || item.kind === "merchant_order";
-        const pinKind = isMerchantPoint ? "rest" : item.kind === "courier" ? "courier" : "dest";
-        const markKind = isMerchantPoint ? "rest" : item.kind === "courier" ? "courier" : "dest";
+        const pinKind = isMerchantPoint ? "merchant" : item.kind === "courier" ? "courier" : "dest";
+        const markKind = isMerchantPoint ? "merchant" : item.kind === "courier" ? "courier" : "dest";
         const showSelectedLabel = false;
         pin.className = `pin ${pinKind}`;
         pin.dataset.entity = item.id;
+        pin.dataset.kind = item.kind || "";
         pin.dataset.assignment = assignmentId;
         pin.dataset.rawX = Number(display.rawX).toFixed(1);
         pin.dataset.rawY = Number(display.rawY).toFixed(1);
@@ -2999,6 +2970,7 @@ def render_index() -> str:
         label.style.setProperty("--label-offset-x", labelOffset[0] + "px");
         label.style.setProperty("--label-offset-y", labelOffset[1] + "px");
         label.dataset.entity = item.id;
+        label.dataset.kind = item.kind || "";
         label.dataset.assignment = assignmentId;
         label.dataset.rawX = Number(display.rawX).toFixed(1);
         label.dataset.rawY = Number(display.rawY).toFixed(1);
@@ -3398,12 +3370,23 @@ def render_index() -> str:
     function dispatchArrowPoints(points, primary = false) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
-      const [x1, y1] = svgPoint(usable[usable.length - 2]);
-      const [x2, y2] = svgPoint(usable[usable.length - 1]);
+      let bestStart = usable[usable.length - 2];
+      let bestEnd = usable[usable.length - 1];
+      let bestDistance = -1;
+      for (let index = 1; index < usable.length; index += 1) {
+        const segmentDistance = distance2D(usable[index - 1], usable[index]);
+        if (segmentDistance > bestDistance) {
+          bestDistance = segmentDistance;
+          bestStart = usable[index - 1];
+          bestEnd = usable[index];
+        }
+      }
+      const [x1, y1] = svgPoint(bestStart);
+      const [x2, y2] = svgPoint(bestEnd);
       const angle = Math.atan2(y2 - y1, x2 - x1);
       const size = primary ? 9 : 6;
-      const tipX = x2;
-      const tipY = y2;
+      const tipX = x1 + (x2 - x1) * 0.68;
+      const tipY = y1 + (y2 - y1) * 0.68;
       const leftX = tipX - Math.cos(angle - 0.52) * size;
       const leftY = tipY - Math.sin(angle - 0.52) * size;
       const rightX = tipX - Math.cos(angle + 0.52) * size;
@@ -3668,24 +3651,26 @@ def render_index() -> str:
           .slice()
           .sort((a, b) => safeNumber(a.cost, 0) - safeNumber(b.cost, 0))
           .slice(0, 3);
-        $("detail-title").textContent = "商家：" + entity.id;
-        $("detail-courier").textContent = relatedCandidates[0] ? relatedCandidates[0].courier_id : "-";
-        $("detail-merchant").innerHTML = `黄色点位为商家侧订单入口，位于道路边/建筑边；坐标 <code>${coordinateText(entity)}</code>，当前有 <code>${merchant.order_count || 1}</code> 单待派。`;
-        $("detail-orders").innerHTML = relatedCandidates.map((candidate) => `<span class="chip">${candidate.courier_id} · ${Math.round(safeNumber(candidate.accept_probability, 0) * 100)}%</span>`).join("");
-        $("detail-eta").textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} min 期望` : "-";
+        $("detail-title").textContent = "商家输入：" + entity.id;
+        $("detail-courier").textContent = relatedCandidates[0] ? `候选骑手 ${relatedCandidates[0].courier_id}` : "待匹配";
+        $("detail-merchant").innerHTML = `该点代表商家及其订单入口，当前 <code>${merchant.order_count || 1}</code> 单待派；推理完成后会锁定最终承接骑手。`;
+        $("detail-orders").innerHTML = relatedCandidates.length
+          ? relatedCandidates.map((candidate) => `<span class="chip">${candidate.courier_id} · 接单 ${Math.round(safeNumber(candidate.accept_probability, 0) * 100)}%</span>`).join("")
+          : `<span class="chip">等待候选生成</span>`;
+        $("detail-eta").textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} min 目标` : "-";
         $("right-cost").textContent = merchant.expected_price ? money(merchant.expected_price) : "-";
         document.querySelector(".prob span").textContent = relatedCandidates[0] ? `${Math.round(safeNumber(relatedCandidates[0].accept_probability, 0) * 100)}%` : "--";
         $("detail-reasons").innerHTML = [
-          `<li>商家点不会压在道路中心线，坐标按最近道路边缘和商圈热区生成。</li>`,
-          `<li>候选骑手来自当前刷新样本，不是写死数据。</li>`,
-          `<li>点击运行后才会把该商家最终派给一个骑手并显示连线。</li>`
+          "<li>候选骑手按距离、接单意愿、价格和风险综合排序。</li>",
+          "<li>当前仅展示输入侧候选，不提前显示最终派单。</li>",
+          "<li>接单概率用于判断该商家是否需要多派候选或风险平衡策略。</li>"
         ].join("");
         const rows = document.querySelectorAll(".decision-card.evidence .row strong");
         if (rows[0]) rows[0].textContent = merchant.hotspot === "crossroad" ? "路口商圈" : "街区商家";
-        if (rows[1]) rows[1].textContent = coordinateText(entity);
+        if (rows[1]) rows[1].textContent = relatedCandidates.length ? relatedCandidates.map((candidate) => candidate.courier_id).join(" / ") : "待匹配";
         if (rows[2]) rows[2].textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} min` : "-";
         if (rows[3]) rows[3].textContent = relatedCandidates[0] ? relatedCandidates[0].risk : "-";
-        if (rows[4]) rows[4].textContent = sample.selected_strategy_id || "-";
+        if (rows[4]) rows[4].textContent = "待评估";
         showToast(`已选中商家 ${entity.id}`);
         return true;
       }
@@ -3708,21 +3693,21 @@ def render_index() -> str:
             };
           }).sort((a, b) => safeNumber(a.cost, 0) - safeNumber(b.cost, 0)).slice(0, 4);
         }
-        $("detail-title").textContent = "骑手位置：" + entity.id;
+        $("detail-title").textContent = "骑手输入：" + entity.id;
         $("detail-courier").textContent = entity.id;
-        $("detail-merchant").innerHTML = `骑手位于道路上/道路边，坐标 <code>${coordinateText(entity)}</code>，当前状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>。`;
-        $("detail-orders").innerHTML = relatedCandidates.map((candidate) => `<span class="chip">${candidate.merchant_id}</span>`).join("");
+        $("detail-merchant").innerHTML = `当前状态 <code>${courier.status || "available"}</code>，可承接容量 <code>${courier.capacity || 1}</code>；接单意愿会影响最终是否绑定该骑手。`;
+        $("detail-orders").innerHTML = relatedCandidates.map((candidate) => `<span class="chip">${candidate.merchant_id} · ${candidate.risk}</span>`).join("");
         $("detail-eta").textContent = relatedCandidates[0] ? `${relatedCandidates[0].eta_min} min 最近候选` : "-";
         $("right-cost").textContent = relatedCandidates[0] ? money(relatedCandidates[0].cost) : "-";
         document.querySelector(".prob span").textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
         $("detail-reasons").innerHTML = [
-          `<li>骑手位置按当前道路网络吸附生成，不放到建筑块内部。</li>`,
-          `<li>接单意愿会影响候选排序、风险和最终策略选择。</li>`,
-          `<li>该骑手当前可接候选：${relatedCandidates.map((candidate) => candidate.merchant_id).join("、") || "暂无"}。</li>`
+          `<li>候选商家：${relatedCandidates.map((candidate) => candidate.merchant_id).join("、") || "暂无"}。</li>`,
+          "<li>系统优先避免把低意愿骑手绑定到高风险商家。</li>",
+          "<li>运行完成后，如果该骑手被选中，地图会显示其承接的商家关系线。</li>"
         ].join("");
         const rows = document.querySelectorAll(".decision-card.evidence .row strong");
         if (rows[0]) rows[0].textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
-        if (rows[1]) rows[1].textContent = coordinateText(entity);
+        if (rows[1]) rows[1].textContent = relatedCandidates.map((candidate) => candidate.merchant_id).join(" / ") || "-";
         if (rows[2]) rows[2].textContent = courier.status || "-";
         if (rows[3]) rows[3].textContent = relatedCandidates[0] ? relatedCandidates[0].risk : "-";
         if (rows[4]) rows[4].textContent = relatedCandidates.length + " 个候选";
@@ -3748,22 +3733,22 @@ def render_index() -> str:
       if (entity.kind === "merchant_order" || entity.kind === "pickup_cluster") {
         setDetailContext("merchant", assignmentId, entityId, "");
         const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
-        $("detail-title").textContent = "商家详情：" + entity.id;
-        $("detail-courier").textContent = assignment.courier;
-        $("detail-merchant").innerHTML = `商家坐标 <code>${coordinateText(entity)}</code>，共 <code>${orderCount}</code> 单，最终派给 <code>${assignment.courier}</code>。`;
+        $("detail-title").textContent = "商家派单：" + entity.id;
+        $("detail-courier").textContent = `派给 ${assignment.courier}`;
+        $("detail-merchant").innerHTML = `该商家共 <code>${orderCount}</code> 单，最终由 <code>${assignment.courier}</code> 承接。`;
         $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
         $("detail-eta").textContent = assignment.eta;
         $("right-cost").textContent = assignment.cost;
         document.querySelector(".prob span").textContent = assignment.probability;
         $("detail-reasons").innerHTML = [
           `<li>派单对象：${entity.id} → ${assignment.courier}，覆盖该商家 ${orderCount} 单。</li>`,
-          `<li>订单期望：${merchant.expected_eta_min || "-"} min，预估收入 ${merchant.expected_price ? money(merchant.expected_price) : "-"}。</li>`,
-          `<li>策略依据：${strategyText}；风险等级 ${assignment.risk}。</li>`,
-          `<li>${assignment.merchantNote || "位置由当前刷新样本和匿名道路网络生成。"}</li>`
+          `<li>时效目标：${merchant.expected_eta_min || "-"} min；预计派单成本 ${assignment.cost}。</li>`,
+          `<li>策略依据：${strategyText}；风险等级 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`,
+          `<li>${assignment.merchantNote || "该派单来自当前场景样本的最终策略选择。"}</li>`
         ].join("");
         const rows = document.querySelectorAll(".decision-card.evidence .row strong");
         if (rows[0]) rows[0].textContent = assignment.fit;
-        if (rows[1]) rows[1].textContent = coordinateText(entity);
+        if (rows[1]) rows[1].textContent = assignment.courier;
         if (rows[2]) rows[2].textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} min` : assignment.eta;
         if (rows[3]) rows[3].textContent = assignment.risk;
         if (rows[4]) rows[4].textContent = strategyText;
@@ -3778,22 +3763,22 @@ def render_index() -> str:
           ? Math.round(courierAssignments.reduce((sum, [, item]) => sum + safeNumber(String(item.eta || "").replace("min", ""), 0), 0) / courierAssignments.length)
           : 0;
         setDetailContext("courier", assignmentId, entityId, "");
-        $("detail-title").textContent = "骑手详情：" + entity.id;
-        $("detail-courier").textContent = entity.id;
-        $("detail-merchant").innerHTML = `骑手坐标 <code>${coordinateText(entity)}</code>，状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>，当前承接 <code>${courierAssignments.length}</code> 个商家。`;
-        $("detail-orders").innerHTML = assignedOrders.map((order) => `<span class="chip">${order}</span>`).join("") || `<span class="chip">暂无最终订单</span>`;
+        $("detail-title").textContent = "骑手承接：" + entity.id;
+        $("detail-courier").textContent = `${courierAssignments.length} 个商家`;
+        $("detail-merchant").innerHTML = `状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>，本轮承接 <code>${courierAssignments.length}</code> 个商家。`;
+        $("detail-orders").innerHTML = courierAssignments.map(([, item]) => `<span class="chip">${item.pickup}</span>`).join("") || `<span class="chip">暂无最终派单</span>`;
         $("detail-eta").textContent = avgEta ? `${avgEta} min 平均` : assignment.eta;
         $("right-cost").textContent = money(totalCost || safeNumber(String(assignment.cost || "0").replace("$", ""), 0));
         document.querySelector(".prob span").textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
         $("detail-reasons").innerHTML = [
           `<li>骑手接单意愿 ${Math.round(safeNumber(courier.willingness, 0) * 100)}%，当前状态 ${courier.status || "available"}。</li>`,
           `<li>已分配商家：${courierAssignments.map(([, item]) => item.pickup).join("、") || "-"}。</li>`,
-          `<li>承接商家订单：${assignedOrders.join("、") || "-"}。</li>`,
-          `<li>最近匹配候选成本 ${candidate ? money(candidate.cost) : assignment.cost}，风险 ${assignment.risk}。</li>`
+          `<li>覆盖订单数：${assignedOrders.length || 0}；平均 ETA：${avgEta ? avgEta + " min" : assignment.eta}。</li>`,
+          `<li>当前风险 ${assignment.risk}；累计派单成本 ${money(totalCost || safeNumber(String(assignment.cost || "0").replace("$", ""), 0))}。</li>`
         ].join("");
         const rows = document.querySelectorAll(".decision-card.evidence .row strong");
         if (rows[0]) rows[0].textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
-        if (rows[1]) rows[1].textContent = coordinateText(entity);
+        if (rows[1]) rows[1].textContent = courierAssignments.map(([, item]) => item.pickup).join(" / ") || "-";
         if (rows[2]) rows[2].textContent = courier.status || "-";
         if (rows[3]) rows[3].textContent = assignment.risk;
         if (rows[4]) rows[4].textContent = `${courierAssignments.length} 个商家`;
@@ -3818,18 +3803,17 @@ def render_index() -> str:
       const legLabel = "骑手到商家";
       const endpointText = `${courierId} → ${merchantId}`;
       setDetailContext("route", resolvedAssignment, merchantId, leg || "courier-to-merchant");
-      $("detail-title").textContent = "线路详情：" + legLabel;
+      $("detail-title").textContent = "派单关系：" + legLabel;
       $("detail-courier").textContent = assignment.courier;
-      $("detail-merchant").innerHTML = `线路 <code>${endpointText}</code>，${legLabel}，道路折线节点 <code>${routePoints || "-"}</code> 个。`;
+      $("detail-merchant").innerHTML = `关系线 <code>${endpointText}</code>，用于表达骑手承接商家；线条沿稳定调度路网绘制，不作为真实导航指令。`;
       $("detail-orders").innerHTML = [merchantId, courierId].filter(Boolean).map((item) => `<span class="chip">${item}</span>`).join("");
       $("detail-eta").textContent = assignment.eta;
       $("right-cost").textContent = assignment.cost;
       document.querySelector(".prob span").textContent = assignment.probability;
       $("detail-reasons").innerHTML = [
-        `<li>该线段属于 assignment ${resolvedAssignment}，不是静态装饰线。</li>`,
-        `<li>起点/终点：${endpointText}；坐标 ${coordinateText(courier)} → ${coordinateText(merchant)}。</li>`,
-        `<li>线路沿匿名道路层折线吸附，节点数 ${routePoints || "-"}，降低直穿建筑的视觉问题。</li>`,
-        `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}，接单概率 ${assignment.probability}。</li>`
+        `<li>该线属于派单 ${resolvedAssignment}，点击后聚焦对应商家与骑手。</li>`,
+        `<li>折线节点 ${routePoints || "-"} 个，采用稳定调度线，避免运行后路径跳变。</li>`,
+        `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
       if (rows[0]) rows[0].textContent = routePoints ? `${routePoints} 节点` : "-";
@@ -3863,6 +3847,7 @@ def render_index() -> str:
       const scoreText = node ? (node.querySelector("strong") && node.querySelector("strong").textContent.replace(strategyStatusText(node), "").trim()) : "--";
       const statusText = strategyStatusText(node);
       const isSelected = node && node.dataset.reasoningStatus === "selected";
+      const revealDetail = statusText === "已选中" || statusText === "已淘汰";
       const profile = currentProfile || profileForCase(selectedCase());
       if (isSelected && profile && profile.assignments && Object.keys(profile.assignments).length) {
         applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
@@ -3873,22 +3858,22 @@ def render_index() -> str:
       $("detail-merchant").innerHTML = `策略 <code>${branch.title}</code> 当前状态 <code>${statusText}</code>，用于${branch.desc}。`;
       $("detail-orders").innerHTML = [
         `<span class="chip">${branch.id}</span>`,
-        sampleItem && sampleItem.rank ? `<span class="chip">排名 ${sampleItem.rank}</span>` : "",
-        sampleItem && sampleItem.evidence ? `<span class="chip">${sampleItem.evidence}</span>` : ""
+        revealDetail && sampleItem && sampleItem.rank ? `<span class="chip">排名 ${sampleItem.rank}</span>` : "",
+        revealDetail && sampleItem && sampleItem.evidence ? `<span class="chip">${sampleItem.evidence}</span>` : ""
       ].filter(Boolean).join("");
-      $("detail-eta").textContent = sampleItem && sampleItem.score ? Number(sampleItem.score).toFixed(2) : scoreText || "-";
+      $("detail-eta").textContent = revealDetail && sampleItem && sampleItem.score ? Number(sampleItem.score).toFixed(2) : (statusText === "评估中" ? "计算中" : "-");
       $("right-cost").textContent = isSelected && profile ? profile.cost : "-";
-      document.querySelector(".prob span").textContent = sampleItem && sampleItem.score ? `${Math.round(safeNumber(sampleItem.score, 0) * 100)}%` : "--";
+      document.querySelector(".prob span").textContent = revealDetail && sampleItem && sampleItem.score ? `${Math.round(safeNumber(sampleItem.score, 0) * 100)}%` : "--";
       $("detail-reasons").innerHTML = [
-        `<li>该卡片来自当前样本的策略评分链路，不是静态展示。</li>`,
+        "<li>该卡片来自当前场景的策略评分链路，不是静态展示。</li>",
         `<li>策略说明：${branch.desc}。</li>`,
-        `<li>样本证据：${sampleItem && sampleItem.evidence ? sampleItem.evidence : "等待刷新样本或运行推理后生成证据"}。</li>`,
-        `<li>当前状态：${statusText}${isSelected ? "，地图保持展示全部最终派单关系。" : "，可与选中策略对比成本、风险和覆盖率。"}。</li>`
+        `<li>策略证据：${revealDetail && sampleItem && sampleItem.evidence ? sampleItem.evidence : "运行推理到该策略后再显示"}。</li>`,
+        `<li>当前状态：${statusText}${isSelected ? "，地图保持展示全部最终派单关系" : "，可与选中策略对比成本、风险和覆盖率"}。</li>`
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
       if (rows[0]) rows[0].textContent = branch.title;
-      if (rows[1]) rows[1].textContent = sampleItem && sampleItem.evidence ? sampleItem.evidence : "-";
-      if (rows[2]) rows[2].textContent = sampleItem && sampleItem.score ? Number(sampleItem.score).toFixed(2) : scoreText || "-";
+      if (rows[1]) rows[1].textContent = revealDetail && sampleItem && sampleItem.evidence ? sampleItem.evidence : "-";
+      if (rows[2]) rows[2].textContent = revealDetail && sampleItem && sampleItem.score ? Number(sampleItem.score).toFixed(2) : "-";
       if (rows[3]) rows[3].textContent = statusText;
       if (rows[4]) rows[4].textContent = branch.id;
       showToast(`策略 ${branch.id}：${statusText}`);
@@ -3905,30 +3890,39 @@ def render_index() -> str:
         document.querySelectorAll(".strategy").forEach((node) => node.classList.toggle("inspected", node.dataset.branch === branchId));
       }
       setDetailContext("table-row", row.dataset.assignment || "", branchId || rowType, "");
+      const rowDescriptions = {
+        "scene-summary": "该行说明当前调度场景输入，包括商家规模、骑手供给、天气/密度和风险画像。",
+        "preview-strategy": "该行展示刷新场景后的预期策略倾向，只作为推理前输入，不提前泄露最终结果。",
+        "strategy-candidate": "该行对比一种候选派单策略在覆盖率、ETA、成本、骑手占用和无人接单风险上的表现。",
+        "final-strategy": "该行是 AutoSolver 最终采纳方案，用于和贪心、合单、多派、修复、风险平衡策略做业务对比。",
+        "empty-state": "该行提示当前工作台状态：刷新场景可查看输入，运行推理后才生成最终派单。"
+      };
       const title = rowType === "preview-candidate"
         ? `候选关系：${row.dataset.merchant || cells[0] || "-"} → ${row.dataset.courier || "-"}`
-        : rowType === "sample-summary"
-        ? `样本概览：${cells[0] || "-"}`
+        : rowType === "scene-summary"
+        ? `场景输入：${cells[0] || "-"}`
         : `策略对比：${cells[0] || "-"}`;
       $("detail-title").textContent = title;
       $("detail-courier").textContent = row.dataset.courier || row.dataset.status || cells[7] || "-";
+      const rowEta = row.dataset.eta || cells[2] || "";
+      const rowEtaText = rowEta && /min|分钟/.test(rowEta) ? rowEta : (rowEta ? `${rowEta} min` : "-");
       $("detail-merchant").innerHTML = rowType === "preview-candidate"
-        ? `候选派单来自当前刷新样本：商家 <code>${row.dataset.merchant || "-"}</code>，骑手 <code>${row.dataset.courier || "-"}</code>。`
-        : `表格行类型 <code>${rowType}</code>，对应策略 <code>${branchId || row.dataset.strategy || "-"}</code>。`;
+        ? `候选派单来自当前场景输入：商家 <code>${row.dataset.merchant || "-"}</code>，骑手 <code>${row.dataset.courier || "-"}</code>。`
+        : `${rowDescriptions[rowType] || "该行用于解释当前派单工作台的策略或结果。"}${branchId ? ` 对应策略 <code>${branchId}</code>。` : ""}`;
       $("detail-orders").innerHTML = cells.slice(0, 4).map((item) => `<span class="chip">${item || "-"}</span>`).join("");
-      $("detail-eta").textContent = row.dataset.eta ? `${row.dataset.eta} min` : (cells[2] || "-");
+      $("detail-eta").textContent = rowEtaText;
       $("right-cost").textContent = row.dataset.cost || cells[3] || "-";
       document.querySelector(".prob span").textContent = row.dataset.probability || (row.dataset.score ? `${Math.round(safeNumber(row.dataset.score, 0) * 100)}%` : "--");
       $("detail-reasons").innerHTML = [
-        `<li>该详情由表格行点击触发，用于说明候选/最终策略，不是纯视觉表格。</li>`,
+        `<li>${rowDescriptions[rowType] || "该详情由表格行点击触发，用于说明候选/最终策略，不是纯视觉表格。"}</li>`,
         `<li>覆盖率：${cells[1] || "-"}；ETA：${cells[2] || "-"}；成本：${cells[3] || "-"}。</li>`,
         `<li>风险：${row.dataset.risk || cells[5] || "-"}；状态：${row.dataset.status || cells[7] || "-"}。</li>`,
-        `<li>业务解释：${cells[8] || "等待刷新样本后生成候选关系"}。</li>`
+        `<li>业务解释：${cells[8] || "等待刷新场景后生成候选关系"}。</li>`
       ].join("");
       const rows = document.querySelectorAll(".decision-card.evidence .row strong");
       if (rows[0]) rows[0].textContent = cells[1] || "-";
       if (rows[1]) rows[1].textContent = row.dataset.cost || cells[3] || "-";
-      if (rows[2]) rows[2].textContent = row.dataset.eta ? `${row.dataset.eta} min` : (cells[2] || "-");
+      if (rows[2]) rows[2].textContent = rowEtaText;
       if (rows[3]) rows[3].textContent = row.dataset.risk || cells[5] || "-";
       if (rows[4]) rows[4].textContent = branchId || rowType;
       showToast(`已打开表格详情：${cells[0] || rowType}`);
@@ -4036,15 +4030,22 @@ def render_index() -> str:
       const bestCost = safeNumber(best["local" + "_cost"], Number(profile.cost.replace(/[$,]/g, "")) || 657.1);
       const totalTasks = safeNumber(best.total_tasks || (report && report.features && report.features.tasks), 38);
       const fallbackRows = [
-        {name: "greedy_baseline", ["local" + "_cost"]: bestCost * 3.2, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 8, accepted: false, valid: true},
         {name: "disjoint_then_multidispatch", ["local" + "_cost"]: bestCost * 1.05, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 6, accepted: true, valid: true},
         {name: "single_task_multidispatch", ["local" + "_cost"]: bestCost * 1.88, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 9, accepted: false, valid: true},
         {name: "sparse_cover", ["local" + "_cost"]: bestCost * 1.54, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
+        {name: "greedy_baseline", ["local" + "_cost"]: bestCost * 3.2, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 8, accepted: false, valid: true},
+        {name: "risk_balancing", ["local" + "_cost"]: bestCost * 1.28, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
       ];
       const usingFallbackRows = attempts.length === 0;
-      const rows = (usingFallbackRows ? fallbackRows : attempts).slice(0, 4);
+      const sourceRows = usingFallbackRows ? fallbackRows : attempts;
+      const rows = strategyBranchCatalog.map((branch) => {
+        const matched = sourceRows
+          .filter((item) => strategyMatchesBranch(item, branch, profile))
+          .sort((left, right) => localCostOf(left) - localCostOf(right))[0];
+        return matched || fallbackRows.find((item) => branchForStrategy(item.name, profile) === branch.id) || null;
+      }).filter(Boolean);
       const tableRows = rows.map((item) => {
-        const branch = branchForStrategy(item.name, profile);
+        const branchId = branchForStrategy(item.name, profile);
         const reportedTotal = safeNumber(item.total_tasks || item.totalTasks, totalTasks);
         const total = reportedTotal > 0 ? reportedTotal : totalTasks;
         const reportedCovered = item.covered_tasks ?? item.coveredTasks;
@@ -4056,8 +4057,15 @@ def render_index() -> str:
         const status = item.accepted ? "可行" : "已淘汰";
         const statusClass = item.accepted ? "status-ok" : "status-bad";
         const score = Math.max(0.35, Math.min(0.91, bestCost / Math.max(cost, 1))).toFixed(2);
-        const insight = item.accepted ? "当前 best-so-far，被 Critic 接受" : (item.valid ? "成本或资源占用高于当前最优" : "覆盖或约束校验失败");
-        return `<tr data-row-type="strategy-candidate" data-branch="${escapeAttr(branch.id)}" data-strategy="${escapeAttr(item.name || "")}" data-cost="${escapeAttr(money(cost))}" data-eta="${escapeAttr((12 + safeNumber(item.groups, 6) * 0.7).toFixed(1))}" data-risk="${escapeAttr(risk)}" data-score="${score}" data-status="${escapeAttr(status)}"><td>${strategyLabel(item.name)}</td><td>${coverage}%</td><td>${(12 + safeNumber(item.groups, 6) * 0.7).toFixed(1)} min</td><td>${money(cost)}</td><td>${safeNumber(item.groups, 0)} 个骑手</td><td>${risk} (${profile.missedRisk})</td><td>${score}</td><td class="${statusClass}">${status}</td><td>${insight}</td></tr>`;
+        const insightByBranch = {
+          S1: item.accepted ? "订单集中度高，合单后骑手占用更稳定" : "合单收益不足或局部绕行偏大",
+          S2: "保留多个骑手候选，适合距离接近但资源占用更高",
+          S3: "可修复高风险派单，但整体成本仍高于当前方案",
+          S4: "最近骑手优先，作为业务基线但容易放大无人接单风险",
+          S5: "降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+        };
+        const insight = insightByBranch[branchId] || (item.valid ? "成本或资源占用高于当前最优" : "覆盖或约束校验失败");
+        return `<tr data-row-type="strategy-candidate" data-branch="${escapeAttr(branchId)}" data-strategy="${escapeAttr(item.name || "")}" data-cost="${escapeAttr(money(cost))}" data-eta="${escapeAttr((12 + safeNumber(item.groups, 6) * 0.7).toFixed(1))}" data-risk="${escapeAttr(risk)}" data-score="${score}" data-status="${escapeAttr(status)}"><td>${strategyLabel(item.name)}</td><td>${coverage}%</td><td>${(12 + safeNumber(item.groups, 6) * 0.7).toFixed(1)} min</td><td>${money(cost)}</td><td>${safeNumber(item.groups, 0)} 个骑手</td><td>${risk} (${profile.missedRisk})</td><td>${score}</td><td class="${statusClass}">${status}</td><td>${insight}</td></tr>`;
       });
       const used = safeNumber(best.used_couriers || best.groups, 6);
       tableRows.push(`<tr class="emphasis" data-row-type="final-strategy" data-branch="${escapeAttr(selectedBranchForReport(report, profile))}" data-strategy="production_solver" data-cost="${escapeAttr(money(bestCost))}" data-eta="${escapeAttr(profile.eta)}" data-risk="Low" data-score="0.89" data-status="已选中"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>${totalTasks ? Math.round(safeNumber(best.covered_tasks, totalTasks) / totalTasks * 100) : 100}%</b></td><td><b>${profile.eta}</b></td><td><b id="table-cost">${money(bestCost)}</b></td><td><b>${used} 个骑手</b></td><td><b>Low (${profile.missedRisk})</b></td><td><b>0.89</b></td><td><b>已选中</b></td><td><b>成本、风险、ETA 综合最优</b></td></tr>`);
@@ -4086,33 +4094,10 @@ def render_index() -> str:
       $("right-cost").textContent = "-";
       $("improvement").textContent = "--";
       clearDispatchResult(profile);
-      const activeScenario = selectedScenarioId();
-      document.querySelectorAll(".scene-button").forEach((button) => {
-        button.classList.toggle("active", button.dataset.scenario === activeScenario || button.dataset.case === activeCase);
-      });
       if (source === "button") setStatus("已选择场景：" + profile.label, false);
     }
     function renderSimulationSceneButtons(scenarios) {
-      const strip = document.querySelector(".scene-strip");
-      if (!strip || !Array.isArray(scenarios) || scenarios.length === 0) return;
-      strip.innerHTML = scenarios.map((item) => {
-        const strategies = Array.isArray(item.primary_strategies) ? item.primary_strategies.join("/") : "";
-        return `<button class="scene-button" data-case="${item.case_id}" data-scenario="${item.id}"><strong>${item.name}</strong><span>${item.sample_count} samples · ${strategies}</span></button>`;
-      }).join("");
-      strip.querySelectorAll(".scene-button").forEach((button) => {
-        button.addEventListener("click", async () => {
-          if (button.dataset.scenario) {
-            try {
-              await loadSimulationScenario(button.dataset.scenario);
-            } catch (error) {
-              console.error(error);
-              setStatus("加载仿真场景失败", false);
-            }
-            return;
-          }
-          applyScene(button.dataset.case, "button");
-        });
-      });
+      return Array.isArray(scenarios);
     }
     async function loadCases() {
       try {
@@ -4135,7 +4120,7 @@ def render_index() -> str:
             const option = document.createElement("option");
             option.value = item.case_id || item.id;
             option.dataset.scenario = item.id;
-            option.textContent = `${item.name} · ${item.sample_count} samples`;
+            option.textContent = item.name;
             select.appendChild(option);
           });
           renderSimulationSceneButtons(scenarios);
@@ -4143,7 +4128,7 @@ def render_index() -> str:
           (payload.cases || [{id: "large_seed301"}]).forEach((item) => {
             const option = document.createElement("option");
             option.value = item.id;
-            option.textContent = item.scenario_name ? `${item.scenario_name} · ${item.id}` : item.id;
+            option.textContent = item.scenario_name || item.id;
             select.appendChild(option);
           });
         }
@@ -4260,7 +4245,7 @@ def render_index() -> str:
         const routeSvg = document.querySelector(".route-svg");
         if (routeSvg) routeSvg.innerHTML = "";
         document.body.classList.add("pending-run", "sample-preview", "reasoning");
-        setStatus(`基于 ${sample.name} ${sampleNumberLabel(sample)} 推理`, true);
+        setStatus(`基于 ${sample.name} 推理`, true);
         updateReasonSummary(profile, null);
         setReasoningState(sample, -1, false);
         updateReasonProgress(0);
@@ -4269,7 +4254,7 @@ def render_index() -> str:
         setStatus(`识别 ${sample.name} 的订单密度、骑手意愿和路况风险`, true);
         await wait(DEMO_REASONING_PHASE_DELAYS.perception);
         updateReasonProgress(2);
-        setStatus(`生成候选派单策略：${sample.seed}`, true);
+        setStatus("生成候选派单策略", true);
         await wait(DEMO_REASONING_PHASE_DELAYS.candidates);
         const evaluationOrder = reasoningOrderForSample(sample);
         for (let index = 0; index < evaluationOrder.length; index += 1) {
@@ -4277,7 +4262,7 @@ def render_index() -> str:
           const branch = strategyBranchCatalog.find((item) => item.id === branchId);
           setReasoningState(sample, index, false);
           updateReasonProgress(index < 2 ? 3 : 4);
-          setStatus(`评估策略 ${branchId}${branch ? " · " + branch.title : ""}：${sample.seed}`, true);
+          setStatus(`评估策略 ${branchId}${branch ? " · " + branch.title : ""}`, true);
           await wait(DEMO_REASONING_PHASE_DELAYS.perStrategy);
           await yieldUi();
         }
@@ -4286,22 +4271,22 @@ def render_index() -> str:
         setStatus(`最终选择 ${sample.selected_strategy_id}：复核成本、风险和接单概率`, true);
         await wait(DEMO_REASONING_PHASE_DELAYS.finalReview);
         await waitUntilElapsed(reasoningStartedAt, DEMO_REASONING_TARGET_MS);
-        setStatus(`最终选择 ${sample.selected_strategy_id}：生成当前样本派单线`, true);
+        setStatus(`最终选择 ${sample.selected_strategy_id}：生成当前场景派单线`, true);
         await yieldUi();
         if (routeSvg) routeSvg.innerHTML = "";
         const mapPayload = simulationFinalMap(sample);
         const report = reportForSimulationSample(sample, mapPayload);
         document.body.classList.remove("pending-run", "sample-preview", "reasoning");
         render(report);
-        setStatus("当前样本派单完成", false);
-        showToast("已按当前刷新样本生成最终派单线");
+        setStatus("当前场景派单完成", false);
+        showToast("已按当前场景生成最终派单线");
         return true;
       } catch (error) {
         console.error(error);
         clearReasoningState();
         document.body.classList.remove("pending-run", "sample-preview", "reasoning");
         setStatus("模拟派单运行失败", false);
-        showToast("运行失败，请刷新样本后重试");
+        showToast("运行失败，请刷新场景后重试");
         return false;
       }
     }
@@ -4347,10 +4332,11 @@ def render_index() -> str:
         applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
       }
       frame.classList.toggle("hide-candidates", mode === "selected");
+      frame.dataset.controlState = mode;
       document.querySelectorAll(".dispatch-link.secondary").forEach((route) => {
         route.style.opacity = mode === "candidates" ? "1" : "";
       });
-      showToast(mode === "selected" ? "仅显示最终派单" : mode === "candidates" ? "突出显示候选派单" : "显示全部派单图层");
+      showToast(mode === "selected" ? "已聚焦当前派单，其余关系降噪" : mode === "candidates" ? "已增强派单关系线，便于检查" : "显示全部派单图层");
     }
     function bindMapControls() {
       $("expand-graph").addEventListener("click", (event) => {
@@ -4366,18 +4352,24 @@ def render_index() -> str:
           button.classList.toggle("active");
           if (action === "depots") {
             const hidden = button.classList.contains("active");
-            document.querySelector(".map-frame").classList.toggle("hide-entities", hidden);
+            const frame = document.querySelector(".map-frame");
+            frame.classList.toggle("hide-entities", hidden);
+            frame.dataset.entitiesMuted = hidden ? "true" : "false";
             showToast(hidden ? "点位图层已弱化，仅保留派单关系" : "点位图层已恢复：商家与骑手可见");
             return;
           }
           if (action === "routes") {
             const active = button.classList.contains("active");
-            document.querySelector(".map-frame").classList.toggle("hide-dispatch-routes", active);
+            const frame = document.querySelector(".map-frame");
+            frame.classList.toggle("hide-dispatch-routes", active);
+            frame.dataset.routesHidden = active ? "true" : "false";
             showToast(active ? "派单关系线已隐藏，仅保留点位" : "派单关系线已恢复，展示商家 → 骑手关系");
             return;
           }
           if (action === "locate") {
-            document.querySelector(".map-frame").classList.add("locating");
+            const frame = document.querySelector(".map-frame");
+            frame.classList.add("locating");
+            frame.dataset.locating = "true";
             const profile = currentProfile || profileForCase(selectedCase());
             const selected = profile.assignments && (profile.assignments[profile.selected] || profile.assignments.A1);
             if (selected) {
@@ -4389,9 +4381,17 @@ def render_index() -> str:
             return;
           }
           if (action === "fit") {
-            document.querySelector(".map-frame").classList.remove("zoomed");
-            document.querySelector(".map-frame").classList.remove("locating");
+            const frame = document.querySelector(".map-frame");
+            frame.classList.remove("zoomed", "locating", "hide-entities", "hide-dispatch-routes", "hide-candidates");
+            frame.dataset.zoomLevel = "1";
+            frame.dataset.locating = "false";
+            frame.dataset.routesHidden = "false";
+            frame.dataset.entitiesMuted = "false";
+            frame.dataset.controlState = "all";
             $("zoom-in").classList.remove("active");
+            document.querySelectorAll('[data-map-action="depots"], [data-map-action="routes"]').forEach((node) => node.classList.remove("active"));
+            const layerMode = $("layer-mode");
+            if (layerMode) layerMode.value = "all";
             const profile = currentProfile || profileForCase(selectedCase());
             if (profile.assignments && Object.keys(profile.assignments).length) {
               applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
@@ -4403,7 +4403,10 @@ def render_index() -> str:
             return;
           }
           if (action === "fullscreen") {
-            const expanded = document.querySelector(".map-panel").classList.toggle("active");
+            const panel = document.querySelector(".map-panel");
+            const frame = document.querySelector(".map-frame");
+            const expanded = panel.classList.toggle("active");
+            frame.dataset.fullscreen = expanded ? "true" : "false";
             button.textContent = expanded ? "↙" : "↗";
             if (leafletMap) window.setTimeout(() => leafletMap.invalidateSize(false), 120);
             showToast(expanded ? "演示视图已进入地图聚焦模式" : "演示视图已退出地图聚焦模式");
@@ -4413,19 +4416,25 @@ def render_index() -> str:
         });
       });
       $("zoom-in").addEventListener("click", () => {
-        document.querySelector(".map-frame").classList.add("zoomed");
+        const frame = document.querySelector(".map-frame");
+        frame.classList.add("zoomed");
+        frame.dataset.zoomLevel = "1.16";
         if (leafletMap) leafletMap.zoomIn(1);
         $("zoom-in").classList.add("active");
         showToast("地图已放大");
       });
       $("zoom-out").addEventListener("click", () => {
-        document.querySelector(".map-frame").classList.remove("zoomed");
+        const frame = document.querySelector(".map-frame");
+        frame.classList.remove("zoomed");
+        frame.dataset.zoomLevel = "1";
         if (leafletMap) leafletMap.zoomOut(1);
         $("zoom-in").classList.remove("active");
         showToast("地图已缩小");
       });
       $("recenter").addEventListener("click", () => {
-        document.querySelector(".map-frame").classList.add("locating");
+        const frame = document.querySelector(".map-frame");
+        frame.classList.add("locating");
+        frame.dataset.locating = "true";
         const profile = currentProfile || profileForCase(selectedCase());
         if (profile.assignments && Object.keys(profile.assignments).length) {
           applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
@@ -4460,8 +4469,8 @@ def render_index() -> str:
     $("reload-cases").addEventListener("click", () => {
       refreshSimulationSample().catch((error) => {
         console.error(error);
-        setStatus("刷新样本失败", false);
-        showToast("刷新样本失败，请检查仿真场景接口");
+        setStatus("刷新场景失败", false);
+        showToast("刷新场景失败，请检查仿真场景接口");
       });
     });
     $("case-select").addEventListener("change", async () => {
@@ -4476,9 +4485,6 @@ def render_index() -> str:
         return;
       }
       applyScene(selectedCase());
-    });
-    document.querySelectorAll(".scene-button").forEach((button) => {
-      button.addEventListener("click", () => applyScene(button.dataset.case, "button"));
     });
     renderRasterTileBasemap();
     bindMapControls();
