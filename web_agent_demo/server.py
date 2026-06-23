@@ -29,7 +29,6 @@ except ImportError:  # The demo can still run before optional synthetic cases ar
 
 DATA_DIR = ROOT / "data" / "official_cases"
 GENERATED_CASE_DIR = ROOT / "web_agent_demo" / "generated_cases"
-STATIC_DIR = ROOT / "web_agent_demo" / "static"
 CASE_FILES = {
     "large_seed301": DATA_DIR / "large_seed301.txt",
 }
@@ -1252,12 +1251,13 @@ def render_index() -> str:
       inset: 0;
       z-index: 0;
       background:
-        linear-gradient(180deg, rgba(2, 9, 17, .12), rgba(2, 9, 17, .34)),
-        url("/assets/reference-dark-map.png") center / cover no-repeat;
-      opacity: .98;
+        radial-gradient(circle at 46% 42%, rgba(70, 104, 121, .18), transparent 30%),
+        radial-gradient(circle at 72% 24%, rgba(66, 89, 111, .16), transparent 28%),
+        linear-gradient(180deg, rgba(2, 9, 17, .08), rgba(2, 9, 17, .28));
+      opacity: .92;
       pointer-events: none;
     }
-    .map-frame.topology .map-bg { opacity: .38; filter: saturate(.44) contrast(.92) brightness(.64); }
+    .map-frame.topology .map-bg { opacity: .95; filter: saturate(.76) contrast(1.05) brightness(.86); }
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .74; z-index: 1; }
@@ -1289,14 +1289,14 @@ def render_index() -> str:
     .district, .zone-block { fill: rgba(24, 36, 47, .3); stroke: rgba(124, 146, 162, .075); stroke-width: 1; }
     .water { fill: rgba(11, 24, 35, .62); stroke: rgba(85, 116, 137, .14); }
     .building-block {
-      fill: rgba(36, 48, 58, .14);
-      stroke: rgba(126, 145, 158, .075);
+      fill: rgba(36, 48, 58, .24);
+      stroke: rgba(126, 145, 158, .09);
       stroke-width: .7;
       vector-effect: non-scaling-stroke;
     }
-    .building-block.commerce { fill: rgba(70, 57, 32, .13); stroke: rgba(255, 209, 45, .05); }
-    .building-block.office { fill: rgba(39, 56, 67, .12); }
-    .building-block.residential { fill: rgba(32, 47, 50, .1); }
+    .building-block.commerce { fill: rgba(70, 57, 32, .2); stroke: rgba(255, 209, 45, .07); }
+    .building-block.office { fill: rgba(39, 56, 67, .22); }
+    .building-block.residential { fill: rgba(32, 47, 50, .18); }
     .commerce-hotspot {
       fill: rgba(255, 174, 66, .085);
       stroke: rgba(255, 174, 66, .16);
@@ -1315,13 +1315,13 @@ def render_index() -> str:
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
     }
-    .road-base { stroke: rgba(0, 4, 9, .24); stroke-width: calc(var(--road-width, 8px) + 1.4px); }
-    .road-base.secondary { stroke: rgba(0, 4, 9, .18); stroke-width: calc(var(--road-width, 6px) + .8px); }
-    .road-base.service { stroke: rgba(0, 4, 9, .1); stroke-width: calc(var(--road-width, 4px) + .3px); }
-    .road-core { stroke: rgba(126, 139, 148, .13); stroke-width: var(--road-width, 6px); }
-    .road-core.arterial { stroke: rgba(172, 180, 186, .18); }
-    .road-core.secondary { stroke: rgba(109, 125, 135, .1); }
-    .road-core.service { stroke: rgba(87, 101, 112, .055); stroke-dasharray: 1 12; }
+    .road-base { stroke: rgba(0, 4, 9, .48); stroke-width: calc(var(--road-width, 8px) + 2px); }
+    .road-base.secondary { stroke: rgba(0, 4, 9, .38); stroke-width: calc(var(--road-width, 6px) + 1.2px); }
+    .road-base.service { stroke: rgba(0, 4, 9, .2); stroke-width: calc(var(--road-width, 4px) + .5px); }
+    .road-core { stroke: rgba(126, 139, 148, .3); stroke-width: var(--road-width, 6px); }
+    .road-core.arterial { stroke: rgba(172, 180, 186, .38); }
+    .road-core.secondary { stroke: rgba(109, 125, 135, .24); }
+    .road-core.service { stroke: rgba(87, 101, 112, .14); stroke-dasharray: 1 12; }
     .traffic-band { stroke-width: var(--traffic-width, 2px); opacity: .34; }
     .traffic-band.smooth { stroke: rgba(54, 230, 126, .18); }
     .traffic-band.moderate { stroke: rgba(255, 209, 45, .32); stroke-dasharray: 18 16; }
@@ -1350,7 +1350,7 @@ def render_index() -> str:
     .dispatch-link.secondary { stroke: rgba(103, 232, 249, .34); stroke-width: 1.45; stroke-dasharray: none; filter: none; opacity: .54; }
     .dispatch-link.overview-route { stroke: rgba(103, 232, 249, .3); stroke-width: 1.45; opacity: .48; filter: none; }
     .dispatch-link.pickup-leg { stroke: rgba(103, 232, 249, .56); stroke-width: 2.1; filter: none; }
-    .dispatch-link.pickup-leg.overview-route { stroke: rgba(103, 232, 249, .24); stroke-width: 1.15; opacity: .26; stroke-dasharray: none; filter: none; }
+    .dispatch-link.pickup-leg.overview-route { stroke: rgba(103, 232, 249, .42); stroke-width: 1.75; opacity: .58; stroke-dasharray: none; filter: none; }
     .dispatch-link.endpoint-connector { stroke: rgba(155, 232, 241, .2); stroke-width: 1.1; opacity: .34; stroke-dasharray: 3 4; filter: none; animation: none; pointer-events: none; }
     .dispatch-link.selected-overview {
       stroke: #9be8f1;
@@ -1361,8 +1361,8 @@ def render_index() -> str:
     }
     .dispatch-link.pickup-leg.selected-overview {
       stroke: rgba(155, 232, 241, .72);
-      stroke-width: 2.35;
-      opacity: .76;
+      stroke-width: 2.15;
+      opacity: .72;
     }
     .dispatch-arrow.selected-overview {
       fill: #9be8f1;
@@ -1464,10 +1464,10 @@ def render_index() -> str:
     .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .24; fill: rgba(43,222,205,.5); }
     .map-frame.assignment-overview .dispatch-link { stroke-dashoffset: 0; }
     .map-frame.assignment-overview .dispatch-link.primary { stroke: rgba(37, 234, 216, .82); stroke-width: 3.35; opacity: .94; filter: drop-shadow(0 0 5px rgba(37,234,216,.24)); }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .3); stroke-width: 1.35; opacity: .34; filter: none; }
-    .map-frame.assignment-overview .dispatch-link.pickup-leg.selected-overview { stroke: rgba(155, 232, 241, .82); stroke-width: 2.45; opacity: .8; filter: drop-shadow(0 0 4px rgba(155,232,241,.16)); }
-    .map-frame.assignment-overview .dispatch-arrow { opacity: .34; }
-    .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .82; }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg { stroke: rgba(37, 234, 216, .48); stroke-width: 1.7; opacity: .62; filter: none; }
+    .map-frame.assignment-overview .dispatch-link.pickup-leg.selected-overview { stroke: rgba(155, 232, 241, .78); stroke-width: 2.15; opacity: .76; filter: drop-shadow(0 0 4px rgba(155,232,241,.12)); }
+    .map-frame.assignment-overview .dispatch-arrow { opacity: .58; }
+    .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .76; }
     .map-frame.assignment-overview .dispatch-link.active-assignment { stroke: #25ead8; stroke-width: 4.15; opacity: 1; stroke-dasharray: 980; filter: drop-shadow(0 0 7px rgba(37,234,216,.42)); }
     .map-frame.assignment-overview .dispatch-arrow.active-assignment { opacity: .96; fill: #25ead8; }
     .map-frame.assignment-overview .dispatch-link.pickup-leg.long-pickup.active-assignment,
@@ -3232,14 +3232,14 @@ def render_index() -> str:
         const pickupPoint = entityPoints[assignment.pickup];
         if (!pickupPoint || courierPoints.length === 0) return "";
         const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
-        const isRecommendedOverview = Boolean(!focusMode && assignment.id === overviewAssignmentId);
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
         const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
         const pickupRoute = roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers);
         const pickupD = dispatchPathFor(pickupRoute);
         if (!pickupD) return "";
         const longPickup = longRouteClass(courierPoints[0], pickupPoint, pickupRoute, {direct: 21, span: 34, length: 44});
-        const pickupClass = `${cls} pickup-leg${isRecommendedOverview && !longPickup ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`;
+        const showInOverview = Boolean(!focusMode && !longPickup);
+        const pickupClass = `${cls} pickup-leg${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`;
         const pickupMeta = {
           merchant: assignment.pickup,
           courier: couriers[0],
@@ -3253,7 +3253,7 @@ def render_index() -> str:
           dispatchEndpointConnectorsFor(pickupRoute, assignment.id, pickupMeta),
           `<path class="${pickupClass}" data-assignment="${assignment.id}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
           dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
-          dispatchArrowFor(pickupRoute, `${arrowCls}${isRecommendedOverview && !longPickup ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
+          dispatchArrowFor(pickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
         ];
         return routeParts.join("");
       }).join("");
@@ -4191,26 +4191,9 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
-    def _send_static_asset(self, path: str) -> bool:
-        if path != "/assets/reference-dark-map.png":
-            return False
-        asset_path = STATIC_DIR / "reference-dark-map.png"
-        if not asset_path.exists():
-            return False
-        raw = asset_path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", "image/png")
-        self.send_header("Cache-Control", "public, max-age=3600")
-        self.send_header("Content-Length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
-        return True
-
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API.
         parsed = urlparse(self.path)
         try:
-            if parsed.path.startswith("/assets/") and self._send_static_asset(parsed.path):
-                return
             if parsed.path == "/":
                 self._send_html(render_index())
                 return

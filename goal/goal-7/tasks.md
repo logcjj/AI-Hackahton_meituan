@@ -138,3 +138,18 @@
 - 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+
+## Task 9: 去除模板截图直贴并默认显示全部派单线
+
+验证标准：地图底图不能直接复制用户参考图，不能残留参考图里的 T/C/D 等业务标记和路线；底图应由本项目程序生成类似深色导航地图结构。最终派单完成后所有商家到骑手的派单关系线默认可见，不需要点击才看见，且不能只高亮一条。
+
+完成记录：
+- 已删除上一轮错误的本地截图底图 `web_agent_demo/static/reference-dark-map.png`，移除 `/assets/reference-dark-map.png` 静态路由和所有 CSS 引用，页面不再直接复制粘贴用户参考图。
+- 已把地图底图恢复为程序生成：保留深色导航地图风格、匿名细路网、主路/支路层级、建筑块、商圈热区、路况带和天气层，但不包含参考图原有的 `T0023`、`D02`、`C017` 等残留业务标记。
+- 已增强程序化底图的道路、建筑和商圈层级，使其接近参考图结构但不直接使用参考截图。
+- 已修改最终态派单线显示逻辑：所有非长距离派单线默认加入 `selected-overview` 可见层，不再只突出一条；长距离线仍以低噪样式显示，避免消失。
+- 已补测试断言：禁止 HTML 中出现 `reference-dark-map` 和 `/assets/reference-dark-map.png`；要求 `showInOverview` 控制最终总览派单线可见。
+- 浏览器验证通过：`hasReferenceAsset=false`、`oldTemplateLabels=[]`、`runtime=00:00:10`、`routeCount=5`、`selectedOverview=5`、`visibleFullRoutes=5`、`mutedNotSelected=0`，最终截图为 `goal/goal-7/task9-generated-basemap-all-routes.png`，审计文件为 `goal/goal-7/task9-browser-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。

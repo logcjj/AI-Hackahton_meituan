@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import unittest
 from types import SimpleNamespace
 from unittest import mock
@@ -12,7 +11,6 @@ class WebAgentDemoTest(unittest.TestCase):
         from web_agent_demo.server import render_index
 
         html = render_index()
-        self.assertTrue((Path(__file__).resolve().parents[1] / "web_agent_demo" / "static" / "reference-dark-map.png").exists())
 
         self.assertIn("AutoSolver Agent", html)
         self.assertIn("Real-time Dispatch Assignment Optimization", html)
@@ -127,7 +125,8 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("district", html)
         self.assertIn("anonymous-navigation-layer", html)
         self.assertIn("simulated-map-layer", html)
-        self.assertIn("/assets/reference-dark-map.png", html)
+        self.assertNotIn("/assets/reference-dark-map.png", html)
+        self.assertNotIn("reference-dark-map", html)
         self.assertIn("renderSimulatedBaseMap", html)
         self.assertIn("building-block", html)
         self.assertIn("traffic-band", html)
@@ -164,7 +163,8 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("focus-selected", html)
         self.assertIn("data-selected-assignment", html)
         self.assertIn('pin.classList.toggle("active-assignment"', html)
-        self.assertIn('dispatchArrowFor(pickupRoute, `${arrowCls}${isRecommendedOverview && !longPickup ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)', html)
+        self.assertIn("const showInOverview = Boolean(!focusMode && !longPickup);", html)
+        self.assertIn('dispatchArrowFor(pickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)', html)
         self.assertIn('event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow, .dispatch-hit-area")', html)
         self.assertIn("function renderAssignmentOverviewDetail", html)
         self.assertIn("派单总览：全部商家已自动连线", html)

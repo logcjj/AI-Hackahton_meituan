@@ -1,0 +1,16 @@
+{
+  "frameClass": "map-frame topology assignment-overview",
+  "hasReferenceAsset": false,
+  "longRoutes": 0,
+  "mapStyle": "baidu_like_simulated",
+  "mutedNotSelected": 0,
+  "oldTemplateLabels": [],
+  "pinCount": 16,
+  "routeCount": 5,
+  "runtime": "00:00:10",
+  "scoreCards": [
+    "S1"
+  ],
+  "selectedOverview": 5,
+  "visibleFullRoutes": 5
+}
