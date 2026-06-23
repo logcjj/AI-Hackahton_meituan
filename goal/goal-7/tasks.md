@@ -117,6 +117,22 @@
 - 已同步修复 ReasonGraph 数字 bug：可行性校验最终态改为 `covered_tasks / total_tasks`，不再把派单组数除以候选策略数，避免出现 `6 / 5`。
 - 浏览器最终审计通过：`runtime=00:00:10`、`tileCount=15`、`loadedTileCount=15`、`leafletMarkers=0`、`leafletRoutes=0`、`svgRoutes=5`、`osrmRoutes=5`、`visibleOverviewRoutes=5`、`routeSvgOpacity=1`、`entityLayerOpacity=1`、`feasibilityValue=5 / 5`。
 - 截图与审计产物：`goal/goal-7/task11-duplicate-layer-final.png`、`goal/goal-7/task11-duplicate-layer-audit.json`。
+
+## Task 12: 修复派单线路跳变与异常绕路
+
+验证标准：最终派单线显示后不再从 fallback 路径异步跳到另一条 OSRM 路径；每条线只使用同一套稳定路径；长距离派单不画跨半屏大绕路，默认以低噪、短连接关系表达；浏览器审计证明 1 秒和 3 秒后的 `d` 路径完全一致。
+
+完成记录：
+- 已定位路径跳变原因：最终态先渲染本地 fallback 路径，随后 `upgradeDispatchRoutesWithOsrm()` 异步把 DOM 中同一条派单线替换成 OSRM 路径，导致第 1 秒和第 2 秒看到的线路不同。
+- 已取消最终派单线的 OSRM 异步覆盖，不再把远端 routing 结果写回已展示路径，避免运行完成后线路跳变。
+- 已新增 `stableDispatchRoute()`，最终总览用稳定短折线表达骑手到商家的派单关系；每条路径最多 4 个点，避免大范围绕行和跨半屏复杂折线。
+- 已移除 overview 里的 endpoint connector 叠加，避免路线端点出现额外小箭头/短线造成视觉误判。
+- 已把地图角标从 `OSRM routing` 改成 `stable dispatch routing`，避免和当前稳定派单线逻辑不一致。
+- 浏览器最终审计通过：`runtime=00:00:10`、`samePaths=true`、`osrmRoutes=0`、`stableRoutes=6`、`svgRoutes=6`、`selectedOverview=6`、`endpointConnectors=0`、`maxPoints=4`、`maxDSize=51`。
+- 截图与审计产物：`goal/goal-7/task12-stable-routing-final.png`、`goal/goal-7/task12-stable-routing-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
 - 浏览器自动点击限制说明：in-app browser 控制接口持续引用旧 tab，Chrome 的 AppleScript 执行 JS 被安全设置禁用，Computer Use 坐标点击不稳定；本轮已用 Chrome 可视初始状态、后端接口、HTML/JS 结构和全量测试完成可验证覆盖。
 
 ## Task 7: 修复策略分数提前泄露与派单线贴路问题

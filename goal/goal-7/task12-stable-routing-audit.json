@@ -1,0 +1,67 @@
+{
+  "courierPins": 14,
+  "endpointConnectors": 0,
+  "leafletMarkers": 0,
+  "loadedTileCount": 15,
+  "maxDSize": 51,
+  "maxPoints": 4,
+  "merchantPins": 6,
+  "osrmRoutes": 0,
+  "routeSamples": [
+    {
+      "assignment": "A0101",
+      "d": "M657.6 288.0 L588.0 288.0 L588.0 268.8 L484.1 268.8",
+      "length": "20.7",
+      "long": "false",
+      "points": "4",
+      "source": "stable-local"
+    },
+    {
+      "assignment": "A0102",
+      "d": "M657.6 288.0 L588.0 288.0 L496.9 285.4",
+      "length": "16.4",
+      "long": "false",
+      "points": "3",
+      "source": "stable-local"
+    },
+    {
+      "assignment": "A0103",
+      "d": "M422.4 397.4 L422.4 358.4 L431.2 324.5",
+      "length": "11.5",
+      "long": "false",
+      "points": "3",
+      "source": "stable-local"
+    },
+    {
+      "assignment": "A0104",
+      "d": "M322.4 202.9 L322.4 256.0 L411.6 256.0 L411.6 289.9",
+      "length": "22.7",
+      "long": "false",
+      "points": "4",
+      "source": "stable-local"
+    },
+    {
+      "assignment": "A0105",
+      "d": "M356.7 161.3 L356.7 230.4 L431.2 230.4 L438.1 222.7",
+      "length": "19.8",
+      "long": "false",
+      "points": "4",
+      "source": "stable-local"
+    },
+    {
+      "assignment": "A0106",
+      "d": "M682.1 209.3 L627.2 209.3 L627.2 246.4 L564.5 246.4",
+      "length": "17.8",
+      "long": "false",
+      "points": "4",
+      "source": "stable-local"
+    }
+  ],
+  "runtime": "00:00:10",
+  "samePaths": true,
+  "selectedOverview": 6,
+  "stableRoutes": 6,
+  "status": "当前样本派单完成",
+  "svgRoutes": 6,
+  "tileCount": 15
+}

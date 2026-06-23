@@ -1966,7 +1966,7 @@ def render_index() -> str:
           tiles.push(`<img alt="" data-tile="${zoom}/${x}/${y}" src="https://${subdomain}.basemaps.cartocdn.com/dark_nolabels/${zoom}/${x}/${y}.png" style="left:${left.toFixed(4)}%;top:${top.toFixed(4)}%;width:${tileWidth.toFixed(4)}%;height:${tileHeight.toFixed(4)}%;">`);
         }
       }
-      tileMap.innerHTML = tiles.join("") + `<span class="tile-credit">OSM / CARTO tiles · OSRM routing</span>`;
+      tileMap.innerHTML = tiles.join("") + `<span class="tile-credit">OSM / CARTO tiles · stable dispatch routing</span>`;
       frame.classList.add("tile-ready");
     }
     function ensureLeafletMap() {
@@ -3310,6 +3310,37 @@ def render_index() -> str:
       const hub = routeHubBetween(startSnap.point, endSnap.point, mapLayers);
       return roadTerminalRoute(start, startSnap, [startSnap.point, hub, endSnap.point], endSnap, end);
     }
+    function compactRoutePoints(points) {
+      return (points || []).filter(Boolean).reduce((list, point) => {
+        const normalized = [safeNumber(point[0], 50), safeNumber(point[1], 50)];
+        const previous = list[list.length - 1];
+        if (!previous || distance2D(previous, normalized) >= 1.2) list.push(normalized);
+        return list;
+      }, []);
+    }
+    function gridSnap(value, step = 4) {
+      return Math.max(4, Math.min(96, Math.round(safeNumber(value, 50) / step) * step));
+    }
+    function stableDispatchRoute(start, end) {
+      const sx = safeNumber(start && start[0], 50);
+      const sy = safeNumber(start && start[1], 50);
+      const ex = safeNumber(end && end[0], 50);
+      const ey = safeNumber(end && end[1], 50);
+      const dx = Math.abs(ex - sx);
+      const dy = Math.abs(ey - sy);
+      if (Math.hypot(dx, dy) < 7) return compactRoutePoints([[sx, sy], [ex, ey]]);
+      if (dx > dy * 1.45) {
+        const midX = gridSnap((sx + ex) / 2);
+        return compactRoutePoints([[sx, sy], [midX, sy], [midX, ey], [ex, ey]]);
+      }
+      if (dy > dx * 1.45) {
+        const midY = gridSnap((sy + ey) / 2);
+        return compactRoutePoints([[sx, sy], [sx, midY], [ex, midY], [ex, ey]]);
+      }
+      const firstTurn = dx >= dy ? [gridSnap(ex), sy] : [sx, gridSnap(ey)];
+      const secondTurn = dx >= dy ? [gridSnap(ex), gridSnap(ey)] : [gridSnap(ex), gridSnap(ey)];
+      return compactRoutePoints([[sx, sy], firstTurn, secondTurn, [ex, ey]]);
+    }
     function dispatchPathFor(points) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
@@ -3484,43 +3515,6 @@ def render_index() -> str:
       }).filter((item) => item.id);
       return scored.sort((left, right) => right.score - left.score)[0]?.id || selectedAssignment;
     }
-    function upgradeDispatchRoutesWithOsrm(profile, entityPoints, version) {
-      if (!profile || !profile.dispatchMap || !Array.isArray(profile.dispatchMap.assignments)) return;
-      profile.dispatchMap.assignments.forEach((assignment) => {
-        const couriers = assignment.map_couriers || courierTokens(assignment.courier);
-        const courierPoint = entityPoints[couriers[0]];
-        const pickupPoint = entityPoints[assignment.pickup];
-        if (!courierPoint || !pickupPoint) return;
-        const startLatLng = pointToLatLng(courierPoint);
-        const endLatLng = pointToLatLng(pickupPoint);
-        fetchOsrmRoute(startLatLng, endLatLng).then((latLngs) => {
-          if (version !== dispatchRouteVersion || !latLngs || latLngs.length < 2) return;
-          const routePoints = latLngs.map((latLng) => latLngToPoint(latLng));
-          const d = dispatchPathFor(routePoints);
-          if (!d) return;
-          const escapedId = cssEscapeValue(assignment.id);
-          const mainPath = document.querySelector(`.dispatch-link.pickup-leg[data-assignment="${escapedId}"]`);
-          const hitPath = document.querySelector(`.dispatch-hit-area.pickup-leg[data-assignment="${escapedId}"]`);
-          const arrow = document.querySelector(`.dispatch-arrow[data-assignment="${escapedId}"][data-route-role="arrow"]`);
-          if (mainPath) {
-            mainPath.setAttribute("d", d);
-            mainPath.dataset.routeSource = "osrm";
-            mainPath.dataset.routePoints = String(routePoints.length);
-            mainPath.dataset.routeLength = routePolylineLength(routePoints).toFixed(1);
-          }
-          if (hitPath) {
-            hitPath.setAttribute("d", d);
-            hitPath.dataset.routeSource = "osrm";
-            hitPath.dataset.routePoints = String(routePoints.length);
-            hitPath.dataset.routeLength = routePolylineLength(routePoints).toFixed(1);
-          }
-          if (arrow) {
-            const pointsAttr = dispatchArrowPoints(routePoints, arrow.classList.contains("primary"));
-            if (pointsAttr) arrow.setAttribute("points", pointsAttr);
-          }
-        });
-      });
-    }
     function renderDispatchLinks(profile, entityPoints) {
       const svg = document.querySelector(".route-svg");
       if (!svg) return;
@@ -3529,7 +3523,7 @@ def render_index() -> str:
         dispatchRouteVersion += 1;
         return;
       }
-      const routeVersion = ++dispatchRouteVersion;
+      dispatchRouteVersion += 1;
       const focusMode = profile.mapFocusMode === "focus";
       const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
@@ -3543,7 +3537,7 @@ def render_index() -> str:
         const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
         const cls = isActive ? "dispatch-link primary active-assignment" : "dispatch-link secondary overview-route";
-        const pickupRoute = roadFollowingRoute(courierPoints[0], pickupPoint, mapLayers);
+        const pickupRoute = stableDispatchRoute(courierPoints[0], pickupPoint);
         const pickupD = dispatchPathFor(pickupRoute);
         if (!pickupD) return "";
         const longPickup = longRouteClass(courierPoints[0], pickupPoint, pickupRoute, {direct: 21, span: 34, length: 44});
@@ -3553,13 +3547,13 @@ def render_index() -> str:
           merchant: assignment.pickup,
           courier: couriers[0],
           leg: "courier-to-merchant",
+          "route-source": "stable-local",
           "route-points": pickupRoute.length,
           "route-length": routePolylineLength(pickupRoute).toFixed(1),
           "long-leg": longPickup ? "true" : "false"
         };
         const arrowCls = isActive ? "primary" : "secondary overview-route";
         const routeParts = [
-          dispatchEndpointConnectorsFor(pickupRoute, assignment.id, pickupMeta),
           `<path class="${pickupClass}" data-assignment="${assignment.id}" data-route-role="main"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
           dispatchHitAreaFor(pickupD, `pickup-leg${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta),
           dispatchArrowFor(pickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
@@ -3568,7 +3562,6 @@ def render_index() -> str:
       }).join("");
       const bundleOverlay = focusMode ? renderReferenceRouteBundle(profile.dispatchMap.assignments, entityPoints, mapLayers, overviewAssignmentId) : "";
       svg.innerHTML = pathHtml + bundleOverlay;
-      upgradeDispatchRoutesWithOsrm(profile, entityPoints, routeVersion);
     }
     function applyMapFocus(profile, assignmentId, focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
