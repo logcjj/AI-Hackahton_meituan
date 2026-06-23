@@ -1,0 +1,604 @@
+{
+  "audit": {
+    "generatedAt": "2026-06-23T19:42:13+0800",
+    "initial": {
+      "optionCount": 10,
+      "textLayers": {
+        "total": 19,
+        "visible": 0,
+        "hidden": 19
+      },
+      "leftLayout": {
+        "itemCount": 11,
+        "overlapCount": 0,
+        "outsideCount": 0,
+        "allVisibleWithoutScroll": true,
+        "scrollHeight": 597,
+        "clientHeight": 597
+      },
+      "tableLayout": {
+        "rows": 3,
+        "outside": 0
+      },
+      "mapReady": true,
+      "dragPan": "native"
+    },
+    "scenarioResults": [
+      {
+        "scenario": "commerce_peak",
+        "text": "商圈十字路口高峰",
+        "wallSeconds": 10.68,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 5,
+          "routeCount": 5,
+          "arrowCount": 5,
+          "connectorCount": 5,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 5,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 2,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "medium_parallel",
+        "text": "中型并行派单",
+        "wallSeconds": 10.68,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 5,
+          "routeCount": 5,
+          "arrowCount": 5,
+          "connectorCount": 5,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 5,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 2,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "scarce_repair",
+        "text": "骑手稀缺修复",
+        "wallSeconds": 10.62,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 5,
+          "routeCount": 5,
+          "arrowCount": 5,
+          "connectorCount": 5,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 5,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 3,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "rain_low_willingness",
+        "text": "雨天低接单意愿",
+        "wallSeconds": 10.47,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 4,
+          "routeCount": 4,
+          "arrowCount": 4,
+          "connectorCount": 4,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 4,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 3,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "offpeak_greedy",
+        "text": "低峰分散订单",
+        "wallSeconds": 10.72,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 5,
+          "routeCount": 5,
+          "arrowCount": 5,
+          "connectorCount": 5,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 5,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 2,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "event_mixed_pressure",
+        "text": "活动混合压力",
+        "wallSeconds": 10.72,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 6,
+          "routeCount": 6,
+          "arrowCount": 6,
+          "connectorCount": 6,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 6,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 2,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "night_foodcourt",
+        "text": "夜间商圈宵夜",
+        "wallSeconds": 10.55,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 4,
+          "routeCount": 4,
+          "arrowCount": 4,
+          "connectorCount": 4,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 4,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 2,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "campus_lunch_peak",
+        "text": "校园午高峰",
+        "wallSeconds": 10.71,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 5,
+          "routeCount": 5,
+          "arrowCount": 5,
+          "connectorCount": 6,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 5,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 2,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "hospital_office_peak",
+        "text": "医院写字楼午峰",
+        "wallSeconds": 10.47,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 4,
+          "routeCount": 4,
+          "arrowCount": 4,
+          "connectorCount": 4,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 4,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 3,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      },
+      {
+        "scenario": "congestion_reassign",
+        "text": "拥堵异常补单",
+        "wallSeconds": 10.65,
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "preview": {
+          "changed": true,
+          "routeCount": 0,
+          "arrowCount": 0
+        },
+        "final": {
+          "merchantCount": 6,
+          "routeCount": 6,
+          "arrowCount": 6,
+          "connectorCount": 6,
+          "pinOverlaps": 0,
+          "routeSummary": {
+            "count": 6,
+            "invalid": 0,
+            "longLegs": 0,
+            "minRoutePoints": 2,
+            "minConnectors": 1
+          },
+          "leftLayout": {
+            "itemCount": 11,
+            "overlapCount": 0,
+            "outsideCount": 0,
+            "allVisibleWithoutScroll": true,
+            "scrollHeight": 597,
+            "clientHeight": 597
+          },
+          "tableLayout": {
+            "rows": 6,
+            "outside": 0
+          },
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "failures": []
+      }
+    ],
+    "failures": [],
+    "interaction": {
+      "zoom": {
+        "before": 13.35,
+        "afterIn": 14.2,
+        "afterOut": 13.35,
+        "changed": true
+      },
+      "drag": {
+        "before": {
+          "lng": 121.476,
+          "lat": 31.222
+        },
+        "after": {
+          "lng": 121.466806,
+          "lat": 31.226368
+        },
+        "changed": true,
+        "method": "Chrome DevTools Input.dispatchMouseEvent trusted mouse drag"
+      },
+      "toolbar": {
+        "routesHidden": true,
+        "routesRestored": true,
+        "pointsHidden": true,
+        "afterFit": {
+          "zoom": 13.35,
+          "center": {
+            "lng": 121.462,
+            "lat": 31.229
+          }
+        },
+        "locating": true,
+        "fullscreenOn": true,
+        "fullscreenOff": true
+      },
+      "layerModes": {},
+      "refresh": {
+        "map": {
+          "beforeRegion": 0,
+          "afterRegion": 1,
+          "beforeCenter": {
+            "lng": 121.462,
+            "lat": 31.229
+          },
+          "afterCenter": {
+            "lng": 121.475254,
+            "lat": 31.222373
+          },
+          "style": "https://tiles.openfreemap.org/styles/positron",
+          "clearedRoutes": true,
+          "textLayers": {
+            "total": 19,
+            "visible": 0,
+            "hidden": 19
+          }
+        },
+        "position": {
+          "changed": true,
+          "clearedRoutes": true,
+          "status": "场景已刷新，等待推理"
+        }
+      },
+      "detailChecks": {
+        "merchant": {
+          "clicked": true,
+          "title": "商家派单：M0301"
+        },
+        "courier": {
+          "clicked": true,
+          "title": "骑手承接：R0301"
+        },
+        "route": {
+          "clicked": true,
+          "title": "派单关系：骑手到商家"
+        },
+        "strategy": {
+          "clicked": true,
+          "title": "策略详情：S1 · 合单优先"
+        },
+        "table": {
+          "clicked": true,
+          "title": "策略对比：合单优先"
+        }
+      }
+    },
+    "finalVisual": {
+      "leftLayout": {
+        "itemCount": 11,
+        "overlapCount": 0,
+        "outsideCount": 0,
+        "allVisibleWithoutScroll": true,
+        "scrollHeight": 597,
+        "clientHeight": 597
+      },
+      "tableLayout": {
+        "rows": 6,
+        "outside": 0
+      },
+      "pinOverlaps": 0,
+      "routeSummary": {
+        "count": 6,
+        "invalid": 0,
+        "longLegs": 0,
+        "minRoutePoints": 3,
+        "minConnectors": 1
+      }
+    },
+    "hardFailures": [],
+    "interactionCorrections": {
+      "drag_real_cdp_input": {
+        "before": {
+          "lng": 121.476,
+          "lat": 31.222
+        },
+        "after": {
+          "lng": 121.466806,
+          "lat": 31.226368
+        },
+        "changed": true,
+        "method": "Chrome DevTools Input.dispatchMouseEvent trusted mouse drag"
+      },
+      "depots_button_actual_class": {
+        "on": true,
+        "off": true,
+        "effectiveClass": "hide-entities",
+        "effectiveDataset": "entitiesMuted",
+        "note": "Earlier automated audit expected obsolete hide-depots class; current implementation intentionally weakens points with hide-entities."
+      }
+    },
+    "hardFailuresOriginalBeforeCorrection": [
+      "drag ineffective",
+      "toolbar control ineffective"
+    ]
+  },
+  "console": [],
+  "exceptions": []
+}
