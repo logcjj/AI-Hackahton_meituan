@@ -1,0 +1,3584 @@
+{
+  "tenScenarioAudit": {
+    "options": [
+      {
+        "scenario": "commerce_peak",
+        "text": "商圈十字路口高峰",
+        "value": "large_seed301"
+      },
+      {
+        "scenario": "medium_parallel",
+        "text": "中型并行派单",
+        "value": "medium_seed201"
+      },
+      {
+        "scenario": "scarce_repair",
+        "text": "骑手稀缺修复",
+        "value": "scarce_couriers_seed401"
+      },
+      {
+        "scenario": "rain_low_willingness",
+        "text": "雨天低接单意愿",
+        "value": "low_willingness_seed501"
+      },
+      {
+        "scenario": "offpeak_greedy",
+        "text": "低峰分散订单",
+        "value": "high_noise_seed601"
+      },
+      {
+        "scenario": "event_mixed_pressure",
+        "text": "活动混合压力",
+        "value": "large_seed302"
+      },
+      {
+        "scenario": "night_foodcourt",
+        "text": "夜间商圈宵夜",
+        "value": "night_foodcourt_seed701"
+      },
+      {
+        "scenario": "campus_lunch_peak",
+        "text": "校园午高峰",
+        "value": "campus_lunch_seed801"
+      },
+      {
+        "scenario": "hospital_office_peak",
+        "text": "医院写字楼午峰",
+        "value": "hospital_office_seed901"
+      },
+      {
+        "scenario": "congestion_reassign",
+        "text": "拥堵异常补单",
+        "value": "congestion_reassign_seed1001"
+      }
+    ],
+    "results": [
+      {
+        "option": {
+          "scenario": "commerce_peak",
+          "text": "商圈十字路口高峰",
+          "value": "large_seed301"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 12,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：商圈十字路口高峰",
+              "pins": 18,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：商圈十字路口高峰",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-1-preview",
+          "merchantCount": 6,
+          "minCourier": 5.1,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "commerce_peak",
+            "text": "商圈十字路口高峰",
+            "value": "large_seed301"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 6,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 6,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 12,
+              "routeArrows": 6,
+              "routeLinks": 6,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "6 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0201",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-1-final",
+          "merchantCount": 6,
+          "minCourier": 9.08,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 6,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0210",
+              "end": 0.058,
+              "longLeg": "false",
+              "maxSeg": 3.69,
+              "merchant": "M0201",
+              "points": 3,
+              "start": 0.038
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0203",
+              "end": 0.058,
+              "longLeg": "false",
+              "maxSeg": 4.25,
+              "merchant": "M0202",
+              "points": 3,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0202",
+              "end": 0.008,
+              "longLeg": "false",
+              "maxSeg": 3.08,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0205",
+              "end": 0.046,
+              "longLeg": "false",
+              "maxSeg": 3.99,
+              "merchant": "M0204",
+              "points": 6,
+              "start": 0.044
+            },
+            {
+              "assignment": "A0205",
+              "courier": "R0211",
+              "end": 0.026,
+              "longLeg": "false",
+              "maxSeg": 3.05,
+              "merchant": "M0205",
+              "points": 7,
+              "start": 0.042
+            },
+            {
+              "assignment": "A0206",
+              "courier": "R0207",
+              "end": 0.06,
+              "longLeg": "false",
+              "maxSeg": 4.27,
+              "merchant": "M0206",
+              "points": 5,
+              "start": 0.057
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "commerce_peak",
+            "text": "商圈十字路口高峰",
+            "value": "large_seed301"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "medium_parallel",
+          "text": "中型并行派单",
+          "value": "medium_seed201"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 11,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：中型并行派单",
+              "pins": 15,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：中型并行派单",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-2-preview",
+          "merchantCount": 4,
+          "minCourier": 5.89,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "medium_parallel",
+            "text": "中型并行派单",
+            "value": "medium_seed201"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 4,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 4,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 8,
+              "routeArrows": 4,
+              "routeLinks": 4,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "4 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0201",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-2-final",
+          "merchantCount": 4,
+          "minCourier": 15.98,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 4,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0202",
+              "end": 0.036,
+              "longLeg": "false",
+              "maxSeg": 3.05,
+              "merchant": "M0201",
+              "points": 5,
+              "start": 0.042
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0201",
+              "end": 0.058,
+              "longLeg": "false",
+              "maxSeg": 4.25,
+              "merchant": "M0202",
+              "points": 3,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0208",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 2.74,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0204",
+              "end": 0.046,
+              "longLeg": "false",
+              "maxSeg": 3.99,
+              "merchant": "M0204",
+              "points": 6,
+              "start": 0.044
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "medium_parallel",
+            "text": "中型并行派单",
+            "value": "medium_seed201"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "scarce_repair",
+          "text": "骑手稀缺修复",
+          "value": "scarce_couriers_seed401"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 9,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：骑手稀缺修复",
+              "pins": 13,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：骑手稀缺修复",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-3-preview",
+          "merchantCount": 4,
+          "minCourier": 5.1,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "scarce_repair",
+            "text": "骑手稀缺修复",
+            "value": "scarce_couriers_seed401"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 4,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 4,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 8,
+              "routeArrows": 4,
+              "routeLinks": 4,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "4 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0203",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-3-final",
+          "merchantCount": 4,
+          "minCourier": 15.98,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 4,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0206",
+              "end": 0.067,
+              "longLeg": "false",
+              "maxSeg": 2.88,
+              "merchant": "M0201",
+              "points": 4,
+              "start": 0.038
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0201",
+              "end": 0.058,
+              "longLeg": "false",
+              "maxSeg": 4.25,
+              "merchant": "M0202",
+              "points": 3,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0203",
+              "end": 0.008,
+              "longLeg": "false",
+              "maxSeg": 3.08,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0205",
+              "end": 0.046,
+              "longLeg": "false",
+              "maxSeg": 3.99,
+              "merchant": "M0204",
+              "points": 6,
+              "start": 0.044
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "scarce_repair",
+            "text": "骑手稀缺修复",
+            "value": "scarce_couriers_seed401"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "rain_low_willingness",
+          "text": "雨天低接单意愿",
+          "value": "low_willingness_seed501"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 12,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：雨天低接单意愿",
+              "pins": 16,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：雨天低接单意愿",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-4-preview",
+          "merchantCount": 4,
+          "minCourier": 5.89,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "rain_low_willingness",
+            "text": "雨天低接单意愿",
+            "value": "low_willingness_seed501"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 4,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 4,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 8,
+              "routeArrows": 4,
+              "routeLinks": 4,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "4 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0201",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-4-final",
+          "merchantCount": 4,
+          "minCourier": 20.06,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 4,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0207",
+              "end": 0.04,
+              "longLeg": "false",
+              "maxSeg": 2.1,
+              "merchant": "M0201",
+              "points": 3,
+              "start": 0.043
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0206",
+              "end": 0.034,
+              "longLeg": "false",
+              "maxSeg": 4.29,
+              "merchant": "M0202",
+              "points": 5,
+              "start": 0.042
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0202",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 2.74,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0211",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 2.66,
+              "merchant": "M0204",
+              "points": 4,
+              "start": 0.052
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "rain_low_willingness",
+            "text": "雨天低接单意愿",
+            "value": "low_willingness_seed501"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "offpeak_greedy",
+          "text": "低峰分散订单",
+          "value": "high_noise_seed601"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 9,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：低峰分散订单",
+              "pins": 14,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：低峰分散订单",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-5-preview",
+          "merchantCount": 5,
+          "minCourier": 5.1,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "offpeak_greedy",
+            "text": "低峰分散订单",
+            "value": "high_noise_seed601"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 5,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 5,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 10,
+              "routeArrows": 5,
+              "routeLinks": 5,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "5 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0205",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-5-final",
+          "merchantCount": 5,
+          "minCourier": 9.08,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 5,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0208",
+              "end": 0.011,
+              "longLeg": "false",
+              "maxSeg": 3.09,
+              "merchant": "M0201",
+              "points": 4,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0202",
+              "end": 0.053,
+              "longLeg": "false",
+              "maxSeg": 3.06,
+              "merchant": "M0202",
+              "points": 6,
+              "start": 0.042
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0203",
+              "end": 0.037,
+              "longLeg": "false",
+              "maxSeg": 4.3,
+              "merchant": "M0203",
+              "points": 4,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0201",
+              "end": 0.008,
+              "longLeg": "false",
+              "maxSeg": 3.08,
+              "merchant": "M0204",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0205",
+              "courier": "R0204",
+              "end": 0.045,
+              "longLeg": "false",
+              "maxSeg": 3.28,
+              "merchant": "M0205",
+              "points": 5,
+              "start": 0.052
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "offpeak_greedy",
+            "text": "低峰分散订单",
+            "value": "high_noise_seed601"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "event_mixed_pressure",
+          "text": "活动混合压力",
+          "value": "large_seed302"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 1,
+          "courierCount": 15,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：活动混合压力",
+              "pins": 21,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：活动混合压力",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-6-preview",
+          "merchantCount": 6,
+          "minCourier": 1.94,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "event_mixed_pressure",
+            "text": "活动混合压力",
+            "value": "large_seed302"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 6,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 6,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 12,
+              "routeArrows": 6,
+              "routeLinks": 6,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "6 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0205",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-6-final",
+          "merchantCount": 6,
+          "minCourier": 9.08,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 6,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0203",
+              "end": 0.045,
+              "longLeg": "false",
+              "maxSeg": 3.28,
+              "merchant": "M0201",
+              "points": 5,
+              "start": 0.052
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0205",
+              "end": 0.058,
+              "longLeg": "false",
+              "maxSeg": 4.25,
+              "merchant": "M0202",
+              "points": 3,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0204",
+              "end": 0.008,
+              "longLeg": "false",
+              "maxSeg": 3.08,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0202",
+              "end": 0.026,
+              "longLeg": "false",
+              "maxSeg": 3.05,
+              "merchant": "M0204",
+              "points": 7,
+              "start": 0.042
+            },
+            {
+              "assignment": "A0205",
+              "courier": "R0212",
+              "end": 0.046,
+              "longLeg": "false",
+              "maxSeg": 3.99,
+              "merchant": "M0205",
+              "points": 4,
+              "start": 0
+            },
+            {
+              "assignment": "A0206",
+              "courier": "R0208",
+              "end": 0.06,
+              "longLeg": "false",
+              "maxSeg": 4.27,
+              "merchant": "M0206",
+              "points": 5,
+              "start": 0.057
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "event_mixed_pressure",
+            "text": "活动混合压力",
+            "value": "large_seed302"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "night_foodcourt",
+          "text": "夜间商圈宵夜",
+          "value": "night_foodcourt_seed701"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 9,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：夜间商圈宵夜",
+              "pins": 13,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：夜间商圈宵夜",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-7-preview",
+          "merchantCount": 4,
+          "minCourier": 5.1,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "night_foodcourt",
+            "text": "夜间商圈宵夜",
+            "value": "night_foodcourt_seed701"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 4,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 4,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 8,
+              "routeArrows": 4,
+              "routeLinks": 4,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "4 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0201",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-7-final",
+          "merchantCount": 4,
+          "minCourier": 20.06,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 4,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0207",
+              "end": 0.035,
+              "longLeg": "false",
+              "maxSeg": 2.34,
+              "merchant": "M0201",
+              "points": 4,
+              "start": 0.013
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0204",
+              "end": 0.034,
+              "longLeg": "false",
+              "maxSeg": 4.29,
+              "merchant": "M0202",
+              "points": 5,
+              "start": 0.042
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0205",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 2.74,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0201",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 2.66,
+              "merchant": "M0204",
+              "points": 4,
+              "start": 0.052
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "night_foodcourt",
+            "text": "夜间商圈宵夜",
+            "value": "night_foodcourt_seed701"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "campus_lunch_peak",
+          "text": "校园午高峰",
+          "value": "campus_lunch_seed801"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 12,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：校园午高峰",
+              "pins": 17,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：校园午高峰",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-8-preview",
+          "merchantCount": 5,
+          "minCourier": 5.1,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "campus_lunch_peak",
+            "text": "校园午高峰",
+            "value": "campus_lunch_seed801"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 5,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 5,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 10,
+              "routeArrows": 5,
+              "routeLinks": 5,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "5 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0205",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-8-final",
+          "merchantCount": 5,
+          "minCourier": 13.69,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 5,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0211",
+              "end": 0.042,
+              "longLeg": "false",
+              "maxSeg": 3.64,
+              "merchant": "M0201",
+              "points": 5,
+              "start": 0.037
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0205",
+              "end": 0.058,
+              "longLeg": "false",
+              "maxSeg": 4.25,
+              "merchant": "M0202",
+              "points": 3,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0204",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 2.74,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0201",
+              "end": 0.046,
+              "longLeg": "false",
+              "maxSeg": 3.99,
+              "merchant": "M0204",
+              "points": 4,
+              "start": 0.01
+            },
+            {
+              "assignment": "A0205",
+              "courier": "R0203",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 3.07,
+              "merchant": "M0205",
+              "points": 4,
+              "start": 0.052
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "campus_lunch_peak",
+            "text": "校园午高峰",
+            "value": "campus_lunch_seed801"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "hospital_office_peak",
+          "text": "医院写字楼午峰",
+          "value": "hospital_office_seed901"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 9,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：医院写字楼午峰",
+              "pins": 14,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：医院写字楼午峰",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-9-preview",
+          "merchantCount": 5,
+          "minCourier": 5.79,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "hospital_office_peak",
+            "text": "医院写字楼午峰",
+            "value": "hospital_office_seed901"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 5,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 5,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 10,
+              "routeArrows": 5,
+              "routeLinks": 5,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "5 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0205",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-9-final",
+          "merchantCount": 5,
+          "minCourier": 14.08,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 5,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0208",
+              "end": 0.063,
+              "longLeg": "false",
+              "maxSeg": 2.83,
+              "merchant": "M0201",
+              "points": 3,
+              "start": 0.037
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0203",
+              "end": 0.058,
+              "longLeg": "false",
+              "maxSeg": 4.25,
+              "merchant": "M0202",
+              "points": 3,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0202",
+              "end": 0.023,
+              "longLeg": "false",
+              "maxSeg": 2.65,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.029
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0205",
+              "end": 0.046,
+              "longLeg": "false",
+              "maxSeg": 3.99,
+              "merchant": "M0204",
+              "points": 6,
+              "start": 0.044
+            },
+            {
+              "assignment": "A0205",
+              "courier": "R0204",
+              "end": 0.052,
+              "longLeg": "false",
+              "maxSeg": 2.53,
+              "merchant": "M0205",
+              "points": 4,
+              "start": 0.037
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "hospital_office_peak",
+            "text": "医院写字楼午峰",
+            "value": "hospital_office_seed901"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      },
+      {
+        "option": {
+          "scenario": "congestion_reassign",
+          "text": "拥堵异常补单",
+          "value": "congestion_reassign_seed1001"
+        },
+        "preview": {
+          "arrowCount": 0,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 10,
+          "debug": {
+            "dom": {
+              "detailTitle": "场景输入：拥堵异常补单",
+              "pins": 15,
+              "routeArrows": 0,
+              "routeLinks": 0,
+              "status": "场景已刷新，等待推理",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "-",
+          "detailTitle": "场景输入：拥堵异常补单",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-10-preview",
+          "merchantCount": 5,
+          "minCourier": 7.22,
+          "overlaps": [],
+          "rejectedStrategies": 0,
+          "routeCount": 0,
+          "routeEndpointsOk": true,
+          "routes": [],
+          "runtime": "--:--:--",
+          "selectedScenario": {
+            "scenario": "congestion_reassign",
+            "text": "拥堵异常补单",
+            "value": "congestion_reassign_seed1001"
+          },
+          "selectedStrategies": 0,
+          "status": "场景已刷新，等待推理",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "final": {
+          "arrowCount": 5,
+          "body": {
+            "dashboardScale": "0.2492",
+            "viewportWidth": "319"
+          },
+          "closePairs": 0,
+          "courierCount": 5,
+          "debug": {
+            "dom": {
+              "detailTitle": "派单总览：全部商家已自动连线",
+              "pins": 10,
+              "routeArrows": 5,
+              "routeLinks": 5,
+              "status": "当前场景派单完成",
+              "strategyCards": 5,
+              "tableRows": 6
+            },
+            "region": "运营分析浅色区域 A",
+            "textLayers": {
+              "hidden": 19,
+              "total": 19,
+              "visible": 0
+            },
+            "viewport": {
+              "center": {
+                "lat": 31.229,
+                "lng": 121.462
+              },
+              "zoom": 13.35
+            }
+          },
+          "detailCourier": "5 个骑手",
+          "detailTitle": "派单总览：全部商家已自动连线",
+          "frame": {
+            "controlState": "all",
+            "dragFallbackBound": "true",
+            "mapRegion": "运营分析浅色区域 A",
+            "mapStyle": "运营分析浅色图",
+            "selectedAssignment": "A0204",
+            "zoomLevel": "13.35"
+          },
+          "headerButtons": {
+            "recenter": {
+              "height": 8.7,
+              "text": "⌾",
+              "topElement": "BUTTON#recenter.",
+              "width": 9.5
+            },
+            "refresh-map": {
+              "height": 7,
+              "text": "刷新地图",
+              "topElement": "BUTTON#refresh-map.",
+              "width": 15.5
+            },
+            "reload-cases": {
+              "height": 7,
+              "text": "刷新位置",
+              "topElement": "BUTTON#reload-cases.",
+              "width": 15.5
+            },
+            "run-agent": {
+              "height": 7,
+              "text": "运行派单推理",
+              "topElement": "BUTTON#run-agent.",
+              "width": 24.4
+            },
+            "zoom-in": {
+              "height": 8.7,
+              "text": "+",
+              "topElement": "BUTTON#zoom-in.",
+              "width": 9.5
+            },
+            "zoom-out": {
+              "height": 8.7,
+              "text": "−",
+              "topElement": "BUTTON#zoom-out.",
+              "width": 9.5
+            }
+          },
+          "label": "scenario-10-final",
+          "merchantCount": 5,
+          "minCourier": 13.69,
+          "overlaps": [],
+          "rejectedStrategies": 4,
+          "routeCount": 5,
+          "routeEndpointsOk": true,
+          "routes": [
+            {
+              "assignment": "A0201",
+              "courier": "R0201",
+              "end": 0.023,
+              "longLeg": "false",
+              "maxSeg": 3.45,
+              "merchant": "M0201",
+              "points": 3,
+              "start": 0.01
+            },
+            {
+              "assignment": "A0202",
+              "courier": "R0202",
+              "end": 0.053,
+              "longLeg": "false",
+              "maxSeg": 3.06,
+              "merchant": "M0202",
+              "points": 6,
+              "start": 0.042
+            },
+            {
+              "assignment": "A0203",
+              "courier": "R0203",
+              "end": 0.025,
+              "longLeg": "false",
+              "maxSeg": 4.53,
+              "merchant": "M0203",
+              "points": 3,
+              "start": 0.052
+            },
+            {
+              "assignment": "A0204",
+              "courier": "R0205",
+              "end": 0.037,
+              "longLeg": "false",
+              "maxSeg": 4.3,
+              "merchant": "M0204",
+              "points": 4,
+              "start": 0.057
+            },
+            {
+              "assignment": "A0205",
+              "courier": "R0204",
+              "end": 0.047,
+              "longLeg": "false",
+              "maxSeg": 2.74,
+              "merchant": "M0205",
+              "points": 3,
+              "start": 0.029
+            }
+          ],
+          "runtime": "00:00:10",
+          "selectedScenario": {
+            "scenario": "congestion_reassign",
+            "text": "拥堵异常补单",
+            "value": "congestion_reassign_seed1001"
+          },
+          "selectedStrategies": 1,
+          "status": "当前场景派单完成",
+          "strategyCards": 5,
+          "tableRows": 6,
+          "textLayerHidden": true
+        },
+        "checks": {
+          "previewNoRoutes": true,
+          "previewHasEntities": true,
+          "finalCompleted": true,
+          "finalRouted": true,
+          "endpointsConnected": true,
+          "noCourierStack": true,
+          "noOverlayPins": true,
+          "textLayersHidden": true,
+          "tableComplete": true,
+          "strategiesRendered": true
+        }
+      }
+    ],
+    "logs": [],
+    "summary": {
+      "scenarioCount": 10,
+      "failed": [],
+      "noConsoleErrors": true
+    }
+  },
+  "interactionAudit": {
+    "initial": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "initial",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "zoomIn": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.9
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "lastViewportSync": "zoom-in-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.90"
+      },
+      "label": "zoom-in",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "zoomOut": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "zoom-out",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "routesHidden": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "true",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "routes-hidden",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": true,
+      "status": "当前场景派单完成"
+    },
+    "routesShown": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "routes-shown",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "depotsMuted": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": true,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "true",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "depots-muted",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "depotsShown": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "depots-shown",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "layerSelected": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "selected",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "layer-selected",
+      "layerMode": "selected",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "layerCandidates": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "candidates",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "layer-candidates",
+      "layerMode": "candidates",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "layerAll": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "lastViewportSync": "zoom-out-control",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "layer-all",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "fit": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "lastViewportSync": "fit-control",
+        "locating": "false",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "fit",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "recenter": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "lastViewportSync": "recenter-control",
+        "locating": "true",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "recenter",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "fullscreenOn": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "fullscreen": "true",
+        "lastViewportSync": "manual-pan",
+        "locating": "true",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "fullscreen-on",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel active",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "fullscreenOff": {
+      "activeStrategies": 0,
+      "arrowCount": 5,
+      "debugViewport": {
+        "center": {
+          "lat": 31.229,
+          "lng": 121.462
+        },
+        "zoom": 13.35
+      },
+      "detailCourier": "5 个骑手",
+      "detailTitle": "派单总览：全部商家已自动连线",
+      "detailType": "overview",
+      "entitiesHiddenClass": false,
+      "frame": {
+        "controlState": "all",
+        "dragFallbackBound": "true",
+        "entitiesMuted": "false",
+        "fullscreen": "false",
+        "lastViewportSync": "manual-pan",
+        "locating": "true",
+        "mapCenter": "121.46200,31.22900",
+        "mapRegion": "运营分析浅色区域 A",
+        "mapStyle": "运营分析浅色图",
+        "routesHidden": "false",
+        "selectedAssignment": "A0204",
+        "zoomLevel": "13.35"
+      },
+      "label": "fullscreen-off",
+      "layerMode": "all",
+      "mapPanelClass": "panel map-panel",
+      "pinCount": 10,
+      "routeCount": 5,
+      "routesHiddenClass": false,
+      "status": "当前场景派单完成"
+    },
+    "drag": {
+      "before": {
+        "activeStrategies": 0,
+        "arrowCount": 5,
+        "debugViewport": {
+          "center": {
+            "lat": 31.229,
+            "lng": 121.462
+          },
+          "zoom": 13.35
+        },
+        "detailCourier": "5 个骑手",
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailType": "overview",
+        "entitiesHiddenClass": false,
+        "frame": {
+          "controlState": "all",
+          "dragFallbackBound": "true",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "lastViewportSync": "manual-pan",
+          "locating": "true",
+          "mapCenter": "121.46200,31.22900",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0204",
+          "zoomLevel": "13.35"
+        },
+        "label": "drag-before",
+        "layerMode": "all",
+        "mapPanelClass": "panel map-panel",
+        "pinCount": 10,
+        "routeCount": 5,
+        "routesHiddenClass": false,
+        "status": "当前场景派单完成"
+      },
+      "after": {
+        "activeStrategies": 0,
+        "arrowCount": 5,
+        "debugViewport": {
+          "center": {
+            "lat": 31.239429,
+            "lng": 121.492373
+          },
+          "zoom": 13.35
+        },
+        "detailCourier": "5 个骑手",
+        "detailTitle": "派单总览：全部商家已自动连线",
+        "detailType": "overview",
+        "entitiesHiddenClass": false,
+        "frame": {
+          "controlState": "all",
+          "dragFallbackBound": "true",
+          "dragPan": "true",
+          "dragging": "false",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "lastViewportSync": "manual-pan",
+          "locating": "true",
+          "mapCenter": "121.49237,31.23943",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0204",
+          "zoomLevel": "13.35"
+        },
+        "label": "drag-after",
+        "layerMode": "all",
+        "mapPanelClass": "panel map-panel",
+        "pinCount": 10,
+        "routeCount": 5,
+        "routesHiddenClass": false,
+        "status": "当前场景派单完成"
+      }
+    },
+    "clickMerchant": {
+      "clicked": {
+        "className": "pin merchant",
+        "count": 5,
+        "dataset": {
+          "assignment": "A0201",
+          "displayX": "66.1",
+          "displayY": "39.2",
+          "entity": "M0201",
+          "kind": "merchant_order",
+          "rawX": "66.1",
+          "rawY": "39.2"
+        },
+        "text": "商",
+        "x": 196.589599609375,
+        "y": 66.0418930053711
+      },
+      "state": {
+        "activeStrategies": 0,
+        "arrowCount": 5,
+        "debugViewport": {
+          "center": {
+            "lat": 31.239429,
+            "lng": 121.492373
+          },
+          "zoom": 13.35
+        },
+        "detailCourier": "R0207",
+        "detailTitle": "派单关系：骑手到商家",
+        "detailType": "route",
+        "entitiesHiddenClass": false,
+        "frame": {
+          "controlState": "all",
+          "dragFallbackBound": "true",
+          "dragPan": "true",
+          "dragging": "false",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "lastViewportSync": "manual-pan",
+          "locating": "true",
+          "mapCenter": "121.49237,31.23943",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0201",
+          "zoomLevel": "13.35"
+        },
+        "label": "click-merchant",
+        "layerMode": "all",
+        "mapPanelClass": "panel map-panel",
+        "pinCount": 10,
+        "routeCount": 5,
+        "routesHiddenClass": false,
+        "status": "当前场景派单完成"
+      }
+    },
+    "clickCourier": {
+      "clicked": {
+        "className": "pin courier",
+        "count": 5,
+        "dataset": {
+          "assignment": "A0204",
+          "displayX": "36.0",
+          "displayY": "41.8",
+          "entity": "R0201",
+          "kind": "courier",
+          "rawX": "36.0",
+          "rawY": "41.8"
+        },
+        "text": "骑",
+        "x": 142.1335678100586,
+        "y": 68.61955642700195
+      },
+      "state": {
+        "activeStrategies": 0,
+        "arrowCount": 5,
+        "debugViewport": {
+          "center": {
+            "lat": 31.239429,
+            "lng": 121.492373
+          },
+          "zoom": 13.35
+        },
+        "detailCourier": "R0201",
+        "detailTitle": "派单关系：骑手到商家",
+        "detailType": "route",
+        "entitiesHiddenClass": false,
+        "frame": {
+          "controlState": "all",
+          "dragFallbackBound": "true",
+          "dragPan": "true",
+          "dragging": "false",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "lastViewportSync": "manual-pan",
+          "locating": "true",
+          "mapCenter": "121.49237,31.23943",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0204",
+          "zoomLevel": "13.35"
+        },
+        "label": "click-courier",
+        "layerMode": "all",
+        "mapPanelClass": "panel map-panel",
+        "pinCount": 10,
+        "routeCount": 5,
+        "routesHiddenClass": false,
+        "status": "当前场景派单完成"
+      }
+    },
+    "clickRoute": {
+      "clicked": {
+        "className": "dispatch-arrow selected-overview secondary overview-route",
+        "count": 5,
+        "dataset": {
+          "assignment": "A0201",
+          "courier": "R0207",
+          "endpointConnectors": "1",
+          "leg": "courier-to-merchant",
+          "longLeg": "false",
+          "merchant": "M0201",
+          "routeLength": "20.9",
+          "routePoints": "8",
+          "routeRole": "arrow",
+          "routeSource": "delivery-routes-road-graph-v3"
+        },
+        "text": "",
+        "x": 200.5078582763672,
+        "y": 61.02401924133301
+      },
+      "state": {
+        "activeStrategies": 0,
+        "arrowCount": 5,
+        "debugViewport": {
+          "center": {
+            "lat": 31.239429,
+            "lng": 121.492373
+          },
+          "zoom": 13.35
+        },
+        "detailCourier": "R0207",
+        "detailTitle": "派单关系：骑手到商家",
+        "detailType": "route",
+        "entitiesHiddenClass": false,
+        "frame": {
+          "controlState": "all",
+          "dragFallbackBound": "true",
+          "dragPan": "true",
+          "dragging": "false",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "lastViewportSync": "manual-pan",
+          "locating": "true",
+          "mapCenter": "121.49237,31.23943",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0201",
+          "zoomLevel": "13.35"
+        },
+        "label": "click-route",
+        "layerMode": "all",
+        "mapPanelClass": "panel map-panel",
+        "pinCount": 10,
+        "routeCount": 5,
+        "routesHiddenClass": false,
+        "status": "当前场景派单完成"
+      }
+    },
+    "clickStrategy": {
+      "clicked": {
+        "className": "strategy rejected",
+        "count": 5,
+        "dataset": {
+          "branch": "S1",
+          "reasoningOrder": "",
+          "reasoningStatus": "rejected",
+          "strategyEvidence": "密度 0.0 / 合单需求 1.6",
+          "strategyRank": "5"
+        },
+        "text": "S1合单优先同路高重叠订单合并派单-- 未采用",
+        "x": 11.508951663970947,
+        "y": 151.4571418762207
+      },
+      "state": {
+        "activeStrategies": 1,
+        "arrowCount": 5,
+        "debugViewport": {
+          "center": {
+            "lat": 31.239429,
+            "lng": 121.492373
+          },
+          "zoom": 13.35
+        },
+        "detailCourier": "已淘汰",
+        "detailTitle": "策略详情：S1 · 合单优先",
+        "detailType": "strategy",
+        "entitiesHiddenClass": false,
+        "frame": {
+          "controlState": "all",
+          "dragFallbackBound": "true",
+          "dragPan": "true",
+          "dragging": "false",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "lastViewportSync": "manual-pan",
+          "locating": "true",
+          "mapCenter": "121.49237,31.23943",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0201",
+          "zoomLevel": "13.35"
+        },
+        "label": "click-strategy",
+        "layerMode": "all",
+        "mapPanelClass": "panel map-panel",
+        "pinCount": 10,
+        "routeCount": 5,
+        "routesHiddenClass": false,
+        "status": "当前场景派单完成"
+      }
+    },
+    "clickTableRow": {
+      "clicked": {
+        "className": "",
+        "count": 6,
+        "dataset": {
+          "branch": "S1",
+          "cost": "$423.15",
+          "eta": "15.5",
+          "risk": "Med",
+          "rowType": "strategy-candidate",
+          "score": "0.54",
+          "status": "已淘汰",
+          "strategy": "disjoint_then_multidispatch"
+        },
+        "text": "合单优先100%15.5 min$423.155 个骑手Med (高)0.54已淘汰合单收益不足或局部绕行偏大",
+        "x": 167.46239471435547,
+        "y": 147.17694091796875
+      },
+      "state": {
+        "activeStrategies": 1,
+        "arrowCount": 5,
+        "debugViewport": {
+          "center": {
+            "lat": 31.239429,
+            "lng": 121.492373
+          },
+          "zoom": 13.35
+        },
+        "detailCourier": "已淘汰",
+        "detailTitle": "策略对比：合单优先",
+        "detailType": "table-row",
+        "entitiesHiddenClass": false,
+        "frame": {
+          "controlState": "all",
+          "dragFallbackBound": "true",
+          "dragPan": "true",
+          "dragging": "false",
+          "entitiesMuted": "false",
+          "fullscreen": "false",
+          "lastViewportSync": "manual-pan",
+          "locating": "true",
+          "mapCenter": "121.49237,31.23943",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "routesHidden": "false",
+          "selectedAssignment": "A0201",
+          "zoomLevel": "13.35"
+        },
+        "label": "click-table-row",
+        "layerMode": "all",
+        "mapPanelClass": "panel map-panel",
+        "pinCount": 10,
+        "routeCount": 5,
+        "routesHiddenClass": false,
+        "status": "当前场景派单完成"
+      }
+    },
+    "logs": [],
+    "checks": {
+      "zoomChanged": true,
+      "routesToggleWorks": true,
+      "depotsToggleWorks": true,
+      "layerModeWorks": true,
+      "fitWorks": true,
+      "fullscreenWorks": true,
+      "dragWorks": true,
+      "merchantDetailWorks": true,
+      "courierDetailWorks": true,
+      "routeDetailWorks": true,
+      "strategyDetailWorks": true,
+      "tableDetailWorks": true,
+      "noConsoleErrors": true
+    }
+  },
+  "generatedAt": "2026-06-23T10:05:44.227Z",
+  "url": "http://127.0.0.1:8772/"
+}
