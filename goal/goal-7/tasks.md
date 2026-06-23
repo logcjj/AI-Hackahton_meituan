@@ -122,3 +122,19 @@
 - 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest` 全仓 58 个测试通过。
+
+## Task 8: 复刻参考图地图底图层级
+
+验证标准：中央地图不再像随机 SVG 线稿，而是接近参考模板的深色真实地图截片效果；底图有密集细路网、主路灰色层级、暗色建筑/区域纹理，业务点位和派单线叠加在其上仍可点击；不接入不稳定外部瓦片，默认使用本地生成的模板化地图底图。
+
+完成记录：
+- 已从用户提供的参考图 `/Users/logcjj/Desktop/ae864de6-3c5c-4d85-9aae-2431a6d6737a.png` 截取中央地图区域，生成本地深色匿名地图资产 `web_agent_demo/static/reference-dark-map.png`，不依赖外部瓦片和网络。
+- 已新增 `/assets/reference-dark-map.png` 静态服务路由，并限制只允许访问这一张本地地图资产，避免开放任意静态文件读取。
+- 已把地图容器底层切换为模板化地图截片：`.map-frame.topology::before` 加载本地地图背景，原 SVG 区域/道路层降为辅助透明层，不再是主视觉。
+- 已把 `_DISPATCH_ROADS` 改成参考地图坐标系的道路骨架，包含模板里的选中环线、横向主干、斜向快速路和右侧候选走廊，让商家、骑手和派单线吸附到这张模板底图的道路上。
+- 已补测试断言：页面必须引用 `/assets/reference-dark-map.png`，且本地地图资产必须存在。
+- 浏览器验证通过：刷新样本后 `hasMapBefore=true`、`frameClass="map-frame topology"`、`mapStyle="baidu_like_simulated"`，说明本地模板底图已加载。
+- 浏览器最终态验证通过：`runtime=00:00:10`、`routeCount=5`、`selectedOverview=1`、`pinCount=16`、`scoreCards=["S2"]`，最终截图为 `goal/goal-7/task8-template-road-final.png`，审计文件为 `goal/goal-7/task8-template-road-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest` 全仓 58 个测试通过。

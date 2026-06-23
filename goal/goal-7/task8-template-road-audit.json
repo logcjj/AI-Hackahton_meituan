@@ -1,0 +1,49 @@
+{
+  "bodyClass": "",
+  "frameClass": "map-frame topology assignment-overview",
+  "hasMapBefore": true,
+  "pinCount": 16,
+  "routeCount": 5,
+  "routes": [
+    {
+      "assignment": "A0201",
+      "length": "19.5",
+      "longLeg": "false",
+      "points": "4",
+      "selected": false
+    },
+    {
+      "assignment": "A0202",
+      "length": "14.4",
+      "longLeg": "false",
+      "points": "4",
+      "selected": false
+    },
+    {
+      "assignment": "A0203",
+      "length": "27.9",
+      "longLeg": "false",
+      "points": "7",
+      "selected": false
+    },
+    {
+      "assignment": "A0204",
+      "length": "19.2",
+      "longLeg": "false",
+      "points": "4",
+      "selected": false
+    },
+    {
+      "assignment": "A0205",
+      "length": "34.0",
+      "longLeg": "false",
+      "points": "8",
+      "selected": true
+    }
+  ],
+  "runtime": "00:00:10",
+  "scoreCards": [
+    "S2"
+  ],
+  "selectedOverview": 1
+}

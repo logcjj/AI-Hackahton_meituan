@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 import unittest
 from types import SimpleNamespace
 from unittest import mock
@@ -11,6 +12,7 @@ class WebAgentDemoTest(unittest.TestCase):
         from web_agent_demo.server import render_index
 
         html = render_index()
+        self.assertTrue((Path(__file__).resolve().parents[1] / "web_agent_demo" / "static" / "reference-dark-map.png").exists())
 
         self.assertIn("AutoSolver Agent", html)
         self.assertIn("Real-time Dispatch Assignment Optimization", html)
@@ -125,6 +127,7 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("district", html)
         self.assertIn("anonymous-navigation-layer", html)
         self.assertIn("simulated-map-layer", html)
+        self.assertIn("/assets/reference-dark-map.png", html)
         self.assertIn("renderSimulatedBaseMap", html)
         self.assertIn("building-block", html)
         self.assertIn("traffic-band", html)

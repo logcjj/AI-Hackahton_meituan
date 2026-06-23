@@ -29,6 +29,7 @@ except ImportError:  # The demo can still run before optional synthetic cases ar
 
 DATA_DIR = ROOT / "data" / "official_cases"
 GENERATED_CASE_DIR = ROOT / "web_agent_demo" / "generated_cases"
+STATIC_DIR = ROOT / "web_agent_demo" / "static"
 CASE_FILES = {
     "large_seed301": DATA_DIR / "large_seed301.txt",
 }
@@ -98,22 +99,22 @@ def _clamp_point(x: float, y: float) -> tuple[float, float]:
 
 
 _DISPATCH_ROADS = [
-    # Anonymous navigation layer, shaped to read like a city logistics map
-    # instead of a sparse abstract SVG. Coordinates stay normalized 0-100.
-    ((6.0, 31.0), (22.0, 33.0), (40.0, 32.0), (59.0, 30.0), (78.0, 25.0), (96.0, 17.0)),
-    ((2.0, 48.0), (20.0, 45.0), (39.0, 44.0), (58.0, 43.0), (76.0, 40.0), (96.0, 34.0)),
-    ((0.0, 63.0), (20.0, 60.0), (40.0, 58.0), (61.0, 60.0), (81.0, 64.0), (98.0, 70.0)),
-    ((8.0, 82.0), (27.0, 73.0), (43.0, 61.0), (58.0, 48.0), (76.0, 36.0), (96.0, 25.0)),
-    ((12.0, 12.0), (25.0, 28.0), (38.0, 47.0), (51.0, 66.0), (67.0, 89.0)),
-    ((30.0, 7.0), (33.0, 25.0), (35.0, 45.0), (33.0, 65.0), (29.0, 89.0)),
-    ((52.0, 8.0), (52.0, 28.0), (54.0, 47.0), (52.0, 67.0), (55.0, 94.0)),
-    ((70.0, 4.0), (67.0, 23.0), (68.0, 42.0), (72.0, 61.0), (84.0, 91.0)),
-    ((16.0, 19.0), (38.0, 36.0), (57.0, 50.0), (76.0, 66.0), (93.0, 84.0)),
-    ((7.0, 72.0), (25.0, 61.0), (44.0, 49.0), (66.0, 36.0), (90.0, 16.0)),
-    ((18.0, 40.0), (35.0, 36.0), (54.0, 35.0), (73.0, 31.0), (92.0, 28.0)),
-    ((10.0, 88.0), (29.0, 78.0), (49.0, 73.0), (70.0, 73.0), (91.0, 80.0)),
-    ((43.0, 16.0), (45.0, 34.0), (47.0, 52.0), (46.0, 72.0), (45.0, 88.0)),
-    ((61.0, 13.0), (59.0, 31.0), (60.0, 49.0), (61.0, 69.0), (64.0, 90.0)),
+    # Normalized from the reference dark-map crop so route snapping follows
+    # the same visual corridors as the basemap instead of a separate line set.
+    ((21.0, 66.0), (26.0, 55.0), (31.0, 45.0), (43.0, 36.0), (55.0, 22.0), (64.0, 24.0), (70.0, 33.0), (67.0, 45.0), (59.0, 50.0), (55.0, 61.0), (47.0, 69.0), (34.0, 67.0), (24.0, 61.0)),
+    ((6.0, 36.0), (24.0, 35.0), (42.0, 35.0), (60.0, 31.0), (79.0, 27.0), (96.0, 19.0)),
+    ((4.0, 60.0), (22.0, 56.0), (39.0, 53.0), (58.0, 52.0), (77.0, 55.0), (96.0, 63.0)),
+    ((13.0, 90.0), (27.0, 77.0), (42.0, 63.0), (58.0, 48.0), (75.0, 35.0), (95.0, 25.0)),
+    ((46.0, 18.0), (52.0, 31.0), (57.0, 45.0), (58.0, 60.0), (59.0, 82.0)),
+    ((70.0, 12.0), (67.0, 24.0), (70.0, 39.0), (77.0, 54.0), (90.0, 77.0)),
+    ((16.0, 18.0), (31.0, 30.0), (47.0, 45.0), (64.0, 61.0), (86.0, 81.0)),
+    ((74.0, 15.0), (80.0, 25.0), (87.0, 39.0), (83.0, 52.0), (77.0, 64.0)),
+    ((28.0, 28.0), (40.0, 23.0), (52.0, 26.0), (63.0, 33.0), (75.0, 43.0)),
+    ((19.0, 47.0), (33.0, 44.0), (45.0, 48.0), (58.0, 57.0), (72.0, 70.0)),
+    ((37.0, 12.0), (36.0, 29.0), (39.0, 46.0), (42.0, 63.0), (45.0, 86.0)),
+    ((55.0, 8.0), (56.0, 22.0), (54.0, 37.0), (50.0, 52.0), (47.0, 73.0)),
+    ((65.0, 18.0), (58.0, 27.0), (50.0, 36.0), (41.0, 44.0), (31.0, 52.0), (22.0, 64.0)),
+    ((24.0, 74.0), (35.0, 69.0), (48.0, 66.0), (63.0, 67.0), (82.0, 73.0)),
 ]
 
 
@@ -1245,10 +1246,21 @@ def render_index() -> str:
         linear-gradient(180deg, #08121b 0%, #040a11 100%);
       background-size: auto, 56px 56px, 56px 56px, auto;
     }
-    .map-frame.topology .map-bg { opacity: .96; filter: saturate(.58) contrast(1.08) brightness(.78); }
+    .map-frame.topology::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        linear-gradient(180deg, rgba(2, 9, 17, .12), rgba(2, 9, 17, .34)),
+        url("/assets/reference-dark-map.png") center / cover no-repeat;
+      opacity: .98;
+      pointer-events: none;
+    }
+    .map-frame.topology .map-bg { opacity: .38; filter: saturate(.44) contrast(.92) brightness(.64); }
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-    .map-bg { opacity: .74; z-index: 0; }
+    .map-bg { opacity: .74; z-index: 1; }
     .route-svg { z-index: 2; pointer-events: auto; }
     .route-bundle-highlight,
     .route-bundle-candidate,
@@ -1277,14 +1289,14 @@ def render_index() -> str:
     .district, .zone-block { fill: rgba(24, 36, 47, .3); stroke: rgba(124, 146, 162, .075); stroke-width: 1; }
     .water { fill: rgba(11, 24, 35, .62); stroke: rgba(85, 116, 137, .14); }
     .building-block {
-      fill: rgba(36, 48, 58, .25);
+      fill: rgba(36, 48, 58, .14);
       stroke: rgba(126, 145, 158, .075);
       stroke-width: .7;
       vector-effect: non-scaling-stroke;
     }
-    .building-block.commerce { fill: rgba(70, 57, 32, .26); stroke: rgba(255, 209, 45, .08); }
-    .building-block.office { fill: rgba(39, 56, 67, .24); }
-    .building-block.residential { fill: rgba(32, 47, 50, .22); }
+    .building-block.commerce { fill: rgba(70, 57, 32, .13); stroke: rgba(255, 209, 45, .05); }
+    .building-block.office { fill: rgba(39, 56, 67, .12); }
+    .building-block.residential { fill: rgba(32, 47, 50, .1); }
     .commerce-hotspot {
       fill: rgba(255, 174, 66, .085);
       stroke: rgba(255, 174, 66, .16);
@@ -1303,13 +1315,13 @@ def render_index() -> str:
       stroke-linejoin: round;
       vector-effect: non-scaling-stroke;
     }
-    .road-base { stroke: rgba(0, 4, 9, .62); stroke-width: calc(var(--road-width, 8px) + 2px); }
-    .road-base.secondary { stroke: rgba(0, 4, 9, .5); stroke-width: calc(var(--road-width, 6px) + 1.2px); }
-    .road-base.service { stroke: rgba(0, 4, 9, .34); stroke-width: calc(var(--road-width, 4px) + .6px); }
-    .road-core { stroke: rgba(126, 139, 148, .34); stroke-width: var(--road-width, 6px); }
-    .road-core.arterial { stroke: rgba(154, 162, 168, .42); }
-    .road-core.secondary { stroke: rgba(109, 125, 135, .28); }
-    .road-core.service { stroke: rgba(87, 101, 112, .14); stroke-dasharray: 1 12; }
+    .road-base { stroke: rgba(0, 4, 9, .24); stroke-width: calc(var(--road-width, 8px) + 1.4px); }
+    .road-base.secondary { stroke: rgba(0, 4, 9, .18); stroke-width: calc(var(--road-width, 6px) + .8px); }
+    .road-base.service { stroke: rgba(0, 4, 9, .1); stroke-width: calc(var(--road-width, 4px) + .3px); }
+    .road-core { stroke: rgba(126, 139, 148, .13); stroke-width: var(--road-width, 6px); }
+    .road-core.arterial { stroke: rgba(172, 180, 186, .18); }
+    .road-core.secondary { stroke: rgba(109, 125, 135, .1); }
+    .road-core.service { stroke: rgba(87, 101, 112, .055); stroke-dasharray: 1 12; }
     .traffic-band { stroke-width: var(--traffic-width, 2px); opacity: .34; }
     .traffic-band.smooth { stroke: rgba(54, 230, 126, .18); }
     .traffic-band.moderate { stroke: rgba(255, 209, 45, .32); stroke-dasharray: 18 16; }
@@ -4179,9 +4191,26 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
+    def _send_static_asset(self, path: str) -> bool:
+        if path != "/assets/reference-dark-map.png":
+            return False
+        asset_path = STATIC_DIR / "reference-dark-map.png"
+        if not asset_path.exists():
+            return False
+        raw = asset_path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", "image/png")
+        self.send_header("Cache-Control", "public, max-age=3600")
+        self.send_header("Content-Length", str(len(raw)))
+        self.end_headers()
+        self.wfile.write(raw)
+        return True
+
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API.
         parsed = urlparse(self.path)
         try:
+            if parsed.path.startswith("/assets/") and self._send_static_asset(parsed.path):
+                return
             if parsed.path == "/":
                 self._send_html(render_index())
                 return
