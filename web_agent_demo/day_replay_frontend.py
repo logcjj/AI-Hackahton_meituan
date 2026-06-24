@@ -157,6 +157,21 @@ def render_day_replay_index() -> str:
       letter-spacing: -.05em;
     }}
     .kpi-card span {{ color: rgba(255, 243, 214, .68); font-size: 12px; }}
+    .kpi-card em {{
+      display: block;
+      margin-top: 8px;
+      color: rgba(255, 243, 214, .86);
+      font: 800 11px var(--mono);
+      font-style: normal;
+    }}
+    .kpi-card[data-trend="good"] {{
+      border-color: rgba(93, 186, 119, .38);
+      background: linear-gradient(150deg, rgba(47, 112, 84, .32), rgba(255, 255, 255, .04));
+    }}
+    .kpi-card[data-trend="warn"] {{
+      border-color: rgba(181, 68, 53, .42);
+      background: linear-gradient(150deg, rgba(181, 68, 53, .28), rgba(255, 255, 255, .04));
+    }}
     .control-strip {{
       display: grid;
       grid-template-columns: minmax(210px, .8fr) repeat(5, minmax(120px, .45fr)) auto;
@@ -380,6 +395,21 @@ def render_day_replay_index() -> str:
     .pin.courier {{ background: var(--blue); }}
     .pin.order {{ background: var(--red); width: 24px; height: 24px; font-size: 10px; }}
     .agent .pin.courier {{ background: var(--green); }}
+    .pin.highlight {{
+      outline: 4px solid rgba(255, 243, 214, .92);
+      animation: decisionPulse 1.1s ease-in-out infinite;
+      z-index: 12;
+    }}
+    .route-svg path.highlight-route {{
+      stroke-width: 5.2;
+      stroke-dasharray: 1 0;
+      opacity: 1;
+      filter: drop-shadow(0 0 8px rgba(255, 243, 214, .86));
+    }}
+    @keyframes decisionPulse {{
+      0%, 100% {{ transform: translate(-50%, -50%) scale(1); }}
+      50% {{ transform: translate(-50%, -50%) scale(1.14); }}
+    }}
     .theater-foot {{
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -440,6 +470,20 @@ def render_day_replay_index() -> str:
       padding: 12px 14px 14px;
       overflow-x: auto;
     }}
+    .decision-highlight-strip {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 14px 0;
+    }}
+    .decision-chip {{
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: var(--green-deep);
+      background: rgba(47, 112, 84, .1);
+      border: 1px solid rgba(47, 112, 84, .22);
+      font: 800 11px var(--mono);
+    }}
     .event-card, .memory-card {{
       padding: 12px;
       border-radius: 18px;
@@ -447,6 +491,16 @@ def render_day_replay_index() -> str:
       border: 1px solid var(--line);
       line-height: 1.45;
       font-size: 12px;
+    }}
+    .event-card[data-highlight-card="true"] {{
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }}
+    .event-card[data-highlight-card="true"]:hover,
+    .event-card[data-active-highlight="true"] {{
+      transform: translateY(-2px);
+      border-color: rgba(47, 112, 84, .42);
+      background: rgba(47, 112, 84, .12);
     }}
     .event-card time, .memory-card code {{
       display: block;
@@ -517,12 +571,12 @@ def render_day_replay_index() -> str:
     </header>
 
     <section class="kpi-strip" id="kpi-strip" aria-label="全日对比指标">
-      <article class="kpi-card"><small>Time Saved</small><strong id="kpi-time-saved">--</strong><span>相对 nearest greedy</span></article>
-      <article class="kpi-card"><small>Cost Saved</small><strong id="kpi-cost-saved">--</strong><span>履约成本节省</span></article>
-      <article class="kpi-card"><small>Delivered</small><strong id="kpi-delivered">--</strong><span>同一批订单</span></article>
-      <article class="kpi-card"><small>Timeout Risk</small><strong id="kpi-risk">--</strong><span>风险变化</span></article>
-      <article class="kpi-card"><small>Average ETA</small><strong id="kpi-eta">--</strong><span>AutoSolver 端</span></article>
-      <article class="kpi-card"><small>Utilization</small><strong id="kpi-utilization">--</strong><span>骑手利用率变化</span></article>
+      <article class="kpi-card" id="kpi-card-time" data-kpi="time_saved"><small>Time Saved</small><strong id="kpi-time-saved">--</strong><span id="kpi-time-context">当前帧 vs nearest greedy</span><em id="kpi-time-total">全日累计 --</em></article>
+      <article class="kpi-card" id="kpi-card-cost" data-kpi="cost_saved"><small>Cost Saved</small><strong id="kpi-cost-saved">--</strong><span id="kpi-cost-context">当前帧履约成本节省</span><em id="kpi-cost-total">全日累计 --</em></article>
+      <article class="kpi-card" id="kpi-card-delivered" data-kpi="delivered"><small>Delivered</small><strong id="kpi-delivered">--</strong><span id="kpi-delivered-context">当前帧同一批订单</span><em id="kpi-delivered-total">全日累计 --</em></article>
+      <article class="kpi-card" id="kpi-card-risk" data-kpi="timeout_risk"><small>Timeout Risk</small><strong id="kpi-risk">--</strong><span id="kpi-risk-context">当前帧风险变化</span><em id="kpi-risk-total">全日累计 --</em></article>
+      <article class="kpi-card" id="kpi-card-eta" data-kpi="average_eta"><small>Average ETA</small><strong id="kpi-eta">--</strong><span id="kpi-eta-context">当前帧 AutoSolver</span><em id="kpi-eta-total">全日累计 --</em></article>
+      <article class="kpi-card" id="kpi-card-utilization" data-kpi="utilization"><small>Utilization</small><strong id="kpi-utilization">--</strong><span id="kpi-utilization-context">当前帧骑手利用率</span><em id="kpi-utilization-total">全日累计 --</em></article>
     </section>
 
     <section class="control-strip" id="replay-controls" aria-label="全日推演控制">
@@ -607,6 +661,7 @@ def render_day_replay_index() -> str:
           </div>
           <div class="api-tags" id="day-api-tags"></div>
         </div>
+        <div class="decision-highlight-strip" id="decision-highlight-summary" aria-label="当前决策高亮"></div>
         <div class="timeline-track" id="reasoning-timeline"></div>
       </article>
       <article class="memory-panel" id="memory-evolution-panel">
@@ -632,7 +687,8 @@ def render_day_replay_index() -> str:
       playing: false,
       timer: null,
       pendingRunToken: "",
-      controlRunTimer: null
+      controlRunTimer: null,
+      highlight: {{orderIds: [], courierIds: [], sourceLabel: "current frame"}}
     }};
     const $ = (id) => document.getElementById(id);
 
@@ -663,6 +719,16 @@ def render_day_replay_index() -> str:
       return `${{num >= 0 ? "+" : ""}}${{(num * 100).toFixed(1)}}%`;
     }}
 
+    function signedMinutes(value) {{
+      const num = Number(value) || 0;
+      return `${{num >= 0 ? "+" : ""}}${{(num / 60).toFixed(1)}}m`;
+    }}
+
+    function signedYuan(value) {{
+      const num = Number(value) || 0;
+      return `${{num >= 0 ? "+" : ""}}${{num.toFixed(1)}}元`;
+    }}
+
     function clock(seconds) {{
       const total = Math.max(0, Math.round(Number(seconds) || 0));
       const hh = String(Math.floor(total / 3600)).padStart(2, "0");
@@ -672,6 +738,34 @@ def render_day_replay_index() -> str:
 
     function currentFrame() {{
       return replayState.contract.frames[Math.min(replayState.frameIndex, replayState.contract.frames.length - 1)];
+    }}
+
+    function traceForFrame(frame) {{
+      const tracesById = new Map(replayState.contract.reasoning_traces.map((trace) => [trace.id, trace]));
+      return tracesById.get((frame.reasoning_trace_ids || [])[0]);
+    }}
+
+    function finalDelta() {{
+      const baseline = replayState.contract.baseline_run.metrics;
+      const challenger = replayState.contract.challenger_run.metrics;
+      return {{
+        time_saved_s: baseline.total_time_cost_s - challenger.total_time_cost_s,
+        cost_saved_yuan: baseline.total_cost_yuan - challenger.total_cost_yuan,
+        delivered_delta: challenger.delivered_orders - baseline.delivered_orders,
+        timeout_risk_delta: challenger.timeout_risk - baseline.timeout_risk,
+        utilization_delta: challenger.courier_utilization - baseline.courier_utilization
+      }};
+    }}
+
+    function setKpiCard(cardId, valueId, contextId, totalId, value, context, total, trend) {{
+      $(valueId).textContent = value;
+      $(contextId).textContent = context;
+      $(totalId).textContent = total;
+      $(cardId).dataset.trend = trend;
+    }}
+
+    function idCsv(ids) {{
+      return (ids || []).filter(Boolean).join(",");
     }}
 
     function setEngineStatus(title, detail) {{
@@ -750,6 +844,8 @@ def render_day_replay_index() -> str:
 
     function stageBaseHtml(frame, algorithmFrame) {{
       const orderIds = new Set(algorithmFrame.active_order_ids || []);
+      const highlightedOrders = new Set(replayState.highlight.orderIds || frame.highlighted_order_ids || []);
+      const highlightedCouriers = new Set(replayState.highlight.courierIds || frame.highlighted_courier_ids || []);
       const timeSlice = replayState.contract.time_slices.find((item) => item.id === frame.time_slice_id) || {{}};
       const shockIds = timeSlice.shock_ids || [];
       const hasBurst = shockIds.some((id) => id.includes("merchant-burst"));
@@ -757,13 +853,18 @@ def render_day_replay_index() -> str:
       const merchants = replayState.contract.merchants.slice(0, 8).map((merchant) =>
         `<span class="pin merchant" data-label="${{escapeText(merchant.id)}}" style="${{positionStyle(merchant.position)}}">商</span>`
       ).join("");
-      const couriers = (algorithmFrame.courier_positions || []).slice(0, 10).map((courier) =>
-        `<span class="pin courier" data-label="${{escapeText(courier.courier_id)}}" style="${{positionStyle(courier.position)}}">骑</span>`
-      ).join("");
-      const orders = replayState.contract.orders.filter((order) => orderIds.has(order.id)).slice(0, 10).map((order) =>
-        `<span class="pin order" data-label="${{escapeText(order.id)}}" style="${{positionStyle(order.destination)}}">单</span>`
-      ).join("");
-      const routes = (algorithmFrame.route_overlays || []).slice(0, 8).map((route) => `<path d="${{routePath(route)}}"></path>`).join("");
+      const couriers = (algorithmFrame.courier_positions || []).slice(0, 10).map((courier) => {{
+        const isHot = highlightedCouriers.has(courier.courier_id);
+        return `<span class="pin courier${{isHot ? " highlight" : ""}}" data-courier-id="${{escapeText(courier.courier_id, "")}}" data-label="${{escapeText(courier.courier_id)}}" style="${{positionStyle(courier.position)}}">骑</span>`;
+      }}).join("");
+      const orders = replayState.contract.orders.filter((order) => orderIds.has(order.id)).slice(0, 10).map((order) => {{
+        const isHot = highlightedOrders.has(order.id);
+        return `<span class="pin order${{isHot ? " highlight" : ""}}" data-order-id="${{escapeText(order.id, "")}}" data-label="${{escapeText(order.id)}}" style="${{positionStyle(order.destination)}}">单</span>`;
+      }}).join("");
+      const routes = (algorithmFrame.route_overlays || []).slice(0, 8).map((route) => {{
+        const isHot = highlightedOrders.has(route.order_id) || highlightedCouriers.has(route.courier_id);
+        return `<path class="${{isHot ? "highlight-route" : ""}}" data-order-id="${{escapeText(route.order_id, "")}}" data-courier-id="${{escapeText(route.courier_id, "")}}" d="${{routePath(route)}}"></path>`;
+      }}).join("");
       return `
         <div class="map-hud">
           <span>${{escapeText(timeSlice.label || frame.time_slice_id)}}</span>
@@ -799,27 +900,145 @@ def render_day_replay_index() -> str:
     function renderKpis(frame) {{
       const baseline = replayState.contract.baseline_run.metrics;
       const challenger = replayState.contract.challenger_run.metrics;
-      $("kpi-time-saved").textContent = minutes(baseline.total_time_cost_s - challenger.total_time_cost_s);
-      $("kpi-cost-saved").textContent = yuan(baseline.total_cost_yuan - challenger.total_cost_yuan);
-      $("kpi-delivered").textContent = `${{challenger.delivered_orders}}/${{challenger.total_orders}}`;
-      $("kpi-risk").textContent = signedPercent(challenger.timeout_risk - baseline.timeout_risk);
-      $("kpi-eta").textContent = minutes(challenger.avg_eta_s);
-      $("kpi-utilization").textContent = signedPercent(challenger.courier_utilization - baseline.courier_utilization);
+      const final = finalDelta();
+      const frameBaseline = frame.baseline.metrics;
+      const frameChallenger = frame.challenger.metrics;
+      setKpiCard(
+        "kpi-card-time",
+        "kpi-time-saved",
+        "kpi-time-context",
+        "kpi-time-total",
+        signedMinutes(frame.delta.time_saved_s),
+        `当前帧 ${{clock(frame.sim_time_s)}} 累计节省`,
+        `全日累计 ${{signedMinutes(final.time_saved_s)}}`,
+        frame.delta.time_saved_s >= 0 ? "good" : "warn"
+      );
+      setKpiCard(
+        "kpi-card-cost",
+        "kpi-cost-saved",
+        "kpi-cost-context",
+        "kpi-cost-total",
+        signedYuan(frame.delta.cost_saved_yuan),
+        "当前帧履约成本差值",
+        `全日累计 ${{signedYuan(final.cost_saved_yuan)}}`,
+        frame.delta.cost_saved_yuan >= 0 ? "good" : "warn"
+      );
+      setKpiCard(
+        "kpi-card-delivered",
+        "kpi-delivered",
+        "kpi-delivered-context",
+        "kpi-delivered-total",
+        `${{frameChallenger.delivered_orders}}/${{frameChallenger.total_orders}}`,
+        `当前帧 vs greedy ${{frame.delta.extra_delivered_orders >= 0 ? "+" : ""}}${{frame.delta.extra_delivered_orders}} 单`,
+        `全日累计 ${{challenger.delivered_orders}}/${{challenger.total_orders}}`,
+        frame.delta.extra_delivered_orders >= 0 ? "good" : "warn"
+      );
+      setKpiCard(
+        "kpi-card-risk",
+        "kpi-risk",
+        "kpi-risk-context",
+        "kpi-risk-total",
+        signedPercent(frame.delta.timeout_risk_delta),
+        `Greedy ${{percent(frameBaseline.timeout_risk)}} / AutoSolver ${{percent(frameChallenger.timeout_risk)}}`,
+        `全日累计 ${{signedPercent(final.timeout_risk_delta)}}`,
+        frame.delta.timeout_risk_delta <= 0 ? "good" : "warn"
+      );
+      setKpiCard(
+        "kpi-card-eta",
+        "kpi-eta",
+        "kpi-eta-context",
+        "kpi-eta-total",
+        minutes(frameChallenger.avg_eta_s),
+        `当前帧 Greedy ${{minutes(frameBaseline.avg_eta_s)}}`,
+        `全日 AutoSolver ${{minutes(challenger.avg_eta_s)}}`,
+        frameChallenger.avg_eta_s <= frameBaseline.avg_eta_s ? "good" : "warn"
+      );
+      setKpiCard(
+        "kpi-card-utilization",
+        "kpi-utilization",
+        "kpi-utilization-context",
+        "kpi-utilization-total",
+        percent(frameChallenger.courier_utilization),
+        `vs greedy ${{signedPercent(frame.delta.utilization_delta)}}`,
+        `全日 AutoSolver ${{percent(challenger.courier_utilization)}}`,
+        frame.delta.utilization_delta >= -0.03 ? "good" : "warn"
+      );
       $("timeline-label").textContent = clock(frame.sim_time_s);
     }}
 
+    function businessCandidateReason(score, trace) {{
+      const evidence = (trace && trace.evidence) || {{}};
+      const phase = escapeText(evidence.demand_phase || "unknown");
+      const orders = Number(evidence.order_count || 0);
+      const congestion = Number(evidence.congestion_level || 0).toFixed(2);
+      if (score.algorithm_id === "nearest_greedy") {{
+        return `只看最近取餐距离，${{phase}} 的 ${{orders}} 单在拥堵 ${{congestion}} 下容易把超时风险推到后续时间片。`;
+      }}
+      if (score.algorithm_id === "autosolver_agent") {{
+        return `综合供给、拥堵、deadline、成本和 Memory，在 ${{phase}} 中优先压低 ETA 与风险。`;
+      }}
+      return escapeText(score.reason);
+    }}
+
+    function impactLine(delta) {{
+      return `预计影响: 时间 ${{signedMinutes(delta.time_saved_s)}} / 成本 ${{signedYuan(delta.cost_saved_yuan)}} / 风险 ${{signedPercent(delta.timeout_risk_delta)}}`;
+    }}
+
+    function renderDecisionHighlights(frame, trace, sourceLabel = "关键决策点") {{
+      const orderIds = replayState.highlight.orderIds || frame.highlighted_order_ids || [];
+      const courierIds = replayState.highlight.courierIds || frame.highlighted_courier_ids || [];
+      const evidence = (trace && trace.evidence) || {{}};
+      const chips = [
+        ["source", sourceLabel],
+        ["time-slice", `${{clock(frame.sim_time_s)}} · ${{frame.time_slice_id}}`],
+        ["orders", orderIds.length ? orderIds.slice(0, 4).join(", ") : "no highlighted order"],
+        ["couriers", courierIds.length ? courierIds.slice(0, 4).join(", ") : "no courier switch"],
+        ["phase", `${{escapeText(evidence.demand_phase)}} · congestion ${{Number(evidence.congestion_level || 0).toFixed(2)}}`],
+        ["impact", `${{signedMinutes(frame.delta.time_saved_s)}} / ${{signedYuan(frame.delta.cost_saved_yuan)}}`]
+      ];
+      $("decision-highlight-summary").innerHTML = chips.map(([label, value]) => `<span class="decision-chip" data-chip="${{escapeText(label, "")}}">${{escapeText(label)}}: ${{escapeText(value)}}</span>`).join("");
+    }}
+
+    function applyDecisionHighlight(frame, orderIds, courierIds, sourceLabel) {{
+      replayState.highlight = {{
+        orderIds: orderIds && orderIds.length ? orderIds : (frame.highlighted_order_ids || []),
+        courierIds: courierIds && courierIds.length ? courierIds : (frame.highlighted_courier_ids || []),
+        sourceLabel: sourceLabel || "关键决策点"
+      }};
+      renderMaps(frame);
+      renderDecisionHighlights(frame, traceForFrame(frame), replayState.highlight.sourceLabel);
+      document.querySelectorAll("#reasoning-timeline [data-highlight-card='true']").forEach((card) => {{
+        card.dataset.activeHighlight = card.dataset.highlightSource === replayState.highlight.sourceLabel ? "true" : "false";
+      }});
+    }}
+
+    function bindDecisionCards(frame) {{
+      document.querySelectorAll("#reasoning-timeline [data-highlight-card='true']").forEach((card) => {{
+        const orderIds = (card.dataset.orderIds || "").split(",").filter(Boolean);
+        const courierIds = (card.dataset.courierIds || "").split(",").filter(Boolean);
+        const label = card.dataset.highlightSource || "关键决策点";
+        const activate = () => applyDecisionHighlight(frame, orderIds, courierIds, label);
+        card.addEventListener("mouseenter", activate);
+        card.addEventListener("focus", activate);
+        card.addEventListener("click", activate);
+      }});
+    }}
+
     function renderReasoning(frame) {{
-      const tracesById = new Map(replayState.contract.reasoning_traces.map((trace) => [trace.id, trace]));
-      const trace = tracesById.get(frame.reasoning_trace_ids[0]);
+      const trace = traceForFrame(frame);
+      const orderCsv = idCsv(frame.highlighted_order_ids);
+      const courierCsv = idCsv(frame.highlighted_courier_ids);
       const cards = [];
-      cards.push(`<article class="event-card"><time>${{clock(frame.sim_time_s)}} · ${{escapeText(frame.time_slice_id)}}</time><b>同一时间片对比</b><span>${{escapeText(frame.delta.headline)}}</span></article>`);
+      cards.push(`<article class="event-card" tabindex="0" data-highlight-card="true" data-active-highlight="true" data-highlight-source="关键决策点" data-time-slice-id="${{escapeText(frame.time_slice_id, "")}}" data-order-ids="${{escapeText(orderCsv, "")}}" data-courier-ids="${{escapeText(courierCsv, "")}}"><time>${{clock(frame.sim_time_s)}} · ${{escapeText(frame.time_slice_id)}}</time><b>关键决策点</b><span>${{escapeText(frame.delta.headline)}} ${{impactLine(frame.delta)}}</span></article>`);
       if (trace) {{
         (trace.candidate_scores || []).forEach((score) => {{
-          cards.push(`<article class="event-card" data-algorithm="${{escapeText(score.algorithm_id)}}"><time>score ${{Number(score.score).toFixed(2)}} · ${{Number(score.estimated_runtime_ms).toFixed(0)}}ms</time><b>${{escapeText(score.algorithm_id)}}</b><span>${{escapeText(score.reason)}}</span></article>`);
+          cards.push(`<article class="event-card" tabindex="0" data-highlight-card="true" data-highlight-source="${{escapeText(score.algorithm_id, "")}}" data-algorithm="${{escapeText(score.algorithm_id, "")}}" data-time-slice-id="${{escapeText(frame.time_slice_id, "")}}" data-order-ids="${{escapeText(orderCsv, "")}}" data-courier-ids="${{escapeText(courierCsv, "")}}"><time>score ${{Number(score.score).toFixed(2)}} · ${{Number(score.estimated_runtime_ms).toFixed(0)}}ms</time><b>${{escapeText(score.algorithm_id)}}</b><span>${{businessCandidateReason(score, trace)}} ${{impactLine(trace.expected_impact)}}</span></article>`);
         }});
-        cards.push(`<article class="event-card"><time>10s budget</time><b>${{escapeText(trace.selected_strategy)}}</b><span>${{escapeText(trace.rationale)}}</span></article>`);
+        cards.push(`<article class="event-card" tabindex="0" data-highlight-card="true" data-highlight-source="${{escapeText(trace.selected_strategy, "")}}" data-time-slice-id="${{escapeText(frame.time_slice_id, "")}}" data-order-ids="${{escapeText(orderCsv, "")}}" data-courier-ids="${{escapeText(courierCsv, "")}}"><time>10s budget · ${{Number(trace.time_budget_ms || 0)}}ms</time><b>${{escapeText(trace.selected_strategy)}}</b><span>${{escapeText(trace.rationale)}} 命中订单 ${{escapeText(orderCsv || "none")}}，涉及骑手 ${{escapeText(courierCsv || "none")}}。</span></article>`);
       }}
       $("reasoning-timeline").innerHTML = cards.join("");
+      renderDecisionHighlights(frame, trace, replayState.highlight.sourceLabel || "关键决策点");
+      bindDecisionCards(frame);
     }}
 
     function renderMemory(frame) {{
@@ -842,7 +1061,13 @@ def render_day_replay_index() -> str:
       const frames = replayState.contract.frames;
       replayState.frameIndex = Math.max(0, Math.min(frames.length - 1, Number(index) || 0));
       const frame = currentFrame();
+      $("timeline-scrubber").max = String(Math.max(0, frames.length - 1));
       $("timeline-scrubber").value = String(replayState.frameIndex);
+      replayState.highlight = {{
+        orderIds: frame.highlighted_order_ids || [],
+        courierIds: frame.highlighted_courier_ids || [],
+        sourceLabel: "关键决策点"
+      }};
       renderKpis(frame);
       renderMaps(frame);
       renderReasoning(frame);
@@ -912,6 +1137,9 @@ def render_day_replay_index() -> str:
       replayState,
       bootstrapDayReplayShell,
       setFrameIndex,
+      setKpiCard,
+      applyDecisionHighlight,
+      renderDecisionHighlights,
       playReplay,
       pauseReplay,
       compareAlgorithms

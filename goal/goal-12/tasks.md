@@ -246,7 +246,7 @@ Confidence loop:
 
 ## Task 9 - Add KPI Savings, Reasoning Flow, And Decision Highlights
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - KPI strip shows time saved, cost saved, delivered count, timeout risk, ETA, and utilization.
@@ -254,10 +254,24 @@ Independent verification:
 - Decision highlights connect to map entities and time slices.
 
 Work log:
--
+- Expanded the KPI cards so each one shows current-frame values plus full-day cumulative context.
+- Added KPI trend styling for favorable and guardrail states.
+- Covered all Task 9 KPI dimensions in the frontend: time saved, cost saved, delivered count, timeout risk, average ETA and courier utilization.
+- Added `decision-highlight-summary` chips for the selected source, time slice, highlighted orders, highlighted couriers, demand phase/congestion and impact.
+- Added map entity linkage through `data-order-id`, `data-courier-id`, `data-order-ids`, `data-courier-ids`, `data-highlight-card` and highlighted route classes.
+- Reworked reasoning cards into direct business language for key decision point, algorithm candidate scores, selected strategy, 10-second budget and expected impact.
+- Added hover/focus/click behavior so reasoning cards update highlighted orders, couriers and routes on both side-by-side maps.
+- Updated `tests/test_web_agent_demo.py` to assert KPI detail markers, decision-highlight markers, highlighted frame ids and reasoning trace impact linkage.
+- Added `goal/goal-12/task9-kpi-reasoning-audit.md` with implementation and verification evidence.
+- Verified syntax with `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/server.py tests/test_web_agent_demo.py`.
+- Ran `uv run --with pytest pytest tests/test_web_agent_demo.py`; 15 tests passed.
+- Ran focused day-replay/day-simulation tests; 34 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 100 tests passed.
+- Ran non-goal/non-output business-code sensitive scan for supplied model/domain/key patterns; no matches were found.
+- Ran browser verification on `127.0.0.1:8789`: page ready, frame 0 KPI/highlight summary present, frame 5 changed KPI values, clicking a reasoning card activated one card, highlighted 19 pins and 10 routes, updated highlighted order/courier state, and browser console had zero warnings/errors.
 
 Confidence loop:
--
+- 100% confidence for Task 9 scope: the frontend now displays the required KPI savings dimensions, reasoning is readable and tied to expected impact, decision cards connect to concrete order/courier/time-slice DOM attributes, browser interaction proves the map highlight loop works, automated tests pass, and sensitive runtime LLM configuration remains outside business code.
 
 ## Debug Cycle 3 - Tasks 7-9 Comprehensive Check
 

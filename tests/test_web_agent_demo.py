@@ -55,6 +55,10 @@ class WebAgentDemoTest(unittest.TestCase):
             "Timeout Risk",
             "Average ETA",
             "Utilization",
+            "当前帧 vs nearest greedy",
+            "全日累计",
+            "关键决策点",
+            "预计影响",
             "商家",
             "骑手",
             "订单",
@@ -65,6 +69,12 @@ class WebAgentDemoTest(unittest.TestCase):
             "function renderMaps",
             "function renderReasoning",
             "function renderMemory",
+            "function setKpiCard",
+            "function finalDelta",
+            "function traceForFrame",
+            "function renderDecisionHighlights",
+            "function applyDecisionHighlight",
+            "function bindDecisionCards",
             "function apiJson",
             "function dayRunRequest",
             "function runDaySimulation",
@@ -79,8 +89,15 @@ class WebAgentDemoTest(unittest.TestCase):
             "对比完成",
             "merchant_burst",
             "data-shock-ids",
+            "data-order-id",
+            "data-courier-id",
+            "data-order-ids",
+            "data-courier-ids",
+            "data-highlight-card",
+            'id="decision-highlight-summary"',
             "map-hud",
             "burst-marker",
+            "highlight-route",
         ]
         for marker in required_markers:
             self.assertIn(marker, html)
@@ -150,6 +167,10 @@ class WebAgentDemoTest(unittest.TestCase):
             {"memory_recall", "memory_writeback", "future_policy_shift"},
         )
         self.assertGreater(contract["frames"][0]["delta"]["time_saved_s"], 0)
+        self.assertTrue(contract["frames"][0]["highlighted_order_ids"])
+        self.assertTrue(contract["frames"][0]["highlighted_courier_ids"])
+        self.assertEqual(contract["reasoning_traces"][0]["expected_impact"], contract["frames"][0]["delta"])
+        self.assertEqual(contract["reasoning_traces"][0]["frame_id"], contract["frames"][0]["id"])
         self.assertEqual(contract["privacy"]["secret_handling"], "env-only-redacted")
         self.assertTrue(contract["frames"][0]["memory_event_ids"])
 
@@ -198,6 +219,10 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertEqual(frame_payload["status"], "ok")
         self.assertEqual(frame_payload["frame_index"], 3)
         self.assertEqual(frame_payload["frame"]["baseline"]["active_order_ids"], frame_payload["frame"]["challenger"]["active_order_ids"])
+        self.assertTrue(frame_payload["frame"]["highlighted_order_ids"])
+        self.assertTrue(frame_payload["frame"]["highlighted_courier_ids"])
+        self.assertGreater(frame_payload["frame"]["delta"]["time_saved_s"], 0)
+        self.assertIn("cumulatively", frame_payload["frame"]["delta"]["headline"])
         self.assertEqual(memory_payload["status"], "ok")
         self.assertEqual(
             {event["event_type"] for event in memory_payload["evolution_events"]},
