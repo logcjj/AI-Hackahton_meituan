@@ -78,7 +78,7 @@ class DaySimulationComparisonTest(unittest.TestCase):
             self.assertEqual(trace["time_budget_ms"], 10_000)
             self.assertIn(trace["evidence"]["demand_phase"], {"lunch_peak", "dinner_peak", "night_supply_gap"})
             self.assertIn("AutoSolver", trace["rationale"])
-            self.assertEqual(trace["memory_event_ids"], [])
+            self.assertEqual(len(trace["memory_event_ids"]), 3)
         self.assertGreater(len(shock_frames), 0)
 
 

@@ -137,7 +137,7 @@ Confidence loop:
 
 ## Task 6 - Implement Memory Evolution Trace
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Recall/writeback/future-policy-shift events are generated per important time slice.
@@ -145,10 +145,23 @@ Independent verification:
 - Fallback predictor works without external API.
 
 Work log:
--
+- Read the `hermes-evolve` skill and kept this task scoped to Hermes-style demonstration data rather than modifying local Hermes configuration.
+- Added day-level memory evolution generation in `run_full_day_comparison()`: every important comparison frame now gets `memory_recall`, `memory_writeback`, and `future_policy_shift` events.
+- Linked memory event ids back into each `SideBySideFrame`, each `ReasoningTrace`, and the challenger `AlgorithmDayRun`.
+- Added deterministic context signatures, recalled case ids, learned rules, future policy rules, and confidence before/after values.
+- Added an env-only LLM predictor hook inside reasoning trace evidence. It reports `local-heuristic` fallback without env, or `external-env-hook` readiness with env, while never returning raw base URL, API key, or model values.
+- Supported `memory_mode="off"` to disable evolution events and memory links.
+- Added `tests/test_day_simulation_memory_evolution.py` covering event types, frame/trace/run links, confidence changes, fallback predictor behavior, env hook redaction, and memory off mode.
+- Updated `tests/test_day_simulation_comparison.py` to require memory event links on reasoning traces.
+- Verified syntax with `python3 -m py_compile web_agent_demo/day_simulation.py tests/test_day_simulation_memory_evolution.py tests/test_day_simulation_comparison.py`.
+- Ran focused tests with `uv run --with pytest pytest tests/test_day_simulation_memory_evolution.py tests/test_day_simulation_comparison.py`; 10 tests passed.
+- Ran broader focused tests with day simulation plus legacy simulation/compare/API/memory coverage; 39 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 98 tests passed.
+- Ran ASCII-only scan for new/changed Python source and non-goal business-code secret scan; both passed.
+- Final deterministic probe for seed `task6-final` at 16 couriers and 0.35 order scale produced SHA-256 `82e9ff55fd08486283af26861976090d3921b12bcf502beac4e590281f2a4682`, 40 frames, 120 memory events and all three event types.
 
 Confidence loop:
--
+- 100% confidence for Task 6 scope: important frames now demonstrate recall, writeback and future policy evolution; predictor behavior is env-only and redacted; fallback works without external API; and all old/new tests remain green.
 
 ## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
 

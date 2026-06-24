@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from web_agent_demo.simulation_engine import Position, simulation_to_dict
@@ -12,6 +13,7 @@ DAY_SIMULATION_CONTRACT_VERSION = "day-simulation-contract-v1"
 DAY_START_S = 7 * 60 * 60
 DAY_END_S = 23 * 60 * 60
 DEFAULT_TIME_SLICE_S = 15 * 60
+DAY_PREDICTOR_ENV_VARS = ("AUTOSOLVER_LLM_BASE_URL", "AUTOSOLVER_LLM_API_KEY", "AUTOSOLVER_LLM_MODEL")
 
 DAY_SIMULATION_ENDPOINTS = {
     "scenarios": "/api/day-simulation/scenarios",
@@ -340,11 +342,14 @@ def run_full_day_comparison(
     seed: str = "demo",
     controls: DaySimulationControls | None = None,
     world: DaySimulationWorld | None = None,
+    env: dict[str, str] | None = None,
 ) -> DaySimulationContract:
     day_world = world or generate_full_day_world(scenario_id=scenario_id, seed=seed, controls=controls)
     baseline = _simulate_day_algorithm(day_world, day_world.controls.baseline_algorithm_id)
     challenger = _simulate_day_algorithm(day_world, day_world.controls.challenger_algorithm_id)
-    frames, reasoning_traces = _build_comparison_frames(day_world, baseline, challenger)
+    frames, reasoning_traces = _build_comparison_frames(day_world, baseline, challenger, env)
+    evolution_events = _build_evolution_memory_events(day_world, frames)
+    frames, reasoning_traces = _attach_memory_events(frames, reasoning_traces, evolution_events)
     return DaySimulationContract(
         contract_version=DAY_SIMULATION_CONTRACT_VERSION,
         scenario=day_world.scenario,
@@ -357,7 +362,7 @@ def run_full_day_comparison(
         challenger_run=_algorithm_day_run(day_world, challenger, frames, reasoning_traces),
         frames=frames,
         reasoning_traces=reasoning_traces,
-        evolution_events=(),
+        evolution_events=evolution_events,
         api_endpoints=dict(DAY_SIMULATION_ENDPOINTS),
         privacy={
             "llm_api_key": "env-only",
@@ -864,6 +869,7 @@ def _build_comparison_frames(
     world: DaySimulationWorld,
     baseline: _AlgorithmSimulationResult,
     challenger: _AlgorithmSimulationResult,
+    env: dict[str, str] | None,
 ) -> tuple[tuple[SideBySideFrame, ...], tuple[ReasoningTrace, ...]]:
     frames: list[SideBySideFrame] = []
     traces: list[ReasoningTrace] = []
@@ -891,7 +897,7 @@ def _build_comparison_frames(
             memory_event_ids=(),
         )
         frames.append(frame)
-        traces.append(_reasoning_trace(frame, time_slice, baseline, challenger, delta))
+        traces.append(_reasoning_trace(frame, time_slice, baseline, challenger, delta, world.controls, env))
     return tuple(frames), tuple(traces)
 
 
@@ -920,35 +926,38 @@ def _reasoning_trace(
     baseline: _AlgorithmSimulationResult,
     challenger: _AlgorithmSimulationResult,
     delta: MetricDelta,
+    controls: DaySimulationControls,
+    env: dict[str, str] | None,
 ) -> ReasoningTrace:
     baseline_metrics = frame.baseline.metrics
     challenger_metrics = frame.challenger.metrics
     selected = "adaptive_risk_balanced_dispatch" if delta.time_saved_s >= 0 else "fallback_to_baseline_guardrail"
+    candidate_scores = (
+        AlgorithmCandidateScore(
+            algorithm_id=baseline.algorithm_id,
+            score=round(_candidate_score(baseline_metrics), 4),
+            estimated_runtime_ms=round(8.0 + len(time_slice.order_ids) * 0.7, 3),
+            expected_time_cost_s=baseline_metrics.total_time_cost_s,
+            expected_cost_yuan=baseline_metrics.total_cost_yuan,
+            risk_score=baseline_metrics.timeout_risk,
+            reason="Baseline optimizes nearest pickup, so queueing and deadline risk can accumulate.",
+        ),
+        AlgorithmCandidateScore(
+            algorithm_id=challenger.algorithm_id,
+            score=round(_candidate_score(challenger_metrics), 4),
+            estimated_runtime_ms=round(180.0 + len(time_slice.order_ids) * 5.5, 3),
+            expected_time_cost_s=challenger_metrics.total_time_cost_s,
+            expected_cost_yuan=challenger_metrics.total_cost_yuan,
+            risk_score=challenger_metrics.timeout_risk,
+            reason="AutoSolver evaluates availability, congestion, route cost and deadline pressure.",
+        ),
+    )
     return ReasoningTrace(
         id=frame.reasoning_trace_ids[0],
         frame_id=frame.id,
         algorithm_id=challenger.algorithm_id,
         selected_strategy=selected,
-        candidate_scores=(
-            AlgorithmCandidateScore(
-                algorithm_id=baseline.algorithm_id,
-                score=round(_candidate_score(baseline_metrics), 4),
-                estimated_runtime_ms=round(8.0 + len(time_slice.order_ids) * 0.7, 3),
-                expected_time_cost_s=baseline_metrics.total_time_cost_s,
-                expected_cost_yuan=baseline_metrics.total_cost_yuan,
-                risk_score=baseline_metrics.timeout_risk,
-                reason="Baseline optimizes nearest pickup, so queueing and deadline risk can accumulate.",
-            ),
-            AlgorithmCandidateScore(
-                algorithm_id=challenger.algorithm_id,
-                score=round(_candidate_score(challenger_metrics), 4),
-                estimated_runtime_ms=round(180.0 + len(time_slice.order_ids) * 5.5, 3),
-                expected_time_cost_s=challenger_metrics.total_time_cost_s,
-                expected_cost_yuan=challenger_metrics.total_cost_yuan,
-                risk_score=challenger_metrics.timeout_risk,
-                reason="AutoSolver evaluates availability, congestion, route cost and deadline pressure.",
-            ),
-        ),
+        candidate_scores=candidate_scores,
         evidence={
             "time_slice_id": time_slice.id,
             "demand_phase": time_slice.demand_phase,
@@ -957,6 +966,7 @@ def _reasoning_trace(
             "order_count": len(time_slice.order_ids),
             "courier_supply": time_slice.courier_supply,
             "shock_ids": time_slice.shock_ids,
+            "llm_predictor": _day_predictor_hook(controls.predictor_mode, time_slice, candidate_scores, env),
         },
         rationale=_reasoning_rationale(time_slice, delta),
         expected_impact=delta,
@@ -972,6 +982,7 @@ def _algorithm_day_run(
     traces: tuple[ReasoningTrace, ...],
 ) -> AlgorithmDayRun:
     trace_ids = tuple(trace.id for trace in traces) if result.algorithm_id == world.controls.challenger_algorithm_id else ()
+    memory_event_ids = tuple(event_id for trace in traces for event_id in trace.memory_event_ids) if result.algorithm_id == world.controls.challenger_algorithm_id else ()
     return AlgorithmDayRun(
         run_id=f"DAY-RUN-{result.algorithm_id}-{world.seed}",
         scenario_id=world.scenario.id,
@@ -982,9 +993,166 @@ def _algorithm_day_run(
         metrics=result.metrics,
         frame_ids=tuple(frame.id for frame in frames),
         decision_trace_ids=trace_ids,
-        memory_event_ids=(),
+        memory_event_ids=memory_event_ids,
         summary=_run_summary(result),
     )
+
+
+def _build_evolution_memory_events(
+    world: DaySimulationWorld,
+    frames: tuple[SideBySideFrame, ...],
+) -> tuple[EvolutionMemoryEvent, ...]:
+    if world.controls.memory_mode == "off":
+        return ()
+    slice_by_id = {time_slice.id: time_slice for time_slice in world.time_slices}
+    events: list[EvolutionMemoryEvent] = []
+    for frame in frames:
+        time_slice = slice_by_id[frame.time_slice_id]
+        signature = _context_signature(time_slice)
+        recalled = _recalled_case_ids(world, time_slice)
+        confidence_before = _confidence_before(time_slice, frame.delta)
+        confidence_after = _confidence_after(confidence_before, frame.delta)
+        learned_rule = _learned_rule(time_slice, frame.delta)
+        events.extend(
+            (
+                EvolutionMemoryEvent(
+                    id=f"ME-{frame.id}-recall",
+                    frame_id=frame.id,
+                    event_type="memory_recall",
+                    context_signature=signature,
+                    recalled_case_ids=recalled,
+                    chosen_algorithm_id=frame.challenger.algorithm_id,
+                    learned_rule=f"Recall {signature} and rank historical risk-aware dispatch before nearest-only matching.",
+                    confidence_before=confidence_before,
+                    confidence_after=confidence_before,
+                    writeback=False,
+                ),
+                EvolutionMemoryEvent(
+                    id=f"ME-{frame.id}-writeback",
+                    frame_id=frame.id,
+                    event_type="memory_writeback",
+                    context_signature=signature,
+                    recalled_case_ids=recalled,
+                    chosen_algorithm_id=frame.challenger.algorithm_id,
+                    learned_rule=learned_rule,
+                    confidence_before=confidence_before,
+                    confidence_after=confidence_after,
+                    writeback=True,
+                ),
+                EvolutionMemoryEvent(
+                    id=f"ME-{frame.id}-policy",
+                    frame_id=frame.id,
+                    event_type="future_policy_shift",
+                    context_signature=signature,
+                    recalled_case_ids=(*recalled, f"current-{frame.id}"),
+                    chosen_algorithm_id=frame.challenger.algorithm_id,
+                    learned_rule=_future_policy_rule(time_slice, frame.delta),
+                    confidence_before=confidence_after,
+                    confidence_after=round(_clamp(confidence_after + 0.045, 0.0, 0.98), 4),
+                    writeback=True,
+                ),
+            )
+        )
+    return tuple(events)
+
+
+def _attach_memory_events(
+    frames: tuple[SideBySideFrame, ...],
+    traces: tuple[ReasoningTrace, ...],
+    events: tuple[EvolutionMemoryEvent, ...],
+) -> tuple[tuple[SideBySideFrame, ...], tuple[ReasoningTrace, ...]]:
+    event_ids_by_frame: dict[str, tuple[str, ...]] = {}
+    for event in events:
+        event_ids_by_frame[event.frame_id] = (*event_ids_by_frame.get(event.frame_id, ()), event.id)
+    frames_with_memory = tuple(replace(frame, memory_event_ids=event_ids_by_frame.get(frame.id, ())) for frame in frames)
+    traces_with_memory = tuple(replace(trace, memory_event_ids=event_ids_by_frame.get(trace.frame_id, ())) for trace in traces)
+    return frames_with_memory, traces_with_memory
+
+
+def _day_predictor_hook(
+    mode: str,
+    time_slice: TimeSlice,
+    candidate_scores: tuple[AlgorithmCandidateScore, ...],
+    env: dict[str, str] | None,
+) -> dict[str, Any]:
+    mode = mode if mode in {"fallback", "auto", "external"} else "fallback"
+    env_values = dict(os.environ if env is None else env)
+    has_external_env = all(env_values.get(name) for name in DAY_PREDICTOR_ENV_VARS)
+    provider = "external-env-hook" if has_external_env and mode in {"auto", "external"} else "local-heuristic"
+    status = "env-ready-fallback" if provider == "external-env-hook" else "fallback"
+    ranked = sorted(candidate_scores, key=lambda item: (item.score, -item.risk_score), reverse=True)
+    return {
+        "mode": mode,
+        "provider": provider,
+        "model": "env:AUTOSOLVER_LLM_MODEL" if provider == "external-env-hook" else "local-heuristic-v1",
+        "base_url": "env:AUTOSOLVER_LLM_BASE_URL" if provider == "external-env-hook" else "",
+        "used_external_api": False,
+        "status": status,
+        "secret_handling": "env-only-redacted",
+        "ranking_reason": _predictor_reason(time_slice, provider),
+        "ranked_algorithms": tuple(
+            {
+                "algorithm_id": item.algorithm_id,
+                "rank": index + 1,
+                "score": item.score,
+                "risk_score": item.risk_score,
+                "reason": item.reason,
+            }
+            for index, item in enumerate(ranked)
+        ),
+    }
+
+
+def _context_signature(time_slice: TimeSlice) -> str:
+    shock_part = ",".join(time_slice.shock_ids) if time_slice.shock_ids else "steady"
+    congestion = "high" if time_slice.congestion_level >= 0.68 else "medium" if time_slice.congestion_level >= 0.45 else "low"
+    supply = "scarce" if time_slice.courier_supply <= 18 else "normal"
+    return f"{time_slice.demand_phase}|{time_slice.weather}|{congestion}_congestion|{supply}_supply|{shock_part}"
+
+
+def _recalled_case_ids(world: DaySimulationWorld, time_slice: TimeSlice) -> tuple[str, ...]:
+    base = _stable_unit(world.seed, time_slice.id, "memory")
+    prefix = "shock" if time_slice.shock_ids else "steady"
+    return (
+        f"{prefix}-{time_slice.demand_phase}-{int(base * 1000):03d}",
+        f"similar-{time_slice.weather}-{int(time_slice.congestion_level * 100):02d}",
+    )
+
+
+def _confidence_before(time_slice: TimeSlice, delta: MetricDelta) -> float:
+    shock_boost = 0.035 * len(time_slice.shock_ids)
+    pressure_boost = min(0.08, len(time_slice.order_ids) / max(1, time_slice.courier_supply) * 0.06)
+    improvement_boost = 0.04 if delta.time_saved_s > 0 and delta.cost_saved_yuan > 0 else 0.0
+    return round(_clamp(0.52 + shock_boost + pressure_boost + improvement_boost, 0.0, 0.9), 4)
+
+
+def _confidence_after(confidence_before: float, delta: MetricDelta) -> float:
+    gain = min(0.16, max(0.0, delta.time_saved_s) / 180_000.0 + max(0.0, delta.cost_saved_yuan) / 6000.0)
+    risk_gain = 0.035 if delta.timeout_risk_delta < 0 else 0.0
+    return round(_clamp(confidence_before + 0.055 + gain + risk_gain, 0.0, 0.96), 4)
+
+
+def _learned_rule(time_slice: TimeSlice, delta: MetricDelta) -> str:
+    if delta.time_saved_s >= 0 and delta.cost_saved_yuan >= 0:
+        return (
+            f"For {time_slice.demand_phase} with {time_slice.weather} and congestion {time_slice.congestion_level:.2f}, "
+            "prefer AutoSolver risk-balanced dispatch over nearest greedy."
+        )
+    return f"For {time_slice.demand_phase}, keep greedy as a guardrail when risk-balanced dispatch has weak savings."
+
+
+def _future_policy_rule(time_slice: TimeSlice, delta: MetricDelta) -> str:
+    priority = "high" if delta.timeout_risk_delta < -0.05 or time_slice.shock_ids else "medium"
+    return (
+        f"Future policy: assign {priority} priority to AutoSolver when context matches {time_slice.demand_phase} "
+        f"and courier supply is {time_slice.courier_supply}."
+    )
+
+
+def _predictor_reason(time_slice: TimeSlice, provider: str) -> str:
+    if provider == "external-env-hook":
+        return "External LLM predictor env is configured; demo keeps the hook redacted and uses deterministic fallback ranking."
+    return f"Local fallback ranks algorithms from current {time_slice.demand_phase} metrics and generated memory trace."
 
 
 def _metrics_from_records(
