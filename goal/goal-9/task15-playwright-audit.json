@@ -1,0 +1,18 @@
+{
+  "source": "playwright-cli",
+  "url": "http://127.0.0.1:8765/",
+  "viewport": "1280x720",
+  "runtime": "after 10 second dispatch run",
+  "routeCount": 6,
+  "linkCount": 6,
+  "arrowCount": 6,
+  "merchantPins": 6,
+  "courierPins": 6,
+  "hitAreas": 0,
+  "oldWeatherRows": 0,
+  "duplicateCouriers": [],
+  "mismatch": [],
+  "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。",
+  "detailExcerpt": "派单总览：全部商家已自动连线\n对象 6 个骑手\n运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。\nM0101 → R0103\nM0102 → R0101\nM0103 → R0102\nM0104 → R0104\n派单履约 ETA\n17 分钟平均\n预计派单成本\n$168.20\n接单 / 覆盖概率\n100%",
+  "screenshot": "goal/goal-9/task15-playwright-final.png"
+}

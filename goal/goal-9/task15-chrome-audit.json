@@ -1,0 +1,199 @@
+{
+  "finalAudit": {
+    "arrowCount": 6,
+    "courierPins": 6,
+    "detail": "派单总览：全部商家已自动连线\n对象 6 个骑手\n运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。\nM0101 → R0103\nM0102 → R0101\nM0103 → R0102\nM0104 → R0104\n派单履约 ETA\n18 分钟平均\n预计派单成本\n$184.60\n接单 / 覆盖概率\n100%",
+    "dupCouriers": [],
+    "hitAreas": 0,
+    "linkCount": 6,
+    "links": [
+      {
+        "assignment": "A0101",
+        "cls": "dispatch-link secondary overview-route pickup-leg selected-overview route-click-target",
+        "courier": "R0103",
+        "d": "M526.1 326.7 L542.1 326.7",
+        "finalCourier": "R0103",
+        "merchant": "M0101"
+      },
+      {
+        "assignment": "A0102",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0101",
+        "d": "M217.8 406.9 L233.8 406.9",
+        "finalCourier": "R0101",
+        "merchant": "M0102"
+      },
+      {
+        "assignment": "A0103",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0102",
+        "d": "M455.8 140.6 L471.8 140.6",
+        "finalCourier": "R0102",
+        "merchant": "M0103"
+      },
+      {
+        "assignment": "A0104",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0104",
+        "d": "M437.5 430.0 L453.5 430.0",
+        "finalCourier": "R0104",
+        "merchant": "M0104"
+      },
+      {
+        "assignment": "A0105",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0105",
+        "d": "M584.6 419.6 L600.6 419.6",
+        "finalCourier": "R0105",
+        "merchant": "M0105"
+      },
+      {
+        "assignment": "A0106",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0112",
+        "d": "M376.5 392.0 L392.5 392.0",
+        "finalCourier": "R0112",
+        "merchant": "M0106"
+      }
+    ],
+    "merchantPins": 6,
+    "oldWeatherRows": 0,
+    "routeCount": 6,
+    "routeCourierMismatch": [],
+    "routes": [
+      {
+        "assignment": "A0101",
+        "cls": "dispatch-visual secondary overview-route pickup-leg selected-overview",
+        "courier": "R0103",
+        "d": "M505.3 321.9 Q535.4 333.7 560.3 317.5",
+        "finalCourier": "R0103",
+        "merchant": "M0101"
+      },
+      {
+        "assignment": "A0102",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0101",
+        "d": "M281.6 408.5 Q224.2 399.9 173.3 419.2",
+        "finalCourier": "R0101",
+        "merchant": "M0102"
+      },
+      {
+        "assignment": "A0103",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0102",
+        "d": "M492.3 152.1 Q466.2 133.7 430.6 142.8",
+        "finalCourier": "R0102",
+        "merchant": "M0103"
+      },
+      {
+        "assignment": "A0104",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0104",
+        "d": "M425.2 409.0 Q455.9 428.1 445.0 454.8",
+        "finalCourier": "R0104",
+        "merchant": "M0104"
+      },
+      {
+        "assignment": "A0105",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0105",
+        "d": "M563.0 419.3 Q596.7 413.0 614.1 432.9",
+        "finalCourier": "R0105",
+        "merchant": "M0105"
+      },
+      {
+        "assignment": "A0106",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0112",
+        "d": "M431.2 396.8 Q380.4 398.5 345.9 374.1",
+        "finalCourier": "R0112",
+        "merchant": "M0106"
+      }
+    ],
+    "url": "http://127.0.0.1:8765/",
+    "weather": {
+      "bg": "rgba(0, 0, 0, 0)",
+      "border": "1px solid rgba(203, 213, 225, 0.9)",
+      "color": "rgb(51, 65, 85)",
+      "shadow": "rgba(15, 23, 42, 0.1) 0px 8px 18px 0px",
+      "text": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。"
+    }
+  },
+  "routeClickResults": [
+    {
+      "assignment": "A0101",
+      "courier": "R0103",
+      "merchant": "M0101",
+      "x": 723,
+      "y": 312,
+      "titleOk": true,
+      "merchantOk": true,
+      "courierOk": true,
+      "ok": true,
+      "detail": "派单关系：骑手到商家\n对象 R0103\n最终派单 M0101 → R0103；地图线 R0103 → M0101 表达骑手承接该商家，不作为骑行导航。\nM0101\nR0103\n派单履约 ETA\n17 分钟\n预计派单成本\n$26.80\n接单 / 覆盖概率\n63%"
+    },
+    {
+      "assignment": "A0102",
+      "courier": "R0101",
+      "merchant": "M0102",
+      "x": 501,
+      "y": 362,
+      "titleOk": true,
+      "merchantOk": true,
+      "courierOk": true,
+      "ok": true,
+      "detail": "派单关系：骑手到商家\n对象 R0101\n最终派单 M0102 → R0101；地图线 R0101 → M0102 表达骑手承接该商家，不作为骑行导航。\nM0102\nR0101\n派单履约 ETA\n19 分钟\n预计派单成本\n$37.00\n接单 / 覆盖概率\n76%"
+    },
+    {
+      "assignment": "A0103",
+      "courier": "R0102",
+      "merchant": "M0103",
+      "x": 672,
+      "y": 196,
+      "titleOk": true,
+      "merchantOk": true,
+      "courierOk": true,
+      "ok": true,
+      "detail": "派单关系：骑手到商家\n对象 R0102\n最终派单 M0103 → R0102；地图线 R0102 → M0103 表达骑手承接该商家，不作为骑行导航。\nM0103\nR0102\n派单履约 ETA\n19 分钟\n预计派单成本\n$29.80\n接单 / 覆盖概率\n76%"
+    },
+    {
+      "assignment": "A0104",
+      "courier": "R0104",
+      "merchant": "M0104",
+      "x": 659,
+      "y": 376,
+      "titleOk": true,
+      "merchantOk": true,
+      "courierOk": true,
+      "ok": true,
+      "detail": "派单关系：骑手到商家\n对象 R0104\n最终派单 M0104 → R0104；地图线 R0104 → M0104 表达骑手承接该商家，不作为骑行导航。\nM0104\nR0104\n派单履约 ETA\n20 分钟\n预计派单成本\n$40.50\n接单 / 覆盖概率\n67%"
+    },
+    {
+      "assignment": "A0105",
+      "courier": "R0105",
+      "merchant": "M0105",
+      "x": 765,
+      "y": 370,
+      "titleOk": true,
+      "merchantOk": true,
+      "courierOk": true,
+      "ok": true,
+      "detail": "派单关系：骑手到商家\n对象 R0105\n最终派单 M0105 → R0105；地图线 R0105 → M0105 表达骑手承接该商家，不作为骑行导航。\nM0105\nR0105\n派单履约 ETA\n15 分钟\n预计派单成本\n$19.50\n接单 / 覆盖概率\n80%"
+    },
+    {
+      "assignment": "A0106",
+      "courier": "R0112",
+      "merchant": "M0106",
+      "x": 615,
+      "y": 353,
+      "titleOk": true,
+      "merchantOk": true,
+      "courierOk": true,
+      "ok": true,
+      "detail": "派单关系：骑手到商家\n对象 R0112\n最终派单 M0106 → R0112；地图线 R0112 → M0106 表达骑手承接该商家，不作为骑行导航。\nM0106\nR0112\n派单履约 ETA\n17 分钟\n预计派单成本\n$31.00\n接单 / 覆盖概率\n76%"
+    }
+  ],
+  "chromeUrl": "http://127.0.0.1:8765/",
+  "chromeTitle": "AutoSolver Agent - 美团即时配送派单决策工作台",
+  "logs": []
+}

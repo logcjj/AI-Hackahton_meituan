@@ -199,3 +199,23 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 15: Chrome 实页复核重复连线和天气卡片
+
+验证标准：在用户 Google Chrome 当前页面复现并修复“一个骑手被两条最终黄线连接，但最终答案没有派给该骑手”的口径错误；最终地图只显示商家到最终承接骑手的派单线，候选/备选骑手不得作为最终线展示；点击任意线、箭头、骑手、商家后的右侧详情必须与最终答案一致；天气模块必须改为清晰、浅色、To B 状态卡，不能再出现黑底或一坨信息；修复后必须保存 Chrome 实测截图/JSON，跑 JS、Python 和单元测试，并提交代码。
+
+完成记录：
+- 已在用户 Google Chrome 当前标签发现实际打开的是 `http://127.0.0.1:8765/` 的旧残留页面，不是当前 `8768` 服务；旧页面复现了 `M0101 → R0113` 与 `M0102 → R0113` 两条最终黄线连到同一骑手，右侧总览显示 4 个骑手，天气卡片仍为黑色旧结构且存在 `.row/.bar`。
+- 已在 `8765` 和 `8768` 均启动当前代码服务，刷新 Chrome 后确认页面标题为“美团即时配送派单决策工作台”，天气旧结构数为 0。
+- 最新 Chrome 运行 10 秒推理后数据审计通过：`routeCount=6`、`linkCount=6`、`arrowCount=6`、`merchantPins=6`、`courierPins=6`、`dupCouriers=[]`、`routeCourierMismatch=[]`、`hitAreas=0`、`oldWeatherRows=0`。
+- 已发现并修复新交互 bug：MapLibre canvas 会盖住 SVG 派单线，用户点击可见黄线时可能命中 canvas 或下方表格，导致右侧详情停在策略详情/总览，造成“线和最终答案不一致”的观感。
+- 已新增 `distanceToRouteAtClientPoint()` 与 `dispatchRouteAtClientPoint()`，地图点击时会根据点击坐标识别最近的最终派单线；即使事件目标是 MapLibre canvas，也能打开该线对应的“派单关系：骑手到商家”详情。
+- 已补实体点击优先级：真实点击商家/骑手 pin 或 label 时不走最近路线覆盖，避免端点附近点击被误判成派单线，保证商家、骑手和线路三类交互都可用。
+- Chrome 逐线坐标点击复测通过：A0101-A0106 每条线均进入“派单关系：骑手到商家”，详情均包含对应 `merchant` 与最终 `courier`，全部 `ok=true`。
+- Playwright 独立验收通过：`routeCount=6`、`linkCount=6`、`arrowCount=6`、`merchantPins=6`、`courierPins=6`、`duplicateCouriers=[]`、`mismatch=[]`、`hitAreas=0`、`oldWeatherRows=0`。
+- 已保存证据：`goal/goal-9/task15-chrome-audit.json`、`goal/goal-9/task15-playwright-audit.json`、`goal/goal-9/task15-playwright-final.png`。Chrome 扩展截图接口一度断开，已用 Playwright 截图补足可视证据。
+- 已补回归测试：锁定 `dispatchRouteAtClientPoint(event, threshold = 14)`、最近最终派单线识别、`.dispatch-visual.pickup-leg` 检索和 `routeByPoint || domTarget` 点击入口，防止 MapLibre canvas 再次抢线点击。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。

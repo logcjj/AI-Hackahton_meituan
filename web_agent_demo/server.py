@@ -4437,6 +4437,41 @@ def render_index() -> str:
       const d = `M${(x - 8).toFixed(1)} ${y.toFixed(1)} L${(x + 8).toFixed(1)} ${y.toFixed(1)}`;
       return `<path class="dispatch-link ${cls} route-click-target" data-assignment="${assignmentId}" data-route-role="main"${routeMetaAttributes(meta)}${styleAttr} d="${d}"></path>`;
     }
+    function distanceToRouteAtClientPoint(path, clientX, clientY) {
+      if (!path || typeof path.getTotalLength !== "function" || typeof path.getPointAtLength !== "function") return Infinity;
+      const matrix = path.getScreenCTM ? path.getScreenCTM() : null;
+      if (!matrix) return Infinity;
+      let total = 0;
+      try {
+        total = path.getTotalLength();
+      } catch (error) {
+        return Infinity;
+      }
+      if (!Number.isFinite(total) || total <= 0) return Infinity;
+      const samples = Math.max(8, Math.min(24, Math.ceil(total / 24)));
+      let best = Infinity;
+      for (let index = 0; index <= samples; index += 1) {
+        const point = path.getPointAtLength((total * index) / samples);
+        const screenX = point.x * matrix.a + point.y * matrix.c + matrix.e;
+        const screenY = point.x * matrix.b + point.y * matrix.d + matrix.f;
+        best = Math.min(best, Math.hypot(clientX - screenX, clientY - screenY));
+      }
+      return best;
+    }
+    function dispatchRouteAtClientPoint(event, threshold = 14) {
+      if (!event || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return null;
+      const routes = [...document.querySelectorAll(".dispatch-visual.pickup-leg")]
+        .filter((route) => {
+          const style = getComputedStyle(route);
+          return style.display !== "none" && style.visibility !== "hidden" && style.opacity !== "0";
+        });
+      let nearest = null;
+      routes.forEach((route) => {
+        const distance = distanceToRouteAtClientPoint(route, event.clientX, event.clientY);
+        if (distance <= threshold && (!nearest || distance < nearest.distance)) nearest = {route, distance};
+      });
+      return nearest ? nearest.route : null;
+    }
     function routePolylineLength(points) {
       const usable = (points || []).filter(Boolean);
       return usable.slice(1).reduce((sum, point, index) => sum + distance2D(usable[index], point), 0);
@@ -5589,12 +5624,16 @@ def render_index() -> str:
         return nearest ? nearest.pin : null;
       };
       document.querySelector(".map-frame").addEventListener("click", (event) => {
-        const target = event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow");
-        if (!target) return;
+        const domTarget = event.target.closest(".map-label, .pin, .dispatch-link, .dispatch-arrow");
         const profile = currentProfile || profileForCase(selectedCase());
         if (!profile.assignments || Object.keys(profile.assignments).length === 0) {
-          if (renderEntityPreviewDetail(profile, target.dataset.entity || "")) return;
+          if (domTarget && renderEntityPreviewDetail(profile, domTarget.dataset.entity || "")) return;
+          return;
         }
+        const preferEntityTarget = Boolean(domTarget && (domTarget.classList.contains("pin") || domTarget.classList.contains("map-label")));
+        const routeByPoint = preferEntityTarget ? null : dispatchRouteAtClientPoint(event);
+        const target = preferEntityTarget ? domTarget : (routeByPoint || domTarget);
+        if (!target) return;
         const routeClickTarget = target.classList.contains("route-click-target");
         const endpointPin = ((target.classList.contains("dispatch-link") && !routeClickTarget) || target.classList.contains("dispatch-arrow"))
           ? entityPinAtClientPoint(event)
