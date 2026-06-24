@@ -159,7 +159,7 @@ def render_day_replay_index() -> str:
     .kpi-card span {{ color: rgba(255, 243, 214, .68); font-size: 12px; }}
     .control-strip {{
       display: grid;
-      grid-template-columns: minmax(210px, .8fr) repeat(4, minmax(120px, .45fr)) auto;
+      grid-template-columns: minmax(210px, .8fr) repeat(5, minmax(120px, .45fr)) auto;
       gap: 10px;
       padding: 12px;
       border: 1px solid rgba(255, 243, 214, .14);
@@ -306,6 +306,36 @@ def render_day_replay_index() -> str:
       border-radius: 999px;
       background: rgba(181, 68, 53, .11);
       transform: rotate(-10deg);
+    }}
+    .map-hud {{
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      z-index: 8;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      max-width: calc(100% - 24px);
+    }}
+    .map-hud span, .burst-marker {{
+      padding: 6px 8px;
+      border-radius: 999px;
+      color: #fff7df;
+      background: rgba(23, 59, 49, .78);
+      font: 800 10px var(--mono);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, .16);
+    }}
+    .burst-marker {{
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      z-index: 9;
+      background: rgba(181, 68, 53, .86);
+      animation: burstPulse 1.4s ease-in-out infinite;
+    }}
+    @keyframes burstPulse {{
+      0%, 100% {{ transform: scale(1); }}
+      50% {{ transform: scale(1.06); }}
     }}
     .route-svg {{ position: absolute; inset: 0; width: 100%; height: 100%; }}
     .route-svg path {{
@@ -503,12 +533,12 @@ def render_day_replay_index() -> str:
         </select>
       </div>
       <div class="control-box">
-        <label for="courier-count"><span>Couriers</span><output id="courier-count-value">48</output></label>
-        <input id="courier-count" type="range" min="8" max="120" value="48">
+        <label for="courier-count"><span>Couriers</span><output id="courier-count-value">18</output></label>
+        <input id="courier-count" type="range" min="8" max="120" value="18">
       </div>
       <div class="control-box">
-        <label for="order-scale"><span>Order Scale</span><output id="order-scale-value">1.00</output></label>
-        <input id="order-scale" type="range" min="0.10" max="2.00" step="0.05" value="1.00">
+        <label for="order-scale"><span>Order Scale</span><output id="order-scale-value">0.38</output></label>
+        <input id="order-scale" type="range" min="0.10" max="2.00" step="0.05" value="0.38">
       </div>
       <div class="control-box">
         <label for="weather-mode"><span>Weather</span><output id="weather-label">mixed</output></label>
@@ -518,6 +548,15 @@ def render_day_replay_index() -> str:
           <option value="rain">rain</option>
           <option value="storm">storm</option>
           <option value="event">event</option>
+        </select>
+      </div>
+      <div class="control-box">
+        <label for="playback-speed"><span>Speed</span><output id="playback-speed-label">1.2s/frame</output></label>
+        <select id="playback-speed">
+          <option value="1800">慢速 1.8s</option>
+          <option value="1200" selected>标准 1.2s</option>
+          <option value="700">快速 0.7s</option>
+          <option value="350">战报 0.35s</option>
         </select>
       </div>
       <div class="control-box">
@@ -591,7 +630,9 @@ def render_day_replay_index() -> str:
       endpoints: replayBoot.endpoints,
       frameIndex: 0,
       playing: false,
-      timer: null
+      timer: null,
+      pendingRunToken: "",
+      controlRunTimer: null
     }};
     const $ = (id) => document.getElementById(id);
 
@@ -633,6 +674,68 @@ def render_day_replay_index() -> str:
       return replayState.contract.frames[Math.min(replayState.frameIndex, replayState.contract.frames.length - 1)];
     }}
 
+    function setEngineStatus(title, detail) {{
+      const box = $("engine-status");
+      if (!box) return;
+      const titleNode = box.querySelector("b");
+      const detailNode = box.querySelector("span");
+      if (titleNode) titleNode.textContent = title;
+      if (detailNode) detailNode.textContent = detail;
+    }}
+
+    async function apiJson(path, body) {{
+      const response = await fetch(path, {{
+        method: "POST",
+        headers: {{"Content-Type": "application/json"}},
+        body: JSON.stringify(body)
+      }});
+      const payload = await response.json();
+      if (!response.ok || payload.status === "error") throw new Error(payload.error || `request failed: ${{path}}`);
+      return payload;
+    }}
+
+    function dayRunRequest() {{
+      const scenarioId = $("scenario-select").value || "weekday_full_day";
+      const controls = {{
+        courier_count: Number($("courier-count").value),
+        order_scale: Number($("order-scale").value),
+        weather: $("weather-mode").value,
+        congestion_profile: "weekday",
+        memory_mode: "read-write",
+        predictor_mode: "auto"
+      }};
+      const seed = `ui-${{scenarioId}}-${{controls.courier_count}}-${{controls.order_scale.toFixed(2)}}-${{controls.weather}}`;
+      return {{scenario_id: scenarioId, seed, controls}};
+    }}
+
+    function applyContractPayload(payload, reason) {{
+      const contract = payload.contract || payload;
+      replayState.contract = contract;
+      replayState.endpoints = payload.endpoints || replayState.endpoints;
+      replayState.frameIndex = 0;
+      renderApiTags();
+      setFrameIndex(0);
+      setEngineStatus("全日推演已更新", `${{reason}} · ${{contract.orders.length}} orders · ${{contract.frames.length}} frames`);
+      return contract;
+    }}
+
+    async function runDaySimulation(reason = "control update") {{
+      const request = dayRunRequest();
+      const token = `${{Date.now()}}-${{Math.random()}}`;
+      replayState.pendingRunToken = token;
+      setEngineStatus("重新构建全日推演", `${{reason}} · couriers=${{request.controls.courier_count}} · scale=${{request.controls.order_scale.toFixed(2)}}`);
+      const payload = await apiJson(replayState.endpoints.run, request);
+      if (replayState.pendingRunToken !== token) return null;
+      return applyContractPayload(payload, reason);
+    }}
+
+    function scheduleReplayRun(reason) {{
+      if (replayState.controlRunTimer) window.clearTimeout(replayState.controlRunTimer);
+      replayState.controlRunTimer = window.setTimeout(() => {{
+        runDaySimulation(reason).catch((error) => setEngineStatus("推演更新失败", error.message || String(error)));
+      }}, 520);
+    }}
+
     function positionStyle(position) {{
       const x = Math.max(4, Math.min(96, Number(position && position.screen_x) || 50));
       const y = Math.max(4, Math.min(96, Number(position && position.screen_y) || 50));
@@ -647,6 +750,10 @@ def render_day_replay_index() -> str:
 
     function stageBaseHtml(frame, algorithmFrame) {{
       const orderIds = new Set(algorithmFrame.active_order_ids || []);
+      const timeSlice = replayState.contract.time_slices.find((item) => item.id === frame.time_slice_id) || {{}};
+      const shockIds = timeSlice.shock_ids || [];
+      const hasBurst = shockIds.some((id) => id.includes("merchant-burst"));
+      const congestionOpacity = Math.max(.2, Math.min(.92, Number(timeSlice.congestion_level || 0.4) * .95)).toFixed(2);
       const merchants = replayState.contract.merchants.slice(0, 8).map((merchant) =>
         `<span class="pin merchant" data-label="${{escapeText(merchant.id)}}" style="${{positionStyle(merchant.position)}}">商</span>`
       ).join("");
@@ -658,9 +765,16 @@ def render_day_replay_index() -> str:
       ).join("");
       const routes = (algorithmFrame.route_overlays || []).slice(0, 8).map((route) => `<path d="${{routePath(route)}}"></path>`).join("");
       return `
+        <div class="map-hud">
+          <span>${{escapeText(timeSlice.label || frame.time_slice_id)}}</span>
+          <span>weather ${{escapeText(timeSlice.weather)}}</span>
+          <span>congestion ${{Number(timeSlice.congestion_level || 0).toFixed(2)}}</span>
+          <span>supply ${{escapeText(timeSlice.courier_supply)}}</span>
+        </div>
         <div class="district one"></div><div class="district two"></div><div class="district three"></div>
         <div class="road r1"></div><div class="road r2"></div><div class="road r3"></div>
-        <div class="shock-band" title="${{escapeText(frame.time_slice_id)}}"></div>
+        <div class="shock-band" data-shock-ids="${{escapeText(shockIds.join(","))}}" title="${{escapeText(shockIds.join(",") || frame.time_slice_id)}}" style="opacity:${{congestionOpacity}}"></div>
+        ${{hasBurst ? `<div class="burst-marker">merchant_burst</div>` : ""}}
         <svg class="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${{routes}}</svg>
         ${{merchants}}${{couriers}}${{orders}}
       `;
@@ -736,37 +850,54 @@ def render_day_replay_index() -> str:
       return frame;
     }}
 
-    function compareAlgorithms() {{
-      const frame = setFrameIndex(replayState.frameIndex);
-      $("engine-status").querySelector("b").textContent = "对比完成";
-      $("engine-status").querySelector("span").textContent = frame.delta.headline;
-      return frame;
+    async function compareAlgorithms() {{
+      const contract = await runDaySimulation("manual compare");
+      if (contract) setEngineStatus("对比完成", `${{contract.orders.length}} orders · ${{contract.frames.length}} frames`);
+      return contract;
+    }}
+
+    function playbackDelayMs() {{
+      return Number($("playback-speed").value) || 1200;
+    }}
+
+    function schedulePlaybackTick(delay = playbackDelayMs()) {{
+      if (replayState.timer) window.clearTimeout(replayState.timer);
+      if (!replayState.playing) return;
+      replayState.timer = window.setTimeout(() => {{
+        const next = replayState.frameIndex + 1 >= replayState.contract.frames.length ? 0 : replayState.frameIndex + 1;
+        setFrameIndex(next);
+        schedulePlaybackTick();
+      }}, delay);
     }}
 
     function playReplay() {{
       if (replayState.playing) return;
       replayState.playing = true;
-      replayState.timer = window.setInterval(() => {{
-        const next = replayState.frameIndex + 1 >= replayState.contract.frames.length ? 0 : replayState.frameIndex + 1;
-        setFrameIndex(next);
-      }}, 1200);
+      setEngineStatus("播放全日推演", `${{replayState.contract.frames.length}} frames · speed=${{playbackDelayMs()}}ms`);
+      schedulePlaybackTick(40);
     }}
 
     function pauseReplay() {{
       replayState.playing = false;
-      if (replayState.timer) window.clearInterval(replayState.timer);
+      if (replayState.timer) window.clearTimeout(replayState.timer);
       replayState.timer = null;
+      setEngineStatus("推演已暂停", `frame ${{replayState.frameIndex + 1}}/${{replayState.contract.frames.length}}`);
     }}
 
     function bindControls() {{
       $("timeline-scrubber").max = String(Math.max(0, replayState.contract.frames.length - 1));
-      $("courier-count").addEventListener("input", () => {{ $("courier-count-value").textContent = $("courier-count").value; }});
-      $("order-scale").addEventListener("input", () => {{ $("order-scale-value").textContent = Number($("order-scale").value).toFixed(2); }});
-      $("weather-mode").addEventListener("change", () => {{ $("weather-label").textContent = $("weather-mode").value; }});
+      $("courier-count").addEventListener("input", () => {{ $("courier-count-value").textContent = $("courier-count").value; scheduleReplayRun("courier control"); }});
+      $("order-scale").addEventListener("input", () => {{ $("order-scale-value").textContent = Number($("order-scale").value).toFixed(2); scheduleReplayRun("order scale control"); }});
+      $("weather-mode").addEventListener("change", () => {{ $("weather-label").textContent = $("weather-mode").value; scheduleReplayRun("weather control"); }});
+      $("scenario-select").addEventListener("change", () => {{ $("scenario-label").textContent = $("scenario-select").value; scheduleReplayRun("scenario control"); }});
+      $("playback-speed").addEventListener("change", () => {{
+        $("playback-speed-label").textContent = `${{(playbackDelayMs() / 1000).toFixed(2)}}s/frame`;
+        if (replayState.playing) schedulePlaybackTick(40);
+      }});
       $("timeline-scrubber").addEventListener("input", (event) => setFrameIndex(event.target.value));
       $("play-replay").addEventListener("click", playReplay);
       $("pause-replay").addEventListener("click", pauseReplay);
-      $("compare-algorithms").addEventListener("click", compareAlgorithms);
+      $("compare-algorithms").addEventListener("click", () => compareAlgorithms().catch((error) => setEngineStatus("对比生成失败", error.message || String(error))));
     }}
 
     function bootstrapDayReplayShell() {{

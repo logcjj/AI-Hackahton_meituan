@@ -218,7 +218,7 @@ Confidence loop:
 
 ## Task 8 - Add Side-By-Side Map Replay And Timeline Controls
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Greedy and AutoSolver panels show the same day/time frame side by side.
@@ -226,10 +226,23 @@ Independent verification:
 - Riders, merchants, orders, congestion, and bursts are visible.
 
 Work log:
--
+- Added API helpers and server routes for `/api/day-simulation/scenarios`, `/api/day-simulation/run`, `/api/day-simulation/frame`, and `/api/day-simulation/memory`.
+- Wired the replay frontend to regenerate full-day contracts from scenario, courier count, order scale and weather controls through debounced API calls.
+- Added playback speed selection plus play/pause scheduling based on the selected frame delay.
+- Kept greedy and AutoSolver panels aligned on the same `SideBySideFrame` and active order ids when scrubbing or replaying.
+- Added visible map HUD chips for time, weather, congestion and courier supply.
+- Added congestion shock-band metadata and `merchant_burst` markers for burst events.
+- Updated `tests/test_web_agent_demo.py` to cover replay control markers and day-simulation API payload shape.
+- Added `goal/goal-12/task8-replay-controls-audit.md` with implementation and verification evidence.
+- Verified syntax with `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/server.py tests/test_web_agent_demo.py`.
+- Ran focused day-replay/day-simulation tests; 34 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 100 tests passed.
+- Ran non-goal/non-output business-code sensitive scan for supplied model/domain/key patterns; no matches were found.
+- Ran browser verification on `127.0.0.1:8788`: initial load had 40 frames, 207 orders, speed `1200`, timeline max `39`, old shell absent, two shock layers, HUD visible, and zero console warnings/errors.
+- Ran browser interaction verification: timeline scrub worked, play advanced frames, speed changed to `0.35s/frame`, control-triggered rerun changed order count from 207 to 112, `/api/day-simulation/run` returned 200, greedy and AutoSolver active order ids stayed aligned, and zero console warnings/errors.
 
 Confidence loop:
--
+- 100% confidence for Task 8 scope: API-backed replay controls are implemented, same-frame greedy/AutoSolver comparison remains aligned, timeline/playback/scenario/courier/order/weather controls update the replay, riders/merchants/orders/congestion/bursts are visible, automated tests and browser interaction checks pass, and sensitive runtime LLM configuration remains outside business code.
 
 ## Task 9 - Add KPI Savings, Reasoning Flow, And Decision Highlights
 

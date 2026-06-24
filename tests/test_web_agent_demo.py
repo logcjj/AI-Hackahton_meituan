@@ -40,6 +40,7 @@ class WebAgentDemoTest(unittest.TestCase):
             'id="courier-count"',
             'id="order-scale"',
             'id="weather-mode"',
+            'id="playback-speed"',
             'id="timeline-scrubber"',
             'id="play-replay"',
             'id="pause-replay"',
@@ -64,12 +65,22 @@ class WebAgentDemoTest(unittest.TestCase):
             "function renderMaps",
             "function renderReasoning",
             "function renderMemory",
+            "function apiJson",
+            "function dayRunRequest",
+            "function runDaySimulation",
+            "function scheduleReplayRun",
             "function playReplay",
             "function pauseReplay",
             "function compareAlgorithms",
+            "function playbackDelayMs",
+            "function schedulePlaybackTick",
             "window.__AUTO_SOLVER_DAY_REPLAY__",
             "window.__AUTO_SOLVER_DAY_REPLAY_READY__",
             "对比完成",
+            "merchant_burst",
+            "data-shock-ids",
+            "map-hud",
+            "burst-marker",
         ]
         for marker in required_markers:
             self.assertIn(marker, html)
@@ -141,6 +152,58 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertGreater(contract["frames"][0]["delta"]["time_saved_s"], 0)
         self.assertEqual(contract["privacy"]["secret_handling"], "env-only-redacted")
         self.assertTrue(contract["frames"][0]["memory_event_ids"])
+
+    def test_day_simulation_api_payloads_support_replay_controls(self):
+        from web_agent_demo.server import (
+            _day_simulation_frame_payload,
+            _day_simulation_memory_payload,
+            _day_simulation_scenarios_payload,
+            _run_day_simulation_payload,
+        )
+
+        scenarios = _day_simulation_scenarios_payload()
+        run_payload = _run_day_simulation_payload(
+            {
+                "scenario_id": "weekday_full_day",
+                "seed": "api-contract-day",
+                "controls": {"courier_count": 12, "order_scale": 0.22, "weather": "rain"},
+            }
+        )
+        frame_payload = _day_simulation_frame_payload(
+            {
+                "seed": ["api-contract-day"],
+                "courier_count": ["12"],
+                "order_scale": ["0.22"],
+                "weather": ["rain"],
+                "frame_index": ["3"],
+            }
+        )
+        memory_payload = _day_simulation_memory_payload(
+            {
+                "seed": ["api-contract-day"],
+                "courier_count": ["12"],
+                "order_scale": ["0.22"],
+                "weather": ["rain"],
+            }
+        )
+
+        self.assertEqual(scenarios["status"], "ok")
+        self.assertEqual(scenarios["endpoints"]["run"], "/api/day-simulation/run")
+        self.assertEqual(run_payload["status"], "ok")
+        self.assertGreater(run_payload["order_count"], 50)
+        self.assertGreater(run_payload["frame_count"], 10)
+        self.assertEqual(run_payload["memory_event_count"], run_payload["frame_count"] * 3)
+        self.assertEqual(run_payload["contract"]["baseline_run"]["algorithm_id"], "nearest_greedy")
+        self.assertEqual(run_payload["contract"]["challenger_run"]["algorithm_id"], "autosolver_agent")
+        self.assertEqual(frame_payload["status"], "ok")
+        self.assertEqual(frame_payload["frame_index"], 3)
+        self.assertEqual(frame_payload["frame"]["baseline"]["active_order_ids"], frame_payload["frame"]["challenger"]["active_order_ids"])
+        self.assertEqual(memory_payload["status"], "ok")
+        self.assertEqual(
+            {event["event_type"] for event in memory_payload["evolution_events"]},
+            {"memory_recall", "memory_writeback", "future_policy_shift"},
+        )
+        self.assertEqual(memory_payload["privacy"]["secret_handling"], "env-only-redacted")
 
     def test_dispatch_map_uses_case_candidate_data(self):
         from web_agent_demo.server import build_dispatch_assignment_map
