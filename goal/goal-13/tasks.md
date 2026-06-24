@@ -23,7 +23,7 @@ Confidence loop:
 
 ## Task 2 - Static Source, Test Coverage, And API Contract Audit
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Current source is inspected for old frontend reachability, day-simulation contracts, memory evolution, engine seam, and API handlers.
@@ -31,10 +31,21 @@ Independent verification:
 - API probes validate current endpoint payloads.
 
 Work log:
--
+- Inspected current `web_agent_demo/server.py` day-simulation handlers and confirmed scenarios, engines, frame, memory and run routes are wired.
+- Inspected `web_agent_demo/day_simulation.py` and `web_agent_demo/day_replay_frontend.py` for full-day comparison, memory evolution and replay-control wiring.
+- Ran Python compile checks for the replay frontend, server, day simulation, adapter module and focused tests; compile passed.
+- Ran focused replay/day-simulation/adapter tests; 37 tests passed.
+- Ran full test suite with `uv run --with pytest pytest`; 103 tests passed.
+- Ran focused test collection and mapped the 37 core tests to frontend shell, API payloads, engine seam, contract, generator, same-stream comparison and memory evolution requirements.
+- Ran a sensitive business-code scan excluding goal/output/browser artifact folders; no matches were found.
+- Ran old frontend marker scan; stale old-shell markers remain only in `tests/test_web_agent_demo.py` negative assertions.
+- Ran direct root render, world generation, comparison, API, memory and engine fallback probes.
+- Corrected two audit-script assumptions after inspecting real payload shape: frame algorithm payloads use `active_order_ids` and `assignments[*].order_id`, and metrics use `total_time_cost_s`.
+- Added `goal/goal-13/static-api-test-audit.md` with command results, direct probe evidence, coverage mapping and findings.
+- Updated `goal/goal-13/requirement-matrix.md` so static/backend/API/security/test requirements with direct evidence are marked `Pass`; browser-visible requirements remain `Needs stronger evidence`.
 
 Confidence loop:
--
+- 100% confidence for Task 2 scope: static imports compile, focused and full tests pass, direct API/backend probes substantiate non-browser requirements, sensitive scans are clean, and browser-dependent requirements are explicitly not overclaimed.
 
 ## Task 3 - Browser Runtime Audit
 
