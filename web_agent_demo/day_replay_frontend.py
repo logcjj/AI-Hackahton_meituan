@@ -60,16 +60,16 @@ def render_day_replay_index() -> str:
         radial-gradient(circle at 80% 18%, rgba(47, 112, 84, .25), transparent 34%),
         linear-gradient(135deg, #090b08 0%, var(--bg) 42%, var(--bg-2) 100%);
       font-family: var(--ui);
-      overflow: hidden;
+      overflow: auto;
     }}
     button, select, input {{ font: inherit; }}
     button {{ cursor: pointer; }}
     .day-replay-shell {{
       width: 100vw;
-      height: 100vh;
+      min-height: 100vh;
       padding: 16px;
       display: grid;
-      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      grid-template-rows: auto auto auto minmax(540px, auto) auto;
       gap: 14px;
     }}
     .hero, .kpi-strip, .control-strip, .replay-grid, .bottom-grid {{
@@ -228,13 +228,13 @@ def render_day_replay_index() -> str:
       box-shadow: none;
     }}
     .replay-grid {{
-      min-height: 0;
+      min-height: 540px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 14px;
     }}
     .algorithm-theater {{
-      min-height: 0;
+      min-height: 540px;
       display: grid;
       grid-template-rows: auto minmax(0, 1fr) auto;
       overflow: hidden;
@@ -280,7 +280,7 @@ def render_day_replay_index() -> str:
     .agent .algorithm-pill {{ background: var(--green); }}
     .map-stage {{
       position: relative;
-      min-height: 0;
+      min-height: 280px;
       margin: 12px 14px;
       overflow: hidden;
       border-radius: 24px;

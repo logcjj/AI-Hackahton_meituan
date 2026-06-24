@@ -275,7 +275,7 @@ Confidence loop:
 
 ## Debug Cycle 3 - Tasks 7-9 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Browser audit has no console/network errors.
@@ -283,10 +283,23 @@ Independent verification:
 - Metrics update correctly through the timeline.
 
 Work log:
--
+- Added `goal/goal-12/debug-cycle-3-audit.md` with the comprehensive Tasks 7-9 audit.
+- Re-read `goal/goal-12/input.md`, `goal/goal-12/plan.md`, and `goal/goal-12/tasks.md` before auditing, per Goal Mode.
+- Ran syntax checks for the replay frontend, server, web tests and day-simulation module.
+- Ran `uv run --with pytest pytest tests/test_web_agent_demo.py`; 15 tests passed.
+- Ran focused Tasks 7-9 tests across web frontend and day-simulation contract/generator/comparison/memory; 34 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 100 tests passed.
+- Ran non-goal/non-output business-code sensitive scan for supplied model/domain/key patterns; no matches were found.
+- Found a real desktop layout defect in browser audit: map stage height collapsed to `0px` at `1440x900`.
+- Fixed the layout by making the shell scrollable, defining five explicit shell grid rows, and adding minimum heights for replay/theater/map areas.
+- Added regression markers to `tests/test_web_agent_demo.py` for the scrollable body, five-row shell template and minimum replay/map heights.
+- Re-ran browser desktop audit at `1440x900`: page ready, old shell absent, side-by-side columns `697px 697px`, greedy and AutoSolver panels aligned, map heights 331px and 312px, KPI changed after frame change, reasoning-card click highlighted 24 pins and 16 routes.
+- Re-ran browser mobile audit at `390x844`: one-column replay grid, two-column KPI grid, panels stacked vertically, map heights 280px and 280px, no horizontal overflow, reasoning-card highlight still worked with 19 highlighted pins and 8 highlighted routes.
+- Browser console audit reported 0 errors and 0 warnings.
+- Browser network audit showed only `GET /` returning 200.
 
 Confidence loop:
--
+- 100% confidence for Debug Cycle 3 scope: the audit covered Tasks 7-9 end to end, caught and fixed an actual visual-readability bug, verified desktop/mobile alignment and timeline metric updates in a real browser, confirmed no console/network errors, passed static/focused/full tests, and kept sensitive runtime LLM configuration outside business code.
 
 ## Task 10 - Optional External Engine Adapter Seam
 
