@@ -1882,6 +1882,15 @@ def render_index() -> str:
     .decision b, .memory-item b { display: block; color: #253629; margin-bottom: 4px; }
     .memory-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
     .memory-meta span { padding: 8px; border-radius: 12px; background: rgba(37, 77, 63, .08); font-family: var(--mono); font-size: 11px; }
+    .memory-section-title { margin: 12px 0 6px; color: #516153; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .memory-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 7px; }
+    .memory-kpis span { padding: 6px; border-radius: 10px; background: rgba(37, 77, 63, .08); font-family: var(--mono); font-size: 10px; }
+    .memory-item .reason { display: block; margin-top: 5px; color: #6f7568; }
+    .memory-item.selected-basis { background: rgba(33, 110, 67, .13); border-color: rgba(33, 110, 67, .28); }
+    .memory-item.rejected-memory { background: rgba(180, 35, 24, .08); border-color: rgba(180, 35, 24, .18); }
+    .ranking-list { display: grid; gap: 6px; margin-top: 8px; }
+    .ranking-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 52px; gap: 6px; align-items: center; font-size: 11px; }
+    .ranking-row code { color: #164b40; font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .evolution-track { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 10px; }
     .evolution-stage { padding: 7px 5px; border-radius: 10px; text-align: center; background: rgba(191, 114, 36, .12); font-size: 11px; }
     .timeline-dock {
@@ -2021,7 +2030,7 @@ def render_index() -> str:
       <aside class="compare-rail" aria-label="算法对比与 Memory 自进化">
         <section class="compare-card">
           <h2>多算法决策对比</h2>
-          <table class="compare-table" id="algorithm-compare-table">
+          <table class="compare-table" id="algorithm-compare-table" data-payload-source="api:/api/compare/run">
             <thead>
               <tr><th>算法</th><th>覆盖</th><th>ETA</th><th>风险</th><th>提升</th></tr>
             </thead>
@@ -2044,7 +2053,9 @@ def render_index() -> str:
           <p class="loading-note" id="memory-summary">Memory 默认使用本地 fallback；外部 predictor 只允许环境变量接入，界面只展示 env-only-redacted。</p>
           <div class="memory-meta">
             <span id="memory-source">source: external-disabled</span>
+            <span id="memory-mode">mode: off</span>
             <span id="predictor-source">predictor: local-heuristic</span>
+            <span id="predictor-status">status: fallback</span>
           </div>
           <div class="evolution-track" aria-label="Hermes style memory evolution lifecycle">
             <div class="evolution-stage" data-memory-event="evolution_generate">evolution_generate</div>
@@ -2096,8 +2107,10 @@ def render_index() -> str:
       playTimer: null,
       compareTimer: null,
       controlApplyTimer: null,
+      memoryRecallTimer: null,
       lastControlSignature: "",
-      lastCompareElapsedMs: 0
+      lastCompareElapsedMs: 0,
+      memoryRecall: null
     };
 
     function syncSandboxScale() {
@@ -2277,10 +2290,30 @@ def render_index() -> str:
       return `${Math.round((Number(value) || 0) * 100)}%`;
     }
 
+    function signedPercent(value) {
+      const num = Number(value) || 0;
+      return `${num > 0 ? "+" : ""}${num.toFixed(1)}%`;
+    }
+
+    function safeFixed(value, digits = 1, fallback = "--") {
+      const num = Number(value);
+      return Number.isFinite(num) ? num.toFixed(digits) : fallback;
+    }
+
+    function predictorDisplayModel(predictor) {
+      if (!predictor) return "local-heuristic-v1";
+      if (predictor.used_external_api) return "external-env-model";
+      return predictor.model || "local-heuristic-v1";
+    }
+
     function renderCompare(compare) {
       appState.compare = compare;
       const selectedId = compare && compare.selected ? compare.selected.algorithm_id : "";
       const results = new Map((compare && compare.results || []).map((item) => [item.algorithm_id, item]));
+      const compareRunId = compare && compare.compare_run ? compare.compare_run.compare_run_id : "";
+      $("algorithm-compare-table").dataset.payloadSource = "api:/api/compare/run";
+      $("algorithm-compare-table").dataset.compareRunId = compareRunId;
+      $("compare-body").dataset.renderedFrom = compareRunId;
       $("compare-body").innerHTML = ALGORITHM_ORDER.map((id) => {
         const item = results.get(id);
         if (!item) return `<tr data-algorithm="${id}"><td>${id}<div class="family">pending</div></td><td colspan="4">等待运行</td></tr>`;
@@ -2301,7 +2334,7 @@ def render_index() -> str:
       $("compare-status").textContent = selectedId ? `当前采纳 ${selectedId} · ${elapsed}` : "等待对比运行";
       renderRoutes(compare);
       renderDecisionPoints(compare && compare.decision_points || []);
-      renderMemory(compare && compare.memory, compare && compare.predictor);
+      renderMemory(compare && compare.memory, compare && compare.predictor, compare && compare.selected, compare);
     }
 
     function resetCompareView() {
@@ -2313,7 +2346,9 @@ def render_index() -> str:
       $("compare-body").innerHTML = ALGORITHM_ORDER.map((id) => `<tr data-algorithm="${id}"><td>${id}<div class="family">pending</div></td><td colspan="4">等待运行</td></tr>`).join("");
       $("decision-point-list").innerHTML = `<div class="decision"><b>关键决策点</b>等待实时求解后展示候选策略胜负、风险变化和 Agent 选择理由。</div>`;
       $("memory-source").textContent = "source: external-disabled";
+      $("memory-mode").textContent = "mode: off";
       $("predictor-source").textContent = "predictor: local-heuristic";
+      $("predictor-status").textContent = "status: fallback";
       $("memory-summary").textContent = "Memory 默认使用本地 fallback；外部 predictor 只允许环境变量接入，界面只展示 env-only-redacted。";
       $("memory-list").innerHTML = `<div class="memory-item"><b>Scenario Memory</b>历史画像会沉淀为雨天、骑手稀缺、订单爆发、拥堵等可 recall 的经验。</div>`;
     }
@@ -2344,15 +2379,134 @@ def render_index() -> str:
       list.innerHTML = points.slice(0, 5).map((point) => `<div class="decision"><b>${text(point.title || point.decision_type || "决策点")}</b>${text(point.summary || point.reason || "策略对比完成")}</div>`).join("");
     }
 
-    function renderMemory(memory, predictor) {
+    function strategyMemoryCard(item) {
+      const attempts = Number(item.attempts || 0);
+      const selected = Number(item.selected_count || 0);
+      const winRate = attempts > 0 ? selected / attempts : 0;
+      return `<div class="memory-item strategy-memory" data-memory-algorithm="${text(item.algorithm_id)}">
+        <b>${text(item.algorithm_id)} · ${text(item.status || "candidate")}</b>
+        <span class="reason">${text(item.last_reason || "历史策略画像已沉淀。")}</span>
+        <div class="memory-kpis">
+          <span>win ${metricPercent(winRate)}</span>
+          <span>score ${safeFixed(item.avg_score, 1)}</span>
+          <span>sim ${safeFixed(item.similarity, 2)}</span>
+        </div>
+      </div>`;
+    }
+
+    function decisionMemoryCard(item) {
+      const metrics = item.metrics || {};
+      const rejected = item.event_type === "strategy_rejected";
+      return `<div class="memory-item ${rejected ? "rejected-memory" : ""}" data-memory-event="${text(item.event_type)}">
+        <b>${text(item.event_type)} · ${text(item.algorithm_id || "scenario")}</b>
+        <span class="reason">${text(item.decision_summary || "历史决策事件。")}</span>
+        <div class="memory-kpis">
+          <span>coverage ${metricPercent(metrics.coverage_rate)}</span>
+          <span>risk ${metricPercent(metrics.timeout_risk)}</span>
+          <span>delta ${signedPercent(metrics.relative_to_baseline && metrics.relative_to_baseline.score_delta_pct)}</span>
+        </div>
+      </div>`;
+    }
+
+    function predictorRankingCard(predictor) {
+      if (!predictor) return "";
+      const ranking = (predictor.ranked_algorithms || []).slice(0, 6).map((item) => `
+        <div class="ranking-row" data-ranked-algorithm="${text(item.algorithm_id)}">
+          <span>#${text(item.rank)}</span>
+          <code>${text(item.algorithm_id)}</code>
+          <span>${safeFixed(item.memory_boost, 1)}</span>
+        </div>
+      `).join("");
+      return `<div class="memory-item predictor-trace" data-secret-handling="${text(predictor.secret_handling || "env-only-redacted")}">
+        <b>Predictor Ranking · ${text(predictor.status || "fallback")}</b>
+        <span class="reason">${text(predictor.ranking_reason || "local fallback ranking")} · ${text(predictor.secret_handling || "env-only-redacted")}</span>
+        <div class="memory-kpis">
+          <span>provider ${text(predictor.provider || "local")}</span>
+          <span>model ${text(predictorDisplayModel(predictor))}</span>
+          <span>external ${predictor.used_external_api ? "yes" : "no"}</span>
+        </div>
+        <div class="ranking-list">${ranking}</div>
+      </div>`;
+    }
+
+    function selectedBasisCard(selected, compare, predictor) {
+      if (!selected) return "";
+      const metrics = selected.metrics || {};
+      const rel = metrics.relative_to_baseline || {};
+      const compareRun = compare && compare.compare_run ? compare.compare_run : {};
+      return `<div class="memory-item selected-basis" data-selected-algorithm="${text(selected.algorithm_id)}">
+        <b>Strategy Decision Basis · ${text(selected.algorithm_id)}</b>
+        <span class="reason">${text(selected.reason || "Agent selected the best ranked dispatch strategy.")}</span>
+        <div class="memory-kpis">
+          <span>source ${text(selected.source_algorithm_id || selected.algorithm_id)}</span>
+          <span>score ${safeFixed(metrics.score, 1)}</span>
+          <span>boost ${safeFixed(((predictor && predictor.ranked_algorithms || []).find((item) => item.algorithm_id === selected.source_algorithm_id) || {}).memory_boost, 1)}</span>
+        </div>
+        <div class="memory-kpis">
+          <span>run ${text(compareRun.compare_run_id || "--")}</span>
+          <span>ETA ${Math.round((Number(metrics.avg_eta_s) || 0) / 60)}m</span>
+          <span>vs greedy ${signedPercent(rel.score_delta_pct)}</span>
+        </div>
+      </div>`;
+    }
+
+    function renderMemory(memory, predictor, selected = null, compare = null) {
       if (!memory && !predictor) return;
       $("memory-source").textContent = `source: ${memory ? memory.source : "external-disabled"}`;
-      $("predictor-source").textContent = `predictor: ${predictor ? predictor.model : "local-heuristic-v1"}`;
+      $("memory-mode").textContent = `mode: ${memory ? memory.mode : "off"}`;
+      $("predictor-source").textContent = `predictor: ${predictorDisplayModel(predictor)}`;
+      $("predictor-status").textContent = `status: ${predictor ? predictor.status : "fallback"} · external=${predictor && predictor.used_external_api ? "yes" : "no"}`;
       $("memory-summary").textContent = memory ? memory.effect_on_ranking : "Memory recall pending.";
-      const groups = ["scenario_memory", "decision_memory", "strategy_memory", "evolution_memory"];
-      const cards = groups.flatMap((key) => (memory && memory[key] || []).slice(0, 2).map((item) => `<div class="memory-item"><b>${text(key)}</b>${text(item.summary || item.reason || item.strategy_id || JSON.stringify(item).slice(0, 110))}</div>`));
-      if (predictor) cards.unshift(`<div class="memory-item"><b>Predictor Trace</b>${text(predictor.ranking_reason || "local fallback ranking")} · ${text(predictor.secret_handling || "env-only-redacted")}</div>`);
-      $("memory-list").innerHTML = cards.length ? cards.join("") : `<div class="memory-item"><b>Memory Recall</b>暂无相似历史，使用当前 tick 指标进行排序。</div>`;
+      const strategyCards = (memory && memory.strategy_memory || []).slice(0, 5).map(strategyMemoryCard);
+      const evolutionCards = (memory && memory.evolution_memory || []).slice(0, 3).map(strategyMemoryCard);
+      const decisionCards = (memory && memory.decision_memory || []).slice(0, 4).map(decisionMemoryCard);
+      const scenarioCards = (memory && memory.scenario_memory || []).slice(0, 2).map(decisionMemoryCard);
+      const sections = [
+        selectedBasisCard(selected, compare, predictor),
+        predictorRankingCard(predictor),
+        strategyCards.length ? `<div class="memory-section-title">Historical Win Rate</div>${strategyCards.join("")}` : "",
+        decisionCards.length ? `<div class="memory-section-title">Rejected Memory / Decision Replay</div>${decisionCards.join("")}` : "",
+        scenarioCards.length ? `<div class="memory-section-title">Scenario Recall</div>${scenarioCards.join("")}` : "",
+        evolutionCards.length ? `<div class="memory-section-title">Evolution Memory</div>${evolutionCards.join("")}` : ""
+      ].filter(Boolean);
+      $("memory-list").innerHTML = sections.length ? sections.join("") : `<div class="memory-item"><b>Memory Recall</b>暂无相似历史，使用当前 tick 指标进行排序。</div>`;
+    }
+
+    function recallQueryForTick() {
+      const tick = appState.tick || {};
+      const session = appState.session || {};
+      const couriers = tick.couriers || [];
+      const orders = tick.active_order_ids || [];
+      const traffic = tick.traffic_state || {};
+      const avgWillingness = couriers.length ? couriers.reduce((total, courier) => total + Number(courier.willingness || 0), 0) / couriers.length : 0;
+      return new URLSearchParams({
+        scenario_id: session.scenario_id || "commerce_peak",
+        scene_type: (scenarioById(session.scenario_id) || {}).scene_type || "dense_commerce",
+        weather: traffic.weather || (tick.map_state && tick.map_state.weather) || controlPayload().weather,
+        traffic_profile: traffic.profile || "local-road-graph",
+        congestion_level: String(traffic.congestion_level || controlPayload().congestion_level),
+        active_order_count: String(orders.length),
+        courier_count: String(couriers.length || controlPayload().courier_count),
+        avg_willingness: String(avgWillingness.toFixed(4)),
+        order_pressure: String((orders.length / Math.max(1, couriers.length || 1)).toFixed(4)),
+        courier_pressure: String((couriers.length / Math.max(1, orders.length || 1)).toFixed(4)),
+        burst_active: String((tick.trigger_reasons || []).includes("order_burst"))
+      });
+    }
+
+    async function refreshMemoryRecall() {
+      if (!appState.session || !appState.tick) return null;
+      const payload = await apiJson(`${API_ENDPOINTS.memoryRecall}?${recallQueryForTick().toString()}`, {method: "GET"});
+      appState.memoryRecall = payload.recall;
+      if (!appState.compare) renderMemory(payload.recall, null, null, null);
+      return payload.recall;
+    }
+
+    function scheduleMemoryRecall() {
+      if (appState.memoryRecallTimer) window.clearTimeout(appState.memoryRecallTimer);
+      appState.memoryRecallTimer = window.setTimeout(() => {
+        refreshMemoryRecall().catch((error) => reportInteractionError(error, "Memory recall失败"));
+      }, 260);
     }
 
     async function createSession() {
@@ -2365,6 +2519,7 @@ def render_index() -> str:
       resetCompareView();
       renderTick(payload.tick);
       appendTimeline(payload.timeline);
+      scheduleMemoryRecall();
       setStatus("仿真会话就绪");
       return payload;
     }
@@ -2381,6 +2536,7 @@ def render_index() -> str:
         renderTick(payload.tick);
         if (controlsChanged) resetCompareView();
         appendTimeline(payload.timeline_delta);
+        scheduleMemoryRecall();
         setStatus(payload.compare_trigger ? "已触发实时对比" : (controlsChanged ? "参数已应用" : "仿真推进完成"));
         return payload;
       } finally {
@@ -2398,7 +2554,7 @@ def render_index() -> str:
       const startedAt = Date.now();
       startCompareCountdown(startedAt, 10000);
       try {
-        const payload = await apiJson(API_ENDPOINTS.compare, {method: "POST", body: {session_id: appState.session.session_id, tick_id: appState.tick.tick_id, time_budget_ms: 10000, memory_mode: "off", predictor_mode: "fallback"}});
+        const payload = await apiJson(API_ENDPOINTS.compare, {method: "POST", body: {session_id: appState.session.session_id, tick_id: appState.tick.tick_id, time_budget_ms: 10000, memory_mode: "read-write", predictor_mode: "auto"}});
         appState.lastCompareElapsedMs = Date.now() - startedAt;
         renderCompare(payload);
         appendTimeline(payload.timeline_delta);

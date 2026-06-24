@@ -68,6 +68,49 @@ class SimulationApiContractTest(unittest.TestCase):
         self.assertEqual(predictor["predictor"]["secret_handling"], "env-only-redacted")
         self.assertEqual([item["algorithm_id"] for item in predictor["ranked_algorithms"]], ["nearest_greedy", "cost_greedy"])
 
+    def test_read_write_compare_payload_surfaces_memory_recall_and_predictor_boost(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(server, "SIMULATION_MEMORY_ROOT", Path(tmp)):
+            session_payload = server._create_simulation_session_payload(
+                {
+                    "scenario_id": "commerce_peak",
+                    "seed": "api-memory-loop",
+                    "controls": {"courier_count": 10, "order_intensity": 0.8, "burstiness": 0.8},
+                }
+            )
+            tick_payload = server._advance_simulation_payload(
+                {
+                    "session_id": session_payload["session"]["session_id"],
+                    "advance_seconds": 60,
+                    "compare_if_due": True,
+                }
+            )
+            first_compare = server._run_compare_payload(
+                {
+                    "session_id": session_payload["session"]["session_id"],
+                    "tick_id": tick_payload["tick"]["tick_id"],
+                    "time_budget_ms": 10_000,
+                    "memory_mode": "read-write",
+                    "predictor_mode": "auto",
+                }
+            )
+            second_compare = server._run_compare_payload(
+                {
+                    "session_id": session_payload["session"]["session_id"],
+                    "tick_id": tick_payload["tick"]["tick_id"],
+                    "time_budget_ms": 10_000,
+                    "memory_mode": "read-write",
+                    "predictor_mode": "auto",
+                }
+            )
+
+        self.assertEqual(first_compare["memory"]["mode"], "read-write")
+        self.assertEqual(second_compare["memory"]["source"], "local-jsonl")
+        self.assertGreater(len(second_compare["memory"]["strategy_memory"]), 0)
+        self.assertIn("Similar memory favors", second_compare["memory"]["effect_on_ranking"])
+        self.assertEqual(second_compare["predictor"]["used_external_api"], False)
+        self.assertEqual(second_compare["predictor"]["secret_handling"], "env-only-redacted")
+        self.assertTrue(any(float(item.get("memory_boost", 0.0)) > 0 for item in second_compare["predictor"]["ranked_algorithms"]))
+
 
 if __name__ == "__main__":
     unittest.main()
