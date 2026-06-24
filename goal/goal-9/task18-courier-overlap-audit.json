@@ -1,0 +1,477 @@
+{
+  "refresh": {
+    "closePairs": [],
+    "minDistance": {
+      "a": "R0103",
+      "b": "R0113",
+      "d": 42.500202492624226
+    },
+    "pinCount": 13,
+    "pins": [
+      {
+        "id": "R0101",
+        "left": "43%",
+        "top": "36%",
+        "x": 641.71875,
+        "y": 252.2734375
+      },
+      {
+        "id": "R0102",
+        "left": "59%",
+        "top": "50.1%",
+        "x": 754.359375,
+        "y": 308.390625
+      },
+      {
+        "id": "R0103",
+        "left": "22%",
+        "top": "76.5%",
+        "x": 493.875,
+        "y": 413.46875
+      },
+      {
+        "id": "R0104",
+        "left": "39%",
+        "top": "52.9%",
+        "x": 613.5546875,
+        "y": 319.5390625
+      },
+      {
+        "id": "R0105",
+        "left": "71.9%",
+        "top": "70.1%",
+        "x": 845.171875,
+        "y": 387.9921875
+      },
+      {
+        "id": "R0106",
+        "left": "77%",
+        "top": "55.1%",
+        "x": 881.078125,
+        "y": 328.296875
+      },
+      {
+        "id": "R0107",
+        "left": "10.5%",
+        "top": "35.8%",
+        "x": 412.9140625,
+        "y": 251.4765625
+      },
+      {
+        "id": "R0108",
+        "left": "74.9%",
+        "top": "34.9%",
+        "x": 866.2890625,
+        "y": 247.8984375
+      },
+      {
+        "id": "R0109",
+        "left": "50%",
+        "top": "74%",
+        "x": 691,
+        "y": 403.515625
+      },
+      {
+        "id": "R0110",
+        "left": "91%",
+        "top": "27%",
+        "x": 979.6328125,
+        "y": 216.453125
+      },
+      {
+        "id": "R0111",
+        "left": "92.2%",
+        "top": "61.4%",
+        "x": 988.0859375,
+        "y": 353.3671875
+      },
+      {
+        "id": "R0112",
+        "left": "31%",
+        "top": "30%",
+        "x": 557.234375,
+        "y": 228.3984375
+      },
+      {
+        "id": "R0113",
+        "left": "20.9%",
+        "top": "66%",
+        "x": 486.1328125,
+        "y": 371.6796875
+      }
+    ],
+    "routes": 0,
+    "stage": "refresh-preview-locked"
+  },
+  "afterRun": {
+    "body": "",
+    "closePairs": [],
+    "merchantPins": 6,
+    "minDistance": {
+      "a": "R0103",
+      "b": "R0113",
+      "d": 42.500202492624226
+    },
+    "pinCount": 13,
+    "pins": [
+      {
+        "id": "R0101",
+        "left": "43%",
+        "top": "36%",
+        "unassigned": false,
+        "x": 641.71875,
+        "y": 252.2734375
+      },
+      {
+        "id": "R0102",
+        "left": "59%",
+        "top": "50.1%",
+        "unassigned": false,
+        "x": 754.359375,
+        "y": 308.390625
+      },
+      {
+        "id": "R0103",
+        "left": "22%",
+        "top": "76.5%",
+        "unassigned": false,
+        "x": 493.875,
+        "y": 413.46875
+      },
+      {
+        "id": "R0104",
+        "left": "39%",
+        "top": "52.9%",
+        "unassigned": false,
+        "x": 613.5546875,
+        "y": 319.5390625
+      },
+      {
+        "id": "R0105",
+        "left": "71.9%",
+        "top": "70.1%",
+        "unassigned": true,
+        "x": 845.171875,
+        "y": 387.9921875
+      },
+      {
+        "id": "R0106",
+        "left": "77%",
+        "top": "55.1%",
+        "unassigned": true,
+        "x": 881.078125,
+        "y": 328.296875
+      },
+      {
+        "id": "R0107",
+        "left": "10.5%",
+        "top": "35.8%",
+        "unassigned": true,
+        "x": 412.9140625,
+        "y": 251.4765625
+      },
+      {
+        "id": "R0108",
+        "left": "74.9%",
+        "top": "34.9%",
+        "unassigned": false,
+        "x": 866.2890625,
+        "y": 247.8984375
+      },
+      {
+        "id": "R0109",
+        "left": "50%",
+        "top": "74%",
+        "unassigned": true,
+        "x": 691,
+        "y": 403.515625
+      },
+      {
+        "id": "R0110",
+        "left": "91%",
+        "top": "27%",
+        "unassigned": true,
+        "x": 979.6328125,
+        "y": 216.453125
+      },
+      {
+        "id": "R0111",
+        "left": "92.2%",
+        "top": "61.4%",
+        "unassigned": false,
+        "x": 988.0859375,
+        "y": 353.3671875
+      },
+      {
+        "id": "R0112",
+        "left": "31%",
+        "top": "30%",
+        "unassigned": true,
+        "x": 557.234375,
+        "y": 228.3984375
+      },
+      {
+        "id": "R0113",
+        "left": "20.9%",
+        "top": "66%",
+        "unassigned": true,
+        "x": 486.1328125,
+        "y": 371.6796875
+      }
+    ],
+    "routeClassCounts": {
+      "dispatch-arrow secondary overview-route": 5,
+      "dispatch-arrow secondary overview-route selected-overview": 1,
+      "dispatch-link secondary overview-route pickup-leg route-click-target": 5,
+      "dispatch-link secondary overview-route pickup-leg selected-overview route-click-target": 1,
+      "dispatch-visual secondary overview-route pickup-leg": 5,
+      "dispatch-visual secondary overview-route pickup-leg selected-overview": 1,
+      "route-terminal courier-terminal secondary overview-route": 5,
+      "route-terminal courier-terminal secondary overview-route selected-overview": 1,
+      "route-terminal merchant-terminal secondary overview-route": 5,
+      "route-terminal merchant-terminal secondary overview-route selected-overview": 1
+    },
+    "routeNodes": [
+      {
+        "assignment": "A0101",
+        "cls": "route-terminal courier-terminal secondary overview-route",
+        "courier": "R0102",
+        "merchant": "M0101",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0101",
+        "cls": "route-terminal merchant-terminal secondary overview-route",
+        "courier": "R0102",
+        "merchant": "M0101",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0101",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0102",
+        "merchant": "M0101",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0101",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0102",
+        "merchant": "M0101",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0101",
+        "cls": "dispatch-arrow secondary overview-route",
+        "courier": "R0102",
+        "merchant": "M0101",
+        "tag": "polygon"
+      },
+      {
+        "assignment": "A0102",
+        "cls": "route-terminal courier-terminal secondary overview-route selected-overview",
+        "courier": "R0101",
+        "merchant": "M0102",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0102",
+        "cls": "route-terminal merchant-terminal secondary overview-route selected-overview",
+        "courier": "R0101",
+        "merchant": "M0102",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0102",
+        "cls": "dispatch-visual secondary overview-route pickup-leg selected-overview",
+        "courier": "R0101",
+        "merchant": "M0102",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0102",
+        "cls": "dispatch-link secondary overview-route pickup-leg selected-overview route-click-target",
+        "courier": "R0101",
+        "merchant": "M0102",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0102",
+        "cls": "dispatch-arrow secondary overview-route selected-overview",
+        "courier": "R0101",
+        "merchant": "M0102",
+        "tag": "polygon"
+      },
+      {
+        "assignment": "A0103",
+        "cls": "route-terminal courier-terminal secondary overview-route",
+        "courier": "R0108",
+        "merchant": "M0103",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0103",
+        "cls": "route-terminal merchant-terminal secondary overview-route",
+        "courier": "R0108",
+        "merchant": "M0103",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0103",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0108",
+        "merchant": "M0103",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0103",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0108",
+        "merchant": "M0103",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0103",
+        "cls": "dispatch-arrow secondary overview-route",
+        "courier": "R0108",
+        "merchant": "M0103",
+        "tag": "polygon"
+      },
+      {
+        "assignment": "A0104",
+        "cls": "route-terminal courier-terminal secondary overview-route",
+        "courier": "R0103",
+        "merchant": "M0104",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0104",
+        "cls": "route-terminal merchant-terminal secondary overview-route",
+        "courier": "R0103",
+        "merchant": "M0104",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0104",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0103",
+        "merchant": "M0104",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0104",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0103",
+        "merchant": "M0104",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0104",
+        "cls": "dispatch-arrow secondary overview-route",
+        "courier": "R0103",
+        "merchant": "M0104",
+        "tag": "polygon"
+      },
+      {
+        "assignment": "A0105",
+        "cls": "route-terminal courier-terminal secondary overview-route",
+        "courier": "R0104",
+        "merchant": "M0105",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0105",
+        "cls": "route-terminal merchant-terminal secondary overview-route",
+        "courier": "R0104",
+        "merchant": "M0105",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0105",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0104",
+        "merchant": "M0105",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0105",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0104",
+        "merchant": "M0105",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0105",
+        "cls": "dispatch-arrow secondary overview-route",
+        "courier": "R0104",
+        "merchant": "M0105",
+        "tag": "polygon"
+      },
+      {
+        "assignment": "A0106",
+        "cls": "route-terminal courier-terminal secondary overview-route",
+        "courier": "R0111",
+        "merchant": "M0106",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0106",
+        "cls": "route-terminal merchant-terminal secondary overview-route",
+        "courier": "R0111",
+        "merchant": "M0106",
+        "tag": "circle"
+      },
+      {
+        "assignment": "A0106",
+        "cls": "dispatch-visual secondary overview-route pickup-leg",
+        "courier": "R0111",
+        "merchant": "M0106",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0106",
+        "cls": "dispatch-link secondary overview-route pickup-leg route-click-target",
+        "courier": "R0111",
+        "merchant": "M0106",
+        "tag": "path"
+      },
+      {
+        "assignment": "A0106",
+        "cls": "dispatch-arrow secondary overview-route",
+        "courier": "R0111",
+        "merchant": "M0106",
+        "tag": "polygon"
+      }
+    ],
+    "runtime": "00:00:10",
+    "status": "当前场景派单完成",
+    "svgNodeCount": 30
+  },
+  "afterZoom": {
+    "arrows": 6,
+    "closePairs": [],
+    "mapFrame": {
+      "controlState": "all",
+      "dragFallbackBound": "native-maplibre",
+      "dragPan": "native",
+      "entitiesMuted": "false",
+      "lastViewportSync": "zoom-in-control",
+      "locating": "false",
+      "mapCenter": "121.46200,31.22900",
+      "mapMoving": "false",
+      "mapRegion": "运营分析浅色区域 A",
+      "mapStyle": "运营分析浅色图",
+      "routesHidden": "false",
+      "selectedAssignment": "A0102",
+      "zoomLevel": "14.20"
+    },
+    "minDistance": {
+      "a": "R0105",
+      "b": "R0106",
+      "d": 69.66196324778075
+    },
+    "pinCount": 13,
+    "routeVisuals": 6,
+    "stage": "after-zoom"
+  }
+}

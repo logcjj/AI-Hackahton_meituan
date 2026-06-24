@@ -8,6 +8,7 @@
 - 最新多场景企业验收：`goal/goal-9/task16-audit.json`
 - 最新最终截图：`goal/goal-9/task16-final.png`
 - Chrome/Playwright 派单线复核：`goal/goal-9/task15-chrome-audit.json`、`goal/goal-9/task15-playwright-audit.json`
+- Task 18 骑手点位重叠修复验收：`goal/goal-9/task18-courier-overlap-audit.json`、`goal/goal-9/task18-courier-overlap-final.png`
 
 ## 验证结果
 

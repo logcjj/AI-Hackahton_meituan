@@ -258,3 +258,20 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 18: 修复骑手点位视觉重叠
+
+验证标准：刷新位置和运行 10 秒推理后，地图中所有可见骑手 pin 不得堆叠或严重遮挡；骑手仍必须落在道路或道路边；商家和骑手推理前后位置稳定；路线数量、商家数、骑手数和最终分配仍一致；缩放/拖拽后点线稳定；用浏览器实测 `.pin.courier` 两两屏幕距离，不能只依赖代码判断。
+
+完成记录：
+- 已复现用户指出的问题：刷新位置后浏览器实测 13 个骑手 pin 最小距离曾只有约 `17.5px`，多个 `骑` pin 在商圈道路区域堆叠。
+- 已修复样本生成端锚点选择：`_select_scene_anchors()` 对骑手改为全局道路锚点贪心分散，优先满足场景标签，同时按实际页面比例计算视觉距离，避免锚点池选出一串过近道路点。
+- 已修复前端二次覆盖：`sample_preview` 阶段锁定后端道路锚点，不再被 MapLibre `queryRenderedFeatures` 重新聚到局部道路；MapLibre 未 ready 或道路查询不足时仍执行静态道路避让兜底。
+- 已修复前端避让测距：`enforceCourierSeparation()` 改为读取 `.map-frame` 实际宽高计算屏幕距离，不再用 980x640 内部 SVG 比例高估纵向间距。
+- 已补回归测试：全部 10 个模拟场景、每个场景 10 个样本都会校验骑手点位按实际页面比例的最小视觉距离 `>=36px`，防止锚点池再次退化。
+- 浏览器验收通过：刷新位置后 `pinCount=13`、`minDistance≈42.5px`、`closePairs=[]`、`routes=0`；运行 10 秒后 `runtime=00:00:10`、`merchantPins=6`、`dispatch-visual.pickup-leg=6`、`dispatch-arrow=6`、`closePairs=[]`；缩放后 `minDistance≈69.7px` 且路线/箭头仍为 6。
+- 已保存证据：`goal/goal-9/task18-courier-overlap-audit.json`、`goal/goal-9/task18-courier-overlap-final.png`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。

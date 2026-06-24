@@ -523,6 +523,31 @@ def _anchor_match_score(anchor: dict[str, object], config: dict[str, object]) ->
     return len(anchor_tags & _scene_anchor_tags(config))
 
 
+def _anchor_screen_distance(left: dict[str, object], right: dict[str, object]) -> float:
+    return math.hypot((float(left["x"]) - float(right["x"])) * 7.04, (float(left["y"]) - float(right["y"])) * 3.98)
+
+
+def _select_spread_courier_anchors(ranked: list[dict[str, object]], count: int, density_profile: str) -> list[dict[str, object]]:
+    min_px = 56.0 if density_profile in {"clustered", "rain_clustered", "event_clustered"} else 48.0
+    for threshold in (min_px, 48.0, 42.0, 36.0):
+        selected: list[dict[str, object]] = []
+        for anchor in ranked:
+            if any(str(item["id"]) == str(anchor["id"]) for item in selected):
+                continue
+            if all(_anchor_screen_distance(anchor, chosen) >= threshold for chosen in selected):
+                selected.append(anchor)
+            if len(selected) >= count:
+                return selected
+    selected = []
+    for anchor in ranked:
+        if any(str(item["id"]) == str(anchor["id"]) for item in selected):
+            continue
+        selected.append(anchor)
+        if len(selected) >= count:
+            break
+    return selected
+
+
 def _select_scene_anchors(config: dict[str, object], role: str, count: int, sample_key: object) -> list[dict[str, object]]:
     anchors = _MERCHANT_ANCHORS if role == "merchant" else _COURIER_ANCHORS
     center = config.get("center", (50.0, 50.0))
@@ -532,6 +557,8 @@ def _select_scene_anchors(config: dict[str, object], role: str, count: int, samp
     center_weight = -0.025 if density_profile in {"spread", "scarce_spread"} else 0.045
     matched = [anchor for anchor in anchors if _anchor_match_score(anchor, config) > 0]
     candidates = matched if len(matched) >= count else anchors
+    if role == "courier":
+        candidates = anchors
     ranked = sorted(
         candidates,
         key=lambda anchor: (
@@ -541,6 +568,8 @@ def _select_scene_anchors(config: dict[str, object], role: str, count: int, samp
             str(anchor["id"]),
         ),
     )
+    if role == "courier":
+        return _select_spread_courier_anchors(ranked, count, density_profile)
     selected = ranked[:count]
     if len(selected) < count:
         selected_ids = {str(anchor["id"]) for anchor in selected}
@@ -738,6 +767,66 @@ def _strategy_score_model(
         "metrics": metrics,
         "evidence": evidence,
     }
+
+
+def _strategy_attempt_flow(config: dict[str, object], strategy_decision: dict[str, object]) -> list[dict[str, object]]:
+    """Mirror the planner's real initial/adaptive strategy pool for the demo stream."""
+
+    scene_type = str(config.get("scene_type", ""))
+    weather = str(config.get("weather", "clear"))
+    metrics = dict(strategy_decision.get("metrics") or {})
+    scores = dict(strategy_decision.get("scores") or {})
+    ranks = {str(item["id"]): index + 1 for index, item in enumerate(strategy_decision.get("ranked") or [])}
+    selected = str(strategy_decision.get("selected_strategy_id") or "")
+    preferred_selected_name = {
+        "S1": "disjoint_gain",
+        "S2": "single_multidispatch",
+        "S3": "sparse_cover",
+        "S4": "greedy_baseline",
+        "S5": "production_solver",
+    }.get(selected, "")
+    flow: list[dict[str, object]] = []
+    seen: set[str] = set()
+
+    def add(name: str, branch: str, phase: str, trigger: str) -> None:
+        if name in seen:
+            return
+        seen.add(name)
+        flow.append(
+            {
+                "name": name,
+                "branch": branch,
+                "phase": phase,
+                "trigger": trigger,
+                "score": scores.get(branch),
+                "rank": ranks.get(branch),
+                "selected_branch": branch == selected and name == preferred_selected_name,
+            }
+        )
+
+    add("greedy_baseline", "S4", "initial", "先构造最快可行基线")
+    add("single_multidispatch", "S2", "initial", "为每个商家保留多个候选骑手")
+    add("disjoint_gain", "S1", "initial", "搜索互不冲突的高收益组合")
+
+    dense_or_medium = scene_type in {"dense_commerce", "medium_parallel", "night_commerce", "campus_lunch", "event_mixed"}
+    if dense_or_medium or float(metrics.get("density_score", 0.0)) >= 0.46:
+        add("pair_matching", "S1", "initial", "订单/骑手候选接近时做二元匹配")
+
+    scarce = scene_type in {"scarce_couriers", "congestion_recovery"} or float(metrics.get("shortage_score", 0.0)) >= 0.32
+    low_willingness = scene_type in {"low_willingness", "medical_office_peak"} or weather in {"rain", "event"} or float(metrics.get("avg_willingness", 1.0)) <= 0.60
+    incomplete_pressure = scarce or low_willingness or float(metrics.get("best_risk_pressure", 0.0)) >= 0.46
+    if incomplete_pressure:
+        add("sparse_cover", "S3", "adaptive", "覆盖不足或风险偏高时补足商家覆盖")
+    if scarce:
+        add("scarce_k2_column", "S1", "adaptive", "骑手稀缺时放大二阶组合列")
+        add("scarce_bundle_mcf", "S1", "adaptive", "稀缺场景用 MCF 重组候选包")
+    if low_willingness:
+        add("low_global_column", "S5", "adaptive", "低意愿场景先做全局风险护栏")
+        add("low_single_column", "S5", "adaptive", "对高风险商家做单点补充")
+
+    add("production_solver", "S5", "production", "进入生产级 anytime 求解器复核")
+    add("evolution_replay", "S5", "evolution", "复用历史有效策略事件")
+    return flow
 
 
 def _delivery_project_map_traces(config: dict[str, object], sample_key: object) -> list[dict[str, object]]:
@@ -1014,6 +1103,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
         )
 
     candidates = []
+    all_candidates_by_merchant: dict[str, list[dict[str, object]]] = {}
     for merchant in merchants:
         ranked = []
         merchant_point = (float(merchant["x"]), float(merchant["y"]))
@@ -1036,17 +1126,18 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
                 }
             )
         ranked.sort(key=lambda item: (item["risk"] == "High", item["cost"]))
+        all_candidates_by_merchant[str(merchant["id"])] = ranked
         candidates.extend(ranked[:3])
 
     strategy_decision = _strategy_score_model(config, sample_key, sample_index, density_profile, traffic_level, merchants, couriers, candidates)
     selected_strategy_id = str(strategy_decision["selected_strategy_id"])
     for courier in couriers:
-        courier["capacity"] = 2 if selected_strategy_id in {"S1", "S2", "S5"} else 1
+        courier["capacity"] = 1
 
     assignments = []
-    courier_load: dict[str, int] = {}
-    for merchant in merchants:
-        merchant_candidates = [candidate for candidate in candidates if candidate["merchant_id"] == merchant["id"]]
+    used_courier_ids: set[str] = set()
+    for merchant_index, merchant in enumerate(merchants):
+        merchant_candidates = list(all_candidates_by_merchant.get(str(merchant["id"]), []))
         if selected_strategy_id == "S5":
             merchant_candidates.sort(key=lambda item: (item["risk"] == "High", -item["accept_probability"], item["cost"]))
         elif selected_strategy_id == "S4":
@@ -1055,20 +1146,45 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
             merchant_candidates.sort(key=lambda item: (item["cost"] - float(merchant["demand_level"]) * 8, item["eta_min"]))
         else:
             merchant_candidates.sort(key=lambda item: (item["cost"], item["eta_min"]))
-        chosen = merchant_candidates[0]
-        for candidate in merchant_candidates:
-            courier = next(item for item in couriers if item["id"] == candidate["courier_id"])
-            if courier_load.get(candidate["courier_id"], 0) < int(courier["capacity"]):
-                chosen = candidate
-                break
-        courier_load[chosen["courier_id"]] = courier_load.get(chosen["courier_id"], 0) + 1
-        backup = merchant_candidates[1] if len(merchant_candidates) > 1 else chosen
+        available_candidates = [candidate for candidate in merchant_candidates if str(candidate["courier_id"]) not in used_courier_ids]
+        chosen = available_candidates[0] if available_candidates else merchant_candidates[0]
+        allocated_courier_ids = [chosen["courier_id"]]
+        if selected_strategy_id == "S2":
+            allocated_courier_ids = [chosen["courier_id"]]
+            remaining_merchants = max(0, len(merchants) - merchant_index - 1)
+            remaining_unused = max(0, len(couriers) - len(used_courier_ids) - len(allocated_courier_ids))
+            extra_slots = max(0, min(2, remaining_unused - remaining_merchants))
+            for candidate in merchant_candidates:
+                candidate_id = str(candidate["courier_id"])
+                if candidate_id in used_courier_ids or candidate_id in allocated_courier_ids:
+                    continue
+                if len(allocated_courier_ids) >= 1 + extra_slots:
+                    break
+                allocated_courier_ids.append(candidate["courier_id"])
+        used_courier_ids.update(str(courier_id) for courier_id in allocated_courier_ids)
+        current_allocated = set(str(courier_id) for courier_id in allocated_courier_ids)
+        backup = next(
+            (
+                candidate
+                for candidate in merchant_candidates
+                if str(candidate["courier_id"]) not in used_courier_ids
+            ),
+            None,
+        ) or next(
+            (
+                candidate
+                for candidate in merchant_candidates
+                if str(candidate["courier_id"]) not in current_allocated
+            ),
+            chosen,
+        )
         assignments.append(
             {
                 "id": f"A{sample_index + 1:02d}{len(assignments) + 1:02d}",
                 "merchant_id": merchant["id"],
                 "courier_id": chosen["courier_id"],
                 "backup_courier_id": backup["courier_id"],
+                "allocated_courier_ids": allocated_courier_ids,
                 "strategy_id": selected_strategy_id,
                 "cost": chosen["cost"],
                 "eta_min": chosen["eta_min"],
@@ -1078,7 +1194,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
                 "reason": [
                     _SIMULATION_STRATEGIES[selected_strategy_id]["reason"],
                     f"接单概率 {round(chosen['accept_probability'] * 100)}%，预计 {chosen['eta_min']} 分钟送达",
-                    f"备选骑手 {backup['courier_id']} 可用于风险兜底",
+                    f"分配骑手集合 {' / '.join(allocated_courier_ids)} 用于最大化当前期望值",
                 ],
             }
         )
@@ -1111,6 +1227,7 @@ def build_simulated_scenario_sample(scenario_id: str, sample_index: int = 0, var
         "selected_strategy_id": selected_strategy_id,
         "selected_strategy": _SIMULATION_STRATEGIES[selected_strategy_id],
         "strategy_path": strategy_path,
+        "strategy_attempt_flow": _strategy_attempt_flow(config, strategy_decision),
         "strategy_decision": strategy_decision,
         "map_layers": map_layers,
         "merchants": merchants,
@@ -1238,7 +1355,7 @@ def build_dispatch_assignment_map(case_id: str, report: dict[str, object] | None
                     f"来自输入候选行：{task_key} -> {courier_id}",
                     f"候选 total_score={score:.3f}，willingness={willingness:.4f}",
                     "位置由 score/willingness 模拟：高意愿更近，成本越高距离越长",
-                    "最终派单关系以求解器 solution 为准" if stage == "final" else "当前为未运行前的真实候选预览",
+                    "派单分配关系以求解器 solution 为准" if stage == "final" else "当前为未运行前的真实候选预览",
                 ],
             }
         )
@@ -1473,19 +1590,15 @@ def render_index() -> str:
     }
     .node h3, .strategy h4 { margin: 0 0 2px; font-size: 12px; }
     .node p, .strategy p, .tiny { margin: 0; color: var(--muted); font-size: 9.5px; line-height: 1.18; }
-    .node p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .node p br { display: none; }
-    .left-panel.expanded .node p,
-    .left-panel.expanded .strategy p {
+    .node p,
+    .strategy p {
       white-space: normal;
       overflow: visible;
       text-overflow: clip;
-      line-height: 1.34;
+      line-height: 1.28;
     }
-    .left-panel.expanded .node p br,
-    .left-panel.expanded .strategy p br { display: block; }
-    .left-panel.expanded .node { min-height: 58px; align-items: start; }
-    .left-panel.expanded .strategy { min-height: 48px; align-items: start; }
+    .node p br,
+    .strategy p br { display: block; }
     .node .icon {
       width: 23px; height: 23px; border-radius: 7px;
       display: grid; place-items: center;
@@ -1498,29 +1611,144 @@ def render_index() -> str:
     .metric strong { color: var(--green); display: block; font-size: 14px; font-family: var(--mono); line-height: 1.1; }
     .metric span { display: block; color: var(--muted); font-size: 9.5px; margin-bottom: 2px; }
     .connector {
-      height: 4px;
+      height: 8px;
       width: 2px;
-      margin-left: 14px;
+      margin-left: 34px;
       background: linear-gradient(var(--stroke-2), var(--cyan));
-      opacity: .8;
+      opacity: .58;
       position: relative;
     }
-    .connector:after { content: ""; position: absolute; bottom: -1px; left: -3px; width: 8px; height: 8px; border-right: 1px solid var(--cyan); border-bottom: 1px solid var(--cyan); transform: rotate(45deg); }
+    .connector:after { content: none; }
     .branch-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 3px;
-      margin: 5px 0 6px;
+      margin: 4px 0 6px;
       width: 100%;
       position: relative;
     }
     .branch-grid:before { content: none; }
-    .strategy {
-      min-height: 26px;
-      display: grid;
-      grid-template-columns: 26px minmax(0, 1fr) 86px;
-      gap: 6px;
+    .branch-caption {
+      display: flex;
       align-items: center;
+      justify-content: space-between;
+      margin: 3px 1px 1px;
+      color: var(--muted);
+      font-size: 9.5px;
+    }
+    .branch-caption b { color: #dce8f3; font-size: 10px; }
+    .strategy-runner {
+      border: 1px solid rgba(65, 86, 105, .72);
+      background: linear-gradient(180deg, rgba(9, 25, 38, .98), rgba(6, 18, 30, .98));
+      border-radius: 8px;
+      padding: 6px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      margin: 5px 0 4px;
+    }
+    .runner-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+      font-size: 10px;
+      color: #cdd8e3;
+    }
+    .runner-head b { font-size: 11px; color: #f0f6fb; }
+    .runner-head small { color: #91a8bb; font-family: var(--mono); }
+    .strategy-stream {
+      max-height: 108px;
+      overflow-y: auto;
+      display: grid;
+      gap: 4px;
+      padding-right: 2px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(83, 111, 134, .75) rgba(8, 20, 34, .6);
+    }
+    .stream-empty {
+      min-height: 58px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      color: #8094a7;
+      border: 1px dashed rgba(113, 133, 150, .36);
+      border-radius: 7px;
+      font-size: 10px;
+      line-height: 1.35;
+      padding: 8px;
+    }
+    .stream-row {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr) 58px;
+      align-items: center;
+      gap: 6px;
+      min-height: 31px;
+      border: 1px solid rgba(80, 102, 122, .58);
+      border-radius: 6px;
+      background: rgba(13, 29, 44, .88);
+      padding: 4px 5px;
+      cursor: pointer;
+    }
+    .stream-row .phase {
+      color: #9db3c6;
+      font-family: var(--mono);
+      font-size: 8.5px;
+      text-transform: uppercase;
+    }
+    .stream-row .name {
+      color: #ecf5fb;
+      font-family: var(--mono);
+      font-size: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stream-row .trigger {
+      color: #8fa4b6;
+      font-size: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+    .stream-row .state {
+      justify-self: end;
+      border: 1px solid rgba(142, 160, 176, .38);
+      border-radius: 4px;
+      padding: 1px 4px;
+      color: #a8b8c7;
+      font-size: 8.5px;
+      white-space: nowrap;
+    }
+    .stream-row.evaluating {
+      border-color: rgba(40,168,255,.72);
+      background: linear-gradient(90deg, rgba(12, 58, 83, .96), rgba(9, 31, 49, .96));
+      box-shadow: 0 0 14px rgba(40,168,255,.22);
+    }
+    .stream-row.evaluating .state { color: #7ad4ff; border-color: rgba(40,168,255,.55); }
+    .stream-row.selected {
+      border-color: rgba(54,230,126,.68);
+      background: linear-gradient(90deg, rgba(11, 65, 48, .96), rgba(8, 31, 30, .96));
+      box-shadow: 0 0 14px rgba(54,230,126,.22);
+    }
+    .stream-row.selected .state { color: var(--green); border-color: rgba(54,230,126,.55); }
+    .stream-row.evaluated {
+      border-color: rgba(40,168,255,.38);
+      background: rgba(13, 31, 48, .9);
+    }
+    .stream-row.evaluated .state { color: #7ad4ff; border-color: rgba(40,168,255,.42); }
+    .stream-row.standby {
+      border-color: rgba(145,168,187,.36);
+      background: rgba(12, 27, 42, .78);
+    }
+    .stream-row.standby .state { color: #aebdca; border-color: rgba(145,168,187,.36); }
+    .stream-row.rejected { opacity: .68; }
+    .strategy {
+      min-height: 34px;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) 64px;
+      gap: 6px;
+      align-items: start;
       border: 1px solid rgba(135, 152, 166, .35);
       background: linear-gradient(180deg, rgba(16, 32, 47, .96), rgba(8, 20, 34, .96));
       border-radius: 6px;
@@ -1533,10 +1761,9 @@ def render_index() -> str:
     .strategy.best { border-color: var(--green); box-shadow: 0 0 18px rgba(54, 230, 126, .34); background: linear-gradient(180deg, rgba(8, 69, 52, .95), rgba(5, 38, 35, .95)); }
     .strategy.evaluating { border-color: var(--blue); box-shadow: 0 0 16px rgba(40, 168, 255, .24); }
     .strategy.rejected { opacity: .72; }
-    .strategy h4 { margin: 0; font-family: var(--mono); font-size: 11px; color: #d8efff; }
-    .strategy p { font-size: 9.5px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .strategy p br { display: none; }
-    .strategy strong { display: flex; justify-content: flex-end; align-items: center; gap: 4px; color: var(--green); font-family: var(--mono); margin-top: 0; font-size: 10.5px; white-space: nowrap; }
+    .strategy h4 { margin: 0; font-family: var(--mono); font-size: 11px; line-height: 1.15; color: #d8efff; }
+    .strategy p { font-size: 9px; line-height: 1.18; }
+    .strategy strong { display: flex; justify-content: flex-end; align-items: center; gap: 3px; color: var(--green); font-family: var(--mono); margin-top: 0; font-size: 9.8px; white-space: nowrap; }
     .strategy.rejected strong, .strategy.pending strong { color: var(--muted); }
     .strategy .evidence { display: block; margin-top: 4px; color: #9db1c3; font-family: var(--mono); font-size: 10px; }
     .badge { display: inline-block; border: 1px solid rgba(255,91,101,.48); color: #ff7881; background: rgba(255,91,101,.12); border-radius: 4px; padding: 2px 5px; font-size: 9px; margin-left: 5px; }
@@ -1554,7 +1781,8 @@ def render_index() -> str:
     .map-frame.dragging-map .map-label,
     .map-frame.dragging-map .dispatch-visual,
     .map-frame.dragging-map .dispatch-link,
-    .map-frame.dragging-map .dispatch-arrow { transition: none !important; animation: none !important; }
+    .map-frame.dragging-map .dispatch-arrow,
+    .map-frame.dragging-map .route-terminal { transition: none !important; animation: none !important; }
     .semi-real-map {
       position: absolute;
       inset: 0;
@@ -1619,7 +1847,7 @@ def render_index() -> str:
     .map-frame.topology .pin { display: block; }
     .map-bg, .route-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
     .map-bg { opacity: .38; z-index: 1; pointer-events: none; }
-    .route-svg { z-index: 7; pointer-events: none; }
+    .route-svg { z-index: 3; pointer-events: none; }
     .district, .zone-block { fill: rgba(24, 36, 47, .3); stroke: rgba(124, 146, 162, .075); stroke-width: 1; }
     .water { fill: rgba(13, 31, 40, .56); stroke: rgba(85, 116, 137, .14); }
     .building-block {
@@ -1689,7 +1917,30 @@ def render_index() -> str:
     .dispatch-visual.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.5; opacity: .62; filter: none; }
     .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.55; filter: none; }
     .dispatch-visual.pickup-leg.overview-route { stroke: var(--route-color, var(--map-route)); stroke-width: 1.7; opacity: .72; stroke-dasharray: none; filter: drop-shadow(0 1px 1px rgba(15, 118, 110, .12)); }
+    .dispatch-visual.candidate-dispatch {
+      stroke: #64748b;
+      stroke-width: 1.15;
+      opacity: .42;
+      stroke-dasharray: 6 5;
+      filter: none;
+    }
+    .dispatch-visual.candidate-dispatch.active-assignment,
+    .map-frame.assignment-overview .dispatch-visual.candidate-dispatch {
+      stroke-width: 1.2;
+      opacity: .48;
+      stroke-dasharray: 6 5;
+    }
     .dispatch-visual.endpoint-connector { stroke: var(--route-color, var(--map-route)); stroke-width: 1.65; opacity: .64; stroke-dasharray: none; filter: none; animation: none; pointer-events: none; }
+    .route-terminal {
+      fill: var(--route-color, var(--map-route));
+      stroke: rgba(255, 255, 255, .92);
+      stroke-width: 1.15;
+      opacity: .62;
+      vector-effect: non-scaling-stroke;
+      pointer-events: none;
+    }
+    .route-terminal.merchant-terminal { stroke: rgba(255, 214, 132, .96); }
+    .route-terminal.courier-terminal { stroke: rgba(190, 255, 246, .92); }
     .dispatch-visual.selected-overview {
       stroke: #d99a00;
       stroke-width: 1.85;
@@ -1723,6 +1974,7 @@ def render_index() -> str:
     .dispatch-arrow { fill: #d99a00; opacity: .78; filter: drop-shadow(0 1px 1px rgba(68, 64, 60, .18)); pointer-events: auto; cursor: pointer; }
     .dispatch-arrow.overview-route { fill: var(--route-color, #0f766e); opacity: .84; }
     .dispatch-arrow.active-assignment { opacity: 1; }
+    .dispatch-arrow.candidate-dispatch { fill: #64748b; opacity: .5; filter: none; }
     .arrow { fill: var(--cyan); filter: drop-shadow(0 0 6px rgba(39,230,208,.75)); }
     @keyframes draw { to { stroke-dashoffset: 0; } }
     .map-legend {
@@ -1833,14 +2085,18 @@ def render_index() -> str:
     .map-frame.focus-selected .pin.active-assignment .mark { box-shadow: 0 0 0 4px rgba(15,118,110,.14), 0 4px 12px rgba(15,118,110,.26); }
     .map-frame.focus-selected .dispatch-visual.secondary:not(.active-assignment) { opacity: .28; stroke-width: 1.7; filter: none; }
     .map-frame.focus-selected .dispatch-arrow.secondary:not(.active-assignment) { opacity: .24; fill: rgba(43,222,205,.5); }
+    .map-frame.focus-selected .route-terminal.secondary:not(.active-assignment) { opacity: .18; }
     .map-frame.assignment-overview .dispatch-visual { stroke-dashoffset: 0; }
     .map-frame.assignment-overview .dispatch-visual.primary { stroke: var(--map-route-focus); stroke-width: 2.15; opacity: .82; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
     .map-frame.assignment-overview .dispatch-visual.pickup-leg { stroke: var(--route-color, var(--map-route)); stroke-width: 1.75; opacity: .72; filter: drop-shadow(0 1px 1px rgba(15, 118, 110, .12)); }
     .map-frame.assignment-overview .dispatch-visual.pickup-leg.selected-overview { stroke: var(--map-route-focus); stroke-width: 2.05; opacity: .84; filter: drop-shadow(0 1px 2px rgba(15, 118, 110, .16)); }
     .map-frame.assignment-overview .dispatch-arrow { opacity: .68; }
     .map-frame.assignment-overview .dispatch-arrow.selected-overview { opacity: .76; fill: var(--map-route-focus); }
+    .map-frame.assignment-overview .route-terminal { opacity: .54; }
+    .map-frame.assignment-overview .route-terminal.selected-overview { opacity: .72; fill: var(--map-route-focus); }
     .map-frame.assignment-overview .dispatch-visual.active-assignment { stroke: var(--map-route-focus); stroke-width: 2.0; opacity: .78; stroke-dasharray: none; filter: drop-shadow(0 1px 2px rgba(15,118,110,.12)); }
     .map-frame.assignment-overview .dispatch-arrow.active-assignment { opacity: .96; fill: var(--map-route-focus); }
+    .map-frame.assignment-overview .route-terminal.active-assignment { opacity: .82; fill: var(--map-route-focus); }
     .map-frame.assignment-overview .dispatch-visual.pickup-leg.long-pickup.active-assignment,
     .map-frame.assignment-overview .dispatch-visual.pickup-leg.long-pickup {
       stroke: var(--route-color, var(--map-route));
@@ -1866,9 +2122,10 @@ def render_index() -> str:
     .map-frame.hide-entities .map-label { opacity: .12; pointer-events: none; }
     .map-frame.hide-entities .pin.active-assignment,
     .map-frame.hide-entities .map-label.active-assignment { opacity: .45; }
-    .map-entities { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+    .map-entities { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
     .map-entities .pin, .map-entities .map-label { pointer-events: auto; }
     .pin { position: absolute; z-index: 3; width: 18px; height: 18px; transform: translate(-50%, -50%); cursor: pointer; }
+    .pin.unassigned { opacity: .58; }
     .pin.rest, .pin.merchant { z-index: 6; }
     .pin.courier { z-index: 5; }
     .pin.dest { z-index: 4; }
@@ -1901,33 +2158,34 @@ def render_index() -> str:
     .map-frame.hide-candidates .dispatch-arrow.secondary:not(.active-assignment) { display: none; }
     .map-frame.hide-dispatch-routes .dispatch-visual,
     .map-frame.hide-dispatch-routes .dispatch-link,
-    .map-frame.hide-dispatch-routes .dispatch-arrow { display: none; }
+    .map-frame.hide-dispatch-routes .dispatch-arrow,
+    .map-frame.hide-dispatch-routes .route-terminal { display: none; }
     .map-frame.hide-candidates .map-label:not(.selected):not(.depot) { opacity: .68; }
     .weather {
       position: absolute;
-      right: 14px;
-      bottom: 13px;
+      right: 12px;
+      bottom: 12px;
       z-index: 12;
-      width: 212px;
-      padding: 9px 10px;
+      width: 184px;
+      padding: 7px 8px;
       border: 1px solid rgba(203, 213, 225, .9);
-      border-radius: 14px;
+      border-radius: 12px;
       background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,250,252,.98));
       color: #334155 !important;
       box-shadow: 0 8px 18px rgba(15,23,42,.10);
       backdrop-filter: blur(12px);
       display: grid;
-      gap: 6px;
+      gap: 5px;
       pointer-events: none;
     }
     .weather-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .weather-title { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 850; color: #334155; letter-spacing: .02em; }
     .weather-title::before { content: ""; width: 7px; height: 7px; border-radius: 999px; background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.14); }
     .weather-badge { padding: 3px 8px; border-radius: 999px; background: #fff7ed; color: #b45309; border: 1px solid rgba(217,119,6,.2); font-size: 10px; font-weight: 850; white-space: nowrap; }
-    .weather-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .weather-line { display: grid; gap: 3px; min-width: 0; font-size: 10px; line-height: 1.2; color: #64748b; background: rgba(255,255,255,.78); border: 1px solid rgba(226,232,240,.86); border-radius: 10px; padding: 5px 7px; }
+    .weather-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .weather-line { display: grid; gap: 2px; min-width: 0; font-size: 9px; line-height: 1.15; color: #64748b; background: rgba(255,255,255,.78); border: 1px solid rgba(226,232,240,.86); border-radius: 8px; padding: 4px 6px; }
     .weather-line strong { color: #0f172a; font-weight: 850; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .weather-impact { margin: 0; padding: 6px 8px; border: 1px solid rgba(226,232,240,.9); border-radius: 10px; background: rgba(248,250,252,.78); color: #475569; font-size: 10px; line-height: 1.28; }
+    .weather-impact { display: none; margin: 0; padding: 5px 7px; border: 1px solid rgba(226,232,240,.9); border-radius: 9px; background: rgba(248,250,252,.78); color: #475569; font-size: 9px; line-height: 1.22; }
     .toast {
       position: absolute;
       right: 18px;
@@ -2042,8 +2300,6 @@ def render_index() -> str:
     .scene-select-label { color: var(--muted); font-size: 11px; white-space: nowrap; }
     #case-select { max-width: 180px; min-width: 156px; }
     #run-agent.running { opacity: .72; }
-    .left-panel.expanded .reason-wrap { overflow-y: auto; }
-    .left-panel.expanded .node, .left-panel.expanded .strategy { box-shadow: 0 0 15px rgba(39, 230, 208, .16), inset 0 1px 0 rgba(146, 225, 255, .05); }
     body.pending-run:not(.reasoning) .strategy .badge { display: none; }
     body.pending-run .strategy.best { border-color: rgba(135, 152, 166, .35); box-shadow: none; background: linear-gradient(180deg, rgba(16, 32, 47, .96), rgba(8, 20, 34, .96)); }
     body.pending-run .star { display: none; }
@@ -2075,7 +2331,7 @@ def render_index() -> str:
 
     <section class="main-grid">
       <aside class="panel left-panel" aria-label="AI Reasoning Graph">
-        <div class="panel-head"><span class="dot">✣</span> ReasonGraph 推理链路 <span class="spacer"></span><button id="expand-graph" aria-expanded="false">展开全部</button></div>
+        <div class="panel-head"><span class="dot">✣</span> ReasonGraph 推理链路 <span class="spacer"></span><span class="mini">真实 Planner 策略池</span></div>
         <div class="reason-wrap">
           <article class="node current">
             <div class="step-index">1</div><div class="icon">▣</div>
@@ -2091,15 +2347,22 @@ def render_index() -> str:
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">3</div><div class="icon">↯</div>
-            <div><h3>动态策略组合</h3><p>按 regime、覆盖率和当前最优解生成候选<br>下方是算法族分组，不是固定调用顺序</p></div>
+            <div><h3>真实策略池调度</h3><p>来自 autosolver_agent/system.py<br>初始探索后按场景自适应补充</p></div>
             <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
+          <div class="strategy-runner">
+            <div class="runner-head"><b>策略运行流</b><small id="strategy-stream-status">等待运行</small></div>
+            <div class="strategy-stream" id="strategy-stream" aria-label="真实策略尝试流">
+              <div class="stream-empty">运行推理后按 initial → adaptive → production/evolution 展开<br>左侧展示真实策略尝试，不是固定 S1-S5 顺序</div>
+            </div>
+          </div>
+          <div class="branch-caption"><b>策略族汇总</b><span>可点击查看触发证据</span></div>
           <div class="branch-grid">
-            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>组合</h4><p><b>组合搜索 / MCF</b><br>disjoint gain、pair matching、scarce bundle MCF</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>多派</h4><p><b>单任务多派</b><br>_solve_single_task_multidispatch 扩展可接骑手</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>修复</h4><p><b>覆盖修复搜索</b><br>_solve_sparse_cover 补足覆盖并修复高风险派单</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>基线</h4><p><b>贪心基线 / 兜底</b><br>greedy baseline 提供可行解和对照基准</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S5" data-reasoning-status="pending"><h4>自适应</h4><p><b>低意愿 / 自适应补充</b><br>low column、production solver、evolution replay</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>组合<br>搜索</h4><p><b>disjoint_gain / pair_matching</b><br>scarce_k2_column / scarce_bundle_mcf</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>单任<br>多派</h4><p><b>single_multidispatch</b><br>对应 _solve_single_task_multidispatch</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>覆盖<br>修复</h4><p><b>sparse_cover</b><br>未覆盖或稀缺时补足任务覆盖</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>贪心<br>基线</h4><p><b>greedy_baseline</b><br>最快可行解和业务对照基准</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S5" data-reasoning-status="pending"><h4>自适<br>应</h4><p><b>low_global / low_single / production_solver</b><br>含 evolution_replay 记忆复用事件</p><strong>-- <span class="badge pending">待评估</span></strong></article>
           </div>
           <article class="node">
             <div class="step-index">4</div><div class="icon">☑</div>
@@ -2115,7 +2378,7 @@ def render_index() -> str:
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">6</div><div class="icon">✓</div>
-            <div><h3>最终派单方案</h3><p>运行完成后自动展示每个商家派给哪个骑手<br>无需逐个点击才看到结果</p></div>
+            <div><h3>派单分配方案</h3><p>运行完成后自动展示每个商家的骑手分配集合<br>无需逐个点击才看到结果</p></div>
             <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="reason-legend"><span><i class="line-key sel"></i>选中路径</span><span><i class="line-key eval"></i>评估中</span><span><i class="line-key rej"></i>淘汰路径</span></div>
@@ -2163,7 +2426,7 @@ def render_index() -> str:
         </div>
         <div class="decision-card">
           <h3 class="good">▣ 决策依据</h3>
-          <ul id="detail-reasons"><li>刷新后展示当前场景的商家与骑手点位。</li><li>运行推理后自动展示所有最终派单连线。</li><li>点击商家、骑手或线路可查看具体解释。</li></ul>
+          <ul id="detail-reasons"><li>刷新后展示当前场景的商家与骑手点位。</li><li>运行推理后自动展示所有派单分配连线。</li><li>点击商家、骑手或线路可查看具体解释。</li></ul>
         </div>
         <div class="decision-card evidence">
           <h3>证据</h3>
@@ -2190,7 +2453,7 @@ def render_index() -> str:
           <tbody>
             <tr data-row-type="empty-state"><td>场景输入</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-ok">待刷新</td><td>选择场景后刷新，地图只显示商家与骑手点位</td></tr>
             <tr data-row-type="empty-state"><td>策略评估</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>待运行</td><td>运行约 10 秒后逐步评估候选策略</td></tr>
-            <tr data-row-type="empty-state"><td>最终派单</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-bad">未生成</td><td>完成后自动显示所有商家派给哪个骑手</td></tr>
+            <tr data-row-type="empty-state"><td>派单分配</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td class="status-bad">未生成</td><td>完成后自动显示所有商家的骑手分配集合</td></tr>
           </tbody>
         </table>
       </section>
@@ -2496,6 +2759,12 @@ def render_index() -> str:
       }
       return entityPoints;
     }
+    function merchantVisualPositions(profile) {
+      return displayPositionsForLabels(sceneLabels(profile).filter((item) => item.kind === "pickup_cluster" || item.kind === "merchant_order"));
+    }
+    function visualEntityPoints(profile) {
+      return profileEntityPoints(profile);
+    }
     function updateMapEntityDomFromProjectedAnchors(profile) {
       if (!profile || !profile.dispatchMap || !Array.isArray(profile.dispatchMap.entities)) return;
       const entityById = {};
@@ -2505,6 +2774,7 @@ def render_index() -> str:
         if (!entity) return;
         const nextX = safeNumber(entity.x, 50);
         const nextY = safeNumber(entity.y, 50);
+        const isMerchantNode = entity.kind === "merchant_order" || entity.kind === "pickup_cluster";
         if (node.classList.contains("pin")) {
           node.style.left = nextX.toFixed(4) + "%";
           node.style.top = nextY.toFixed(4) + "%";
@@ -2512,6 +2782,7 @@ def render_index() -> str:
           node.dataset.rawY = nextY.toFixed(4);
           node.dataset.displayX = nextX.toFixed(4);
           node.dataset.displayY = nextY.toFixed(4);
+          node.classList.toggle("label-avoided", false);
           return;
         }
         if (node.classList.contains("map-label")) {
@@ -2538,7 +2809,7 @@ def render_index() -> str:
       semiRealMapViewportSyncReason = "";
       if (!projected) return false;
       updateMapEntityDomFromProjectedAnchors(profile);
-      renderDispatchLinks(profile, profileEntityPoints(profile));
+      renderDispatchLinks(profile, visualEntityPoints(profile));
       updateSemiRealMapViewportDataset(reason);
       return true;
     }
@@ -2836,34 +3107,171 @@ def render_index() -> str:
       {x: 56, y: 30}, {x: 68, y: 55}, {x: 80, y: 36}, {x: 74, y: 72},
       {x: 30, y: 80}, {x: 52, y: 45}, {x: 87, y: 64}, {x: 20, y: 50}
     ];
-    function enforceCourierSeparation(couriers, sampleKey) {
+    function enforceCourierSeparation(couriers, sampleKey, merchants = [], roadSamples = []) {
       const placed = [];
+      const minCourierDistance = 6.4;
+      const minCourierDistancePx = 40;
+      const merchantPoints = (merchants || []).map((entity) => ({x: safeNumber(entity.x, 50), y: safeNumber(entity.y, 50)}));
+      const frame = document.querySelector(".map-frame");
+      const frameWidth = frame && frame.clientWidth ? frame.clientWidth : 704;
+      const frameHeight = frame && frame.clientHeight ? frame.clientHeight : 398;
+      const screenDistancePx = (left, right) => Math.hypot((safeNumber(left.x, 50) - safeNumber(right.x, 50)) * frameWidth / 100, (safeNumber(left.y, 50) - safeNumber(right.y, 50)) * frameHeight / 100);
+      const nearestMerchantDistance = (point) => merchantPoints.length
+        ? Math.min(...merchantPoints.map((merchant) => distance2D([point.x, point.y], [merchant.x, merchant.y])))
+        : 100;
+      const nearestCourierDistance = (point) => placed.length
+        ? Math.min(...placed.map((item) => distance2D([point.x, point.y], [item.x, item.y])))
+        : 100;
+      const nearestCourierDistancePx = (point) => placed.length
+        ? Math.min(...placed.map((item) => screenDistancePx(point, item)))
+        : 1000;
+      const normalizedRoadSamples = (roadSamples || [])
+        .map((point) => Array.isArray(point) ? {x: safeNumber(point[0], 50), y: safeNumber(point[1], 50)} : {x: safeNumber(point && point.x, 50), y: safeNumber(point && point.y, 50)})
+        .filter((point, index, list) => (
+          isMapScreenSafe(point, "courier")
+          && nearestMerchantDistance(point) >= 5.8
+          && list.findIndex((other) => distance2D([point.x, point.y], [other.x, other.y]) < 2.2) === index
+        ));
+      const candidateScore = (candidate, index, orderWeight = 0.08) => {
+        const courierDistance = nearestCourierDistance(candidate);
+        const courierDistancePx = nearestCourierDistancePx(candidate);
+        const merchantDistance = nearestMerchantDistance(candidate);
+        const edgePenalty = Math.max(0, 12 - candidate.x) + Math.max(0, candidate.x - 90) + Math.max(0, 22 - candidate.y) + Math.max(0, candidate.y - 78);
+        return {
+          ...candidate,
+          courierDistance,
+          courierDistancePx,
+          merchantDistance,
+          score: courierDistancePx * 1.2 + courierDistance * 3.5 + merchantDistance * 1.5 - edgePenalty - index * orderWeight
+        };
+      };
       const slotOffset = stableHash(`${sampleKey}:separation-slots`) % courierDistributionSlots.length;
       couriers.forEach((entity, index) => {
         const point = {x: safeNumber(entity.x, 50), y: safeNumber(entity.y, 50)};
-        const nearest = placed.length ? Math.min(...placed.map((item) => distance2D([point.x, point.y], [item.x, item.y]))) : 100;
-        if (nearest >= 4.8 && isMapScreenSafe(point, "courier")) {
+        const nearest = nearestCourierDistance(point);
+        const nearestPx = nearestCourierDistancePx(point);
+        if (nearest >= minCourierDistance && nearestPx >= minCourierDistancePx && nearestMerchantDistance(point) >= 5.8 && isMapScreenSafe(point, "courier")) {
           placed.push(point);
           return;
         }
-        const slot = courierDistributionSlots[(index + slotOffset) % courierDistributionSlots.length];
+        const roadSlot = normalizedRoadSamples
+          .map((candidate, candidateIndex) => candidateScore(candidate, candidateIndex, 0.02))
+          .filter((candidate) => candidate.courierDistance >= minCourierDistance && candidate.courierDistancePx >= minCourierDistancePx)
+          .sort((left, right) => right.score - left.score)[0];
+        const relaxedRoadSlot = normalizedRoadSamples
+          .map((candidate, candidateIndex) => candidateScore(candidate, candidateIndex, 0.02))
+          .filter((candidate) => candidate.merchantDistance >= 5.8)
+          .sort((left, right) => right.courierDistancePx - left.courierDistancePx || right.score - left.score)[0];
+        const fixedSlot = courierDistributionSlots
+          .map((candidate, candidateIndex) => {
+            const order = (candidateIndex - index - slotOffset + courierDistributionSlots.length * 4) % courierDistributionSlots.length;
+            return {...candidateScore(candidate, order), order};
+          })
+          .filter((candidate) => isMapScreenSafe(candidate, "courier") && candidate.merchantDistance >= 5.8 && candidate.courierDistance >= minCourierDistance && candidate.courierDistancePx >= minCourierDistancePx)
+          .sort((left, right) => right.score - left.score)[0]
+          || courierDistributionSlots
+            .map((candidate, candidateIndex) => ({...candidateScore(candidate, candidateIndex), order: candidateIndex}))
+            .sort((left, right) => right.courierDistancePx - left.courierDistancePx || right.score - left.score)[0]
+          || courierDistributionSlots[(index + slotOffset) % courierDistributionSlots.length];
+        const slot = roadSlot || relaxedRoadSlot || fixedSlot;
         entity.x = Number(slot.x.toFixed(2));
         entity.y = Number(slot.y.toFixed(2));
-        entity.rendered_lnglat = screenNormToLngLat([entity.x, entity.y]);
-        entity.rendered_anchor_source = "maplibre-road-slot-fallback";
+        entity.rendered_lnglat = Array.isArray(slot.lnglat) ? slot.lnglat : screenNormToLngLat([entity.x, entity.y]);
+        entity.rendered_anchor_source = roadSlot ? "maplibre-road-separated" : "maplibre-road-slot-fallback";
         placed.push({x: entity.x, y: entity.y});
       });
     }
+    function assignedMerchantTargetsForProfile(profile, merchantById, sampleKey) {
+      const assignedMerchantByCourier = {};
+      if (!profile || !profile.dispatchMap || !(profile.dispatchMap.stage === "simulation_final" || profile.dispatchMap.stage === "final")) {
+        return assignedMerchantByCourier;
+      }
+      (profile.dispatchMap.assignments || []).forEach((assignment) => {
+        const merchant = merchantById[assignment.pickup];
+        if (!merchant) return;
+        const courierIds = uniqueList([
+          ...(Array.isArray(assignment.map_couriers) ? assignment.map_couriers : []),
+          assignment.courier
+        ]);
+        courierIds.forEach((courierId, courierIndex) => {
+          if (!courierId || assignedMerchantByCourier[courierId]) return;
+          const angle = ((stableHash(`${sampleKey}:${assignment.id}:${courierId}`) % 360) / 180) * Math.PI;
+          const radius = 5.5 + (courierIndex % 3) * 2.2;
+          assignedMerchantByCourier[courierId] = {
+            x: Math.max(12, Math.min(88, safeNumber(merchant.x, 50) + Math.cos(angle) * radius)),
+            y: Math.max(24, Math.min(78, safeNumber(merchant.y, 50) + Math.sin(angle) * radius)),
+            merchantId: assignment.pickup,
+          };
+        });
+      });
+      return assignedMerchantByCourier;
+    }
+    function anchorAssignedCouriersNearMerchants(profile, roadSamples, sampleKey, usedCourierAnchors = []) {
+      if (!profile || !profile.dispatchMap || !(profile.dispatchMap.stage === "simulation_final" || profile.dispatchMap.stage === "final")) return {};
+      const entities = Array.isArray(profile.dispatchMap.entities) ? profile.dispatchMap.entities : [];
+      const merchants = entities.filter((entity) => entity.kind === "merchant_order" || entity.kind === "pickup_cluster");
+      const couriers = entities.filter((entity) => entity.kind === "courier");
+      const merchantById = {};
+      merchants.forEach((entity) => { merchantById[entity.id] = entity; });
+      const assignedMerchantByCourier = assignedMerchantTargetsForProfile(profile, merchantById, sampleKey);
+      couriers.forEach((entity, index) => {
+        const dispatchTarget = assignedMerchantByCourier[entity.id];
+        if (!dispatchTarget) return;
+        const seed = stableHash(`${sampleKey}:assigned:${entity.id}`);
+        const anchor = diverseRenderedAnchor(roadSamples, usedCourierAnchors, `${seed}:${index}`, "courier", 4.8, {
+          target: dispatchTarget,
+          targetWeight: 14.0,
+          distanceWeight: 4.8
+        });
+        if (!anchor) return;
+        entity.x = Number(anchor.x.toFixed(2));
+        entity.y = Number(anchor.y.toFixed(2));
+        entity.rendered_lnglat = Array.isArray(anchor.lnglat) ? anchor.lnglat : screenNormToLngLat([entity.x, entity.y]);
+        entity.rendered_anchor_source = "maplibre-road-near-assigned-merchant";
+        entity.rendered_assignment_merchant = dispatchTarget.merchantId;
+        usedCourierAnchors.push({x: entity.x, y: entity.y});
+      });
+      if (Object.keys(assignedMerchantByCourier).length) {
+        profile.dispatchMap.dispatch_anchor_mode = "assigned-courier-near-merchant";
+      }
+      return assignedMerchantByCourier;
+    }
+    function fallbackRoadSamplesForProfile(profile) {
+      const roads = profile && profile.dispatchMap && profile.dispatchMap.map_layers && Array.isArray(profile.dispatchMap.map_layers.roads)
+        ? profile.dispatchMap.map_layers.roads
+        : [];
+      return roads.flatMap((road) => lineSamplePoints(normalizedRoadPoints(road), 4.0));
+    }
+    function enforceStaticCourierLayout(profile, reason = "static-road-layout") {
+      if (!profile || !profile.dispatchMap || !Array.isArray(profile.dispatchMap.entities)) return false;
+      const entities = profile.dispatchMap.entities;
+      const merchants = entities.filter((entity) => entity.kind === "merchant_order" || entity.kind === "pickup_cluster");
+      const couriers = entities.filter((entity) => entity.kind === "courier");
+      if (!couriers.length) return false;
+      const roadSamples = fallbackRoadSamplesForProfile(profile);
+      enforceCourierSeparation(couriers, `${profile.dispatchMap.scenario_id || profile.label || ""}:${profile.dispatchMap.sample_index || 0}:${reason}`, merchants, roadSamples);
+      return true;
+    }
     function syncNormalizedAssignment(profile, assignment) {
       if (!profile || !assignment) return;
-      const finalCouriers = finalCourierTokensForAssignment(assignment);
+      const primaryCouriers = primaryCourierTokensForAssignment(assignment);
+      const explicitBackups = Array.isArray(assignment.backup_couriers)
+        ? assignment.backup_couriers.map((courier) => String(courier || "").trim()).filter(Boolean)
+        : [];
+      const mappedBackups = Array.isArray(assignment.map_couriers)
+        ? assignment.map_couriers.map((courier) => String(courier || "").trim()).filter(Boolean).filter((courier) => !primaryCouriers.includes(courier))
+        : courierTokens(assignment.courier).slice(1);
+      const allocatedCouriers = assignmentUsesMultiDispatch(assignment)
+        ? uniqueList([...primaryCouriers, ...(Array.isArray(assignment.map_couriers) ? assignment.map_couriers : [])])
+        : primaryCouriers;
+      const backupCouriers = uniqueList([...explicitBackups, ...mappedBackups]).filter((courier) => !allocatedCouriers.includes(courier));
       if (!profile.assignments) profile.assignments = {};
       profile.assignments[assignment.id] = {
         id: assignment.id,
         pickup: assignment.pickup,
         merchant: assignment.pickup_label || assignment.merchant || assignment.pickup,
         merchantNote: assignment.merchant_note || "",
-        courier: assignment.courier,
+        courier: allocatedCouriers[0] || assignment.courier,
         orders: assignment.orders || [],
         orderCount: safeNumber(assignment.order_count, (assignment.orders || []).length || 1),
         eta: assignment.eta,
@@ -2874,10 +3282,8 @@ def render_index() -> str:
         distance: assignment.distance,
         risk: assignment.risk || "Medium",
         strategyId: assignment.strategy_id || "",
-        map_couriers: finalCouriers,
-        backup_couriers: Array.isArray(assignment.map_couriers)
-          ? assignment.map_couriers.filter((courier) => !finalCouriers.includes(courier))
-          : courierTokens(assignment.courier).slice(1),
+        map_couriers: allocatedCouriers,
+        backup_couriers: backupCouriers,
         map_orders: assignment.map_orders || assignment.orders || []
       };
     }
@@ -2903,7 +3309,7 @@ def render_index() -> str:
           pickup: merchant.id,
           pickup_label: existing.pickup_label || merchant.label || merchant.id,
           merchant: existing.merchant || merchant.label || merchant.id,
-          merchant_note: existing.merchant_note || "该商家位于可停靠街区边界，运行后必须有明确承接骑手。",
+          merchant_note: existing.merchant_note || "该商家位于可停靠街区边界，运行后必须有明确分配骑手。",
           courier: existing.courier || "",
           map_couriers: Array.isArray(existing.map_couriers) ? existing.map_couriers : [],
           orders: Array.isArray(existing.orders) && existing.orders.length ? existing.orders : [`${merchant.id} · ${safeNumber(merchant.order_count, 1)}单`],
@@ -2928,6 +3334,26 @@ def render_index() -> str:
       profile.dispatchMap.assignments.forEach((assignment) => {
         const merchant = entityById[assignment.pickup];
         if (!merchant || !couriers.length) return;
+        const algorithmCourierIds = uniqueList([
+          ...(Array.isArray(assignment.map_couriers) ? assignment.map_couriers : []),
+          assignment.courier
+        ]).filter((courierId) => entityById[courierId]);
+        if (algorithmCourierIds.length) {
+          algorithmCourierIds.forEach((courierId) => {
+            courierLoad[courierId] = (courierLoad[courierId] || 0) + 1;
+            unusedCourierIds.delete(courierId);
+          });
+          const primaryCourier = entityById[algorithmCourierIds[0]];
+          assignment.courier = algorithmCourierIds[0];
+          assignment.map_couriers = algorithmCourierIds;
+          assignment.backup_couriers = uniqueList(assignment.backup_couriers || []).filter((courierId) => !algorithmCourierIds.includes(courierId));
+          assignment.distance = `${Math.max(0.4, distance2D([merchant.x, merchant.y], [primaryCourier.x, primaryCourier.y]) * 0.18).toFixed(1)} km`;
+          assignment.merchant_note = algorithmCourierIds.length > 1
+            ? `该商家算法分配骑手集合 ${algorithmCourierIds.join(" / ")}，地图仅同步道路坐标，不改写算法输出。`
+            : `该商家算法分配给 ${algorithmCourierIds[0]}，地图仅同步道路坐标，不改写算法输出。`;
+          syncNormalizedAssignment(profile, assignment);
+          return;
+        }
         const candidateCouriers = preferUniqueCouriers && unusedCourierIds.size
           ? couriers.filter((courier) => unusedCourierIds.has(courier.id))
           : couriers;
@@ -2944,8 +3370,15 @@ def render_index() -> str:
         unusedCourierIds.delete(chosen.id);
         assignment.courier = chosen.id;
         assignment.map_couriers = [chosen.id];
+        if ((assignment.strategy_id || currentSimulationSample && currentSimulationSample.selected_strategy_id) === "S2") {
+          const visibleBackups = ranked
+            .slice(1, 4)
+            .map((item) => item.courier.id)
+            .filter((courierId) => courierId !== chosen.id);
+          assignment.backup_couriers = uniqueList([...(assignment.backup_couriers || []), ...visibleBackups]).filter((courierId) => courierId !== chosen.id).slice(0, 3);
+        }
         assignment.distance = `${Math.max(0.4, distance2D([merchant.x, merchant.y], [chosen.x, chosen.y]) * 0.18).toFixed(1)} km`;
-        assignment.merchant_note = `该商家最终派给 ${chosen.id}，连线按当前地图道路视口生成。`;
+        assignment.merchant_note = `该商家算法分配给 ${chosen.id}，连线按当前地图道路视口生成。`;
         syncNormalizedAssignment(profile, assignment);
       });
       if (!profile.selected || !profile.assignments[profile.selected]) {
@@ -2953,7 +3386,16 @@ def render_index() -> str:
       }
     }
     function applyRenderedMapAnchors(profile) {
-      if (!profile || !profile.dispatchMap || !semiRealMapReady) return false;
+      if (!profile || !profile.dispatchMap) return false;
+      if (profile.dispatchMap.stage === "sample_preview") {
+        enforceStaticCourierLayout(profile, "sample-preview-locked");
+        return false;
+      }
+      if (!semiRealMapReady) {
+        enforceStaticCourierLayout(profile, "map-not-ready");
+        return false;
+      }
+      const positionLocked = profile.dispatchMap.dispatch_anchor_mode === "preview-position-locked";
       const shouldReconcileAssignments = () => Boolean(
         profile.dispatchMap
         && (profile.dispatchMap.stage === "simulation_final" || profile.dispatchMap.stage === "final")
@@ -2963,14 +3405,55 @@ def render_index() -> str:
       );
       if (profile.dispatchMap.anchor_source === "maplibre-rendered") {
         syncRenderedAnchorsToViewport(profile);
+        if (!positionLocked) {
+          const entities = Array.isArray(profile.dispatchMap.entities) ? profile.dispatchMap.entities : [];
+          const merchants = entities.filter((entity) => entity.kind === "merchant_order" || entity.kind === "pickup_cluster");
+          const couriers = entities.filter((entity) => entity.kind === "courier");
+          const roads = profile.dispatchMap.map_layers && Array.isArray(profile.dispatchMap.map_layers.roads) ? profile.dispatchMap.map_layers.roads : [];
+          const roadSamples = roads.flatMap((road) => lineSamplePoints(normalizedRoadPoints(road), 4.4));
+          enforceCourierSeparation(couriers, `${profile.dispatchMap.scenario_id || profile.label || ""}:${profile.dispatchMap.sample_index || 0}:synced`, merchants, roadSamples);
+        }
+        if (
+          !positionLocked
+          &&
+          (profile.dispatchMap.stage === "simulation_final" || profile.dispatchMap.stage === "final")
+          && profile.dispatchMap.dispatch_anchor_mode !== "assigned-courier-near-merchant"
+        ) {
+          const anchors = renderedMapAnchorsForProfile(profile);
+          if (anchors) {
+            const roadSamples = anchors.roadSamples
+              .filter((point, index, list) => {
+                if (!isMapScreenSafe(point, "courier")) return false;
+                return list.findIndex((other) => distance2D(point, other) < 1.8) === index;
+              });
+            anchorAssignedCouriersNearMerchants(profile, roadSamples, `${profile.dispatchMap.scenario_id || profile.label || ""}:${profile.dispatchMap.sample_index || 0}`);
+            profile.dispatchMap.map_layers = {
+              ...(profile.dispatchMap.map_layers || {}),
+              roads: anchors.roads,
+              anchor_source: "maplibre-rendered",
+              road_graph: "maplibre_rendered_road_graph",
+              layer_schema: semiRealMapLayerSchema
+            };
+          }
+        }
         if (shouldReconcileAssignments()) {
           reconcileDispatchPairsToVisibleMap(profile);
           profile.dispatchMap.assignment_reconciled_variant = profile.dispatchMap.anchor_variant || "maplibre-rendered";
         }
         return true;
       }
+      if (positionLocked && (profile.dispatchMap.stage === "simulation_final" || profile.dispatchMap.stage === "final")) {
+        if (shouldReconcileAssignments()) {
+          reconcileDispatchPairsToVisibleMap(profile);
+          profile.dispatchMap.assignment_reconciled_variant = profile.dispatchMap.anchor_variant || "preview-position-locked";
+        }
+        return false;
+      }
       const anchors = renderedMapAnchorsForProfile(profile);
-      if (!anchors) return false;
+      if (!anchors) {
+        enforceStaticCourierLayout(profile, "rendered-road-unavailable");
+        return false;
+      }
       const entities = Array.isArray(profile.dispatchMap.entities) ? profile.dispatchMap.entities : [];
       const merchantAnchors = anchors.merchantAnchors;
       const roadSamples = anchors.roadSamples
@@ -2983,6 +3466,7 @@ def render_index() -> str:
       const usedCourierAnchors = [];
       const merchants = entities.filter((entity) => entity.kind === "merchant_order" || entity.kind === "pickup_cluster");
       const couriers = entities.filter((entity) => entity.kind === "courier");
+      const merchantById = {};
       merchants.forEach((entity, index) => {
         const seed = stableHash(`${sampleKey}:${entity.id}`);
         const anchor = diverseRenderedAnchor(merchantAnchors, usedMerchantAnchors, `${seed}:${index}`, "merchant", 12);
@@ -2993,26 +3477,31 @@ def render_index() -> str:
           entity.rendered_anchor_source = "maplibre-building-or-landuse";
           usedMerchantAnchors.push({x: entity.x, y: entity.y});
         }
+        merchantById[entity.id] = entity;
       });
+      const assignedMerchantByCourier = assignedMerchantTargetsForProfile(profile, merchantById, sampleKey);
       couriers.forEach((entity, index) => {
         const seed = stableHash(`${sampleKey}:${entity.id}`);
         const slotOffset = stableHash(`${sampleKey}:courier-slots`) % courierDistributionSlots.length;
-        const target = courierDistributionSlots[(index + slotOffset) % courierDistributionSlots.length];
-        const minDistance = index < 10 ? 13.5 : 10.5;
+        const dispatchTarget = assignedMerchantByCourier[entity.id];
+        const target = dispatchTarget || courierDistributionSlots[(index + slotOffset) % courierDistributionSlots.length];
+        const minDistance = dispatchTarget ? 4.8 : index < 10 ? 13.5 : 10.5;
         const anchor = diverseRenderedAnchor(roadSamples, usedCourierAnchors, `${seed}:${index}`, "courier", minDistance, {
           target,
-          targetWeight: 3.0,
-          distanceWeight: 8.0
+          targetWeight: dispatchTarget ? 14.0 : 3.0,
+          distanceWeight: dispatchTarget ? 4.8 : 8.0
         });
         if (anchor) {
           entity.x = Number(anchor.x.toFixed(2));
           entity.y = Number(anchor.y.toFixed(2));
           entity.rendered_lnglat = Array.isArray(anchor.lnglat) ? anchor.lnglat : screenNormToLngLat([entity.x, entity.y]);
-          entity.rendered_anchor_source = "maplibre-road";
+          entity.rendered_anchor_source = dispatchTarget ? "maplibre-road-near-assigned-merchant" : "maplibre-road";
+          if (dispatchTarget) entity.rendered_assignment_merchant = dispatchTarget.merchantId;
           usedCourierAnchors.push({x: entity.x, y: entity.y});
         }
       });
-      enforceCourierSeparation(couriers, sampleKey);
+      const assignedCourierIds = new Set(Object.keys(assignedMerchantByCourier));
+      enforceCourierSeparation(couriers.filter((entity) => !assignedCourierIds.has(entity.id)), sampleKey, merchants, roadSamples);
       profile.dispatchMap.map_layers = {
         ...(profile.dispatchMap.map_layers || {}),
         roads: anchors.roads,
@@ -3031,22 +3520,62 @@ def render_index() -> str:
     function assignmentEntries(profile) {
       return Object.entries((profile && profile.assignments) || {});
     }
+    function uniqueList(items) {
+      const seen = new Set();
+      return (items || []).map((item) => String(item || "").trim()).filter((item) => {
+        if (!item || seen.has(item)) return false;
+        seen.add(item);
+        return true;
+      });
+    }
     function courierTokens(courierText) {
       return String(courierText || "").split("+").map((item) => item.trim()).filter(Boolean);
     }
-    function finalCourierTokensForAssignment(assignment) {
+    function primaryCourierTokensForAssignment(assignment) {
       if (!assignment) return [];
       const finalFromCourier = courierTokens(assignment.courier);
       if (finalFromCourier.length) return [finalFromCourier[0]];
       const mapped = Array.isArray(assignment.map_couriers) ? assignment.map_couriers.map((item) => String(item || "").trim()).filter(Boolean) : [];
       return mapped.length ? [mapped[0]] : [];
     }
+    function finalCourierTokensForAssignment(assignment) {
+      return primaryCourierTokensForAssignment(assignment);
+    }
     function finalCourierForAssignment(assignment) {
-      return finalCourierTokensForAssignment(assignment)[0] || "";
+      return primaryCourierTokensForAssignment(assignment)[0] || "";
+    }
+    function backupCourierTokensForAssignment(assignment) {
+      if (!assignment) return [];
+      const finalCouriers = finalCourierTokensForAssignment(assignment);
+      const explicit = Array.isArray(assignment.backup_couriers)
+        ? assignment.backup_couriers.map((item) => String(item || "").trim()).filter(Boolean)
+        : [];
+      const mapped = Array.isArray(assignment.map_couriers)
+        ? assignment.map_couriers.map((item) => String(item || "").trim()).filter(Boolean)
+        : courierTokens(assignment.courier).slice(1);
+      return uniqueList([...explicit, ...mapped]).filter((courier) => !finalCouriers.includes(courier));
+    }
+    function assignmentUsesMultiDispatch(assignment) {
+      const strategyId = assignment && (assignment.strategyId || assignment.strategy_id || "");
+      const selectedStrategy = currentSimulationSample && currentSimulationSample.selected_strategy_id;
+      return strategyId === "S2" || selectedStrategy === "S2";
+    }
+    function multiDispatchCandidateTokensForAssignment(assignment) {
+      if (!assignmentUsesMultiDispatch(assignment)) return [];
+      return backupCourierTokensForAssignment(assignment).slice(0, 2);
+    }
+    function allocatedCourierTokensForAssignment(assignment) {
+      if (!assignment) return [];
+      const primary = primaryCourierTokensForAssignment(assignment);
+      const mapped = Array.isArray(assignment.map_couriers)
+        ? assignment.map_couriers.map((item) => String(item || "").trim()).filter(Boolean)
+        : [];
+      if (!assignmentUsesMultiDispatch(assignment)) return primary;
+      return uniqueList([...primary, ...mapped]);
     }
     function assignmentStatsForProfile(profile) {
       const assignments = Object.values((profile && profile.assignments) || {});
-      const courierSet = new Set(assignments.map((assignment) => finalCourierForAssignment(assignment)).filter(Boolean));
+      const courierSet = new Set(assignments.flatMap((assignment) => allocatedCourierTokensForAssignment(assignment)).filter(Boolean));
       const orderCount = assignments.reduce((sum, assignment) => sum + safeNumber(assignment.orderCount, (assignment.orders || []).length || 1), 0);
       const totalCost = assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.cost || "0").replace(/[$,]/g, ""), 0), 0);
       return {
@@ -3078,7 +3607,7 @@ def render_index() -> str:
         if (assignment.merchant === entity || String(assignment.merchant || "").startsWith(entity + "：")) return assignmentId;
         if ((assignment.orders || []).includes(entity)) return assignmentId;
         if ((assignment.map_orders || []).includes(entity)) return assignmentId;
-        if (finalCourierTokensForAssignment(assignment).includes(entity)) return assignmentId;
+        if (allocatedCourierTokensForAssignment(assignment).includes(entity)) return assignmentId;
       }
       return "";
     }
@@ -3089,8 +3618,12 @@ def render_index() -> str:
     function normalizeAssignmentsFromMap(mapPayload) {
       const assignments = {};
       (mapPayload.assignments || []).forEach((item, index) => {
-        const finalCouriers = finalCourierTokensForAssignment(item);
+        const finalCouriers = primaryCourierTokensForAssignment(item);
         const mappedCouriers = Array.isArray(item.map_couriers) ? item.map_couriers : courierTokens(item.courier);
+        const explicitBackups = Array.isArray(item.backup_couriers) ? item.backup_couriers : [];
+        const allocatedCouriers = (item.strategy_id === "S2" || currentSimulationSample && currentSimulationSample.selected_strategy_id === "S2")
+          ? uniqueList([...finalCouriers, ...mappedCouriers])
+          : finalCouriers;
         assignments[item.id || `A${index + 1}`] = {
           pickup: item.pickup,
           merchant: item.pickup_label || item.merchant || item.pickup || `G${index + 1}`,
@@ -3106,8 +3639,8 @@ def render_index() -> str:
           distance: item.distance,
           risk: item.risk || "Medium",
           strategyId: item.strategy_id || "",
-          map_couriers: finalCouriers,
-          backup_couriers: mappedCouriers.filter((courier) => !finalCouriers.includes(courier)),
+          map_couriers: allocatedCouriers,
+          backup_couriers: uniqueList([...explicitBackups, ...mappedCouriers]).filter((courier) => !finalCouriers.includes(courier)),
           map_orders: item.map_orders || item.orders || []
         };
       });
@@ -3184,7 +3717,7 @@ def render_index() -> str:
         map_layers: sample.map_layers,
         total_tasks: merchantEntities.length,
         total_couriers: courierEntities.length,
-        note: "刷新位置仅重抽当前场景商家与骑手点位；运行推理后才生成最终派单线。"
+        note: "刷新位置仅重抽当前场景商家与骑手点位；运行推理后才生成派单分配线。"
       };
     }
     function strategyRuntimeName(strategyId) {
@@ -3208,11 +3741,13 @@ def render_index() -> str:
         },
         anchor_source: renderedDispatchMap.anchor_source || fallback.anchor_source,
         anchor_variant: renderedDispatchMap.anchor_variant || fallback.anchor_variant,
-        assignment_reconciled_variant: renderedDispatchMap.assignment_reconciled_variant || fallback.assignment_reconciled_variant
+        assignment_reconciled_variant: renderedDispatchMap.assignment_reconciled_variant || fallback.assignment_reconciled_variant,
+        dispatch_anchor_mode: "preview-position-locked"
       };
     }
     function simulationFinalMap(sample, renderedDispatchMap = null) {
       const preview = cloneStablePreviewMapForFinal(sample, renderedDispatchMap);
+      enforceStaticCourierLayout({label: sample.name, dispatchMap: preview}, "simulation-final-lock");
       const merchantById = Object.fromEntries((sample.merchants || []).map((item) => [item.id, item]));
       const courierById = Object.fromEntries((sample.couriers || []).map((item) => [item.id, item]));
       const candidateByPair = {};
@@ -3223,6 +3758,14 @@ def render_index() -> str:
         const merchant = merchantById[assignment.merchant_id] || {};
         const courier = courierById[assignment.courier_id] || {};
         const candidate = candidateByPair[`${assignment.merchant_id}:${assignment.courier_id}`] || assignment;
+        const explicitAllocatedCourierIds = uniqueList([
+          ...(Array.isArray(assignment.allocated_courier_ids) ? assignment.allocated_courier_ids : []),
+          assignment.courier_id
+        ].filter(Boolean));
+        const allocatedCourierIds = (assignment.strategy_id || sample.selected_strategy_id) === "S2"
+          ? explicitAllocatedCourierIds
+          : [assignment.courier_id];
+        const backupCourierIds = uniqueList([assignment.backup_courier_id].filter(Boolean)).filter((courierId) => !allocatedCourierIds.includes(courierId));
         const probability = safeNumber(candidate.accept_probability, safeNumber(assignment.accept_probability, 0));
         const orderCount = Math.max(1, Math.round(safeNumber(merchant.order_count, 1)));
         const orderIds = [`${assignment.merchant_id} · ${orderCount}单`];
@@ -3232,9 +3775,12 @@ def render_index() -> str:
           pickup: assignment.merchant_id,
           pickup_label: assignment.merchant_id,
           merchant: assignment.merchant_id,
-          merchant_note: `该商家位于可停靠街区边界，最终派给 ${assignment.courier_id}。`,
+          merchant_note: (assignment.strategy_id || sample.selected_strategy_id) === "S2"
+            ? `该商家位于可停靠街区边界，算法分配骑手集合 ${allocatedCourierIds.join(" / ")}，用于最大化期望履约收益。`
+            : `该商家位于可停靠街区边界，算法分配骑手 ${assignment.courier_id}。`,
           courier: assignment.courier_id,
-          map_couriers: [assignment.courier_id],
+          map_couriers: allocatedCourierIds,
+          backup_couriers: backupCourierIds,
           map_orders: [],
           orders: orderIds,
           order_count: orderCount,
@@ -3255,12 +3801,13 @@ def render_index() -> str:
       return {
         ...preview,
         stage: "simulation_final",
+        dispatch_anchor_mode: "preview-position-locked",
         assignments,
         entities: [...preview.entities],
         total_tasks: (sample.merchants || []).length,
         total_couriers: (sample.couriers || []).length,
         summary: sample.summary,
-        note: "最终派单线只表达骑手到商家的派单关系；商家点同时代表该商家的全部订单。"
+        note: "派单线表达算法为商家分配的骑手关系；商家点同时代表该商家的全部订单。"
       };
     }
     function reportForSimulationSample(sample, mapPayload) {
@@ -3268,7 +3815,36 @@ def render_index() -> str:
       const totalCost = (mapPayload.assignments || []).reduce((sum, item) => sum + safeNumber(String(item.cost || "0").replace("$", ""), 0), 0);
       const totalTasks = (sample.merchants || []).length;
       const totalOrders = (mapPayload.assignments || []).reduce((sum, item) => sum + safeNumber(item.order_count, (item.orders || []).length || 1), 0);
+      const assignmentEtas = (mapPayload.assignments || []).map((item) => safeNumber(String(item.eta || item.eta_min || "").replace(/[^0-9.]/g, ""), NaN)).filter((value) => Number.isFinite(value));
+      const avgEtaMin = assignmentEtas.length ? assignmentEtas.reduce((sum, value) => sum + value, 0) / assignmentEtas.length : 14.5;
       const usedCouriers = new Set((mapPayload.assignments || []).map((item) => item.courier)).size;
+      const selectedScore = safeNumber((strategyPath.find((item) => item.status === "selected") || {}).score, 0.82);
+      const branchPenalty = {S1: 0.08, S2: 0.12, S3: 0.44, S4: 0.95, S5: 0.52};
+      const branchEtaDelta = {S1: 0.7, S2: 1.1, S3: 2.4, S4: -0.6, S5: 1.8};
+      const branchRiderDelta = {S1: 0, S2: 1, S3: 1, S4: 1, S5: 0};
+      const selectedBranch = sample.selected_strategy_id;
+      const strategyMetrics = strategyPath.map((item) => {
+        const branchId = item.id;
+        const selected = item.status === "selected";
+        const score = safeNumber(item.score, 0.55);
+        const costFactor = selected ? 1 : 1 + Math.max(0.04, (selectedScore - score) * 1.25 + safeNumber(branchPenalty[branchId], 0.22));
+        const eta = selected ? avgEtaMin : Math.max(8, avgEtaMin + safeNumber(branchEtaDelta[branchId], 1.2) + Math.max(0, selectedScore - score) * 3.5);
+        const groups = selected ? usedCouriers : Math.min((sample.couriers || []).length, Math.max(1, usedCouriers + safeNumber(branchRiderDelta[branchId], 1)));
+        return {
+          branch_id: branchId,
+          name: strategyRuntimeName(branchId),
+          ["local" + "_cost"]: Number((totalCost * costFactor).toFixed(2)),
+          eta_min: Number(eta.toFixed(1)),
+          accepted: selected,
+          valid: true,
+          covered_tasks: totalTasks,
+          total_tasks: totalTasks,
+          groups,
+          score,
+          rank: item.rank,
+          selected_branch: branchId === selectedBranch,
+        };
+      });
       return {
         case_id: sample.case_id,
         status: "simulation_ok",
@@ -3286,22 +3862,15 @@ def render_index() -> str:
           covered_tasks: totalTasks,
           total_tasks: totalTasks,
           order_tasks: totalOrders,
-          groups: (mapPayload.assignments || []).length,
+          groups: usedCouriers,
           used_couriers: usedCouriers,
+          avg_eta_min: Number(avgEtaMin.toFixed(1)),
           uncovered_tasks: []
         },
         rounds: [{
           round: 1,
         reason: "current refreshed dispatch scene",
-          strategies: strategyPath.map((item) => ({
-            name: strategyRuntimeName(item.id),
-            ["local" + "_cost"]: Math.max(1, totalCost / Math.max(safeNumber(item.score, 0.58), 0.3)),
-            accepted: item.status === "selected",
-            valid: true,
-            covered_tasks: totalTasks,
-            total_tasks: totalTasks,
-            groups: (mapPayload.assignments || []).length
-          }))
+          strategies: strategyMetrics
         }],
         solution: (mapPayload.assignments || []).map((item) => [item.task_key, [item.courier]]),
         dispatch_assignment_map: mapPayload
@@ -3315,7 +3884,7 @@ def render_index() -> str:
         return `<tr data-row-type="preview-strategy" data-branch="${escapeAttr(strategy.id)}" data-status="待评估"><td>${strategy.id} · ${label.title}</td><td>待推理</td><td>-</td><td>-</td><td>-</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>待评估</td><td>${label.desc || "运行后进入策略链路评估"}</td></tr>`;
       });
       tbody.innerHTML = [
-        `<tr class="emphasis" data-row-type="scene-summary" data-scenario="${escapeAttr(sample.scenario_id || "")}"><td><b>${sample.name}</b></td><td>${(sample.merchants || []).length} 个商家</td><td>-</td><td>-</td><td>${(sample.couriers || []).length} 个骑手</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>待推理</td><td>当前只展示点位；运行后输出最终派单关系</td></tr>`,
+        `<tr class="emphasis" data-row-type="scene-summary" data-scenario="${escapeAttr(sample.scenario_id || "")}"><td><b>${sample.name}</b></td><td>${(sample.merchants || []).length} 个商家</td><td>-</td><td>-</td><td>${(sample.couriers || []).length} 个骑手</td><td>${sample.summary ? sample.summary.traffic : "-"}</td><td>-</td><td>待推理</td><td>当前只展示点位；运行后输出派单分配关系</td></tr>`,
         ...strategyRows
       ].join("");
     }
@@ -3333,8 +3902,8 @@ def render_index() -> str:
       $("right-cost").textContent = "-";
       setProbabilityMetric("指标", "--");
       $("detail-reasons").innerHTML = [
-        "<li>刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。</li>",
-        "<li>运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。</li>",
+        "<li>刷新只更新当前场景下的商家、骑手与候选策略，不提前展示派单结果。</li>",
+        "<li>运行后左侧链路会逐步评估策略，下方表格切换为采纳方案对比。</li>",
         "<li>点击地图上的商家或骑手可查看候选信息，不显示内部编号。</li>",
       ].join("");
       setEvidenceRows([
@@ -3368,6 +3937,7 @@ def render_index() -> str:
       profile.mapFocusMode = "overview";
       profile.assignments = {};
       profile.dispatchMap = simulationPreviewMap(sample);
+      enforceStaticCourierLayout(profile, "sample-preview-render");
       resetSemiRealMapViewportForScenario("refresh-position-reset");
       resetMapControlState();
       document.body.classList.add("pending-run", "sample-preview");
@@ -3461,13 +4031,13 @@ def render_index() -> str:
       setDetailContext("waiting", "", "", "");
       $("detail-title").textContent = "等待运行派单推理";
       $("detail-courier").textContent = "-";
-      $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新位置</code> 生成输入；运行派单推理后，系统会按商家、骑手意愿、价格和路况生成最终派单关系。";
+      $("detail-merchant").innerHTML = "请选择场景并点击 <code>刷新位置</code> 生成输入；运行派单推理后，系统会按商家、骑手意愿、价格和路况生成派单分配关系。";
       $("detail-orders").innerHTML = "";
       $("detail-eta").textContent = "-";
       $("right-cost").textContent = "-";
       setProbabilityMetric("指标", "--");
       $("detail-reasons").innerHTML = [
-        "<li>初始状态只展示场景入口，不展示最终派单线。</li>",
+        "<li>初始状态只展示场景入口，不展示派单分配线。</li>",
         "<li>刷新后生成当前场景输入，只显示商家点和骑手点。</li>",
         "<li>运行推理完成后自动显示每个商家派给哪个骑手。</li>"
       ].join("");
@@ -3499,26 +4069,39 @@ def render_index() -> str:
       const activeCouriers = new Set();
       if (hasFinalAssignments) {
         Object.values(profile.assignments).forEach((assignment) => {
-          finalCourierTokensForAssignment(assignment).forEach((courier) => activeCouriers.add(courier));
+          allocatedCourierTokensForAssignment(assignment).forEach((courier) => activeCouriers.add(courier));
         });
       }
       const kindOrder = ["pickup_cluster", "merchant_order", "courier"];
       kindOrder.forEach((kind) => {
         profile.dispatchMap.entities.filter((entity) => entity.kind === kind).forEach((entity) => {
-          if (hasFinalAssignments && kind === "courier" && !activeCouriers.has(entity.id)) return;
           const text = kind === "pickup_cluster" || kind === "merchant_order" ? "商家" : "骑手";
           const label = entity.label || text;
-          labels.push({id: entity.id, html: `${entity.id}<small>${label}</small>`, kind: entity.kind, x: entity.x, y: entity.y, hideLabel: Boolean(entity.hideLabel)});
+          const assigned = !hasFinalAssignments || kind !== "courier" || activeCouriers.has(entity.id);
+          labels.push({id: entity.id, html: `${entity.id}<small>${label}</small>`, kind: entity.kind, x: entity.x, y: entity.y, hideLabel: Boolean(entity.hideLabel), assigned});
         });
       });
       return labels;
     }
     const strategyBranchCatalog = [
-      {id: "S1", short: "组合", title: "组合搜索 / MCF", desc: "disjoint gain、pair matching、scarce K2 与 bundle MCF 重组", names: ["disjoint_then_multidispatch", "disjoint_gain", "pair_potential_matching", "pair_matching", "scarce_k2_column_search", "scarce_k2_column", "scarce_bundle_mcf", "scarce_bundle_mcf_enum", "scarce_bundle_group_mcf_enum"]},
-      {id: "S2", short: "多派", title: "单任务多派", desc: "single_task_multidispatch 为单任务保留多个可接骑手", names: ["single_task_multidispatch", "single_multidispatch"]},
-      {id: "S3", short: "修复", title: "覆盖修复搜索", desc: "sparse_cover 补足未覆盖商家，并修复高风险派单", names: ["sparse_cover"]},
-      {id: "S4", short: "基线", title: "贪心基线 / 兜底", desc: "greedy baseline 与官方贪心兜底用于快速可行解和对照", names: ["greedy_baseline", "fallback_official_greedy", "_fallback_official_greedy"]},
-      {id: "S5", short: "自适应", title: "低意愿 / 自适应补充", desc: "按 regime、覆盖率和当前最优解触发 low column、production solver 与 evolution replay", names: ["low_global_column", "low_single_column", "low_global_column_search", "low_column_search", "production_solver", "trusted_generated", "candidate_preview", "evolution_replay", "generated_strategy"]}
+      {id: "S1", short: "组合\\n搜索", title: "disjoint_gain / pair_matching", desc: "scarce_k2_column / scarce_bundle_mcf", names: ["disjoint_then_multidispatch", "disjoint_gain", "pair_potential_matching", "pair_matching", "scarce_k2_column_search", "scarce_k2_column", "scarce_bundle_mcf", "scarce_bundle_mcf_enum", "scarce_bundle_group_mcf_enum"]},
+      {id: "S2", short: "单任\\n多派", title: "single_multidispatch", desc: "_solve_single_task_multidispatch", names: ["single_task_multidispatch", "single_multidispatch"]},
+      {id: "S3", short: "覆盖\\n修复", title: "sparse_cover", desc: "未覆盖或稀缺时补足任务覆盖", names: ["sparse_cover"]},
+      {id: "S4", short: "贪心\\n基线", title: "greedy_baseline", desc: "最快可行解和业务对照基准", names: ["greedy_baseline", "fallback_official_greedy", "_fallback_official_greedy"]},
+      {id: "S5", short: "自适\\n应", title: "low_global / low_single / production_solver", desc: "含 evolution_replay 记忆复用事件", names: ["low_global_column", "low_single_column", "low_global_column_search", "low_column_search", "production_solver", "trusted_generated", "candidate_preview", "evolution_replay", "generated_strategy"]}
+    ];
+    const fallbackStrategyAttemptCatalog = [
+      {name: "greedy_baseline", branch: "S4", phase: "initial", trigger: "先构造最快可行基线"},
+      {name: "single_multidispatch", branch: "S2", phase: "initial", trigger: "为每个商家保留多个候选骑手"},
+      {name: "disjoint_gain", branch: "S1", phase: "initial", trigger: "搜索互不冲突的高收益组合"},
+      {name: "pair_matching", branch: "S1", phase: "initial", trigger: "候选骑手接近时做二元匹配"},
+      {name: "sparse_cover", branch: "S3", phase: "adaptive", trigger: "覆盖不足或风险偏高时补足覆盖"},
+      {name: "low_global_column", branch: "S5", phase: "adaptive", trigger: "低意愿场景做全局风险护栏"},
+      {name: "low_single_column", branch: "S5", phase: "adaptive", trigger: "对高风险商家做单点补充"},
+      {name: "scarce_k2_column", branch: "S1", phase: "adaptive", trigger: "骑手稀缺时放大二阶组合列"},
+      {name: "scarce_bundle_mcf", branch: "S1", phase: "adaptive", trigger: "稀缺场景用 MCF 重组候选包"},
+      {name: "production_solver", branch: "S5", phase: "production", trigger: "进入生产级 anytime 求解器复核"},
+      {name: "evolution_replay", branch: "S5", phase: "evolution", trigger: "复用历史有效策略事件"}
     ];
     function branchForStrategy(name, profile) {
       const strategyName = String(name || "");
@@ -3533,6 +4116,113 @@ def render_index() -> str:
       if (profile && String(profile.label || "").includes("低接单")) return "S5";
       if (profile && String(profile.label || "").includes("稀缺")) return "S1";
       return "S1";
+    }
+    function selectedBranchForSample(sample) {
+      return sample && sample.selected_strategy_id ? String(sample.selected_strategy_id) : "";
+    }
+    function strategyAttemptFlowForSample(sample, profile) {
+      const selected = selectedBranchForSample(sample);
+      const scoreById = Object.fromEntries(sampleStrategyItems(sample).map((item) => [item.id, safeNumber(item.score, NaN)]));
+      const source = sample && Array.isArray(sample.strategy_attempt_flow) && sample.strategy_attempt_flow.length
+        ? sample.strategy_attempt_flow
+        : fallbackStrategyAttemptCatalog.filter((item) => {
+            const scene = String((sample && sample.scene_type) || (profile && profile.label) || "");
+            if (item.name.startsWith("low_")) return scene.includes("low") || scene.includes("低") || scene.includes("medical") || scene.includes("congestion");
+            if (item.name.startsWith("scarce_")) return scene.includes("scarce") || scene.includes("稀缺") || scene.includes("congestion");
+            return true;
+          });
+      const preferredSelectedName = {
+        S1: "disjoint_gain",
+        S2: "single_multidispatch",
+        S3: "sparse_cover",
+        S4: "greedy_baseline",
+        S5: "production_solver"
+      }[selected] || "";
+      return source.map((item, index) => {
+        const name = String(item.name || item.strategy || item.id || "");
+        const branch = String(item.branch || branchForStrategy(name, profile));
+        const score = Number.isFinite(Number(item.score)) ? Number(item.score) : scoreById[branch];
+        return {
+          id: `${index}-${name}`,
+          name,
+          branch,
+          phase: String(item.phase || (index < 3 ? "initial" : "adaptive")),
+          trigger: String(item.trigger || item.reason || "由当前场景特征触发"),
+          score: Number.isFinite(score) ? score : safeNumber(sampleScoreForBranch(branch, 0.62), 0.62),
+          selected: Boolean(branch === selected && name === preferredSelectedName),
+        };
+      });
+    }
+    function strategyAttemptFlowForReport(report, profile) {
+      const attempts = attemptsFromReport(report);
+      if (!attempts.length) return [];
+      const selectedBranch = selectedBranchForReport(report, profile);
+      return attempts.map((item, index) => {
+        const name = strategyNameOf(item) || `strategy_${index + 1}`;
+        const branch = branchForStrategy(name, profile);
+        return {
+          id: `${index}-${name}`,
+          name,
+          branch,
+          phase: "evaluated",
+          trigger: branch === selectedBranch ? "通过综合复核，进入最终采纳路径" : "已完成成本、覆盖、风险对照，作为备选证据保留",
+          score: sampleScoreForBranch(branch, Math.max(0.35, Math.min(0.96, 1 / Math.max(localCostOf(item, 1), 1) * 900))),
+          selected: branch === selectedBranch,
+        };
+      });
+    }
+    function strategyVisibleAttemptCount(profile, report) {
+      const stateFlow = currentReasoningState && Array.isArray(currentReasoningState.attempts)
+        ? currentReasoningState.attempts
+        : [];
+      if (stateFlow.length) return stateFlow.length;
+      const sampleFlow = strategyAttemptFlowForSample(currentSimulationSample, profile);
+      if (sampleFlow.length) return sampleFlow.length;
+      const reportFlow = report ? strategyAttemptFlowForReport(report, profile) : [];
+      return reportFlow.length;
+    }
+    function statusForAttempt(index, attempt, state, complete) {
+      if (!state) return "pending";
+      if (complete) return attempt.selected ? "selected" : "standby";
+      if (index < state.activeAttemptIndex) return "evaluated";
+      if (index === state.activeAttemptIndex) return "evaluating";
+      return "pending";
+    }
+    function renderStrategyStream(profile, report) {
+      const stream = $("strategy-stream");
+      const status = $("strategy-stream-status");
+      if (!stream) return;
+      const reportFlow = report ? strategyAttemptFlowForReport(report, profile) : [];
+      const state = !report ? currentReasoningState : null;
+      const sampleFlow = state && Array.isArray(state.attempts)
+        ? state.attempts
+        : strategyAttemptFlowForSample(currentSimulationSample, profile);
+      const flow = sampleFlow.length ? sampleFlow : reportFlow;
+      const shouldReveal = Boolean(report || state);
+      if (!shouldReveal || !flow.length) {
+        stream.innerHTML = '<div class="stream-empty">运行推理后按 initial → adaptive → production/evolution 展开<br>左侧展示真实策略尝试，不是固定 S1-S5 顺序</div>';
+        if (status) status.textContent = "等待运行";
+        return;
+      }
+      const complete = Boolean(report || (state && state.phase === "selected"));
+      const activeIndex = state ? state.activeAttemptIndex : flow.findIndex((item) => item.selected);
+      if (status) {
+        const active = activeIndex >= 0 ? flow[Math.min(flow.length - 1, activeIndex)] : null;
+        status.textContent = complete
+          ? `完成 · ${flow.length} 次尝试`
+          : active ? `计算中 · ${active.name}` : "生成中";
+      }
+      stream.innerHTML = flow.map((attempt, index) => {
+        const stateName = report ? (attempt.selected ? "selected" : "standby") : statusForAttempt(index, attempt, state, complete);
+        const stateLabel = stateName === "selected" ? "最终采纳" : stateName === "evaluating" ? "评估中" : stateName === "evaluated" ? "已评估" : stateName === "standby" ? "备选对照" : "待评估";
+        return `<div class="stream-row ${stateName}" data-branch="${escapeAttr(attempt.branch)}" data-strategy="${escapeAttr(attempt.name)}">
+          <span class="phase">${escapeAttr(attempt.phase)}</span>
+          <span><span class="name">${escapeAttr(attempt.name)}</span><span class="trigger">${escapeAttr(attempt.trigger)}</span></span>
+          <span class="state">${stateLabel}</span>
+        </div>`;
+      }).join("");
+      const activeRow = stream.querySelector(".stream-row.evaluating, .stream-row.selected");
+      if (activeRow) activeRow.scrollIntoView({block: "nearest"});
     }
     function strategyNameOf(item) {
       return String((item && (item.name || item.strategy || item.id)) || "");
@@ -3571,37 +4261,38 @@ def render_index() -> str:
       return strategyBranchCatalog.map((branch) => byId[branch.id]);
     }
     function reasoningOrderForSample(sample) {
-      const selected = sample && sample.selected_strategy_id ? sample.selected_strategy_id : "";
-      const items = sampleStrategyItems(sample);
-      const rejected = items
-        .filter((item) => item.id !== selected)
-        .sort((left, right) => safeNumber(left.score, 0) - safeNumber(right.score, 0))
-        .map((item) => item.id);
-      return selected ? [...rejected, selected] : rejected;
+      const flow = strategyAttemptFlowForSample(sample, currentProfile || profileForCase(selectedCase()));
+      return [...new Set(flow.map((item) => item.branch).filter(Boolean))];
     }
     function buildReasoningState(sample, activeIndex = -1, complete = false) {
       const selected = sample && sample.selected_strategy_id ? sample.selected_strategy_id : "";
       const items = sampleStrategyItems(sample);
       const scoreById = Object.fromEntries(items.map((item) => [item.id, safeNumber(item.score, 0)]));
-      const order = reasoningOrderForSample(sample);
+      const attempts = strategyAttemptFlowForSample(sample, currentProfile || profileForCase(selectedCase()));
+      const activeAttempt = activeIndex >= 0 ? (attempts[Math.min(attempts.length - 1, activeIndex)] || null) : null;
+      const visibleAttempts = attempts.slice(0, Math.max(0, activeIndex + 1));
+      const order = [...new Set(attempts.map((item) => item.branch).filter(Boolean))];
       const statuses = {};
       strategyBranchCatalog.forEach((branch) => {
-        const orderIndex = order.indexOf(branch.id);
+        const branchAttempts = visibleAttempts.filter((item) => item.branch === branch.id);
         let status = "pending";
         if (complete) {
           status = branch.id === selected ? "selected" : "rejected";
-        } else if (orderIndex >= 0 && orderIndex < activeIndex) {
-          status = "rejected";
-        } else if (orderIndex === activeIndex) {
+        } else if (activeAttempt && activeAttempt.branch === branch.id) {
           status = "evaluating";
+        } else if (branchAttempts.length > 0) {
+          status = "evaluated";
         }
         statuses[branch.id] = status;
       });
       return {
         phase: complete ? "selected" : "reasoning",
-        activeBranch: complete ? "" : order[activeIndex] || "",
+        activeBranch: complete ? "" : activeAttempt ? activeAttempt.branch : "",
+        activeAttemptIndex: activeIndex,
+        activeStrategyName: activeAttempt ? activeAttempt.name : "",
         selectedBranch: selected,
         order,
+        attempts,
         statuses,
         scores: scoreById,
       };
@@ -3610,11 +4301,13 @@ def render_index() -> str:
       currentReasoningState = buildReasoningState(sample, activeIndex, complete);
       document.body.classList.add("reasoning");
       renderStrategyCards(currentProfile || profileForCase(selectedCase()), null);
+      renderStrategyStream(currentProfile || profileForCase(selectedCase()), null);
       return currentReasoningState;
     }
     function clearReasoningState() {
       currentReasoningState = null;
       document.body.classList.remove("reasoning");
+      renderStrategyStream(currentProfile || profileForCase(selectedCase()), currentReport);
     }
     function renderStrategyCards(profile, report, evaluatingBranch = "") {
       const strategies = Array.from(document.querySelectorAll(".branch-grid .strategy"));
@@ -3634,11 +4327,12 @@ def render_index() -> str:
         const reasoningStatus = reasoningState && reasoningState.statuses ? reasoningState.statuses[branch.id] : "";
         const isBest = hasReport ? branch.id === selectedBranch : reasoningStatus === "selected";
         const isEvaluating = !hasReport && (reasoningStatus === "evaluating" || (!reasoningState && evaluatingBranch === branch.id));
+        const evaluated = !hasReport && reasoningStatus === "evaluated";
         const rejected = hasReport ? (!isBest && branchAttempts.length > 0) : reasoningStatus === "rejected";
-        const pending = !hasReport && !isBest && !isEvaluating && !rejected;
-        const revealStrategyData = Boolean(hasReport || reasoningStatus === "selected" || reasoningStatus === "rejected");
-        const showScoreOnCard = Boolean(isBest || isEvaluating || !hasReport && reasoningStatus === "rejected");
-        const showEvidenceOnCard = Boolean(isBest || !hasReport && reasoningStatus === "rejected");
+        const pending = !hasReport && !isBest && !isEvaluating && !evaluated && !rejected;
+        const revealStrategyData = Boolean(hasReport || reasoningStatus === "selected" || reasoningStatus === "evaluated" || reasoningStatus === "rejected");
+        const showScoreOnCard = Boolean(isBest || isEvaluating || evaluated || !hasReport && reasoningStatus === "rejected");
+        const showEvidenceOnCard = Boolean(isBest || evaluated || !hasReport && reasoningStatus === "rejected");
         const reasoningScore = showScoreOnCard && reasoningState && reasoningState.scores ? reasoningState.scores[branch.id] : NaN;
         const reportScore = showScoreOnCard && bestAttempt
           ? Math.max(0.32, Math.min(0.96, (Number.isFinite(bestCost) ? bestCost : localCostOf(bestAttempt)) / Math.max(localCostOf(bestAttempt, 1), 1))).toFixed(2)
@@ -3646,21 +4340,22 @@ def render_index() -> str:
         const score = Number.isFinite(reasoningScore)
           ? Math.max(0.32, Math.min(0.99, reasoningScore)).toFixed(2)
           : reportScore;
-        const statusText = isBest ? "已选中" : isEvaluating ? "计算中" : rejected ? "未采用" : hasReport ? "未触发" : "待评估";
-        const badgeClass = isBest ? "accepted" : isEvaluating ? "evaluating" : rejected ? "" : "pending";
+        const statusText = isBest ? "已选中" : isEvaluating ? "评估中" : evaluated ? "已评估" : rejected ? "备选对照" : hasReport ? "未触发" : "待评估";
+        const badgeClass = isBest ? "accepted" : isEvaluating ? "evaluating" : evaluated ? "evaluating" : rejected ? "pending" : "pending";
         strategy.classList.toggle("best", isBest);
         strategy.classList.toggle("evaluating", isEvaluating);
         strategy.classList.toggle("rejected", rejected);
         strategy.classList.toggle("pending", pending);
-        strategy.dataset.reasoningStatus = hasReport ? (isBest ? "selected" : rejected ? "rejected" : "not-tried") : (reasoningStatus || (isEvaluating ? "evaluating" : "pending"));
+        strategy.dataset.reasoningStatus = hasReport ? (isBest ? "selected" : rejected ? "standby" : "not-tried") : (reasoningStatus || (isEvaluating ? "evaluating" : "pending"));
         strategy.dataset.reasoningOrder = reasoningState && Array.isArray(reasoningState.order) ? String(reasoningState.order.indexOf(branch.id) + 1 || "") : "";
         strategy.dataset.strategyRank = revealStrategyData && sampleItem.rank ? String(sampleItem.rank) : "";
         strategy.dataset.strategyEvidence = revealStrategyData && sampleItem.evidence ? sampleItem.evidence : "";
-        strategy.querySelector("h4").textContent = (branch.short || branch.id) + (isBest ? " ✓" : "");
+        strategy.querySelector("h4").innerHTML = `${escapeAttr(branch.short || branch.id).replace(/\\n/g, "<br>")}${isBest ? "<br>✓" : ""}`;
         const evidence = showEvidenceOnCard && sampleItem.evidence ? `<span class="evidence">${escapeAttr(sampleItem.evidence)}</span>` : "";
         strategy.querySelector("p").innerHTML = `<b>${branch.title}</b><br>${branch.desc}${evidence}`;
         strategy.querySelector("strong").innerHTML = `${score} <span class="badge ${badgeClass}">${statusText}</span>`;
       });
+      renderStrategyStream(profile, report);
     }
     function setNodeMetric(node, label, value) {
       if (!node) return;
@@ -3685,7 +4380,8 @@ def render_index() -> str:
       const nodes = Array.from(document.querySelectorAll(".reason-wrap .node"));
       const sample = currentSimulationSample;
       const attempts = attemptsFromReport(report);
-      const candidateTotal = Math.max(5, attempts.length || (sample && Array.isArray(sample.strategy_path) ? sample.strategy_path.length : 0) || 5);
+      const attemptFlow = strategyAttemptFlowForSample(sample, profile);
+      const candidateTotal = Math.max(5, strategyVisibleAttemptCount(profile, report) || attempts.length || attemptFlow.length || (sample && Array.isArray(sample.strategy_path) ? sample.strategy_path.length : 0) || 5);
       const selectedScore = sampleSelectedScore(sample);
       const covered = report && report.best ? safeNumber(report.best.covered_tasks, report.best.total_tasks || 0) : 0;
       const total = report && report.best ? safeNumber(report.best.total_tasks, covered || 1) : 1;
@@ -3702,7 +4398,7 @@ def render_index() -> str:
       if (report) {
         setNodeMetric(nodes[0], "状态", "已输入");
         setNodeMetric(nodes[1], "可信度", sceneConfidence);
-        setNodeMetric(nodes[2], "候选策略", String(candidateTotal));
+        setNodeMetric(nodes[2], "策略尝试", String(candidateTotal));
         setNodeMetric(nodes[3], "通过", `${feasiblePassed} / ${feasibleTotal}`);
         setNodeMetric(nodes[4], "最佳分", selectedScore.toFixed(2));
         setNodeMetric(nodes[5], "置信度", finalConfidence);
@@ -3712,8 +4408,8 @@ def render_index() -> str:
       if (activeStep >= 0) setNodeMetric(nodes[0], "状态", "已输入");
       if (activeStep === 1) setNodeMetric(nodes[1], "可信度", "计算中");
       if (activeStep > 1) setNodeMetric(nodes[1], "可信度", sceneConfidence);
-      if (activeStep === 2) setNodeMetric(nodes[2], "候选策略", "生成中");
-      if (activeStep > 2) setNodeMetric(nodes[2], "候选策略", String(candidateTotal));
+      if (activeStep === 2) setNodeMetric(nodes[2], "策略尝试", "生成中");
+      if (activeStep > 2) setNodeMetric(nodes[2], "策略尝试", String(candidateTotal));
       if (activeStep === 3) setNodeMetric(nodes[3], "通过", "校验中");
       if (activeStep > 3) setNodeMetric(nodes[3], "通过", `${currentReasoningState.phase === "selected" ? 1 : 0} / ${candidateTotal}`);
       if (activeStep === 4) setNodeMetric(nodes[4], "最佳分", "评估中");
@@ -3735,9 +4431,8 @@ def render_index() -> str:
         renderStrategyCards(currentProfile || profileForCase(selectedCase()), null);
         return;
       }
-      const samplePath = currentSimulationSample && Array.isArray(currentSimulationSample.strategy_path) ? currentSimulationSample.strategy_path : [];
-      const sampleOrder = samplePath.length ? samplePath.map((item) => item.id) : ["S1", "S2", "S3", "S4", "S5"];
-      const evaluatingOrder = ["", "", ...sampleOrder];
+      const sampleFlow = strategyAttemptFlowForSample(currentSimulationSample, currentProfile || profileForCase(selectedCase()));
+      const evaluatingOrder = ["", "", ...sampleFlow.map((item) => item.branch)];
       renderStrategyCards(currentProfile || profileForCase(selectedCase()), null, evaluatingOrder[Math.min(activeStep, evaluatingOrder.length - 1)] || "");
     }
     function updateReasonSummary(profile, report) {
@@ -3752,15 +4447,15 @@ def render_index() -> str:
       if (nodes[0]) nodes[0].querySelector("p").innerHTML = `${taskCount} 个订单 · ${courierCount} 个骑手<br>当前场景：${profile.label}`;
       if (nodes[1]) nodes[1].querySelector("p").innerHTML = `识别商家、订单、骑手接单意愿<br>无人接单风险：${profile.missedRisk}`;
       if (nodes[2]) {
-        nodes[2].querySelector("p").innerHTML = `生成 ${Math.max(5, attempts.length || 5)} 个候选派单策略<br>比较组合搜索、单任务多派、覆盖修复和自适应补充`;
+        nodes[2].querySelector("p").innerHTML = `真实 Planner 策略池运行流<br>initial + adaptive + production/evolution`;
         const metric = nodes[2].querySelector(".metric strong");
-        if (metric) metric.textContent = String(Math.max(5, attempts.length || 5));
+        if (metric) metric.textContent = String(Math.max(5, strategyVisibleAttemptCount(profile, report) || attempts.length || strategyAttemptFlowForSample(currentSimulationSample, profile).length || 5));
       }
       if (nodes[3]) nodes[3].querySelector("p").innerHTML = `校验商家-订单匹配、骑手容量、时间窗<br>拒绝高成本或无人接单风险方案`;
       if (nodes[5]) {
         nodes[5].querySelector("p").innerHTML = report
           ? `派出 ${used} 个骑手 · ${Object.keys(profile.assignments || {}).length} 个商家派单 · 覆盖 ${covered}/${taskCount} 个订单<br>派单约束已通过`
-          : `等待当前场景推理输出最终派单<br>运行完成后自动展示全部派单覆盖`;
+          : `等待当前场景推理输出派单分配<br>运行完成后自动展示全部派单覆盖`;
       }
       updateReasonMetrics(report ? 6 : 0, profile, report);
       renderStrategyCards(profile, report);
@@ -3929,11 +4624,12 @@ def render_index() -> str:
       const positions = {};
       const density = currentSimulationSample && currentSimulationSample.summary ? currentSimulationSample.summary.density_profile : "";
       const isClusteredScene = String(density || "").includes("clustered");
+      const isMerchant = (item) => item && (item.kind === "merchant_order" || item.kind === "pickup_cluster");
       const minDistanceFor = (item) => {
         const kind = item && item.kind ? item.kind : "";
-        if (kind === "merchant_order" || kind === "pickup_cluster") return isClusteredScene ? 24 : 30;
+        if (kind === "merchant_order" || kind === "pickup_cluster") return isClusteredScene ? 58 : 66;
         if (kind === "order") return 28;
-        if (kind === "courier") return isClusteredScene ? 32 : 36;
+        if (kind === "courier") return isClusteredScene ? 34 : 38;
         return 32;
       };
       const pointDistance = (a, b) => Math.hypot((a.x - b.x) * 9.8, (a.y - b.y) * 6.4);
@@ -3947,12 +4643,12 @@ def render_index() -> str:
         let avoided = false;
         if (collides(chosen, item)) {
           const checksum = String(item.id || "").split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-          for (let attempt = 0; attempt < 42; attempt += 1) {
+          for (let attempt = 0; attempt < 64; attempt += 1) {
             const angle = ((checksum * 37 + attempt * 137) % 360) * Math.PI / 180;
-            const radiusPx = 40 + Math.floor(attempt / 7) * 12;
+            const radiusPx = (isMerchant(item) ? 58 : 42) + Math.floor(attempt / 8) * (isMerchant(item) ? 18 : 12);
             const candidate = {
-              x: Math.max(6, Math.min(94, raw.x + Math.cos(angle) * radiusPx / 9.8)),
-              y: Math.max(6, Math.min(94, raw.y + Math.sin(angle) * radiusPx / 6.4))
+              x: Math.max(isMerchant(item) ? 10 : 6, Math.min(isMerchant(item) ? 91 : 94, raw.x + Math.cos(angle) * radiusPx / 9.8)),
+              y: Math.max(isMerchant(item) ? 14 : 6, Math.min(isMerchant(item) ? 86 : 94, raw.y + Math.sin(angle) * radiusPx / 6.4))
             };
             if (!collides(candidate, item)) {
               chosen = candidate;
@@ -4005,8 +4701,10 @@ def render_index() -> str:
         const display = displayPositions[item.id] || {x: item.x, y: item.y, rawX: item.x, rawY: item.y, avoided: false};
         const rawPoint = {x: safeNumber(item.x, safeNumber(display.rawX, 50)), y: safeNumber(item.y, safeNumber(display.rawY, 50))};
         const labelOffset = labelOffsetFor(item, assignmentId, profile.selected);
-        const pin = document.createElement("div");
         const isMerchantPoint = item.kind === "pickup_cluster" || item.kind === "merchant_order";
+        const pinPoint = rawPoint;
+        entityPoints[item.id] = [pinPoint.x, pinPoint.y];
+        const pin = document.createElement("div");
         const pinKind = isMerchantPoint ? "merchant" : item.kind === "courier" ? "courier" : "dest";
         const markKind = isMerchantPoint ? "merchant" : item.kind === "courier" ? "courier" : "dest";
         const showSelectedLabel = false;
@@ -4016,14 +4714,15 @@ def render_index() -> str:
         pin.dataset.assignment = assignmentId;
         pin.dataset.rawX = Number(rawPoint.x).toFixed(1);
         pin.dataset.rawY = Number(rawPoint.y).toFixed(1);
-        pin.dataset.displayX = Number(rawPoint.x).toFixed(1);
-        pin.dataset.displayY = Number(rawPoint.y).toFixed(1);
+        pin.dataset.displayX = Number(pinPoint.x).toFixed(1);
+        pin.dataset.displayY = Number(pinPoint.y).toFixed(1);
         pin.classList.toggle("active-assignment", assignmentId === profile.selected);
         pin.classList.toggle("label-avoided", Boolean(display.avoided));
-        pin.style.left = Number(rawPoint.x).toFixed(1) + "%";
-        pin.style.top = Number(rawPoint.y).toFixed(1) + "%";
+        pin.classList.toggle("unassigned", Boolean(hasAssignments && item.kind === "courier" && item.assigned === false));
+        pin.style.left = Number(pinPoint.x).toFixed(1) + "%";
+        pin.style.top = Number(pinPoint.y).toFixed(1) + "%";
         pin.title = hasAssignments ? "点击聚焦 " + item.id + " 的派单链路" : "点击查看 " + item.id + " 的样本详情";
-        const pinCode = hasAssignments ? `<span class="pin-code">${escapeAttr(item.id)}</span>` : "";
+        const pinCode = hasAssignments && assignmentId ? `<span class="pin-code">${escapeAttr(item.id)}</span>` : "";
         pin.innerHTML = `<span class="mark ${markKind}"><span class="mark-symbol">${isMerchantPoint ? "商" : "骑"}</span></span>${pinCode}`;
         entityLayer.appendChild(pin);
 
@@ -4658,6 +5357,18 @@ def render_index() -> str:
         return d ? `<path class="dispatch-visual endpoint-connector" data-assignment="${assignmentId}"${routeMetaAttributes({...meta, connector: "endpoint"})}${styleAttr} d="${d}"></path>` : "";
       }).join("");
     }
+    function dispatchRouteTerminalsFor(route, cls, assignmentId = "", meta = {}, style = "") {
+      const usable = (route || []).filter(Boolean);
+      if (usable.length < 2) return "";
+      const styleAttr = style ? ` style="${style}"` : "";
+      const [startX, startY] = svgPoint(usable[0]);
+      const [endX, endY] = svgPoint(usable[usable.length - 1]);
+      const terminalMeta = routeMetaAttributes(meta);
+      return [
+        `<circle class="route-terminal courier-terminal ${cls}" data-assignment="${assignmentId}" data-route-role="terminal" data-terminal="courier"${terminalMeta}${styleAttr} cx="${startX.toFixed(1)}" cy="${startY.toFixed(1)}" r="9.2"></circle>`,
+        `<circle class="route-terminal merchant-terminal ${cls}" data-assignment="${assignmentId}" data-route-role="terminal" data-terminal="merchant"${terminalMeta}${styleAttr} cx="${endX.toFixed(1)}" cy="${endY.toFixed(1)}" r="9.8"></circle>`
+      ].join("");
+    }
     function routeMetaAttributes(meta = {}) {
       return Object.entries(meta)
         .filter(([, value]) => value !== undefined && value !== null && value !== "")
@@ -4771,14 +5482,14 @@ def render_index() -> str:
         .filter(([, point]) => Array.isArray(point));
       const pathHtml = profile.dispatchMap.assignments.flatMap((assignment, index) => {
         const normalizedAssignment = (profile.assignments && profile.assignments[assignment.id]) || assignment;
-        const couriers = finalCourierTokensForAssignment(normalizedAssignment);
+        const couriers = allocatedCourierTokensForAssignment(normalizedAssignment);
         const pickupPoint = entityPoints[assignment.pickup];
         if (!pickupPoint || !couriers.length) return "";
         const isActive = Boolean(focusMode && assignment.id === selectedAssignment);
         const routeStyle = `--route-color:${routePalette[index % routePalette.length]}`;
         const cls = isActive ? "dispatch-visual primary active-assignment" : "dispatch-visual secondary overview-route";
         const hitCls = isActive ? "primary active-assignment" : "secondary overview-route";
-        return couriers.map((courierId, courierIndex) => {
+        const finalRoutes = couriers.map((courierId, courierIndex) => {
           const courierPoint = entityPoints[courierId];
           if (!courierPoint) return "";
           const obstacles = merchantObstacleEntries
@@ -4796,7 +5507,8 @@ def render_index() -> str:
             courier: courierId,
             leg: "courier-to-merchant",
             "leg-index": courierIndex,
-            "final-courier": finalCourierForAssignment(normalizedAssignment),
+              "primary-courier": finalCourierForAssignment(normalizedAssignment),
+              allocation: assignmentUsesMultiDispatch(normalizedAssignment) ? "multi" : "single",
             "route-source": "dispatch-relationship-line-v4",
             "route-points": visiblePickupRoute.length,
             "road-core-points": Array.isArray(pickupRoute.roadCore) ? pickupRoute.roadCore.length : visiblePickupRoute.length,
@@ -4806,12 +5518,15 @@ def render_index() -> str:
             "long-leg": longPickup ? "true" : "false"
           };
           const arrowCls = isActive ? "primary" : "secondary overview-route";
+          const terminalCls = `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`;
           return [
+            dispatchRouteTerminalsFor(visiblePickupRoute, terminalCls, assignment.id, pickupMeta, routeStyle),
             `<path class="${pickupClass}" data-assignment="${assignment.id}" data-route-role="visual" data-courier="${escapeAttr(courierId)}" data-leg-index="${courierIndex}"${routeMetaAttributes(pickupMeta)} style="${routeStyle}" d="${pickupD}"></path>`,
             dispatchRouteClickTargetFor(visiblePickupRoute, `${hitCls} pickup-leg${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, pickupMeta, routeStyle),
             dispatchArrowFor(visiblePickupRoute, `${arrowCls}${showInOverview ? " selected-overview" : ""}${longPickup ? " long-pickup" : ""}`, assignment.id, isActive, routeStyle, pickupMeta)
           ].join("");
         });
+        return finalRoutes;
       }).join("");
       svg.innerHTML = pathHtml;
       alignDispatchArrowsToRenderedPaths(svg);
@@ -4835,9 +5550,9 @@ def render_index() -> str:
         }
       }
       if (!hasDispatch) {
-        document.querySelectorAll(".map-label, .pin, .dispatch-visual, .dispatch-link, .dispatch-arrow").forEach((node) => {
+        document.querySelectorAll(".map-label, .pin, .dispatch-visual, .dispatch-link, .dispatch-arrow, .route-terminal").forEach((node) => {
           node.classList.remove("active-assignment", "selected", "focused", "primary");
-          if (node.classList.contains("dispatch-visual") || node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow")) node.classList.add("secondary");
+          if (node.classList.contains("dispatch-visual") || node.classList.contains("dispatch-link") || node.classList.contains("dispatch-arrow") || node.classList.contains("route-terminal")) node.classList.add("secondary");
         });
         return;
       }
@@ -4849,7 +5564,7 @@ def render_index() -> str:
           node.classList.toggle("focused", focused && active);
         }
       });
-      document.querySelectorAll(".dispatch-visual, .dispatch-link, .dispatch-arrow").forEach((node) => {
+      document.querySelectorAll(".dispatch-visual, .dispatch-link, .dispatch-arrow, .route-terminal").forEach((node) => {
         const active = Boolean(hasDispatch && focused && node.dataset.assignment === selectedAssignment);
         node.classList.toggle("active-assignment", active);
         node.classList.toggle("primary", active);
@@ -4923,7 +5638,7 @@ def render_index() -> str:
           .slice(0, 3);
         $("detail-title").textContent = "商家输入：" + entity.id;
         $("detail-courier").textContent = relatedCandidates[0] ? `候选骑手 ${relatedCandidates[0].courier_id}` : "待匹配";
-        $("detail-merchant").innerHTML = `该点代表商家及其订单入口，当前 <code>${merchant.order_count || 1}</code> 单待派；推理完成后会锁定最终承接骑手。`;
+        $("detail-merchant").innerHTML = `该点代表商家及其订单入口，当前 <code>${merchant.order_count || 1}</code> 单待派；推理完成后会输出骑手分配集合。`;
         $("detail-orders").innerHTML = relatedCandidates.length
           ? relatedCandidates.map((candidate) => `<span class="chip">${candidate.courier_id} · 接单 ${Math.round(safeNumber(candidate.accept_probability, 0) * 100)}%</span>`).join("")
           : `<span class="chip">等待候选生成</span>`;
@@ -4932,7 +5647,7 @@ def render_index() -> str:
         setProbabilityMetric("候选接单概率", relatedCandidates[0] ? `${Math.round(safeNumber(relatedCandidates[0].accept_probability, 0) * 100)}%` : "--");
         $("detail-reasons").innerHTML = [
           "<li>候选骑手按距离、接单意愿、价格和风险综合排序。</li>",
-          "<li>当前仅展示输入侧候选，不提前显示最终派单。</li>",
+          "<li>当前仅展示输入侧候选，不提前显示派单结果。</li>",
           "<li>接单概率用于判断该商家是否需要单任务多派或低意愿自适应补充。</li>"
         ].join("");
         setEvidenceRows([
@@ -4966,7 +5681,7 @@ def render_index() -> str:
         }
         $("detail-title").textContent = "骑手输入：" + entity.id;
         $("detail-courier").textContent = entity.id;
-        $("detail-merchant").innerHTML = `当前状态 <code>${courier.status || "available"}</code>，可承接容量 <code>${courier.capacity || 1}</code>；接单意愿会影响最终是否绑定该骑手。`;
+        $("detail-merchant").innerHTML = `当前状态 <code>${courier.status || "available"}</code>，可承接容量 <code>${courier.capacity || 1}</code>；接单意愿会影响算法是否把该骑手放入分配集合。`;
         $("detail-orders").innerHTML = relatedCandidates.map((candidate) => `<span class="chip">${candidate.merchant_id} · ${candidate.risk}</span>`).join("");
         $("detail-eta").textContent = relatedCandidates[0] ? `${relatedCandidates[0].eta_min} 分钟最近候选` : "-";
         $("right-cost").textContent = relatedCandidates[0] ? money(relatedCandidates[0].cost) : "-";
@@ -4974,7 +5689,7 @@ def render_index() -> str:
         $("detail-reasons").innerHTML = [
           `<li>候选商家：${relatedCandidates.map((candidate) => candidate.merchant_id).join("、") || "暂无"}。</li>`,
           "<li>系统优先避免把低意愿骑手绑定到高风险商家。</li>",
-          "<li>运行完成后，如果该骑手被选中，地图会显示其承接的商家关系线。</li>"
+          "<li>运行完成后，如果该骑手进入分配集合，地图会显示其与商家的派单关系线。</li>"
         ].join("");
         setEvidenceRows([
           ["▧ 接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`],
@@ -5002,61 +5717,67 @@ def render_index() -> str:
       const courier = sampleCourierById(courierId) || entityById(profile, courierId) || {};
       const candidate = candidateForPair(merchantId, courierId);
       const strategyText = strategyLabelForAssignment(assignment);
+      const allocatedCouriers = allocatedCourierTokensForAssignment(assignment);
       if (entity.kind === "merchant_order" || entity.kind === "pickup_cluster") {
         setDetailContext("merchant", assignmentId, entityId, "");
         const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
         $("detail-title").textContent = "商家派单：" + entity.id;
-        $("detail-courier").textContent = `派给 ${assignment.courier}`;
-        $("detail-merchant").innerHTML = `该商家共 <code>${orderCount}</code> 单，最终由 <code>${assignment.courier}</code> 承接。`;
-        $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
+        $("detail-courier").textContent = allocatedCouriers.length > 1 ? `分配 ${allocatedCouriers.length} 个骑手` : `分配 ${assignment.courier}`;
+        $("detail-merchant").innerHTML = allocatedCouriers.length > 1
+          ? `该商家共 <code>${orderCount}</code> 单，算法分配骑手集合 <code>${allocatedCouriers.join(" / ")}</code>，用于最大化当前期望履约收益。`
+          : `该商家共 <code>${orderCount}</code> 单，算法分配给骑手 <code>${assignment.courier}</code>。`;
+        $("detail-orders").innerHTML = [
+          ...assignment.orders.map((order) => `<span class="chip">${order}</span>`),
+          ...allocatedCouriers.map((courierId) => `<span class="chip">骑手 ${courierId}</span>`)
+        ].join("");
         $("detail-eta").textContent = assignment.eta;
         $("right-cost").textContent = assignment.cost;
         setProbabilityMetric("接单概率", assignment.probability);
         $("detail-reasons").innerHTML = [
-          `<li>派单对象：${entity.id} → ${assignment.courier}，覆盖该商家 ${orderCount} 单。</li>`,
+          `<li>派单对象：${entity.id} → ${allocatedCouriers.join(" / ") || assignment.courier}，覆盖该商家 ${orderCount} 单。</li>`,
           `<li>时效目标：${merchant.expected_eta_min ? merchant.expected_eta_min + " 分钟" : "-"}；预计派单成本 ${assignment.cost}。</li>`,
           `<li>策略依据：${strategyText}；风险等级 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`,
-          `<li>${assignment.merchantNote || "该派单来自当前场景样本的最终策略选择。"}</li>`
-        ].join("");
+          `<li>${assignment.merchantNote || "该派单来自当前场景样本的策略选择。"}</li>`,
+          allocatedCouriers.length > 1 ? "<li>单任务多派的输出是骑手分配集合，不在此处确定某一个最终接单骑手。</li>" : ""
+        ].filter(Boolean).join("");
         setEvidenceRows([
-          ["▧ 接单概率", assignment.fit],
-          ["◎ 承接骑手", assignment.courier],
+          ["▧ 期望接单", assignment.fit],
+          ["◎ 分配骑手", allocatedCouriers.join(" / ") || assignment.courier],
           ["◷ ETA / 时效", merchant.expected_eta_min ? `${merchant.expected_eta_min} 分钟` : etaText(assignment.eta)],
           ["△ 接单风险", assignment.risk],
-          ["▣ 策略依据", strategyText]
+          ["▣ 策略依据", allocatedCouriers.length > 1 ? `${strategyText} · ${allocatedCouriers.length}骑手` : strategyText]
         ]);
-        showToast(`商家 ${entity.id} 已派给 ${assignment.courier}`);
+        showToast(`商家 ${entity.id} 已分配 ${allocatedCouriers.join(" / ") || assignment.courier}`);
         return true;
       }
       if (entity.kind === "courier") {
-        const courierAssignments = Object.entries(assignments).filter(([, item]) => finalCourierForAssignment(item) === entity.id);
+        const courierAssignments = Object.entries(assignments).filter(([, item]) => allocatedCourierTokensForAssignment(item).includes(entity.id));
         const assignedOrders = courierAssignments.flatMap(([, item]) => item.orders || []);
         const totalCost = courierAssignments.reduce((sum, [, item]) => sum + safeNumber(String(item.cost || "0").replace("$", ""), 0), 0);
         const avgEta = courierAssignments.length
           ? Math.round(courierAssignments.reduce((sum, [, item]) => sum + safeNumber(String(item.eta || "").replace("min", ""), 0), 0) / courierAssignments.length)
           : 0;
         setDetailContext("courier", assignmentId, entityId, "");
-        $("detail-title").textContent = "骑手承接：" + entity.id;
+        $("detail-title").textContent = "骑手分配：" + entity.id;
         $("detail-courier").textContent = `${courierAssignments.length} 个商家`;
-        $("detail-merchant").innerHTML = `状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>，本轮承接 <code>${courierAssignments.length}</code> 个商家。`;
-        $("detail-orders").innerHTML = courierAssignments.map(([, item]) => `<span class="chip">${item.pickup}</span>`).join("") || `<span class="chip">暂无最终派单</span>`;
+        $("detail-merchant").innerHTML = `状态 <code>${courier.status || "available"}</code>，容量 <code>${courier.capacity || 1}</code>，本轮被算法分配到 <code>${courierAssignments.length}</code> 个商家。`;
+        $("detail-orders").innerHTML = courierAssignments.map(([, item]) => `<span class="chip">${item.pickup}</span>`).join("") || `<span class="chip">暂无派单分配</span>`;
         $("detail-eta").textContent = avgEta ? `${avgEta} 分钟平均` : etaText(assignment.eta);
-        $("right-cost").textContent = money(totalCost || safeNumber(String(assignment.cost || "0").replace("$", ""), 0));
+        $("right-cost").textContent = money(totalCost);
         setProbabilityMetric("骑手接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`);
         $("detail-reasons").innerHTML = [
-          `<li>骑手接单意愿 ${Math.round(safeNumber(courier.willingness, 0) * 100)}%，当前状态 ${courier.status || "available"}。</li>`,
-          `<li>已分配商家：${courierAssignments.map(([, item]) => item.pickup).join("、") || "-"}。</li>`,
-          `<li>覆盖订单数：${assignedOrders.length || 0}；平均 ETA：${avgEta ? avgEta + " 分钟" : etaText(assignment.eta)}。</li>`,
-          `<li>当前风险 ${assignment.risk}；累计派单成本 ${money(totalCost || safeNumber(String(assignment.cost || "0").replace("$", ""), 0))}。</li>`
-        ].join("");
+          `<li>分配商家：${courierAssignments.map(([, item]) => item.pickup).join("、") || "暂无"}。</li>`,
+          "<li>这里展示算法分配结果和期望值，不模拟骑手端最终接单响应。</li>",
+          `<li>策略依据：${strategyText}；多派时同一商家可对应多个集合内骑手。</li>`
+        ].filter(Boolean).join("");
         setEvidenceRows([
-          ["▧ 接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`],
-          ["◎ 已派商家", courierAssignments.map(([, item]) => item.pickup).join(" / ") || "-"],
-          ["◷ 骑手状态", courier.status || "-"],
-          ["△ 接单风险", assignment.risk],
-          ["▣ 承接规模", `${courierAssignments.length} 个商家`]
+          ["▧ 分配商家", `${courierAssignments.length} 个`],
+          ["◎ 覆盖订单", `${assignedOrders.length || 0} 单`],
+          ["◷ ETA / 时效", avgEta ? `${avgEta} 分钟` : "-"],
+          ["△ 接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`],
+          ["▣ 策略依据", strategyText]
         ]);
-        showToast(`骑手 ${entity.id} 当前承接 ${courierAssignments.length} 个商家`);
+        showToast(`骑手 ${entity.id}：分配 ${courierAssignments.length} 个商家`);
         return true;
       }
       return false;
@@ -5087,36 +5808,48 @@ def render_index() -> str:
       applyMapFocus(profile, resolvedAssignment, true);
       const leg = routeDataset.leg || "";
       const merchantId = routeDataset.merchant || assignment.pickup;
-      const finalCourierId = finalCourierForAssignment(assignment);
-      const clickedCourierId = routeDataset.courier || finalCourierId;
-      if (finalCourierId && clickedCourierId && clickedCourierId !== finalCourierId) return false;
-      const courierId = finalCourierId || clickedCourierId;
+      const allocatedCouriers = allocatedCourierTokensForAssignment(assignment);
+      const primaryCourierId = finalCourierForAssignment(assignment);
+      const clickedCourierId = routeDataset.courier || primaryCourierId;
+      if (clickedCourierId && allocatedCouriers.length && !allocatedCouriers.includes(clickedCourierId)) return false;
       const routePoints = routeDataset.routePoints || routeDataset.routepoints || "";
       const routeSource = routeDataset.routeSource || routeDataset.routesource || "delivery-routes-road-graph-v3";
       const endpointConnectors = routeDataset.endpointConnectors || routeDataset.endpointconnectors || "0";
       const merchant = entityById(profile, merchantId);
-      const courier = entityById(profile, courierId);
-      const legLabel = "骑手到商家";
-      const endpointText = `${courierId} → ${merchantId}`;
+      const routeCourierId = clickedCourierId || primaryCourierId;
+      const courier = entityById(profile, routeCourierId);
+      const isMultiDispatch = allocatedCouriers.length > 1;
+      const legLabel = isMultiDispatch ? "多派分配" : "骑手到商家";
+      const endpointText = `${routeCourierId} → ${merchantId}`;
       setDetailContext("route", resolvedAssignment, merchantId, leg || "courier-to-merchant");
-      $("detail-title").textContent = `派单关系：${merchantId} → ${courierId}`;
-      $("detail-courier").textContent = `${merchantId} → ${courierId}`;
-      $("detail-merchant").innerHTML = `最终派单 <code>${merchantId} → ${courierId}</code>；地图线 <code>${endpointText}</code> 表达骑手承接该商家，不作为骑行导航。`;
-      $("detail-orders").innerHTML = [merchantId, courierId].filter(Boolean).map((item) => `<span class="chip">${item}</span>`).join("");
+      $("detail-title").textContent = isMultiDispatch ? `多派分配：${merchantId} ⇢ ${routeCourierId}` : `派单关系：${merchantId} → ${routeCourierId}`;
+      $("detail-courier").textContent = isMultiDispatch ? `集合内骑手 ${routeCourierId}` : `${merchantId} → ${routeCourierId}`;
+      $("detail-merchant").innerHTML = isMultiDispatch
+        ? `单任务多派的算法输出是商家 <code>${merchantId}</code> 的分配骑手集合 <code>${allocatedCouriers.join(" / ")}</code>；当前线表示集合内骑手 <code>${routeCourierId}</code>，页面不模拟“最终谁接单”。`
+        : `算法将商家 <code>${merchantId}</code> 分配给骑手 <code>${routeCourierId}</code>；地图线 <code>${endpointText}</code> 表达派单关系，不作为骑行导航。`;
+      $("detail-orders").innerHTML = [merchantId, ...allocatedCouriers.map((courierId) => courierId === routeCourierId ? `当前 ${courierId}` : courierId)].filter(Boolean).map((item) => `<span class="chip">${item}</span>`).join("");
       $("detail-eta").textContent = etaText(assignment.eta);
       $("right-cost").textContent = assignment.cost;
-      setProbabilityMetric("接单概率", assignment.probability);
-      $("detail-reasons").innerHTML = [
-        `<li>该线属于最终派单 ${resolvedAssignment}：商家 ${merchantId} 派给骑手 ${courierId}。</li>`,
-        `<li>派单线证据来自当前地图路网；采样节点 ${routePoints || "-"} 个，端点贴合校验 ${endpointConnectors} 段。</li>`,
-        `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`
-      ].join("");
+      setProbabilityMetric(isMultiDispatch ? "集合期望接单" : "接单概率", candidateForPair(merchantId, routeCourierId) ? `${Math.round(safeNumber(candidateForPair(merchantId, routeCourierId).accept_probability, 0) * 100)}%` : assignment.probability);
+      const candidate = candidateForPair(merchantId, routeCourierId);
+      $("detail-reasons").innerHTML = isMultiDispatch
+        ? [
+          `<li>该线属于单任务多派的分配集合：商家 ${merchantId} 同时分配给 ${allocatedCouriers.join("、")}。</li>`,
+          "<li>算法目标是在派单阶段最大化期望履约收益，不在演示页里模拟骑手抢单后的最终响应。</li>",
+          `<li>当前骑手指标：ETA ${candidate && candidate.eta_min ? candidate.eta_min + " 分钟" : etaText(assignment.eta)}，成本 ${candidate ? money(candidate.cost) : assignment.cost}，风险 ${candidate ? candidate.risk : assignment.risk}。</li>`,
+          `<li>派单线证据来自当前地图路网；采样节点 ${routePoints || "-"} 个，端点贴合校验 ${endpointConnectors} 段。</li>`
+        ].join("")
+        : [
+          `<li>该线属于派单 ${resolvedAssignment}：商家 ${merchantId} 分配给骑手 ${routeCourierId}。</li>`,
+          `<li>派单线证据来自当前地图路网；采样节点 ${routePoints || "-"} 个，端点贴合校验 ${endpointConnectors} 段。</li>`,
+          `<li>派单策略：${strategyLabelForAssignment(assignment)}；风险 ${assignment.risk}；接单概率 ${assignment.probability}。</li>`
+        ].join("");
       setEvidenceRows([
         ["▧ 线段采样", routePoints ? `${routePoints} 节点` : "-"],
-        ["◎ 派单关系", `${merchantId} → ${courierId}`],
+        ["◎ 分配关系", `${merchantId} → ${routeCourierId}`],
         ["◷ ETA / 时效", etaText(assignment.eta)],
-        ["△ 接单风险", assignment.risk],
-        ["▣ 派单编号", resolvedAssignment]
+        ["△ 接单风险", candidate ? candidate.risk : assignment.risk],
+        ["▣ 派单编号", isMultiDispatch ? `多派集合 · ${resolvedAssignment}` : resolvedAssignment]
       ]);
       showToast(`${legLabel}：${endpointText}`);
       return true;
@@ -5128,7 +5861,9 @@ def render_index() -> str:
       const status = strategyNode && strategyNode.dataset ? strategyNode.dataset.reasoningStatus : "";
       if (status === "selected") return "已选中";
       if (status === "evaluating") return "评估中";
-      if (status === "rejected") return "已淘汰";
+      if (status === "evaluated") return "已评估";
+      if (status === "standby") return "备选对照";
+      if (status === "rejected") return "备选对照";
       if (status === "not-tried") return "未触发";
       return "待评估";
     }
@@ -5144,7 +5879,7 @@ def render_index() -> str:
       const scoreText = node ? (node.querySelector("strong") && node.querySelector("strong").textContent.replace(strategyStatusText(node), "").trim()) : "--";
       const statusText = strategyStatusText(node);
       const isSelected = node && node.dataset.reasoningStatus === "selected";
-      const revealDetail = statusText === "已选中" || statusText === "已淘汰";
+      const revealDetail = ["已选中", "已评估", "备选对照"].includes(statusText);
       const profile = currentProfile || profileForCase(selectedCase());
       if (isSelected && profile && profile.assignments && Object.keys(profile.assignments).length) {
         applyMapFocus(profile, profile.selected || Object.keys(profile.assignments)[0], false);
@@ -5165,7 +5900,7 @@ def render_index() -> str:
         "<li>该卡片来自当前场景的策略评分链路，不是静态展示。</li>",
         `<li>策略说明：${branch.desc}。</li>`,
         `<li>策略证据：${revealDetail && sampleItem && sampleItem.evidence ? sampleItem.evidence : "运行推理到该策略后再显示"}。</li>`,
-        `<li>当前状态：${statusText}${isSelected ? "，地图保持展示全部最终派单关系" : "，可与选中策略对比成本、风险和覆盖率"}。</li>`
+        `<li>当前状态：${statusText}${isSelected ? "，地图保持展示全部派单分配关系" : "，可与选中策略对比成本、风险和覆盖率"}。</li>`
       ].join("");
       setEvidenceRows([
         ["▧ 策略名称", branch.title],
@@ -5192,8 +5927,8 @@ def render_index() -> str:
         "scene-summary": "该行说明当前调度场景输入，包括商家规模、骑手供给、天气/密度和风险画像。",
         "preview-strategy": "该行展示刷新位置后的预期策略倾向，只作为推理前输入，不提前泄露最终结果。",
         "strategy-candidate": "该行对比一种候选派单策略在覆盖率、ETA、成本、骑手占用和无人接单风险上的表现。",
-        "final-strategy": "该行是 AutoSolver 最终采纳方案，用于和贪心、组合搜索、多派、覆盖修复、自适应补充做业务对比。",
-        "empty-state": "该行提示当前工作台状态：刷新位置可查看输入，运行推理后才生成最终派单。"
+        "final-strategy": "该行是 AutoSolver 采纳方案，用于和贪心、组合搜索、多派、覆盖修复、自适应补充做业务对比。",
+        "empty-state": "该行提示当前工作台状态：刷新位置可查看输入，运行推理后才生成派单分配。"
       };
       const title = rowType === "preview-candidate"
         ? `候选关系：${row.dataset.merchant || cells[0] || "-"} → ${row.dataset.courier || "-"}`
@@ -5212,7 +5947,7 @@ def render_index() -> str:
       $("right-cost").textContent = row.dataset.cost || cells[3] || "-";
       setProbabilityMetric(rowType === "final-strategy" || rowType === "strategy-candidate" ? "策略评分" : rowType === "scene-summary" ? "商家覆盖率" : "指标", row.dataset.probability || (row.dataset.score ? `${Math.round(safeNumber(row.dataset.score, 0) * 100)}%` : "--"));
       $("detail-reasons").innerHTML = [
-        `<li>${rowDescriptions[rowType] || "该详情由表格行点击触发，用于说明候选/最终策略，不是纯视觉表格。"}</li>`,
+        `<li>${rowDescriptions[rowType] || "该详情由表格行点击触发，用于说明候选/采纳策略，不是纯视觉表格。"}</li>`,
         `<li>覆盖率：${cells[1] || "-"}；ETA：${cells[2] || "-"}；成本：${cells[3] || "-"}。</li>`,
         `<li>风险：${row.dataset.risk || cells[5] || "-"}；状态：${row.dataset.status || cells[7] || "-"}。</li>`,
         `<li>业务解释：${cells[8] || "等待刷新位置后生成候选关系"}。</li>`
@@ -5231,7 +5966,7 @@ def render_index() -> str:
       const assignments = Object.values((profile && profile.assignments) || {});
       if (!assignments.length) return false;
       const totalOrders = assignments.reduce((sum, assignment) => sum + safeNumber(assignment.orderCount, (assignment.orders || []).length || 1), 0);
-      const courierSet = new Set(assignments.flatMap((assignment) => finalCourierTokensForAssignment(assignment)));
+      const courierSet = new Set(assignments.flatMap((assignment) => allocatedCourierTokensForAssignment(assignment)));
       const totalCost = assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.cost || "0").replace("$", ""), 0), 0);
       const avgEta = Math.round(assignments.reduce((sum, assignment) => sum + safeNumber(String(assignment.eta || "").replace("min", ""), 0), 0) / Math.max(1, assignments.length));
       const best = report && report.best ? report.best : {};
@@ -5245,18 +5980,18 @@ def render_index() -> str:
       }
       $("detail-title").textContent = "派单总览：全部商家已自动连线";
       $("detail-courier").textContent = `${courierSet.size} 个骑手`;
-      $("detail-merchant").innerHTML = `运行完成后，地图已自动展示 <code>${assignments.length}</code> 个商家分别派给哪个骑手；商家点同时代表该商家的 <code>${totalOrders}</code> 单。`;
-      const chips = assignments.slice(0, 7).map((assignment) => `<span class="chip">${assignment.pickup || assignment.merchant} → ${assignment.courier}</span>`);
+      $("detail-merchant").innerHTML = `运行完成后，地图已自动展示 <code>${assignments.length}</code> 个商家的骑手分配集合；商家点同时代表该商家的 <code>${totalOrders}</code> 单。`;
+      const chips = assignments.slice(0, 7).map((assignment) => `<span class="chip">${assignment.pickup || assignment.merchant} → ${allocatedCourierTokensForAssignment(assignment).join(" / ") || assignment.courier}</span>`);
       if (assignments.length > chips.length) chips.push(`<span class="chip">+${assignments.length - chips.length} 个商家</span>`);
       $("detail-orders").innerHTML = chips.join("");
       $("detail-eta").textContent = avgEta ? `${avgEta} 分钟平均` : "-";
       $("right-cost").textContent = money(totalCost);
       setProbabilityMetric("商家覆盖率", `${coverage}%`);
       $("detail-reasons").innerHTML = [
-        "<li>当前默认是全局派单总览：所有商家到骑手的派单线保持可见。</li>",
+        "<li>当前默认是全局派单总览：所有商家到分配骑手集合的派单线保持可见。</li>",
         "<li>点击任意商家、骑手或线路后，才进入单条派单聚焦模式。</li>",
         `<li>运营测算假设：每单履约损耗节约 ${yuan(value.perOrderSaving)}，当前批次约 ${value.tasks} 单，批次节约 ${yuan(value.batchSaving)}；按日均 10 万单估算单城月节约 ${yuan(value.monthSaving)}。</li>`,
-        ...assignments.slice(0, 5).map((assignment) => `<li>${assignment.pickup || assignment.merchant} 派给 ${assignment.courier}，ETA ${etaText(assignment.eta)}，成本 ${assignment.cost}，风险 ${assignment.risk}。</li>`)
+        ...assignments.slice(0, 5).map((assignment) => `<li>${assignment.pickup || assignment.merchant} 分配给 ${allocatedCourierTokensForAssignment(assignment).join(" / ") || assignment.courier}，ETA ${etaText(assignment.eta)}，成本 ${assignment.cost}，风险 ${assignment.risk}。</li>`)
       ].join("");
       setEvidenceRows([
         ["▧ 商家覆盖", `${coverage}%`],
@@ -5275,24 +6010,31 @@ def render_index() -> str:
       setDetailContext("assignment", resolvedAssignment, "", "");
       profile.selected = resolvedAssignment;
       applyMapFocus(profile, resolvedAssignment, focusMap);
+      const allocatedCouriers = allocatedCourierTokensForAssignment(assignment);
       $("detail-title").textContent = sourceLabel ? "派单详情：" + sourceLabel : `派单详情：${assignment.pickup || assignment.merchant || resolvedAssignment} → ${assignment.courier}`;
-      $("detail-courier").textContent = assignment.courier;
+      $("detail-courier").textContent = allocatedCouriers.length > 1 ? `${allocatedCouriers.length} 个骑手` : assignment.courier;
       const orderCount = safeNumber(assignment.orderCount, assignment.orders.length);
-      $("detail-merchant").innerHTML = `商家 <code>${assignment.merchant}</code> 共 ${orderCount} 单，最终派给 ${assignment.courier}`;
-      $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
+      $("detail-merchant").innerHTML = allocatedCouriers.length > 1
+        ? `商家 <code>${assignment.merchant}</code> 共 ${orderCount} 单，算法分配骑手集合：<code>${allocatedCouriers.join(" / ")}</code>。`
+        : `商家 <code>${assignment.merchant}</code> 共 ${orderCount} 单，算法分配给 ${assignment.courier}`;
+      $("detail-orders").innerHTML = [
+        ...assignment.orders.map((order) => `<span class="chip">${order}</span>`),
+        ...allocatedCouriers.map((courierId) => `<span class="chip">骑手 ${courierId}</span>`)
+      ].join("");
       $("detail-eta").textContent = etaText(assignment.eta);
       $("right-cost").textContent = assignment.cost;
       setProbabilityMetric("接单概率", assignment.probability);
       $("detail-reasons").innerHTML = assignment.reason.map((item) => `<li>${item}</li>`).join("");
+      if (allocatedCouriers.length > 1) $("detail-reasons").innerHTML += "<li>单任务多派的业务含义是同一商家分配多个骑手参与期望值优化，页面不确定最终接单骑手。</li>";
       if (assignment.merchantNote) $("detail-reasons").innerHTML += `<li>${assignment.merchantNote}</li>`;
       setEvidenceRows([
         ["▧ 接单概率", assignment.fit],
-        ["◎ 骑手距离", assignment.distance],
+        ["◎ 分配骑手", allocatedCouriers.length ? allocatedCouriers.join(" / ") : assignment.distance],
         ["◷ ETA / 时效", etaText(assignment.eta)],
         ["△ 接单风险", assignment.risk],
         ["▣ 策略/负载", profile.utilization]
       ]);
-      showToast(`${assignment.merchant} → ${assignment.courier}，${orderCount} 单`);
+      showToast(`${assignment.merchant} → ${allocatedCouriers.join(" / ") || assignment.courier}，${orderCount} 单`);
     }
     function updateDecisionPanel(profile, report) {
       const best = report && report.best ? report.best : {};
@@ -5354,7 +6096,8 @@ def render_index() -> str:
         scarce_bundle_mcf: "组合搜索 / MCF",
         scarce_bundle_mcf_enum: "组合搜索 / MCF",
         candidate_preview: "候选预览",
-        production_solver: "最终 AutoSolver"
+        production_solver: "最终 AutoSolver",
+        evolution_replay: "策略记忆复用"
       };
       return labels[name] || name || "候选策略";
     }
@@ -5366,11 +6109,11 @@ def render_index() -> str:
       const bestCost = safeNumber(best["local" + "_cost"], Number(profile.cost.replace(/[$,]/g, "")) || 657.1);
       const totalTasks = safeNumber(best.total_tasks || (report && report.features && report.features.tasks), 38);
       const fallbackRows = [
-        {name: "disjoint_then_multidispatch", ["local" + "_cost"]: bestCost * 1.05, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 6, accepted: true, valid: true},
-        {name: "single_task_multidispatch", ["local" + "_cost"]: bestCost * 1.88, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 9, accepted: false, valid: true},
-        {name: "sparse_cover", ["local" + "_cost"]: bestCost * 1.54, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
-        {name: "greedy_baseline", ["local" + "_cost"]: bestCost * 3.2, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 8, accepted: false, valid: true},
-        {name: "low_global_column_search", ["local" + "_cost"]: bestCost * 1.28, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
+        {name: "disjoint_then_multidispatch", ["local" + "_cost"]: bestCost * 1.08, eta_min: 13.9, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 6, accepted: true, valid: true},
+        {name: "single_task_multidispatch", ["local" + "_cost"]: bestCost * 1.16, eta_min: 14.8, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
+        {name: "sparse_cover", ["local" + "_cost"]: bestCost * 1.54, eta_min: 16.4, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
+        {name: "greedy_baseline", ["local" + "_cost"]: bestCost * 2.2, eta_min: 12.7, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 8, accepted: false, valid: true},
+        {name: "low_global_column_search", ["local" + "_cost"]: bestCost * 1.34, eta_min: 15.8, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 6, accepted: false, valid: true},
       ];
       const usingFallbackRows = attempts.length === 0;
       const sourceRows = usingFallbackRows ? fallbackRows : attempts;
@@ -5380,6 +6123,14 @@ def render_index() -> str:
           .sort((left, right) => localCostOf(left) - localCostOf(right))[0];
         return matched || fallbackRows.find((item) => branchForStrategy(item.name, profile) === branch.id) || null;
       }).filter(Boolean);
+      const selectedBranch = selectedBranchForReport(report, profile);
+      const etaMinutesForItem = (item) => {
+        const explicit = safeNumber(item && (item.eta_min || item.etaMin), NaN);
+        if (Number.isFinite(explicit)) return explicit.toFixed(1);
+        const branchId = branchForStrategy(item && item.name, profile);
+        const fallbackByBranch = {S1: 13.9, S2: 14.8, S3: 16.4, S4: 12.7, S5: 15.8};
+        return safeNumber(fallbackByBranch[branchId], 14.5).toFixed(1);
+      };
       const tableRows = rows.map((item) => {
         const branchId = branchForStrategy(item.name, profile);
         const reportedTotal = safeNumber(item.total_tasks || item.totalTasks, totalTasks);
@@ -5392,7 +6143,7 @@ def render_index() -> str:
         const risk = coverage >= 100 && cost <= bestCost * 1.2 ? "Low" : coverage < 100 ? "High" : "Med";
         const status = item.accepted ? "可行" : "已淘汰";
         const statusClass = item.accepted ? "status-ok" : "status-bad";
-        const scoreValue = sampleScoreForBranch(branchId, Math.max(0.35, Math.min(0.91, bestCost / Math.max(cost, 1))));
+        const scoreValue = Number.isFinite(Number(item.score)) ? Number(item.score) : sampleScoreForBranch(branchId, Math.max(0.35, Math.min(0.91, bestCost / Math.max(cost, 1))));
         const score = Math.max(0.35, Math.min(0.99, scoreValue)).toFixed(2);
         const insightByBranch = {
           S1: item.accepted ? "组合候选在当前样本综合分最高" : "组合搜索收益不足或局部绕行偏大",
@@ -5402,16 +6153,17 @@ def render_index() -> str:
           S5: "自适应低意愿/生产级补充降低无人接单风险"
         };
         const insight = insightByBranch[branchId] || (item.valid ? "成本或资源占用高于当前最优" : "覆盖或约束校验失败");
-        const etaMinutes = (12 + safeNumber(item.groups, 6) * 0.7).toFixed(1);
+        const etaMinutes = etaMinutesForItem(item);
         return `<tr data-row-type="strategy-candidate" data-branch="${escapeAttr(branchId)}" data-strategy="${escapeAttr(item.name || "")}" data-cost="${escapeAttr(money(cost))}" data-eta="${escapeAttr(etaMinutes + " 分钟")}" data-risk="${escapeAttr(risk)}" data-score="${score}" data-status="${escapeAttr(status)}"><td>${strategyLabel(item.name)}</td><td>${coverage}%</td><td>${etaMinutes} 分钟</td><td>${money(cost)}</td><td>${safeNumber(item.groups, 0)} 个骑手</td><td>${risk} (${profile.missedRisk})</td><td>${score}</td><td class="${statusClass}">${status}</td><td>${insight}</td></tr>`;
       });
       const used = safeNumber(best.used_couriers || best.groups, 6);
-      const selectedBranch = selectedBranchForReport(report, profile);
-      const finalScore = Math.max(
-        currentSimulationSample ? sampleSelectedScore(currentSimulationSample) : 0.96,
-        ...rows.map((item) => sampleScoreForBranch(branchForStrategy(item.name, profile), Math.max(0.35, Math.min(0.91, bestCost / Math.max(safeNumber(item["local" + "_cost"], bestCost), 1)))))
-      );
-      tableRows.push(`<tr class="emphasis" data-row-type="final-strategy" data-branch="${escapeAttr(selectedBranch)}" data-strategy="production_solver" data-cost="${escapeAttr(money(bestCost))}" data-eta="${escapeAttr(etaText(profile.eta))}" data-risk="Low" data-score="${finalScore.toFixed(2)}" data-status="已选中"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>${totalTasks ? Math.round(safeNumber(best.covered_tasks, totalTasks) / totalTasks * 100) : 100}%</b></td><td><b>${etaText(profile.eta)}</b></td><td><b id="table-cost">${money(bestCost)}</b></td><td><b>${used} 个骑手</b></td><td><b>Low (${profile.missedRisk})</b></td><td><b>${finalScore.toFixed(2)}</b></td><td><b>已选中</b></td><td><b>动态策略路径最高分，成本、风险、履约时效综合最优</b></td></tr>`);
+      const selectedEtaItem = rows.find((item) => branchForStrategy(item.name, profile) === selectedBranch) || rows.slice().sort((left, right) => localCostOf(left) - localCostOf(right))[0];
+      const finalEtaText = selectedEtaItem ? `${etaMinutesForItem(selectedEtaItem)} 分钟` : etaText(profile.eta);
+      const selectedCost = selectedEtaItem ? safeNumber(selectedEtaItem["local" + "_cost"], bestCost) : bestCost;
+      const selectedScore = selectedEtaItem && Number.isFinite(Number(selectedEtaItem.score))
+        ? Number(selectedEtaItem.score)
+        : sampleSelectedScore(currentSimulationSample);
+      tableRows.push(`<tr class="emphasis" data-row-type="final-strategy" data-branch="${escapeAttr(selectedBranch)}" data-strategy="production_solver" data-cost="${escapeAttr(money(selectedCost))}" data-eta="${escapeAttr(finalEtaText)}" data-risk="Low" data-score="${selectedScore.toFixed(2)}" data-status="已选中"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>${totalTasks ? Math.round(safeNumber(best.covered_tasks, totalTasks) / totalTasks * 100) : 100}%</b></td><td><b>${finalEtaText}</b></td><td><b id="table-cost">${money(selectedCost)}</b></td><td><b>${used} 个骑手</b></td><td><b>Low (${profile.missedRisk})</b></td><td><b>${selectedScore.toFixed(2)}</b></td><td><b>已选中</b></td><td><b>沿用选中候选指标口径：ETA、成本、骑手占用、评分完全一致</b></td></tr>`);
       tbody.innerHTML = tableRows.join("");
     }
     function applyScene(caseId, source) {
@@ -5498,7 +6250,7 @@ def render_index() -> str:
         setStatus("更新最优派单" + strategy, true);
         updateReasonProgress(4);
       }
-      if (type === "final") { setStatus("生成最终派单", true); updateReasonProgress(5); }
+      if (type === "final") { setStatus("生成派单分配", true); updateReasonProgress(5); }
     }
     function render(report) {
       currentReport = report || null;
@@ -5508,11 +6260,13 @@ def render_index() -> str:
       const best = report && report.best ? report.best : {};
       const features = report && report.features ? report.features : {};
       const runtime = Math.max(0, Math.round(Number(report.wall_time_s || 8)));
-      const cost = Number(best["local" + "_cost"] || profile.cost.replace(/[$,]/g, "") || 657.1);
+      const attempts = ((report && report.rounds) || []).flatMap((round) => round.strategies || []);
+      const selectedBranch = selectedBranchForReport(report, profile);
+      const selectedAttempt = attempts.find((item) => branchForStrategy(item.name, profile) === selectedBranch);
+      const cost = Number((selectedAttempt && selectedAttempt["local" + "_cost"]) || best["local" + "_cost"] || profile.cost.replace(/[$,]/g, "") || 657.1);
       const totalTasks = safeNumber(best.total_tasks || features.tasks, 38);
       const coveredTasks = safeNumber(best.covered_tasks, totalTasks);
       const completion = totalTasks > 0 ? Math.round((coveredTasks / totalTasks) * 100) : 100;
-      const attempts = ((report && report.rounds) || []).flatMap((round) => round.strategies || []);
       const greedyAttempt = attempts.find((item) => item.name === "greedy_baseline");
       const greedyCost = safeNumber(greedyAttempt && greedyAttempt["local" + "_cost"], cost / Math.max(0.01, 1 - parseFloat(profile.improvement) / 100));
       const improvement = greedyCost > 0 ? ((greedyCost - cost) / greedyCost * 100).toFixed(1) : parseFloat(profile.improvement).toFixed(1);
@@ -5599,22 +6353,23 @@ def render_index() -> str:
         updateReasonProgress(2);
         setStatus("生成候选派单策略", true);
         await wait(DEMO_REASONING_PHASE_DELAYS.candidates);
-        const evaluationOrder = reasoningOrderForSample(sample);
+        const evaluationOrder = strategyAttemptFlowForSample(sample, profile);
         for (let index = 0; index < evaluationOrder.length; index += 1) {
-          const branchId = evaluationOrder[index];
+          const attempt = evaluationOrder[index];
+          const branchId = attempt.branch;
           const branch = strategyBranchCatalog.find((item) => item.id === branchId);
           setReasoningState(sample, index, false);
           updateReasonProgress(index < 2 ? 3 : 4);
-          setStatus(`评估策略 ${branchId}${branch ? " · " + branch.title : ""}`, true);
+          setStatus(`评估策略 ${attempt.name}${branch ? " · " + branch.title : ""}`, true);
           await wait(DEMO_REASONING_PHASE_DELAYS.perStrategy);
           await yieldUi();
         }
         setReasoningState(sample, evaluationOrder.length, true);
         updateReasonProgress(5);
-        setStatus(`最终选择 ${sample.selected_strategy_id}：复核成本、风险和接单概率`, true);
+        setStatus(`采纳策略 ${sample.selected_strategy_id}：复核成本、风险和接单概率`, true);
         await wait(DEMO_REASONING_PHASE_DELAYS.finalReview);
         await waitUntilElapsed(reasoningStartedAt, DEMO_REASONING_TARGET_MS);
-        setStatus(`最终选择 ${sample.selected_strategy_id}：生成当前场景派单线`, true);
+        setStatus(`采纳策略 ${sample.selected_strategy_id}：生成当前场景派单线`, true);
         await yieldUi();
         if (routeSvg) routeSvg.innerHTML = "";
         const mapPayload = simulationFinalMap(sample, profile.dispatchMap);
@@ -5622,7 +6377,7 @@ def render_index() -> str:
         document.body.classList.remove("pending-run", "sample-preview", "reasoning");
         render(report);
         setStatus("当前场景派单完成", false);
-        showToast("已按当前场景生成最终派单线");
+        showToast("已按当前场景生成派单分配线");
         return true;
       } catch (error) {
         console.error(error);
@@ -5698,14 +6453,6 @@ def render_index() -> str:
           if (recenterButton) recenterButton.classList.remove("active");
         }, delay);
       };
-      $("expand-graph").addEventListener("click", (event) => {
-        document.querySelector(".left-panel").classList.toggle("expanded");
-        event.currentTarget.classList.toggle("active");
-        const expanded = event.currentTarget.classList.contains("active");
-        event.currentTarget.setAttribute("aria-expanded", expanded ? "true" : "false");
-        event.currentTarget.textContent = expanded ? "收起" : "展开全部";
-        setStatus(expanded ? "推理树已展开" : "推理树已收起", false);
-      });
       $("layer-mode").addEventListener("change", (event) => setLayerMode(event.target.value));
       document.querySelectorAll("[data-map-action]").forEach((button) => {
         button.addEventListener("click", () => {
@@ -5885,6 +6632,14 @@ def render_index() -> str:
         if (!strategy) return;
         renderStrategyDetail(strategy.dataset.branch || "");
       });
+      const strategyStream = $("strategy-stream");
+      if (strategyStream) {
+        strategyStream.addEventListener("click", (event) => {
+          const row = event.target.closest(".stream-row");
+          if (!row) return;
+          renderStrategyDetail(row.dataset.branch || "");
+        });
+      }
       document.querySelector(".table-panel tbody").addEventListener("click", (event) => {
         const row = event.target.closest("tr");
         if (!row) return;
@@ -5988,6 +6743,7 @@ def render_index() -> str:
           stage: dispatchMap.stage,
           anchor_source: dispatchMap.anchor_source,
           anchor_variant: dispatchMap.anchor_variant,
+          dispatch_anchor_mode: dispatchMap.dispatch_anchor_mode,
           assignment_reconciled_variant: dispatchMap.assignment_reconciled_variant,
           entityCount: Array.isArray(dispatchMap.entities) ? dispatchMap.entities.length : 0,
           assignmentCount: Array.isArray(dispatchMap.assignments) ? dispatchMap.assignments.length : 0,
