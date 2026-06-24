@@ -303,7 +303,7 @@ Confidence loop:
 
 ## Task 10 - Optional External Engine Adapter Seam
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Native local engine remains default.
@@ -311,10 +311,24 @@ Independent verification:
 - No optional dependency breaks local tests.
 
 Work log:
--
+- Added `web_agent_demo/day_engine_adapters.py` with explicit adapter metadata for `native-local`, `uxsim`, `sumo-traci`, `cityflow`, and `mesa-abm`.
+- Added `DayEngineAdapterCapability`, adapter normalization, optional dependency status detection via `importlib.util.find_spec`, and a selected-engine payload helper.
+- Kept `native-local` as the only active/default adapter. Unknown or optional adapter requests fall back to `native-local`.
+- Added `engine_adapter` to `DaySimulationControls` with `native-local` as the default.
+- Added `/api/day-simulation/engines`.
+- Added engine metadata to day-simulation scenarios, run, frame, and memory payloads.
+- Updated `tests/test_web_agent_demo.py` to assert the engines endpoint and native fallback behavior across scenarios/run/frame/memory payloads.
+- Added `tests/test_day_engine_adapters.py` to verify native default behavior, optional capability statuses, no optional module imports, fallback behavior, source URLs, and install hints.
+- Added `goal/goal-12/task10-engine-adapter-seam-audit.md` with implementation and verification evidence.
+- Reconfirmed external engine references through primary URLs: UXsim GitHub, Eclipse SUMO, CityFlow docs, and Mesa docs.
+- Verified syntax with `python3 -m py_compile web_agent_demo/day_engine_adapters.py web_agent_demo/day_simulation.py web_agent_demo/server.py tests/test_day_engine_adapters.py tests/test_web_agent_demo.py`.
+- Ran focused adapter/day-simulation/frontend tests; 37 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 103 tests passed.
+- Ran non-goal/non-output business-code sensitive scan for supplied model/domain/key patterns; no matches were found.
+- Ran an independent engine payload probe: requested `sumo-traci` and `uxsim` both returned `native-local` as selected/active adapter, optional capabilities were exposed as optional metadata, and the simulation still generated 89 orders and 40 frames.
 
 Confidence loop:
--
+- 100% confidence for Task 10 scope: native local remains the default and active engine, external engines are exposed only through optional metadata without importing or requiring dependencies, API payloads expose the adapter seam, unknown/optional adapter requests fall back safely, tests pass, and sensitive runtime LLM configuration remains outside business code.
 
 ## Task 11 - Browser Verification And Visual Hardening
 

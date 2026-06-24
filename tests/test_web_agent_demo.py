@@ -108,6 +108,7 @@ class WebAgentDemoTest(unittest.TestCase):
 
         for endpoint in [
             "/api/day-simulation/scenarios",
+            "/api/day-simulation/engines",
             "/api/day-simulation/run",
             "/api/day-simulation/frame",
             "/api/day-simulation/memory",
@@ -181,17 +182,19 @@ class WebAgentDemoTest(unittest.TestCase):
     def test_day_simulation_api_payloads_support_replay_controls(self):
         from web_agent_demo.server import (
             _day_simulation_frame_payload,
+            _day_simulation_engines_payload,
             _day_simulation_memory_payload,
             _day_simulation_scenarios_payload,
             _run_day_simulation_payload,
         )
 
         scenarios = _day_simulation_scenarios_payload()
+        engines = _day_simulation_engines_payload({"engine_adapter": ["sumo-traci"]})
         run_payload = _run_day_simulation_payload(
             {
                 "scenario_id": "weekday_full_day",
                 "seed": "api-contract-day",
-                "controls": {"courier_count": 12, "order_scale": 0.22, "weather": "rain"},
+                "controls": {"courier_count": 12, "order_scale": 0.22, "weather": "rain", "engine_adapter": "uxsim"},
             }
         )
         frame_payload = _day_simulation_frame_payload(
@@ -200,6 +203,7 @@ class WebAgentDemoTest(unittest.TestCase):
                 "courier_count": ["12"],
                 "order_scale": ["0.22"],
                 "weather": ["rain"],
+                "engine_adapter": ["uxsim"],
                 "frame_index": ["3"],
             }
         )
@@ -209,12 +213,22 @@ class WebAgentDemoTest(unittest.TestCase):
                 "courier_count": ["12"],
                 "order_scale": ["0.22"],
                 "weather": ["rain"],
+                "engine_adapter": ["uxsim"],
             }
         )
 
         self.assertEqual(scenarios["status"], "ok")
         self.assertEqual(scenarios["endpoints"]["run"], "/api/day-simulation/run")
+        self.assertEqual(scenarios["endpoints"]["engines"], "/api/day-simulation/engines")
+        self.assertEqual(scenarios["engine"]["selected_adapter_id"], "native-local")
+        self.assertEqual(scenarios["engine"]["active_adapter"]["status"], "active")
+        self.assertEqual(engines["status"], "ok")
+        self.assertEqual(engines["engine"]["selected_adapter_id"], "native-local")
+        self.assertEqual(engines["engine"]["active_adapter"]["id"], "native-local")
+        self.assertTrue({"uxsim", "sumo-traci"}.issubset({item["id"] for item in engines["engine"]["adapter_capabilities"]}))
         self.assertEqual(run_payload["status"], "ok")
+        self.assertEqual(run_payload["engine"]["selected_adapter_id"], "native-local")
+        self.assertEqual(run_payload["engine"]["active_adapter"]["id"], "native-local")
         self.assertGreater(run_payload["order_count"], 50)
         self.assertGreater(run_payload["frame_count"], 10)
         self.assertEqual(run_payload["memory_event_count"], run_payload["frame_count"] * 3)
@@ -222,12 +236,14 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertEqual(run_payload["contract"]["challenger_run"]["algorithm_id"], "autosolver_agent")
         self.assertEqual(frame_payload["status"], "ok")
         self.assertEqual(frame_payload["frame_index"], 3)
+        self.assertEqual(frame_payload["engine"]["selected_adapter_id"], "native-local")
         self.assertEqual(frame_payload["frame"]["baseline"]["active_order_ids"], frame_payload["frame"]["challenger"]["active_order_ids"])
         self.assertTrue(frame_payload["frame"]["highlighted_order_ids"])
         self.assertTrue(frame_payload["frame"]["highlighted_courier_ids"])
         self.assertGreater(frame_payload["frame"]["delta"]["time_saved_s"], 0)
         self.assertIn("cumulatively", frame_payload["frame"]["delta"]["headline"])
         self.assertEqual(memory_payload["status"], "ok")
+        self.assertEqual(memory_payload["engine"]["selected_adapter_id"], "native-local")
         self.assertEqual(
             {event["event_type"] for event in memory_payload["evolution_events"]},
             {"memory_recall", "memory_writeback", "future_policy_shift"},

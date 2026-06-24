@@ -6,6 +6,7 @@ import random
 from dataclasses import dataclass, replace
 from typing import Any
 
+from web_agent_demo.day_engine_adapters import DAY_ENGINE_ADAPTER_DEFAULT_ID, normalize_day_engine_adapter
 from web_agent_demo.simulation_engine import Position, simulation_to_dict
 
 
@@ -17,6 +18,7 @@ DAY_PREDICTOR_ENV_VARS = ("AUTOSOLVER_LLM_BASE_URL", "AUTOSOLVER_LLM_API_KEY", "
 
 DAY_SIMULATION_ENDPOINTS = {
     "scenarios": "/api/day-simulation/scenarios",
+    "engines": "/api/day-simulation/engines",
     "run": "/api/day-simulation/run",
     "frame": "/api/day-simulation/frame",
     "memory": "/api/day-simulation/memory",
@@ -34,6 +36,7 @@ class DaySimulationControls:
     challenger_algorithm_id: str = "autosolver_agent"
     memory_mode: str = "read-write"
     predictor_mode: str = "auto"
+    engine_adapter: str = DAY_ENGINE_ADAPTER_DEFAULT_ID
 
 
 @dataclass(frozen=True)
@@ -1383,6 +1386,7 @@ def _normalize_day_controls(controls: DaySimulationControls) -> DaySimulationCon
         challenger_algorithm_id=controls.challenger_algorithm_id or "autosolver_agent",
         memory_mode=controls.memory_mode if controls.memory_mode in {"off", "read-only", "read-write"} else "read-write",
         predictor_mode=controls.predictor_mode if controls.predictor_mode in {"fallback", "auto", "external"} else "auto",
+        engine_adapter=normalize_day_engine_adapter(controls.engine_adapter),
     )
 
 

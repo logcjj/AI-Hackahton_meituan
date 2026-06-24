@@ -21,6 +21,7 @@ if str(ROOT) not in sys.path:
 from autosolver_agent.system import get_agent_blueprint, run_case_agent as _run_case_agent
 from tools.agent_trace_demo import parse_candidates
 from web_agent_demo.compare_engine import run_comparison
+from web_agent_demo.day_engine_adapters import selected_day_engine_payload
 from web_agent_demo.day_simulation import (
     DAY_SIMULATION_ENDPOINTS,
     DaySimulationControls,
@@ -1477,6 +1478,7 @@ def _day_controls_from_payload(payload: dict[str, object] | None) -> DaySimulati
         challenger_algorithm_id=str(source.get("challenger_algorithm_id", defaults.challenger_algorithm_id)),
         memory_mode=str(source.get("memory_mode", defaults.memory_mode)),
         predictor_mode=str(source.get("predictor_mode", defaults.predictor_mode)),
+        engine_adapter=str(source.get("engine_adapter", defaults.engine_adapter)),
     )
 
 
@@ -1492,10 +1494,25 @@ def _day_controls_from_query(query: dict[str, list[str]]) -> DaySimulationContro
         "challenger_algorithm_id",
         "memory_mode",
         "predictor_mode",
+        "engine_adapter",
     ):
         if key in query and query[key]:
             payload[key] = query[key][0]
     return _day_controls_from_payload(payload)
+
+
+def _day_engine_payload(selected_adapter: str | None = None) -> dict[str, object]:
+    return simulation_to_dict(selected_day_engine_payload(selected_adapter))
+
+
+def _day_simulation_engines_payload(query: dict[str, list[str]] | None = None) -> dict[str, object]:
+    query = query or {}
+    selected_adapter = query.get("engine_adapter", ["native-local"])[0]
+    return {
+        "status": "ok",
+        "engine": _day_engine_payload(selected_adapter),
+        "endpoints": dict(DAY_SIMULATION_ENDPOINTS),
+    }
 
 
 def _day_simulation_scenarios_payload() -> dict[str, object]:
@@ -1506,20 +1523,17 @@ def _day_simulation_scenarios_payload() -> dict[str, object]:
         "scenarios": simulation_to_dict(scenarios),
         "defaults": simulation_to_dict(default_controls),
         "endpoints": dict(DAY_SIMULATION_ENDPOINTS),
-        "engine": {
-            "version": "native-discrete-event-v1",
-            "routing_provider": "local-road-graph",
-            "adapter_seam": "uxsim-sumo-optional",
-        },
+        "engine": _day_engine_payload(default_controls.engine_adapter),
     }
 
 
 def _run_day_simulation_payload(payload: dict[str, object]) -> dict[str, object]:
     controls_payload = payload.get("controls") if isinstance(payload.get("controls"), dict) else {}
+    controls = _day_controls_from_payload(controls_payload)
     contract = run_full_day_comparison(
         scenario_id=str(payload.get("scenario_id") or "weekday_full_day"),
         seed=str(payload.get("seed") or "day-replay"),
-        controls=_day_controls_from_payload(controls_payload),
+        controls=controls,
     )
     contract_payload = day_comparison_to_dict(contract)
     return {
@@ -1529,6 +1543,7 @@ def _run_day_simulation_payload(payload: dict[str, object]) -> dict[str, object]
         "order_count": len(contract_payload["orders"]),
         "memory_event_count": len(contract_payload["evolution_events"]),
         "endpoints": dict(DAY_SIMULATION_ENDPOINTS),
+        "engine": _day_engine_payload(controls.engine_adapter),
     }
 
 
@@ -1551,6 +1566,7 @@ def _day_simulation_frame_payload(query: dict[str, list[str]]) -> dict[str, obje
         "frame": frame,
         "time_slice": next((item for item in contract["time_slices"] if frame and item["id"] == frame["time_slice_id"]), None),
         "privacy": contract["privacy"],
+        "engine": _day_engine_payload(query.get("engine_adapter", ["native-local"])[0]),
     }
 
 
@@ -1566,6 +1582,7 @@ def _day_simulation_memory_payload(query: dict[str, list[str]]) -> dict[str, obj
         "evolution_events": events,
         "event_count": len(events),
         "privacy": contract["privacy"],
+        "engine": _day_engine_payload(query.get("engine_adapter", ["native-local"])[0]),
     }
 
 
@@ -2892,6 +2909,9 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 return
             if parsed.path == "/api/day-simulation/scenarios":
                 self._send_json(_day_simulation_scenarios_payload())
+                return
+            if parsed.path == "/api/day-simulation/engines":
+                self._send_json(_day_simulation_engines_payload(parse_qs(parsed.query)))
                 return
             if parsed.path == "/api/day-simulation/frame":
                 self._send_json(_day_simulation_frame_payload(parse_qs(parsed.query)))
