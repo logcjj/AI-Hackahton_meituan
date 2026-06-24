@@ -39,8 +39,8 @@ Status terms:
 | R15 | Desktop and mobile layouts are usable. | Responsive CSS and prior screenshots exist. | Fresh browser audit must validate dimensions, no collapsed maps, no horizontal overflow, and readable panels. | Pass |
 | R16 | Browser runtime is clean. | Prior browser audits reported no console/network errors. | Fresh browser run must collect console errors/warnings and failed network responses. | Pass |
 | R17 | Tests are green and meaningful for the above scope. | 103-test suite exists, focused day replay tests exist. | Re-run compile, focused tests, full tests, and map each test group to requirements. | Pass |
-| R18 | Goal 12 completion archive is accurate or corrected. | `goal/goal-12/COMPLETED.md`, `final-review-completion-audit.md`. | After R1-R17, decide whether archive can stand or needs correction. | Unverified |
+| R18 | Goal 12 completion archive is accurate or corrected. | `goal/goal-12/COMPLETED.md`, `final-review-completion-audit.md`. | After R1-R17, decide whether archive can stand or needs correction. | Pass |
 
 ## Initial Assessment
 
-Tasks 2 and 3 prove static/backend/API/test/security and browser runtime requirements. R18 remains open until the debug cycle and final audit decide whether the previous completion archive stands or needs correction.
+Tasks 2 and 3 prove static/backend/API/test/security and browser runtime requirements. Task 4 corrected the archive evidence by adding a post-completion re-audit note to Goal 12, so all matrix requirements now pass.
