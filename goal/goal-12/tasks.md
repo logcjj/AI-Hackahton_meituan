@@ -189,7 +189,7 @@ Confidence loop:
 
 ## Task 7 - Replace Frontend Shell With Replay Product
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Old frontend composition is replaced by full-day replay UI.
@@ -197,10 +197,24 @@ Independent verification:
 - Responsive shell loads on desktop and mobile widths.
 
 Work log:
--
+- Added `web_agent_demo/day_replay_frontend.py` as the new home-page frontend shell for full-day delivery simulation replay.
+- Updated `web_agent_demo/server.py` so `render_index()` returns the new full-day replay shell instead of the old small simulation sandbox.
+- Updated `tests/test_web_agent_demo.py` to validate the new shell markers and explicitly reject old `simulation-sandbox`, old candidate table, old `/api/compare/run`, old `/api/simulation/*`, ReasonGraph-first, and candidate-preview frontend markers.
+- Embedded a cached deterministic full-day comparison bootstrap in the shell for immediate first paint: seed `frontend-shell`, 18 couriers, 0.38 order scale, 207 orders, 40 frames, 120 memory events, and all three event types `memory_recall`, `memory_writeback`, `future_policy_shift`.
+- Added visible product areas for KPI savings, side-by-side Pure Greedy vs AutoSolver replay panels, replay controls, readable reasoning flow, and Memory self-evolution.
+- Added desktop/mobile responsive CSS with `@media (max-width: 1180px)` and `@media (max-width: 720px)`.
+- Added `goal/goal-12/task7-frontend-shell-audit.md` with implementation and verification evidence.
+- Verified syntax with `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/server.py tests/test_web_agent_demo.py`.
+- Ran `uv run --with pytest pytest tests/test_web_agent_demo.py`; 14 tests passed.
+- Ran frontend plus day-simulation focused tests; 33 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 99 tests passed.
+- Ran non-goal/non-output sensitive pattern scan for supplied model/domain/key patterns; no business-code matches were found.
+- Ran static render probe confirming the new shell is present, the old shell is absent, no `<table>` candidate-table layout is rendered, bootstrap data has more than 10 frames and all three memory event types, and privacy remains `env-only-redacted`.
+- Ran Playwright CLI desktop load at `127.0.0.1:8787`: page ready, 40 frames, KPI `433.0m`, old shell absent, two-column side-by-side replay grid, and 0 console warnings/errors.
+- Ran Playwright CLI mobile probe at `390x844`: page ready, old shell absent, one-column replay grid, two-column KPI grid, body overflow `auto`, scrollable page, and 0 console warnings/errors.
 
 Confidence loop:
--
+- 100% confidence for Task 7 scope: the root UI now renders the full-day replay shell instead of the old sandbox, the primary visual hierarchy is simulation plus comparison with KPI/reasoning/memory panels rather than candidate tables or line diagrams, desktop and mobile browser load probes pass, and the full test suite is green. Remaining dynamic replay controls and live day-simulation endpoint wiring are explicitly deferred to Tasks 8-9 rather than hidden inside Task 7.
 
 ## Task 8 - Add Side-By-Side Map Replay And Timeline Controls
 

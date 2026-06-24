@@ -1639,6 +1639,10 @@ def _sse(event: str, data: dict[str, object]) -> bytes:
 
 
 def render_index() -> str:
+    from web_agent_demo.day_replay_frontend import render_day_replay_index
+
+    return render_day_replay_index()
+
     return """<!doctype html>
 <html lang="zh-CN">
 <head>

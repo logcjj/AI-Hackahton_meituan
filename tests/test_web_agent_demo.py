@@ -8,113 +8,91 @@ from unittest import mock
 
 
 class WebAgentDemoTest(unittest.TestCase):
-    def test_home_page_contains_simulation_comparison_sandbox(self):
+    def test_home_page_contains_full_day_replay_shell(self):
         from web_agent_demo.server import render_index
 
         html = render_index()
 
         required_markers = [
             "AutoSolver Agent",
-            "美团即时配送动态仿真对比沙盘",
-            "动态配送仿真沙盘",
-            "对比模式为核心",
-            "多算法决策对比",
-            "关键决策点",
-            "自动化 Memory 自进化",
-            "事件时间线",
-            "策略游戏式态势",
-            "模拟人生式事件流",
-            "当前项目地图风格",
-            "10 秒内输出对比和关键决策点",
-            'id="simulation-sandbox"',
-            'id="simulation-map"',
-            'id="entity-layer"',
-            'id="route-layer"',
-            'id="algorithm-compare-table"',
+            "全日配送模拟推演对比台",
+            "一天订单流",
+            "跨时间片推演",
+            "纯贪心和 AutoSolver 并排对比",
+            "指标节省",
+            "算法推理流程",
+            "Memory 自进化",
+            "本地确定性仿真引擎",
+            "native discrete-event engine",
+            "existing-project-operational-map",
+            'id="day-replay-shell"',
+            'id="kpi-strip"',
+            'id="replay-controls"',
+            'id="side-by-side-replay"',
+            'id="greedy-map-panel"',
+            'id="autosolver-map-panel"',
+            'id="greedy-map-stage"',
+            'id="autosolver-map-stage"',
+            'id="reasoning-flow-panel"',
             'id="memory-evolution-panel"',
-            'id="event-timeline"',
+            'id="memory-evolution-stack"',
+            'id="day-replay-bootstrap"',
             'id="courier-count"',
-            'id="order-intensity"',
-            'id="burstiness"',
+            'id="order-scale"',
             'id="weather-mode"',
-            'id="congestion-level"',
-            'id="play-sim"',
-            'id="pause-sim"',
-            'id="reset-sim"',
-            'id="run-compare"',
+            'id="timeline-scrubber"',
+            'id="play-replay"',
+            'id="pause-replay"',
+            'id="compare-algorithms"',
+            "Pure Greedy Replay",
+            "AutoSolver Agent Replay",
+            "nearest_greedy",
+            "autosolver_agent",
+            "Time Saved",
+            "Cost Saved",
+            "Delivered",
+            "Timeout Risk",
+            "Average ETA",
+            "Utilization",
             "商家",
             "骑手",
-            "订单目的地",
-            "选中策略路线",
+            "订单",
             "env-only-redacted",
-            "https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js",
-            "https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css",
-            "https://tiles.openfreemap.org/styles/positron",
-            "maplibre-with-offline-schematic-fallback",
-            "function bootstrapSimulationSandbox",
-            "function createSession",
-            "function advanceSimulation",
-            "function runComparison",
-            "function renderCompare",
+            "function bootstrapDayReplayShell",
+            "function setFrameIndex",
+            "function renderKpis",
+            "function renderMaps",
+            "function renderReasoning",
             "function renderMemory",
-            "function handleProgressEvent",
-            "function refreshMemoryRecall",
-            "function recallQueryForTick",
-            "function predictorDisplayModel",
-            "Strategy Decision Basis",
-            "Historical Win Rate",
-            "Rejected Memory / Decision Replay",
-            "Predictor Ranking",
-            'data-secret-handling',
-            'data-memory-algorithm',
-            'data-ranked-algorithm',
-            'data-selected-algorithm',
-            'data-payload-source',
-            'api:/api/compare/run',
-            'memory_mode: "read-write"',
-            'predictor_mode: "auto"',
-            "function startPlaybackLoop",
-            "function playbackStep",
-            "function pausePlayback",
-            "function resetSimulation",
-            "function scheduleControlPatch",
-            "function startCompareCountdown",
-            "function stopCompareCountdown",
-            "playTimer",
-            "controlApplyTimer",
-            "lastControlSignature",
-            "对比预算 10.0s",
-            "参数已应用",
-            "播放推演中",
-            "10 秒预算内并行评估算法",
+            "function playReplay",
+            "function pauseReplay",
+            "function compareAlgorithms",
+            "window.__AUTO_SOLVER_DAY_REPLAY__",
+            "window.__AUTO_SOLVER_DAY_REPLAY_READY__",
             "对比完成",
-            "window.__AUTO_SOLVER_SIMULATION_SANDBOX__",
         ]
         for marker in required_markers:
             self.assertIn(marker, html)
 
         for endpoint in [
-            "/api/simulation/scenarios",
+            "/api/day-simulation/scenarios",
+            "/api/day-simulation/run",
+            "/api/day-simulation/frame",
+            "/api/day-simulation/memory",
+        ]:
+            self.assertIn(endpoint, html)
+
+        for forbidden in [
+            'id="simulation-sandbox"',
+            'id="simulation-map"',
+            'id="algorithm-compare-table"',
+            'id="run-compare"',
             "/api/simulation/session",
             "/api/simulation/tick",
             "/api/compare/run",
             "/api/memory/recall",
             "/api/predictor/rank",
-        ]:
-            self.assertIn(endpoint, html)
-
-        for algorithm in [
-            "nearest_greedy",
-            "cost_greedy",
-            "risk_aware_greedy",
-            "min_cost_matching",
-            "sparse_cover",
-            "flow_mcf",
-            "autosolver_agent",
-        ]:
-            self.assertIn(algorithm, html)
-
-        for forbidden in [
+            "maplibre-with-offline-schematic-fallback",
             "ReasonGraph 推理链路",
             "真实策略尝试流",
             "策略族汇总",
@@ -135,6 +113,34 @@ class WebAgentDemoTest(unittest.TestCase):
             "AUTOSOLVER_LLM_API_KEY",
         ]:
             self.assertNotIn(forbidden, html)
+
+        self.assertIn("@media (max-width: 1180px)", html)
+        self.assertIn("@media (max-width: 720px)", html)
+
+    def test_home_page_bootstrap_contains_full_day_contract_preview(self):
+        from web_agent_demo.server import render_index
+
+        html = render_index()
+        start = html.index('<script id="day-replay-bootstrap" type="application/json">')
+        start = html.index(">", start) + 1
+        end = html.index("</script>", start)
+        payload = json.loads(html[start:end])
+        contract = payload["contract"]
+
+        self.assertEqual(payload["mode"], "full-day-replay-shell")
+        self.assertEqual(payload["endpoints"]["run"], "/api/day-simulation/run")
+        self.assertEqual(contract["scenario"]["id"], "weekday_full_day")
+        self.assertEqual(contract["baseline_run"]["algorithm_id"], "nearest_greedy")
+        self.assertEqual(contract["challenger_run"]["algorithm_id"], "autosolver_agent")
+        self.assertGreater(len(contract["frames"]), 10)
+        self.assertGreater(len(contract["orders"]), 100)
+        self.assertEqual(
+            {event["event_type"] for event in contract["evolution_events"]},
+            {"memory_recall", "memory_writeback", "future_policy_shift"},
+        )
+        self.assertGreater(contract["frames"][0]["delta"]["time_saved_s"], 0)
+        self.assertEqual(contract["privacy"]["secret_handling"], "env-only-redacted")
+        self.assertTrue(contract["frames"][0]["memory_event_ids"])
 
     def test_dispatch_map_uses_case_candidate_data(self):
         from web_agent_demo.server import build_dispatch_assignment_map
@@ -425,10 +431,11 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertNotIn("evolution-step-generate", html)
         self.assertNotIn("data-evolution-step", html)
         self.assertNotIn("function paintEvolutionPanel()", html)
-        self.assertIn("evolution_generate", html)
-        self.assertIn("evolution_validate", html)
-        self.assertIn("evolution_trial", html)
-        self.assertIn("handleProgressEvent", html)
+        self.assertIn("memory_recall", html)
+        self.assertIn("memory_writeback", html)
+        self.assertIn("future_policy_shift", html)
+        self.assertIn("data-secret-handling", html)
+        self.assertIn("function renderMemory", html)
 
     def test_case_listing_exposes_large_seed301_without_local_paths(self):
         from web_agent_demo.server import list_cases
