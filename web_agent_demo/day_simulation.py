@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import random
 from dataclasses import dataclass
 from typing import Any
 
@@ -261,6 +263,19 @@ class DaySimulationContract:
     privacy: dict[str, str]
 
 
+@dataclass(frozen=True)
+class DaySimulationWorld:
+    scenario: DayScenario
+    seed: str
+    controls: DaySimulationControls
+    merchants: tuple[DayMerchant, ...]
+    couriers: tuple[DayCourier, ...]
+    orders: tuple[DayOrder, ...]
+    shocks: tuple[DayShock, ...]
+    time_slices: tuple[TimeSlice, ...]
+    summary: dict[str, Any]
+
+
 def day_scenario_catalog() -> tuple[DayScenario, ...]:
     return (
         DayScenario(
@@ -281,6 +296,72 @@ def day_scenario_catalog() -> tuple[DayScenario, ...]:
             default_controls=DaySimulationControls(),
             visual_directive="Side-by-side operational replay on the existing project map; no complex wireframe-first reasoning graph.",
         ),
+    )
+
+
+def generate_full_day_world(
+    scenario_id: str = "weekday_full_day",
+    seed: str = "demo",
+    controls: DaySimulationControls | None = None,
+) -> DaySimulationWorld:
+    scenario = get_day_scenario(scenario_id)
+    normalized = _normalize_day_controls(controls or scenario.default_controls)
+    merchants = _generate_day_merchants(scenario, seed)
+    couriers = _generate_day_couriers(scenario, seed, normalized)
+    shocks = _generate_day_shocks(scenario, seed, normalized)
+    orders_by_slice: dict[int, list[DayOrder]] = {}
+    slices: list[TimeSlice] = []
+
+    for index, start_s in enumerate(range(scenario.day_start_s, scenario.day_end_s, normalized.time_slice_s)):
+        end_s = min(start_s + normalized.time_slice_s, scenario.day_end_s)
+        phase = _phase_for_second(start_s)
+        active_shocks = _active_shocks(shocks, start_s, end_s)
+        weather = _weather_for_slice(normalized, active_shocks, start_s)
+        congestion = _congestion_for_slice(normalized, phase, active_shocks, start_s)
+        supply = _courier_supply(couriers, active_shocks, start_s)
+        orders = _generate_orders_for_slice(
+            scenario=scenario,
+            seed=seed,
+            controls=normalized,
+            merchants=merchants,
+            phase=phase,
+            start_s=start_s,
+            end_s=end_s,
+            index=index,
+            weather=weather,
+            congestion_level=congestion,
+            active_shocks=active_shocks,
+        )
+        orders_by_slice[index] = list(orders)
+        slices.append(
+            TimeSlice(
+                id=_time_slice_id(start_s),
+                index=index,
+                start_s=start_s,
+                end_s=end_s,
+                label=_time_label(start_s, phase),
+                demand_phase=phase,
+                weather=weather,
+                congestion_level=congestion,
+                courier_supply=supply,
+                order_ids=tuple(order.id for order in orders),
+                shock_ids=tuple(shock.id for shock in active_shocks),
+                compare_due=bool(active_shocks) or len(orders) >= max(4, int(normalized.courier_count * 0.16)),
+            )
+        )
+
+    all_orders = tuple(order for index in sorted(orders_by_slice) for order in orders_by_slice[index])
+    time_slices = tuple(slices)
+    return DaySimulationWorld(
+        scenario=scenario,
+        seed=str(seed),
+        controls=normalized,
+        merchants=merchants,
+        couriers=couriers,
+        orders=all_orders,
+        shocks=shocks,
+        time_slices=time_slices,
+        summary=_world_summary(all_orders, shocks, time_slices, couriers),
     )
 
 
@@ -543,6 +624,10 @@ def day_contract_to_dict(value: Any) -> Any:
     return simulation_to_dict(value)
 
 
+def day_world_to_dict(value: Any) -> Any:
+    return simulation_to_dict(value)
+
+
 def _courier_snapshot(courier: DayCourier) -> dict[str, Any]:
     return {
         "courier_id": courier.id,
@@ -564,3 +649,428 @@ def _route_overlay(order: DayOrder, courier: DayCourier, lane: str) -> dict[str,
             simulation_to_dict(order.destination),
         ],
     }
+
+
+def _normalize_day_controls(controls: DaySimulationControls) -> DaySimulationControls:
+    weather = controls.weather if controls.weather in {"mixed", "clear", "rain", "storm", "event"} else "mixed"
+    profile = controls.congestion_profile if controls.congestion_profile in {"weekday", "smooth", "rainy", "event"} else "weekday"
+    return DaySimulationControls(
+        courier_count=max(1, min(500, int(controls.courier_count))),
+        order_scale=round(_clamp(float(controls.order_scale), 0.1, 3.0), 4),
+        weather=weather,
+        congestion_profile=profile,
+        time_slice_s=max(5 * 60, min(60 * 60, int(controls.time_slice_s))),
+        baseline_algorithm_id=controls.baseline_algorithm_id or "nearest_greedy",
+        challenger_algorithm_id=controls.challenger_algorithm_id or "autosolver_agent",
+        memory_mode=controls.memory_mode if controls.memory_mode in {"off", "read-only", "read-write"} else "read-write",
+        predictor_mode=controls.predictor_mode if controls.predictor_mode in {"fallback", "auto", "external"} else "auto",
+    )
+
+
+def _generate_day_merchants(scenario: DayScenario, seed: str) -> tuple[DayMerchant, ...]:
+    categories = ("quick_service", "tea", "snack", "noodle", "rice_bowl", "bakery")
+    merchants: list[DayMerchant] = []
+    for index in range(18):
+        zone_id = scenario.merchant_zones[index % len(scenario.merchant_zones)]
+        rng = _rng(seed, scenario.id, "merchant", index)
+        merchants.append(
+            DayMerchant(
+                id=f"M{index + 1:03d}",
+                label=f"Merchant {index + 1}",
+                zone_id=zone_id,
+                category=categories[index % len(categories)],
+                position=_zone_position(scenario, zone_id, rng, spread=0.105),
+                peak_capacity=28 + int(rng.random() * 36),
+                prep_time_s=round(220 + rng.random() * 260 + (index % 3) * 35, 1),
+            )
+        )
+    return tuple(merchants)
+
+
+def _generate_day_couriers(
+    scenario: DayScenario,
+    seed: str,
+    controls: DaySimulationControls,
+) -> tuple[DayCourier, ...]:
+    couriers: list[DayCourier] = []
+    for index in range(controls.courier_count):
+        rng = _rng(seed, scenario.id, "courier", index)
+        shift_template = index % 6
+        if shift_template in {0, 1}:
+            shift_start, shift_end = DAY_START_S, 16 * 60 * 60
+        elif shift_template in {2, 3}:
+            shift_start, shift_end = 10 * 60 * 60, 21 * 60 * 60
+        elif shift_template == 4:
+            shift_start, shift_end = 16 * 60 * 60, DAY_END_S
+        else:
+            shift_start, shift_end = DAY_START_S, DAY_END_S
+        zone_id = scenario.merchant_zones[(index + int(rng.random() * 10)) % len(scenario.merchant_zones)]
+        couriers.append(
+            DayCourier(
+                id=f"R{index + 1:03d}",
+                label=f"Courier {index + 1}",
+                home_zone_id=zone_id,
+                shift_start_s=shift_start,
+                shift_end_s=shift_end,
+                capacity=3 if index % 5 == 0 else 2,
+                base_speed_mps=round(3.8 + rng.random() * 1.35, 3),
+                willingness=round(_clamp(0.52 + rng.random() * 0.38, 0.05, 0.98), 4),
+                start_position=_zone_position(scenario, zone_id, rng, spread=0.14),
+            )
+        )
+    return tuple(couriers)
+
+
+def _generate_day_shocks(
+    scenario: DayScenario,
+    seed: str,
+    controls: DaySimulationControls,
+) -> tuple[DayShock, ...]:
+    rng = _rng(seed, scenario.id, "shocks", controls.weather, controls.congestion_profile)
+    rain_severity = 0.52 + rng.random() * 0.24
+    if controls.weather == "clear":
+        rain_severity = 0.22
+    elif controls.weather == "storm":
+        rain_severity = 0.86
+    road_severity = 0.45 + rng.random() * 0.28
+    if controls.congestion_profile == "smooth":
+        road_severity = 0.24
+    elif controls.congestion_profile == "event":
+        road_severity = 0.82
+    shortage_severity = 0.36 + rng.random() * 0.24
+    burst_severity = 0.55 + rng.random() * 0.24
+    return (
+        DayShock(
+            id="S-rain-lunch",
+            shock_type="rain_slowdown",
+            start_s=11 * 60 * 60 + 45 * 60,
+            end_s=13 * 60 * 60 + 15 * 60,
+            affected_zone_ids=("office_core", "mall_foodcourt"),
+            severity=round(rain_severity, 4),
+            summary="Rain slows lunch-peak arterial links.",
+        ),
+        DayShock(
+            id="S-merchant-burst-lunch",
+            shock_type="merchant_burst",
+            start_s=12 * 60 * 60,
+            end_s=12 * 60 * 60 + 45 * 60,
+            affected_zone_ids=("mall_foodcourt", "metro_exit"),
+            severity=round(burst_severity, 4),
+            summary="Merchant burst creates simultaneous lunch orders.",
+        ),
+        DayShock(
+            id="S-road-dinner",
+            shock_type="road_congestion",
+            start_s=17 * 60 * 60 + 30 * 60,
+            end_s=19 * 60 * 60 + 15 * 60,
+            affected_zone_ids=("office_core", "residential_edge"),
+            severity=round(road_severity, 4),
+            summary="Dinner commute congestion slows cross-zone movement.",
+        ),
+        DayShock(
+            id="S-courier-night",
+            shock_type="courier_shortage",
+            start_s=21 * 60 * 60,
+            end_s=22 * 60 * 60 + 30 * 60,
+            affected_zone_ids=tuple(scenario.merchant_zones),
+            severity=round(shortage_severity, 4),
+            summary="Night supply gap reduces available courier pool.",
+        ),
+    )
+
+
+def _generate_orders_for_slice(
+    scenario: DayScenario,
+    seed: str,
+    controls: DaySimulationControls,
+    merchants: tuple[DayMerchant, ...],
+    phase: str,
+    start_s: int,
+    end_s: int,
+    index: int,
+    weather: str,
+    congestion_level: float,
+    active_shocks: tuple[DayShock, ...],
+) -> tuple[DayOrder, ...]:
+    rng = _rng(seed, scenario.id, "orders", start_s, phase)
+    count = _order_count_for_slice(controls, phase, start_s, end_s, active_shocks, rng)
+    affected_zones = {
+        zone_id
+        for shock in active_shocks
+        if shock.shock_type == "merchant_burst"
+        for zone_id in shock.affected_zone_ids
+    }
+    orders: list[DayOrder] = []
+    for offset in range(count):
+        merchant = _merchant_for_order(merchants, rng, phase, affected_zones, offset)
+        created_at = start_s + int((offset + 1) * max(1, (end_s - start_s)) / (count + 1))
+        order_rng = _rng(seed, scenario.id, "order-detail", start_s, offset, merchant.id)
+        priority = _priority_for_order(phase, weather, congestion_level, order_rng)
+        deadline_window = _deadline_window_s(phase, weather, congestion_level, priority, order_rng)
+        destination = _destination_for_order(scenario, merchant.position, order_rng, phase)
+        risk_tags = _risk_tags(phase, weather, congestion_level, active_shocks, priority)
+        orders.append(
+            DayOrder(
+                id=f"O-{created_at // 60:04d}-{index:03d}-{offset + 1:03d}",
+                merchant_id=merchant.id,
+                created_at_s=created_at,
+                deadline_s=created_at + deadline_window,
+                demand_phase=phase,
+                merchant_position=merchant.position,
+                destination=destination,
+                prep_time_s=round(merchant.prep_time_s * _prep_multiplier(active_shocks, congestion_level), 1),
+                priority=priority,
+                basket_value_yuan=round(18.0 + order_rng.random() * 64.0 + priority * 12.0, 2),
+                penalty_yuan=round(4.0 + priority * 9.5 + len(risk_tags) * 0.85, 2),
+                risk_tags=risk_tags,
+            )
+        )
+    return tuple(orders)
+
+
+def _order_count_for_slice(
+    controls: DaySimulationControls,
+    phase: str,
+    start_s: int,
+    end_s: int,
+    active_shocks: tuple[DayShock, ...],
+    rng: random.Random,
+) -> int:
+    base_by_phase = {
+        "breakfast": 4.2,
+        "lunch_peak": 11.5,
+        "afternoon_tea": 5.0,
+        "dinner_peak": 10.2,
+        "night_supply_gap": 3.3,
+    }
+    count = base_by_phase.get(phase, 4.0) * controls.order_scale * ((end_s - start_s) / DEFAULT_TIME_SLICE_S)
+    for shock in active_shocks:
+        if shock.shock_type == "merchant_burst":
+            count *= 1.0 + shock.severity * 0.95
+        elif shock.shock_type in {"rain_slowdown", "road_congestion"}:
+            count *= 1.0 + shock.severity * 0.12
+    jitter = 0.72 + rng.random() * 0.62
+    return max(1, int(round(count * jitter)))
+
+
+def _merchant_for_order(
+    merchants: tuple[DayMerchant, ...],
+    rng: random.Random,
+    phase: str,
+    affected_zones: set[str],
+    offset: int,
+) -> DayMerchant:
+    if affected_zones:
+        candidates = tuple(merchant for merchant in merchants if merchant.zone_id in affected_zones)
+    else:
+        candidates = merchants
+    phase_bias = {"breakfast": 0, "lunch_peak": 1, "afternoon_tea": 2, "dinner_peak": 3, "night_supply_gap": 4}.get(phase, 0)
+    return candidates[(offset + phase_bias + int(rng.random() * len(candidates))) % len(candidates)]
+
+
+def _phase_for_second(second: int) -> str:
+    hour = second // 3600
+    if hour < 10:
+        return "breakfast"
+    if hour < 14:
+        return "lunch_peak"
+    if hour < 17:
+        return "afternoon_tea"
+    if hour < 21:
+        return "dinner_peak"
+    return "night_supply_gap"
+
+
+def _active_shocks(shocks: tuple[DayShock, ...], start_s: int, end_s: int) -> tuple[DayShock, ...]:
+    return tuple(shock for shock in shocks if shock.start_s < end_s and shock.end_s > start_s)
+
+
+def _weather_for_slice(controls: DaySimulationControls, active_shocks: tuple[DayShock, ...], start_s: int) -> str:
+    if any(shock.shock_type == "rain_slowdown" for shock in active_shocks):
+        return "storm" if controls.weather == "storm" else "rain"
+    if controls.weather in {"clear", "rain", "storm", "event"}:
+        return controls.weather
+    hour = start_s // 3600
+    if hour in {15, 16}:
+        return "cloudy"
+    return "clear"
+
+
+def _congestion_for_slice(
+    controls: DaySimulationControls,
+    phase: str,
+    active_shocks: tuple[DayShock, ...],
+    start_s: int,
+) -> float:
+    base_by_phase = {
+        "breakfast": 0.44,
+        "lunch_peak": 0.62,
+        "afternoon_tea": 0.38,
+        "dinner_peak": 0.68,
+        "night_supply_gap": 0.34,
+    }
+    profile_delta = {"smooth": -0.12, "weekday": 0.0, "rainy": 0.09, "event": 0.16}.get(controls.congestion_profile, 0.0)
+    wave = (_stable_unit("congestion", start_s, controls.congestion_profile) - 0.5) * 0.08
+    congestion = base_by_phase.get(phase, 0.45) + profile_delta + wave
+    for shock in active_shocks:
+        if shock.shock_type == "rain_slowdown":
+            congestion += shock.severity * 0.16
+        elif shock.shock_type == "road_congestion":
+            congestion += shock.severity * 0.22
+        elif shock.shock_type == "merchant_burst":
+            congestion += shock.severity * 0.04
+    return round(_clamp(congestion, 0.05, 0.98), 4)
+
+
+def _courier_supply(couriers: tuple[DayCourier, ...], active_shocks: tuple[DayShock, ...], start_s: int) -> int:
+    supply = sum(1 for courier in couriers if courier.shift_start_s <= start_s < courier.shift_end_s)
+    for shock in active_shocks:
+        if shock.shock_type == "courier_shortage":
+            supply = int(round(supply * (1.0 - shock.severity * 0.52)))
+    return max(1, supply)
+
+
+def _priority_for_order(phase: str, weather: str, congestion_level: float, rng: random.Random) -> float:
+    phase_boost = {"lunch_peak": 0.14, "dinner_peak": 0.12, "night_supply_gap": 0.10}.get(phase, 0.04)
+    weather_boost = {"rain": 0.07, "storm": 0.12, "event": 0.05}.get(weather, 0.0)
+    value = 0.38 + phase_boost + weather_boost + congestion_level * 0.18 + rng.random() * 0.18
+    return round(_clamp(value, 0.05, 0.98), 4)
+
+
+def _deadline_window_s(
+    phase: str,
+    weather: str,
+    congestion_level: float,
+    priority: float,
+    rng: random.Random,
+) -> int:
+    base_min = {"breakfast": 38, "lunch_peak": 35, "afternoon_tea": 42, "dinner_peak": 37, "night_supply_gap": 45}.get(phase, 40)
+    weather_extra = {"rain": 5, "storm": 8, "event": 4}.get(weather, 0)
+    tightness = int(priority * 7 + congestion_level * 4 + rng.random() * 5)
+    return max(22 * 60, int((base_min + weather_extra - tightness) * 60))
+
+
+def _destination_for_order(
+    scenario: DayScenario,
+    merchant_position: Position,
+    rng: random.Random,
+    phase: str,
+) -> Position:
+    phase_spread = {"breakfast": 0.22, "lunch_peak": 0.18, "afternoon_tea": 0.16, "dinner_peak": 0.26, "night_supply_gap": 0.31}.get(phase, 0.22)
+    lat_span = scenario.map_bounds[1].lat - scenario.map_bounds[0].lat
+    lng_span = scenario.map_bounds[1].lng - scenario.map_bounds[0].lng
+    lat = merchant_position.lat + (rng.random() - 0.5) * lat_span * phase_spread
+    lng = merchant_position.lng + (rng.random() - 0.5) * lng_span * phase_spread
+    screen_x = (merchant_position.screen_x or 50.0) + (rng.random() - 0.5) * 34.0 * phase_spread * 3.4
+    screen_y = (merchant_position.screen_y or 50.0) + (rng.random() - 0.5) * 34.0 * phase_spread * 3.4
+    return _bounded_position(scenario, lat, lng, screen_x, screen_y)
+
+
+def _risk_tags(
+    phase: str,
+    weather: str,
+    congestion_level: float,
+    active_shocks: tuple[DayShock, ...],
+    priority: float,
+) -> tuple[str, ...]:
+    tags = [phase]
+    if weather in {"rain", "storm"}:
+        tags.append("weather_slowdown")
+    if congestion_level >= 0.7:
+        tags.append("high_congestion")
+    if priority >= 0.72:
+        tags.append("tight_deadline")
+    for shock in active_shocks:
+        tags.append(shock.shock_type)
+    return tuple(dict.fromkeys(tags))
+
+
+def _prep_multiplier(active_shocks: tuple[DayShock, ...], congestion_level: float) -> float:
+    multiplier = 1.0 + congestion_level * 0.08
+    for shock in active_shocks:
+        if shock.shock_type == "merchant_burst":
+            multiplier += shock.severity * 0.22
+        elif shock.shock_type == "rain_slowdown":
+            multiplier += shock.severity * 0.08
+    return round(multiplier, 4)
+
+
+def _world_summary(
+    orders: tuple[DayOrder, ...],
+    shocks: tuple[DayShock, ...],
+    time_slices: tuple[TimeSlice, ...],
+    couriers: tuple[DayCourier, ...],
+) -> dict[str, Any]:
+    phase_counts: dict[str, int] = {}
+    for order in orders:
+        phase_counts[order.demand_phase] = phase_counts.get(order.demand_phase, 0) + 1
+    shock_counts = {shock.shock_type: sum(1 for item in time_slices if shock.id in item.shock_ids) for shock in shocks}
+    peak_orders = max((len(item.order_ids) for item in time_slices), default=0)
+    min_supply = min((item.courier_supply for item in time_slices), default=0)
+    return {
+        "total_orders": len(orders),
+        "total_couriers": len(couriers),
+        "total_time_slices": len(time_slices),
+        "phase_counts": phase_counts,
+        "shock_slice_counts": shock_counts,
+        "peak_orders_per_slice": peak_orders,
+        "min_courier_supply": min_supply,
+    }
+
+
+def _zone_position(scenario: DayScenario, zone_id: str, rng: random.Random, spread: float) -> Position:
+    anchors = {
+        "office_core": (0.45, 0.43),
+        "mall_foodcourt": (0.58, 0.36),
+        "metro_exit": (0.36, 0.58),
+        "residential_edge": (0.68, 0.64),
+    }
+    anchor_x, anchor_y = anchors.get(zone_id, (0.5, 0.5))
+    x_ratio = _clamp(anchor_x + (rng.random() - 0.5) * spread, 0.05, 0.95)
+    y_ratio = _clamp(anchor_y + (rng.random() - 0.5) * spread, 0.05, 0.95)
+    lat = scenario.map_bounds[0].lat + (scenario.map_bounds[1].lat - scenario.map_bounds[0].lat) * y_ratio
+    lng = scenario.map_bounds[0].lng + (scenario.map_bounds[1].lng - scenario.map_bounds[0].lng) * x_ratio
+    return Position(
+        lat=round(lat, 6),
+        lng=round(lng, 6),
+        screen_x=round(6.0 + x_ratio * 88.0, 2),
+        screen_y=round(92.0 - y_ratio * 84.0, 2),
+    )
+
+
+def _bounded_position(
+    scenario: DayScenario,
+    lat: float,
+    lng: float,
+    screen_x: float,
+    screen_y: float,
+) -> Position:
+    min_bound, max_bound = scenario.map_bounds
+    return Position(
+        lat=round(_clamp(lat, min_bound.lat, max_bound.lat), 6),
+        lng=round(_clamp(lng, min_bound.lng, max_bound.lng), 6),
+        screen_x=round(_clamp(screen_x, 6.0, 94.0), 2),
+        screen_y=round(_clamp(screen_y, 8.0, 92.0), 2),
+    )
+
+
+def _time_slice_id(start_s: int) -> str:
+    return f"TS-{start_s // 3600:02d}{(start_s % 3600) // 60:02d}"
+
+
+def _time_label(start_s: int, phase: str) -> str:
+    return f"{start_s // 3600:02d}:{(start_s % 3600) // 60:02d} {phase}"
+
+
+def _rng(*parts: object) -> random.Random:
+    digest = hashlib.sha1("|".join(str(part) for part in parts).encode("utf-8")).digest()
+    return random.Random(int.from_bytes(digest[:8], "big"))
+
+
+def _stable_unit(*parts: object) -> float:
+    digest = hashlib.sha1("|".join(str(part) for part in parts).encode("utf-8")).digest()
+    return int.from_bytes(digest[:4], "big") / 0xFFFFFFFF
+
+
+def _clamp(value: float, lower: float, upper: float) -> float:
+    return max(lower, min(upper, value))

@@ -85,17 +85,29 @@ Confidence loop:
 
 ## Task 4 - Implement Full-Day Scenario Generator
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Generates deterministic full-day order streams with morning, lunch, afternoon, dinner, night, weather, congestion, merchant burst, and courier supply patterns.
 - Same seed produces identical orders and shocks.
 
 Work log:
--
+- Added `DaySimulationWorld` and `generate_full_day_world()` in `web_agent_demo/day_simulation.py`.
+- Generated deterministic merchants, courier shifts, shocks, time slices and orders from seed plus `DaySimulationControls`.
+- Covered all required demand phases: breakfast, lunch peak, afternoon tea, dinner peak and night supply gap.
+- Covered required dynamic shocks: rain slowdown, merchant burst, road congestion and courier shortage.
+- Added per-slice weather, congestion, courier supply, `compare_due`, shock ids and order ids so later replay and algorithm comparison can run from a single world state.
+- Added order details needed by later comparison: merchant, creation/deadline, destination, prep time, priority, basket value, penalty and risk tags.
+- Added `day_world_to_dict()` for deterministic serialization through the existing serializer.
+- Added `tests/test_day_simulation_generator.py` covering same-seed determinism, different-seed variation, full-day phase/shock coverage, valid order/time-slice/shock references, control scaling and night shortage supply reduction.
+- Verified syntax with `python3 -m py_compile web_agent_demo/day_simulation.py tests/test_day_simulation_contract.py tests/test_day_simulation_generator.py`.
+- Ran focused tests with `uv run --with pytest pytest tests/test_day_simulation_generator.py tests/test_day_simulation_contract.py tests/test_delivery_simulation.py tests/test_compare_engine.py tests/test_simulation_api_contract.py`; 25 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 88 tests passed.
+- Ran ASCII-only scan for the new Python source and non-goal business-code secret scan; both passed.
+- Final deterministic probe for seed `task4-final` produced SHA-256 `51c5d7faa29fbe87540992e243b1676d4283ae7c976bb06152524623ee8340d4`, 64 slices and 539 orders.
 
 Confidence loop:
--
+- 100% confidence for Task 4 scope: the full-day generator creates deterministic, varied, cross-time-slice input data covering all required phases and disruptions, all references are tested, and existing code remains green.
 
 ## Task 5 - Implement Same-Day Algorithm Comparison
 
