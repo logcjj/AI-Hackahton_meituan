@@ -27,6 +27,7 @@ from web_agent_demo.reasongraph_clone import autosolver_mermaid
 from web_agent_demo.simulation_engine import (
     ENGINE_VERSION as SIMULATION_ENGINE_VERSION,
     SimulationControls,
+    apply_dispatch_decision,
     advance_simulation,
     create_simulation_session,
     scenario_catalog,
@@ -1538,17 +1539,24 @@ def _run_compare_payload(payload: dict[str, object]) -> dict[str, object]:
         memory_mode=memory_mode,
         predictor_mode=predictor_mode,
     )
+    applied_tick, dispatch_events = apply_dispatch_decision(session, tick, compare.selected.assignments, compare.selected.algorithm_id)
     with _RUNTIME_LOCK:
+        existing = _SIMULATION_RUNTIME.get(session_id, {})
+        timeline = list(existing.get("timeline", []))
+        timeline.extend(compare.timeline_delta)
+        timeline.extend(dispatch_events)
+        _SIMULATION_RUNTIME[session_id] = {"session": session, "tick": applied_tick, "timeline": timeline}
         _COMPARE_RUNTIME[compare.compare_run.compare_run_id] = compare
     return {
         "status": "ok",
+        "tick": simulation_to_dict(applied_tick),
         "compare_run": simulation_to_dict(compare.compare_run),
         "results": simulation_to_dict(compare.results),
         "selected": simulation_to_dict(compare.selected),
         "decision_points": simulation_to_dict(compare.decision_points),
         "memory": simulation_to_dict(compare.memory),
         "predictor": simulation_to_dict(compare.predictor),
-        "timeline_delta": simulation_to_dict(compare.timeline_delta),
+        "timeline_delta": simulation_to_dict(tuple((*compare.timeline_delta, *dispatch_events))),
     }
 
 
@@ -2557,6 +2565,7 @@ def render_index() -> str:
         const payload = await apiJson(API_ENDPOINTS.compare, {method: "POST", body: {session_id: appState.session.session_id, tick_id: appState.tick.tick_id, time_budget_ms: 10000, memory_mode: "read-write", predictor_mode: "auto"}});
         appState.lastCompareElapsedMs = Date.now() - startedAt;
         renderCompare(payload);
+        if (payload.tick) renderTick(payload.tick);
         appendTimeline(payload.timeline_delta);
         const elapsedText = `${(appState.lastCompareElapsedMs / 1000).toFixed(2)}s`;
         stopCompareCountdown(`对比完成 ${elapsedText}`);
@@ -2681,12 +2690,15 @@ def render_index() -> str:
 class AgentRequestHandler(BaseHTTPRequestHandler):
     def _send_json(self, payload: dict[str, object], status: int = 200) -> None:
         raw = json.dumps(payload, ensure_ascii=False).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
+        try:
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            self.close_connection = True
 
     def _read_json(self) -> dict[str, object]:
         length = int(self.headers.get("Content-Length", "0") or "0")
@@ -2702,12 +2714,15 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
     def _send_html(self, html: str) -> None:
         raw = html.encode("utf-8")
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            self.close_connection = True
 
     def _send_static_asset(self, path: str) -> bool:
         allowed = {
@@ -2719,12 +2734,15 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         if not asset_path.exists():
             return False
         raw = asset_path.read_bytes()
-        self.send_response(200)
-        self.send_header("Content-Type", content_type)
-        self.send_header("Cache-Control", "public, max-age=3600")
-        self.send_header("Content-Length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Cache-Control", "public, max-age=3600")
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            self.close_connection = True
         return True
 
     def _send_empty_icon(self) -> None:

@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import unittest
+from types import SimpleNamespace
 
 from web_agent_demo.simulation_engine import (
     SimulationControls,
+    apply_dispatch_decision,
     advance_simulation,
     create_simulation_session,
     simulation_to_dict,
@@ -82,6 +84,44 @@ class DeliverySimulationEngineTest(unittest.TestCase):
         self.assertEqual([courier.id for courier in advanced.tick.couriers[-3:]], ["R004", "R005", "R006"])
         self.assertIn("fleet_resized", {event.event_type for event in advanced.timeline_delta})
         self.assertTrue(all(order.candidate_courier_ids for order in advanced.tick.orders))
+
+    def test_dispatch_decision_updates_world_and_releases_courier_after_eta(self):
+        start = create_simulation_session("commerce_peak", seed="dispatch-loop", controls=SimulationControls(courier_count=4))
+        advanced = advance_simulation(start.session, start.tick, advance_seconds=60)
+        order_id = advanced.tick.active_order_ids[0]
+        order = next(item for item in advanced.tick.orders if item.id == order_id)
+        courier_id = advanced.tick.couriers[0].id
+
+        applied_tick, dispatch_events = apply_dispatch_decision(
+            start.session,
+            advanced.tick,
+            (
+                SimpleNamespace(
+                    order_id=order_id,
+                    courier_id=courier_id,
+                    merchant_id=order.merchant_id,
+                    eta_s=90.0,
+                    delivery_eta_s=45.0,
+                ),
+            ),
+        )
+        dispatched_order = next(item for item in applied_tick.orders if item.id == order_id)
+        dispatched_courier = next(item for item in applied_tick.couriers if item.id == courier_id)
+
+        self.assertEqual(dispatched_order.status, "assigned")
+        self.assertNotIn(order_id, applied_tick.active_order_ids)
+        self.assertEqual(dispatched_courier.status, "delivering")
+        self.assertEqual(dispatched_courier.current_order_ids, (order_id,))
+        self.assertIn("dispatch_applied", {event.event_type for event in dispatch_events})
+
+        settled = advance_simulation(start.session, applied_tick, advance_seconds=120, compare_if_due=False)
+        delivered_order = next(item for item in settled.tick.orders if item.id == order_id)
+        released_courier = next(item for item in settled.tick.couriers if item.id == courier_id)
+
+        self.assertEqual(delivered_order.status, "delivered")
+        self.assertEqual(released_courier.status, "idle")
+        self.assertEqual(released_courier.current_order_ids, ())
+        self.assertIn("orders_delivered", {event.event_type for event in settled.timeline_delta})
 
 
 if __name__ == "__main__":

@@ -46,6 +46,9 @@ class SimulationApiContractTest(unittest.TestCase):
         self.assertEqual(compare_payload["memory"]["mode"], "off")
         self.assertEqual(compare_payload["predictor"]["secret_handling"], "env-only-redacted")
         self.assertTrue(compare_payload["decision_points"])
+        self.assertIn("tick", compare_payload)
+        self.assertLess(len(compare_payload["tick"]["active_order_ids"]), len(tick_payload["tick"]["active_order_ids"]))
+        self.assertIn("dispatch_applied", {event["event_type"] for event in compare_payload["timeline_delta"]})
 
     def test_memory_and_predictor_api_payloads_do_not_require_external_env(self):
         with tempfile.TemporaryDirectory() as tmp, mock.patch.object(server, "SIMULATION_MEMORY_ROOT", Path(tmp)):
@@ -93,10 +96,24 @@ class SimulationApiContractTest(unittest.TestCase):
                     "predictor_mode": "auto",
                 }
             )
+            replay_session_payload = server._create_simulation_session_payload(
+                {
+                    "scenario_id": "commerce_peak",
+                    "seed": "api-memory-loop-replay",
+                    "controls": {"courier_count": 10, "order_intensity": 0.8, "burstiness": 0.8},
+                }
+            )
+            replay_tick_payload = server._advance_simulation_payload(
+                {
+                    "session_id": replay_session_payload["session"]["session_id"],
+                    "advance_seconds": 60,
+                    "compare_if_due": True,
+                }
+            )
             second_compare = server._run_compare_payload(
                 {
-                    "session_id": session_payload["session"]["session_id"],
-                    "tick_id": tick_payload["tick"]["tick_id"],
+                    "session_id": replay_session_payload["session"]["session_id"],
+                    "tick_id": replay_tick_payload["tick"]["tick_id"],
                     "time_budget_ms": 10_000,
                     "memory_mode": "read-write",
                     "predictor_mode": "auto",

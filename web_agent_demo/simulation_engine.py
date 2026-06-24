@@ -281,11 +281,12 @@ def advance_simulation(
     scenario = get_scenario(session.scenario_id)
     controls = _controls_for_advance(session, tick, controls_patch)
     next_time = tick.sim_time_s + float(advance_seconds)
-    existing_orders = list(tick.orders)
+    settled_orders, settled_couriers, settlement_events = _settle_completed_dispatches(session, tick, next_time)
+    existing_orders = list(settled_orders)
     new_orders, order_events, burst_reason = _generate_orders_between(scenario, session, tick, controls, tick.sim_time_s, next_time)
     all_orders = tuple(existing_orders + list(new_orders))
     merchants = _update_merchants_for_orders(tick.merchants, all_orders, controls, next_time)
-    resized_couriers, fleet_events = _resize_couriers(scenario, session, tick.couriers, controls, next_time)
+    resized_couriers, fleet_events = _resize_couriers(scenario, session, settled_couriers, controls, next_time)
     couriers, movement_events = _move_couriers(scenario, session, resized_couriers, merchants, all_orders, controls, tick.sim_time_s, next_time)
     orders = _refresh_order_candidates(all_orders, couriers)
     active_order_ids = tuple(order.id for order in orders if order.status in {"new", "queued"})
@@ -316,6 +317,7 @@ def advance_simulation(
             severity="info",
         )
     ]
+    timeline.extend(settlement_events)
     timeline.extend(order_events)
     timeline.extend(fleet_events)
     timeline.extend(movement_events)
@@ -335,6 +337,86 @@ def advance_simulation(
             )
         )
     return SimulationAdvance(next_tick, tuple(timeline), compare_trigger)
+
+
+def apply_dispatch_decision(
+    session: SimulationSession,
+    tick: SimulationTick,
+    assignments: tuple[Any, ...] | list[Any],
+    applied_by: str = "autosolver_agent",
+) -> tuple[SimulationTick, tuple[TimelineEvent, ...]]:
+    """Apply the selected compare result back into the simulation world state."""
+    active_ids = set(tick.active_order_ids)
+    order_by_id = {order.id: order for order in tick.orders}
+    courier_by_id = {courier.id: courier for courier in tick.couriers}
+    selected: dict[str, Any] = {}
+    used_couriers: set[str] = set()
+
+    for assignment in assignments:
+        order_id = str(_field(assignment, "order_id", ""))
+        courier_id = str(_field(assignment, "courier_id", ""))
+        if not order_id or not courier_id or order_id not in active_ids or courier_id in used_couriers:
+            continue
+        if order_id not in order_by_id or courier_id not in courier_by_id:
+            continue
+        selected[order_id] = assignment
+        used_couriers.add(courier_id)
+
+    if not selected:
+        return tick, ()
+
+    assignment_by_courier = {str(_field(item, "courier_id", "")): item for item in selected.values()}
+    next_orders: list[OrderState] = []
+    for order in tick.orders:
+        if order.id in selected and order.status in {"new", "queued"}:
+            next_orders.append(replace(order, status="assigned"))
+        else:
+            next_orders.append(order)
+
+    next_couriers: list[CourierState] = []
+    for courier in tick.couriers:
+        assignment = assignment_by_courier.get(courier.id)
+        if assignment is None:
+            next_couriers.append(courier)
+            continue
+        order_id = str(_field(assignment, "order_id", ""))
+        eta_s = max(float(_field(assignment, "eta_s", _field(assignment, "delivery_eta_s", 480.0))), 60.0)
+        order = order_by_id.get(order_id)
+        route = (courier.position, order.destination) if order is not None else courier.route
+        current_order_ids = tuple((*courier.current_order_ids, order_id))[: max(1, courier.capacity)]
+        next_couriers.append(
+            replace(
+                courier,
+                status="delivering",
+                current_order_ids=current_order_ids,
+                available_at_s=round(max(courier.available_at_s, tick.sim_time_s + eta_s), 3),
+                route=route,
+            )
+        )
+
+    next_merchants = _update_merchant_pending_after_dispatch(tick.merchants, tuple(next_orders))
+    next_active_order_ids = tuple(order.id for order in next_orders if order.status in {"new", "queued"})
+    next_tick = replace(
+        tick,
+        tick_id=_stable_id("tick", tick.session_id, int(tick.sim_time_s), "dispatch", applied_by, len(selected)),
+        couriers=tuple(next_couriers),
+        merchants=next_merchants,
+        orders=tuple(next_orders),
+        active_order_ids=next_active_order_ids,
+        trigger_reasons=tuple(reason for reason in tick.trigger_reasons if reason != "courier_shortage") if next_active_order_ids else (),
+    )
+    event = TimelineEvent(
+        event_id=_stable_id("event", session.session_id, next_tick.tick_id, "dispatch_applied", applied_by),
+        session_id=session.session_id,
+        tick_id=next_tick.tick_id,
+        sim_time_s=tick.sim_time_s,
+        event_type="dispatch_applied",
+        title="派单执行",
+        summary=f"{applied_by} 已执行 {len(selected)} 个订单派单，待决策订单降至 {len(next_active_order_ids)} 个。",
+        entity_ids=tuple(selected.keys()),
+        severity="notice",
+    )
+    return next_tick, (event,)
 
 
 def simulation_to_dict(value: Any) -> Any:
@@ -403,7 +485,7 @@ def _courier_state(scenario: SimulationScenario, rng: random.Random, index: int,
         label=f"骑手 {index + 1}",
         position=position,
         status="idle",
-        capacity=1,
+        capacity=2 if index % 4 else 3,
         current_order_ids=(),
         available_at_s=0.0,
         willingness=round(_clamp(willingness_base - weather_penalty, 0.05, 0.98), 4),
@@ -448,6 +530,67 @@ def _resize_couriers(
         severity="notice",
     )
     return kept, (event,)
+
+
+def _settle_completed_dispatches(
+    session: SimulationSession,
+    tick: SimulationTick,
+    next_time_s: float,
+) -> tuple[tuple[OrderState, ...], tuple[CourierState, ...], tuple[TimelineEvent, ...]]:
+    orders_by_id = {order.id: order for order in tick.orders}
+    delivered_ids: set[str] = set()
+    released_couriers: list[str] = []
+    next_couriers: list[CourierState] = []
+
+    for courier in tick.couriers:
+        if courier.current_order_ids and courier.available_at_s <= next_time_s:
+            delivered_ids.update(courier.current_order_ids)
+            released_couriers.append(courier.id)
+            destination = orders_by_id.get(courier.current_order_ids[0])
+            next_couriers.append(
+                replace(
+                    courier,
+                    position=destination.destination if destination is not None else courier.position,
+                    status="idle",
+                    current_order_ids=(),
+                    route=(),
+                )
+            )
+        else:
+            next_couriers.append(courier)
+
+    if not delivered_ids:
+        return tick.orders, tick.couriers, ()
+
+    next_orders = tuple(replace(order, status="delivered") if order.id in delivered_ids else order for order in tick.orders)
+    event = TimelineEvent(
+        event_id=_stable_id("event", session.session_id, int(next_time_s), "orders_delivered", len(delivered_ids)),
+        session_id=session.session_id,
+        tick_id=_stable_id("tick-preview", session.session_id, int(next_time_s)),
+        sim_time_s=next_time_s,
+        event_type="orders_delivered",
+        title="订单送达",
+        summary=f"{len(delivered_ids)} 个订单完成送达，{len(released_couriers)} 名骑手回到可调度状态。",
+        entity_ids=tuple(sorted(delivered_ids)),
+        severity="info",
+    )
+    return next_orders, tuple(next_couriers), (event,)
+
+
+def _update_merchant_pending_after_dispatch(
+    merchants: tuple[MerchantState, ...],
+    orders: tuple[OrderState, ...],
+) -> tuple[MerchantState, ...]:
+    pending_by_merchant: dict[str, list[str]] = {merchant.id: [] for merchant in merchants}
+    for order in orders:
+        if order.status in {"new", "queued"}:
+            pending_by_merchant.setdefault(order.merchant_id, []).append(order.id)
+    updated: list[MerchantState] = []
+    for merchant in merchants:
+        pending = tuple(pending_by_merchant.get(merchant.id, ()))
+        pressure = _clamp(merchant.pressure - max(0, len(merchant.pending_order_ids) - len(pending)) * 0.09, 0.0, 1.0)
+        updated.append(replace(merchant, pending_order_ids=pending, pressure=round(pressure, 3)))
+    return tuple(updated)
 
 
 def _generate_orders_between(
@@ -614,6 +757,12 @@ def _trigger_reasons(burst_reason: str | None, new_orders: tuple[OrderState, ...
     if active_order_ids and len(active_order_ids) >= 8:
         reasons.append("courier_shortage")
     return tuple(dict.fromkeys(reasons))
+
+
+def _field(item: Any, name: str, default: Any = None) -> Any:
+    if isinstance(item, dict):
+        return item.get(name, default)
+    return getattr(item, name, default)
 
 
 def _compare_trigger(
