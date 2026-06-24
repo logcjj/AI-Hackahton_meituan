@@ -23,6 +23,10 @@
 验证标准：生成最终截图、审计 JSON 和验收说明；全量测试通过；goal 标记完成。
 
 完成记录：
+- 最终验收由 Task 17 完成前证据审计收口：`goal/goal-9/task17-completion-audit.md` 已逐项核对用户目标、当前代码、自动化审计、截图和测试证据。
+- 最新企业级验收截图与 JSON：`goal/goal-9/task16-final.png`、`goal/goal-9/task16-audit.json`，其中 `failureCount=0`。
+- 全量验证通过：`python3 -m unittest tests.test_web_agent_demo` 13 个测试通过，`python3 -m unittest` 全仓 59 个测试通过。
+- 归档标记见 `goal/goal-9/COMPLETED.md`。
 
 ## Task 5: 修复 Chrome 实际页面派单线/详情不一致和天气卡片
 
@@ -234,6 +238,22 @@
 - 视觉证据已保存：`goal/goal-9/task16-final.png`，目视为当前最终派单工作台，地图、右侧详情、收益量化和表格均在 1280x720 内完整显示。
 - 验证通过：`node --check goal/goal-9/task16-playwright-audit-runner.js`。
 - 验证通过：`python3 -m json.tool goal/goal-9/task16-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 17: 完成前证据审计和残余风险矩阵
+
+验证标准：基于 `input.md`、`plan.md` 和当前代码/测试/截图/JSON 证据，逐条核对用户目标中的功能、视觉、业务逻辑、性能、收益量化、地图交互、天气卡片、最终派单线和状态复位要求；每个要求必须有明确证据文件或当前命令输出支撑；若证据不足或发现缺口，必须补验收或修复；生成一份可追溯的 `task17-completion-audit.md`，并运行全量验证。
+
+完成记录：
+- 已生成完成前证据审计：`goal/goal-9/task17-completion-audit.md`。
+- 审计逐项覆盖地图缩放刷新、10 秒推理、派单非导航、最终线只连最终骑手、路线/商家/骑手点击、天气卡片、雨天/拥堵文案、默认显示所有派单线、ReasonGraph/表格/地图一致性、收益量化、按钮状态、场景切换复位、不卡顿和 To B 观感。
+- 审计结论：当前没有发现 P0/P1/P2 阻断问题；残余边界为半真实地图、运营测算金额和外部扩展 telemetry 告警，不属于当前页面缺陷。
+- 验证通过：`test -s goal/goal-9/task17-completion-audit.md` 且审计结论存在。
+- 验证通过：`python3 -m json.tool goal/goal-9/task16-audit.json`。
+- 验证通过：`node --check goal/goal-9/task16-playwright-audit-runner.js`。
 - 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
