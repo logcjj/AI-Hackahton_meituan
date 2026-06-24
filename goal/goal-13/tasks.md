@@ -49,17 +49,29 @@ Confidence loop:
 
 ## Task 3 - Browser Runtime Audit
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Desktop and mobile browser runs validate actual UI behavior, not just static HTML.
 - Replay controls, timeline, KPI updates, reasoning highlights, memory panel, side-by-side alignment, console, and network state are checked.
 
 Work log:
--
+- Read and used the `playwright` skill because Task 3 requires real browser automation.
+- Verified `npx` is available and used `/Users/logcjj/.codex/skills/playwright/scripts/playwright_cli.sh`.
+- Started the local server on `127.0.0.1:8791` and verified `GET /` returns 200.
+- Opened the root page in Chromium and confirmed the title is `AutoSolver Agent - 全日配送模拟推演`.
+- Ran desktop browser audit at `1440x900`: root ready flag true, product mode `full-day-simulation-replay`, 40 frames, 207 orders, 120 memory events, all three memory event types, old frontend ids/text absent, side-by-side columns `697px 697px`, no horizontal overflow, and visible KPI values.
+- Verified desktop map/theater sizes: replay grid 1408x540, greedy panel 697x540, AutoSolver panel 697x540, greedy map stage 667x331, AutoSolver map stage 667x312.
+- Ran interaction audit: timeline scrub updated frame and KPI values, play advanced frame index, pause stopped playback, speed changed to `0.35s/frame`, control rerun changed order count from 207 to 114, and `/api/day-simulation/run` returned 200.
+- Verified reasoning highlight behavior with the current DOM selectors `.pin.highlight` and `.route-svg path.highlight-route`: 40 pins, 11 highlighted pins, 4 routes and 4 highlighted routes after selecting a reasoning card.
+- Ran mobile browser audit at `390x844`: one-column replay grid, two-column KPI grid, 340x280 map stages, no horizontal overflow, old frontend ids absent, memory and reasoning cards visible.
+- Checked browser console and network: 0 console messages, 0 warnings, 0 errors, and the interactive API request returned 200 OK.
+- Captured and copied screenshots to `output/playwright/goal-13-task3-desktop-1440x900.png` and `output/playwright/goal-13-task3-mobile-390x844.png`.
+- Added `goal/goal-13/browser-runtime-audit.md` with detailed browser evidence and tooling caveats.
+- Updated `goal/goal-13/requirement-matrix.md`; browser-dependent requirements R2, R3, R6-R10, R15 and R16 are now `Pass`.
 
 Confidence loop:
--
+- 100% confidence for Task 3 scope: actual Chromium runtime validates root render, desktop/mobile layout, side-by-side synchronization, timeline/play/pause/speed/rerun controls, KPI updates, reasoning highlights, memory cards, console/network cleanliness and screenshot artifacts. This still does not finalize Goal 13 until the debug cycle and final archive decision are complete.
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
