@@ -150,11 +150,11 @@ _DISPATCH_ROADS = [
 
 
 _SIMULATION_STRATEGIES = {
-    "S1": {"name": "合单优先", "label": "合单优先", "reason": "商圈订单密集，优先把同路订单合并给同一骑手"},
-    "S2": {"name": "多派候选", "label": "多派候选", "reason": "多个骑手距离接近，需要扩展候选后再筛选"},
-    "S3": {"name": "局部修复", "label": "局部修复", "reason": "先得到可行派单，再修复高成本或绕行订单"},
-    "S4": {"name": "贪心基线", "label": "贪心基线", "reason": "低峰期订单分散，最近可用骑手已足够稳定"},
-    "S5": {"name": "风险平衡", "label": "风险平衡", "reason": "低接单意愿或天气风险较高，优先控制无人接单概率"},
+    "S1": {"name": "组合搜索 / MCF", "label": "组合搜索 / MCF", "reason": "调用 disjoint gain、pair matching、稀缺骑手列搜索与 MCF 重组策略"},
+    "S2": {"name": "单任务多派", "label": "单任务多派", "reason": "调用 _solve_single_task_multidispatch，为单任务保留多个可接骑手"},
+    "S3": {"name": "覆盖修复搜索", "label": "覆盖修复搜索", "reason": "调用 _solve_sparse_cover，并在低意愿或未覆盖场景做修复"},
+    "S4": {"name": "贪心基线 / 兜底", "label": "贪心基线 / 兜底", "reason": "调用 greedy baseline，快速得到可行兜底方案"},
+    "S5": {"name": "低意愿 / 自适应补充", "label": "低意愿 / 自适应补充", "reason": "根据 regime 与覆盖率触发 low_global_column、low_single_column 或 production_solver 补充"},
 }
 
 
@@ -172,7 +172,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "clear",
         "density_profile": "clustered",
         "strategy_cycle": ["S1", "S2", "S1", "S3", "S1", "S5", "S2", "S4", "S3", "S1"],
-        "description": "路口商圈订单集中，适合验证合单优先和多骑手候选比较。",
+        "description": "路口商圈订单集中，适合验证组合搜索、MCF 和多骑手候选比较。",
     },
     {
         "id": "medium_parallel",
@@ -187,7 +187,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "clear",
         "density_profile": "balanced",
         "strategy_cycle": ["S2", "S2", "S2", "S4", "S2", "S3", "S2", "S1", "S5", "S2"],
-        "description": "订单不完全重叠，多个骑手候选质量接近，突出多派候选策略。",
+        "description": "订单不完全重叠，多个骑手候选质量接近，突出单任务多派策略。",
     },
     {
         "id": "scarce_repair",
@@ -202,7 +202,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "clear",
         "density_profile": "scarce_spread",
         "strategy_cycle": ["S3", "S3", "S3", "S5", "S3", "S2", "S4", "S3", "S5", "S3"],
-        "description": "骑手少且订单分布拉开，需要先覆盖再做局部修复。",
+        "description": "骑手少且订单分布拉开，需要先覆盖再做修复搜索。",
     },
     {
         "id": "rain_low_willingness",
@@ -247,7 +247,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "event",
         "density_profile": "event_clustered",
         "strategy_cycle": ["S1", "S5", "S2", "S3", "S1", "S5", "S2", "S3", "S4", "S1"],
-        "description": "活动流量导致局部拥堵，策略会在合单、风险平衡和修复之间切换。",
+        "description": "活动流量导致局部拥堵，策略会在组合搜索、低意愿护栏和修复搜索之间切换。",
     },
     {
         "id": "night_foodcourt",
@@ -262,7 +262,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "clear",
         "density_profile": "clustered",
         "strategy_cycle": ["S1", "S2", "S5", "S1", "S4", "S2", "S1", "S3", "S5", "S1"],
-        "description": "夜间宵夜订单集中但骑手供给下降，用于展示合单和多派候选的平衡。",
+        "description": "夜间宵夜订单集中但骑手供给下降，用于展示组合搜索和单任务多派的平衡。",
     },
     {
         "id": "campus_lunch_peak",
@@ -277,7 +277,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "clear",
         "density_profile": "balanced",
         "strategy_cycle": ["S2", "S1", "S2", "S4", "S2", "S5", "S1", "S2", "S3", "S2"],
-        "description": "园区和校园午餐需求密集，多个骑手距离接近，适合展示多派候选。",
+        "description": "园区和校园午餐需求密集，多个骑手距离接近，适合展示单任务多派。",
     },
     {
         "id": "hospital_office_peak",
@@ -292,7 +292,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "event",
         "density_profile": "event_clustered",
         "strategy_cycle": ["S5", "S3", "S2", "S5", "S1", "S3", "S5", "S2", "S4", "S5"],
-        "description": "医院与写字楼周边停车和通行限制更强，重点验证风险平衡和局部修复。",
+        "description": "医院与写字楼周边停车和通行限制更强，重点验证低意愿护栏和覆盖修复。",
     },
     {
         "id": "congestion_reassign",
@@ -307,7 +307,7 @@ _SIMULATED_SCENARIO_CONFIGS = [
         "weather": "event",
         "density_profile": "scarce_spread",
         "strategy_cycle": ["S3", "S5", "S3", "S2", "S3", "S1", "S5", "S3", "S4", "S3"],
-        "description": "局部拥堵叠加异常补单，需要用局部修复减少无人接单和超时风险。",
+        "description": "局部拥堵叠加异常补单，需要用覆盖修复减少无人接单和超时风险。",
     },
 ]
 
@@ -1475,6 +1475,17 @@ def render_index() -> str:
     .node p, .strategy p, .tiny { margin: 0; color: var(--muted); font-size: 9.5px; line-height: 1.18; }
     .node p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .node p br { display: none; }
+    .left-panel.expanded .node p,
+    .left-panel.expanded .strategy p {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      line-height: 1.34;
+    }
+    .left-panel.expanded .node p br,
+    .left-panel.expanded .strategy p br { display: block; }
+    .left-panel.expanded .node { min-height: 58px; align-items: start; }
+    .left-panel.expanded .strategy { min-height: 48px; align-items: start; }
     .node .icon {
       width: 23px; height: 23px; border-radius: 7px;
       display: grid; place-items: center;
@@ -1539,6 +1550,11 @@ def render_index() -> str:
     .line-key.rej { border-top: 2px dashed #a1a1a1; opacity: .7; }
     .map-frame { position: relative; flex: 1; min-height: 0; overflow: hidden; background: #eef3ef; cursor: grab; }
     .map-frame.dragging-map { cursor: grabbing; }
+    .map-frame.dragging-map .pin,
+    .map-frame.dragging-map .map-label,
+    .map-frame.dragging-map .dispatch-visual,
+    .map-frame.dragging-map .dispatch-link,
+    .map-frame.dragging-map .dispatch-arrow { transition: none !important; animation: none !important; }
     .semi-real-map {
       position: absolute;
       inset: 0;
@@ -1588,7 +1604,7 @@ def render_index() -> str:
       box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .08), inset 0 18px 60px rgba(255,255,255,.12);
     }
     .map-frame.topology .map-bg { opacity: .2; filter: saturate(.9) contrast(1.02) brightness(1.05); }
-    .map-frame.maplibre-ready .map-bg { opacity: .12; mix-blend-mode: multiply; }
+    .map-frame.maplibre-ready .map-bg { display: none; opacity: 0; mix-blend-mode: normal; }
     .map-bg[data-map-style="meituan_delivery_project_map_v3"] .district {
       fill: rgba(30, 39, 45, .34);
       stroke: rgba(238, 195, 84, .08);
@@ -1857,6 +1873,25 @@ def render_index() -> str:
     .pin.courier { z-index: 5; }
     .pin.dest { z-index: 4; }
     .pin .mark { width: 18px; height: 18px; box-shadow: 0 2px 7px rgba(15,23,42,.22); }
+    .pin-code {
+      position: absolute;
+      left: 50%;
+      top: 20px;
+      transform: translateX(-50%);
+      padding: 1px 4px;
+      border-radius: 5px;
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(100,116,139,.2);
+      box-shadow: 0 2px 7px rgba(15,23,42,.12);
+      color: #334155;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .pin.courier .pin-code { color: #0f766e; }
+    .pin.merchant .pin-code { color: #8a5200; }
     .pin.depot:after { content: ""; position: absolute; inset: -7px; border: 1px solid rgba(40,168,255,.35); border-radius: 4px; }
     .zoom { position: absolute; left: 18px; bottom: 13px; z-index: 12; display: grid; gap: 1px; border: 1px solid rgba(71,85,105,.2); border-radius: 10px; overflow: hidden; box-shadow: 0 10px 24px rgba(15,23,42,.14); }
     .zoom button { width: 38px; height: 35px; color: #334155; background: rgba(255,255,255,.9); border: 0; border-bottom: 1px solid rgba(100,116,139,.18); font-size: 20px; font-weight: 800; }
@@ -2040,7 +2075,7 @@ def render_index() -> str:
 
     <section class="main-grid">
       <aside class="panel left-panel" aria-label="AI Reasoning Graph">
-        <div class="panel-head"><span class="dot">✣</span> ReasonGraph 推理链路 <span class="spacer"></span><button id="expand-graph">展开全部</button></div>
+        <div class="panel-head"><span class="dot">✣</span> ReasonGraph 推理链路 <span class="spacer"></span><button id="expand-graph" aria-expanded="false">展开全部</button></div>
         <div class="reason-wrap">
           <article class="node current">
             <div class="step-index">1</div><div class="icon">▣</div>
@@ -2056,15 +2091,15 @@ def render_index() -> str:
           <div class="connector"></div>
           <article class="node">
             <div class="step-index">3</div><div class="icon">↯</div>
-            <div><h3>候选策略生成</h3><p>生成 5 类候选派单策略<br>比较合单、多派、修复、贪心与风险平衡</p></div>
+            <div><h3>动态策略组合</h3><p>按 regime、覆盖率和当前最优解生成候选<br>下方是算法族分组，不是固定调用顺序</p></div>
             <div class="metric"><span>状态</span><strong>待推理</strong></div>
           </article>
           <div class="branch-grid">
-            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>S1</h4><p><b>合单优先</b><br>优先匹配同路高重叠订单</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>S2</h4><p><b>多派候选</b><br>为订单保留多个可接骑手</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>S3</h4><p><b>局部修复</b><br>从高风险派单中迭代修复</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>S4</h4><p><b>贪心基线</b><br>按最近和最低成本先验匹配</p><strong>-- <span class="badge pending">待评估</span></strong></article>
-            <article class="strategy pending" data-branch="S5" data-reasoning-status="pending"><h4>S5</h4><p><b>风险平衡</b><br>平衡低意愿、天气和时间窗风险</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S1" data-reasoning-status="pending"><h4>组合</h4><p><b>组合搜索 / MCF</b><br>disjoint gain、pair matching、scarce bundle MCF</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S2" data-reasoning-status="pending"><h4>多派</h4><p><b>单任务多派</b><br>_solve_single_task_multidispatch 扩展可接骑手</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S3" data-reasoning-status="pending"><h4>修复</h4><p><b>覆盖修复搜索</b><br>_solve_sparse_cover 补足覆盖并修复高风险派单</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S4" data-reasoning-status="pending"><h4>基线</h4><p><b>贪心基线 / 兜底</b><br>greedy baseline 提供可行解和对照基准</p><strong>-- <span class="badge pending">待评估</span></strong></article>
+            <article class="strategy pending" data-branch="S5" data-reasoning-status="pending"><h4>自适应</h4><p><b>低意愿 / 自适应补充</b><br>low column、production solver、evolution replay</p><strong>-- <span class="badge pending">待评估</span></strong></article>
           </div>
           <article class="node">
             <div class="step-index">4</div><div class="icon">☑</div>
@@ -2124,7 +2159,7 @@ def render_index() -> str:
           <div class="row"><span id="detail-merchant">等待运行派单推理</span></div><div class="chips" id="detail-orders"></div>
           <div class="row"><span>派单履约 ETA</span><strong id="detail-eta">-</strong></div>
           <div class="row"><span>预计派单成本</span><strong id="right-cost">-</strong></div>
-          <div class="row"><span>接单 / 覆盖概率</span><div class="prob"><span>--</span></div></div>
+          <div class="row"><span id="prob-label">指标</span><div class="prob"><span>--</span></div></div>
         </div>
         <div class="decision-card">
           <h3 class="good">▣ 决策依据</h3>
@@ -2183,6 +2218,7 @@ def render_index() -> str:
     let semiRealMapLiveSyncPending = false;
     let semiRealMapLastLiveSyncAt = 0;
     let semiRealMapViewportSyncReason = "";
+    let semiRealMapIsMoving = false;
     const semiRealMapLayerSchema = "delivery_routes_optimization_maplibre_clone";
     const semiRealMapStyleUrl = "https://tiles.openfreemap.org/styles/positron";
     const semiRealMapBounds = {lngMin: 121.418, lngMax: 121.506, latMin: 31.204, latMax: 31.252};
@@ -2417,6 +2453,8 @@ def render_index() -> str:
           syncSemiRealMapOverlay(currentProfile);
         });
         semiRealMap.on("styledata", hideSemiRealMapTextLayers);
+        semiRealMap.on("movestart", handleSemiRealMapMoveStart);
+        semiRealMap.on("dragstart", handleSemiRealMapMoveStart);
         semiRealMap.on("move", handleSemiRealMapMove);
         semiRealMap.on("moveend", handleSemiRealMapMoveEnd);
         semiRealMap.on("error", () => {
@@ -2435,6 +2473,10 @@ def render_index() -> str:
       semiRealMapViewportSyncReason = reason;
       updateMapScene(profile);
       semiRealMapViewportSyncReason = "";
+      updateSemiRealMapViewportDataset(reason);
+      if (reason !== "viewport-live") publishDebugState();
+    }
+    function updateSemiRealMapViewportDataset(reason = "viewport") {
       const frame = document.querySelector(".map-frame");
       if (frame) {
         frame.dataset.lastViewportSync = reason;
@@ -2444,22 +2486,92 @@ def render_index() -> str:
           frame.dataset.mapCenter = `${center.lng.toFixed(5)},${center.lat.toFixed(5)}`;
         }
       }
-      if (reason !== "viewport-live") publishDebugState();
+    }
+    function profileEntityPoints(profile) {
+      const entityPoints = {};
+      if (profile && profile.dispatchMap && Array.isArray(profile.dispatchMap.entities)) {
+        profile.dispatchMap.entities.forEach((entity) => {
+          entityPoints[entity.id] = [entity.x, entity.y];
+        });
+      }
+      return entityPoints;
+    }
+    function updateMapEntityDomFromProjectedAnchors(profile) {
+      if (!profile || !profile.dispatchMap || !Array.isArray(profile.dispatchMap.entities)) return;
+      const entityById = {};
+      profile.dispatchMap.entities.forEach((entity) => { entityById[entity.id] = entity; });
+      document.querySelectorAll(".map-entities [data-entity]").forEach((node) => {
+        const entity = entityById[node.dataset.entity || ""];
+        if (!entity) return;
+        const nextX = safeNumber(entity.x, 50);
+        const nextY = safeNumber(entity.y, 50);
+        if (node.classList.contains("pin")) {
+          node.style.left = nextX.toFixed(4) + "%";
+          node.style.top = nextY.toFixed(4) + "%";
+          node.dataset.rawX = nextX.toFixed(4);
+          node.dataset.rawY = nextY.toFixed(4);
+          node.dataset.displayX = nextX.toFixed(4);
+          node.dataset.displayY = nextY.toFixed(4);
+          return;
+        }
+        if (node.classList.contains("map-label")) {
+          const previousRawX = safeNumber(node.dataset.rawX, nextX);
+          const previousRawY = safeNumber(node.dataset.rawY, nextY);
+          const previousDisplayX = safeNumber(node.dataset.displayX, previousRawX);
+          const previousDisplayY = safeNumber(node.dataset.displayY, previousRawY);
+          const displayX = previousDisplayX + (nextX - previousRawX);
+          const displayY = previousDisplayY + (nextY - previousRawY);
+          node.style.left = displayX.toFixed(4) + "%";
+          node.style.top = displayY.toFixed(4) + "%";
+          node.dataset.rawX = nextX.toFixed(4);
+          node.dataset.rawY = nextY.toFixed(4);
+          node.dataset.displayX = displayX.toFixed(4);
+          node.dataset.displayY = displayY.toFixed(4);
+        }
+      });
+    }
+    function syncCurrentProfileProjectionToMapViewport(reason = "viewport-live") {
+      const profile = currentProfile;
+      if (!profile || !profile.dispatchMap || !semiRealMapReady) return false;
+      semiRealMapViewportSyncReason = reason;
+      const projected = syncRenderedAnchorsToViewport(profile);
+      semiRealMapViewportSyncReason = "";
+      if (!projected) return false;
+      updateMapEntityDomFromProjectedAnchors(profile);
+      renderDispatchLinks(profile, profileEntityPoints(profile));
+      updateSemiRealMapViewportDataset(reason);
+      return true;
+    }
+    function handleSemiRealMapMoveStart() {
+      if (!semiRealMapReady) return;
+      semiRealMapIsMoving = true;
+      const frame = document.querySelector(".map-frame");
+      if (frame) {
+        frame.classList.add("dragging-map");
+        frame.dataset.mapMoving = "true";
+      }
     }
     function handleSemiRealMapMove() {
       if (!semiRealMapReady || semiRealMapMoveMode === "refresh-map") return;
+      semiRealMapIsMoving = true;
       if (semiRealMapLiveSyncPending) return;
-      const now = Date.now();
-      if (now - semiRealMapLastLiveSyncAt < 90) return;
-      semiRealMapLastLiveSyncAt = now;
       semiRealMapLiveSyncPending = true;
       window.requestAnimationFrame(() => {
         semiRealMapLiveSyncPending = false;
-        resyncCurrentProfileToMapViewport("viewport-live");
+        if (!semiRealMapIsMoving) return;
+        syncCurrentProfileProjectionToMapViewport("viewport-live");
       });
     }
     function handleSemiRealMapMoveEnd() {
       if (!semiRealMapReady) return;
+      semiRealMapIsMoving = false;
+      semiRealMapLiveSyncPending = false;
+      semiRealMapLastLiveSyncAt = 0;
+      const frame = document.querySelector(".map-frame");
+      if (frame) {
+        frame.classList.remove("dragging-map");
+        frame.dataset.mapMoving = "false";
+      }
       if (semiRealMapMoveMode === "refresh-map") {
         semiRealMapMoveMode = "";
         reanchorCurrentProfileToMapRegion();
@@ -2667,8 +2779,8 @@ def render_index() -> str:
       if (!entity || !Array.isArray(entity.rendered_lnglat) || !semiRealMap) return false;
       const projected = lngLatToScreenNorm(entity.rendered_lnglat);
       if (!projected) return false;
-      entity.x = Number(projected[0].toFixed(2));
-      entity.y = Number(projected[1].toFixed(2));
+      entity.x = Number(projected[0].toFixed(4));
+      entity.y = Number(projected[1].toFixed(4));
       entity.rendered_safe_adjusted = false;
       entity.rendered_in_view = projected[0] >= 0 && projected[0] <= 100 && projected[1] >= 0 && projected[1] <= 100;
       return true;
@@ -3081,7 +3193,7 @@ def render_index() -> str:
         S2: "single_task_multidispatch",
         S3: "sparse_cover",
         S4: "greedy_baseline",
-        S5: "risk_balancing"
+        S5: "low_global_column_search"
       }[strategyId] || "candidate_preview";
     }
     function cloneStablePreviewMapForFinal(sample, renderedDispatchMap) {
@@ -3219,7 +3331,7 @@ def render_index() -> str:
       ].join("");
       $("detail-eta").textContent = "-";
       $("right-cost").textContent = "-";
-      document.querySelector(".prob span").textContent = "--";
+      setProbabilityMetric("指标", "--");
       $("detail-reasons").innerHTML = [
         "<li>刷新只更新当前场景下的商家、骑手与候选策略，不提前展示最终派单。</li>",
         "<li>运行后左侧链路会逐步评估策略，下方表格切换为最终方案对比。</li>",
@@ -3353,7 +3465,7 @@ def render_index() -> str:
       $("detail-orders").innerHTML = "";
       $("detail-eta").textContent = "-";
       $("right-cost").textContent = "-";
-      document.querySelector(".prob span").textContent = "--";
+      setProbabilityMetric("指标", "--");
       $("detail-reasons").innerHTML = [
         "<li>初始状态只展示场景入口，不展示最终派单线。</li>",
         "<li>刷新后生成当前场景输入，只显示商家点和骑手点。</li>",
@@ -3402,21 +3514,22 @@ def render_index() -> str:
       return labels;
     }
     const strategyBranchCatalog = [
-      {id: "S1", title: "合单优先", desc: "同路高重叠订单合并派单", names: ["disjoint_then_multidispatch", "pair_potential_matching", "scarce_k2_column_search", "scarce_bundle_mcf_enum"]},
-      {id: "S2", title: "多派候选", desc: "单任务多骑手候选扩展", names: ["single_task_multidispatch"]},
-      {id: "S3", title: "局部修复", desc: "从基线方案做局部修复", names: ["sparse_cover", "low_global_column_search", "low_column_search"]},
-      {id: "S4", title: "贪心基线", desc: "最近/最低成本基线派单", names: ["greedy_baseline", "fallback_official_greedy"]},
-      {id: "S5", title: "风险平衡", desc: "低意愿与时间窗风险平衡", names: ["risk_balancing", "low_willingness_guard", "candidate_preview"]}
+      {id: "S1", short: "组合", title: "组合搜索 / MCF", desc: "disjoint gain、pair matching、scarce K2 与 bundle MCF 重组", names: ["disjoint_then_multidispatch", "disjoint_gain", "pair_potential_matching", "pair_matching", "scarce_k2_column_search", "scarce_k2_column", "scarce_bundle_mcf", "scarce_bundle_mcf_enum", "scarce_bundle_group_mcf_enum"]},
+      {id: "S2", short: "多派", title: "单任务多派", desc: "single_task_multidispatch 为单任务保留多个可接骑手", names: ["single_task_multidispatch", "single_multidispatch"]},
+      {id: "S3", short: "修复", title: "覆盖修复搜索", desc: "sparse_cover 补足未覆盖商家，并修复高风险派单", names: ["sparse_cover"]},
+      {id: "S4", short: "基线", title: "贪心基线 / 兜底", desc: "greedy baseline 与官方贪心兜底用于快速可行解和对照", names: ["greedy_baseline", "fallback_official_greedy", "_fallback_official_greedy"]},
+      {id: "S5", short: "自适应", title: "低意愿 / 自适应补充", desc: "按 regime、覆盖率和当前最优解触发 low column、production solver 与 evolution replay", names: ["low_global_column", "low_single_column", "low_global_column_search", "low_column_search", "production_solver", "trusted_generated", "candidate_preview", "evolution_replay", "generated_strategy"]}
     ];
     function branchForStrategy(name, profile) {
       const strategyName = String(name || "");
       const found = strategyBranchCatalog.find((branch) => branch.names.includes(strategyName));
       if (found) return found.id;
+      if (strategyName.includes("production") || strategyName.includes("evolution") || strategyName.includes("trusted") || strategyName.includes("generated")) return "S5";
       if (strategyName.includes("low")) return "S5";
       if (strategyName.includes("disjoint") || strategyName.includes("pair") || strategyName.includes("bundle") || strategyName.includes("scarce")) return "S1";
       if (strategyName.includes("greedy")) return "S4";
       if (strategyName.includes("single")) return "S2";
-      if (strategyName.includes("sparse") || strategyName.includes("repair")) return "S3";
+      if (strategyName.includes("sparse") || strategyName.includes("repair") || strategyName.includes("column_search")) return "S3";
       if (profile && String(profile.label || "").includes("低接单")) return "S5";
       if (profile && String(profile.label || "").includes("稀缺")) return "S1";
       return "S1";
@@ -3543,7 +3656,7 @@ def render_index() -> str:
         strategy.dataset.reasoningOrder = reasoningState && Array.isArray(reasoningState.order) ? String(reasoningState.order.indexOf(branch.id) + 1 || "") : "";
         strategy.dataset.strategyRank = revealStrategyData && sampleItem.rank ? String(sampleItem.rank) : "";
         strategy.dataset.strategyEvidence = revealStrategyData && sampleItem.evidence ? sampleItem.evidence : "";
-        strategy.querySelector("h4").textContent = branch.id + (isBest ? " ✓" : "");
+        strategy.querySelector("h4").textContent = (branch.short || branch.id) + (isBest ? " ✓" : "");
         const evidence = showEvidenceOnCard && sampleItem.evidence ? `<span class="evidence">${escapeAttr(sampleItem.evidence)}</span>` : "";
         strategy.querySelector("p").innerHTML = `<b>${branch.title}</b><br>${branch.desc}${evidence}`;
         strategy.querySelector("strong").innerHTML = `${score} <span class="badge ${badgeClass}">${statusText}</span>`;
@@ -3559,7 +3672,14 @@ def render_index() -> str:
     function sampleSelectedScore(sample) {
       const selected = sample && sample.selected_strategy_id;
       const item = selected && Array.isArray(sample.strategy_path) ? sample.strategy_path.find((entry) => entry.id === selected) : null;
-      return item && Number.isFinite(Number(item.score)) ? Number(item.score) : 0.89;
+      return item && Number.isFinite(Number(item.score)) ? Number(item.score) : 0.92;
+    }
+    function sampleScoreForBranch(branchId, fallback = NaN) {
+      const item = currentSimulationSample && Array.isArray(currentSimulationSample.strategy_path)
+        ? currentSimulationSample.strategy_path.find((entry) => entry.id === branchId)
+        : null;
+      const score = item && Number(item.score);
+      return Number.isFinite(score) ? score : fallback;
     }
     function updateReasonMetrics(activeStep, profile, report) {
       const nodes = Array.from(document.querySelectorAll(".reason-wrap .node"));
@@ -3632,7 +3752,7 @@ def render_index() -> str:
       if (nodes[0]) nodes[0].querySelector("p").innerHTML = `${taskCount} 个订单 · ${courierCount} 个骑手<br>当前场景：${profile.label}`;
       if (nodes[1]) nodes[1].querySelector("p").innerHTML = `识别商家、订单、骑手接单意愿<br>无人接单风险：${profile.missedRisk}`;
       if (nodes[2]) {
-        nodes[2].querySelector("p").innerHTML = `生成 ${Math.max(5, attempts.length || 5)} 个候选派单策略<br>比较合单、单派、多候选和局部修复`;
+        nodes[2].querySelector("p").innerHTML = `生成 ${Math.max(5, attempts.length || 5)} 个候选派单策略<br>比较组合搜索、单任务多派、覆盖修复和自适应补充`;
         const metric = nodes[2].querySelector(".metric strong");
         if (metric) metric.textContent = String(Math.max(5, attempts.length || 5));
       }
@@ -3903,7 +4023,8 @@ def render_index() -> str:
         pin.style.left = Number(rawPoint.x).toFixed(1) + "%";
         pin.style.top = Number(rawPoint.y).toFixed(1) + "%";
         pin.title = hasAssignments ? "点击聚焦 " + item.id + " 的派单链路" : "点击查看 " + item.id + " 的样本详情";
-        pin.innerHTML = `<span class="mark ${markKind}"><span class="mark-symbol">${isMerchantPoint ? "商" : "骑"}</span></span>`;
+        const pinCode = hasAssignments ? `<span class="pin-code">${escapeAttr(item.id)}</span>` : "";
+        pin.innerHTML = `<span class="mark ${markKind}"><span class="mark-symbol">${isMerchantPoint ? "商" : "骑"}</span></span>${pinCode}`;
         entityLayer.appendChild(pin);
 
         if (item.hideLabel && !showSelectedLabel) return;
@@ -4358,21 +4479,60 @@ def render_index() -> str:
       usable.endpointConnectors = [];
       return usable;
     }
-    function dispatchRelationshipRoute(start, end) {
+    function quadraticPoint(start, control, end, t) {
+      return [
+        (1 - t) * (1 - t) * safeNumber(start[0], 0) + 2 * (1 - t) * t * safeNumber(control[0], 0) + t * t * safeNumber(end[0], 0),
+        (1 - t) * (1 - t) * safeNumber(start[1], 0) + 2 * (1 - t) * t * safeNumber(control[1], 0) + t * t * safeNumber(end[1], 0)
+      ];
+    }
+    function routeObstacleClearance(route, obstacles = []) {
+      const candidates = (obstacles || []).filter(Boolean);
+      if (!candidates.length) return 100;
+      const usable = route.filter(Boolean);
+      const samples = [];
+      if (Array.isArray(route.curveControl) && usable.length >= 2) {
+        const start = usable[0];
+        const end = usable[usable.length - 1];
+        for (let step = 1; step < 10; step += 1) samples.push(quadraticPoint(start, route.curveControl, end, step / 10));
+      } else {
+        usable.forEach((point) => samples.push(point));
+      }
+      let minDistance = 100;
+      samples.forEach((sample) => {
+        candidates.forEach((obstacle) => {
+          minDistance = Math.min(minDistance, distance2D(sample, obstacle));
+        });
+      });
+      return minDistance;
+    }
+    function dispatchRelationshipRoute(start, end, routeSeed = "", obstacles = []) {
       const dx = safeNumber(end[0], 0) - safeNumber(start[0], 0);
       const dy = safeNumber(end[1], 0) - safeNumber(start[1], 0);
       const distance = Math.max(0.001, Math.hypot(dx, dy));
       const bend = Math.min(8.5, Math.max(2.2, distance * 0.075));
-      const sign = ((Math.round(start[0] * 10 + end[1] * 10) % 2) === 0) ? 1 : -1;
-      const control = [
-        (safeNumber(start[0], 0) + safeNumber(end[0], 0)) / 2 + (-dy / distance) * bend * sign,
-        (safeNumber(start[1], 0) + safeNumber(end[1], 0)) / 2 + (dx / distance) * bend * sign
-      ];
-      const route = [start, control, end];
-      route.curveControl = control;
-      route.roadCore = route;
-      route.endpointConnectors = [];
-      return route;
+      const signSeed = routeSeed || `${Math.round(start[0])}:${Math.round(start[1])}:${Math.round(end[0])}:${Math.round(end[1])}`;
+      const preferredSign = (stableHash(signSeed) % 2 === 0) ? 1 : -1;
+      const signs = [preferredSign, -preferredSign];
+      const bendFactors = [1, 1.45, .68, 1.9, 2.35];
+      let best = null;
+      signs.forEach((sign, signIndex) => {
+        bendFactors.forEach((factor, factorIndex) => {
+          const candidateBend = Math.min(18, bend * factor);
+          const control = [
+            (safeNumber(start[0], 0) + safeNumber(end[0], 0)) / 2 + (-dy / distance) * candidateBend * sign,
+            (safeNumber(start[1], 0) + safeNumber(end[1], 0)) / 2 + (dx / distance) * candidateBend * sign
+          ];
+          const route = [start, control, end];
+          route.curveControl = control;
+          route.roadCore = route;
+          route.endpointConnectors = [];
+          const clearance = routeObstacleClearance(route, obstacles);
+          const shortfallPenalty = Math.max(0, 5.2 - clearance) * 80;
+          const score = clearance * 16 - shortfallPenalty - factorIndex * 1.8 - signIndex * .35 - routeSpan(route) * .08;
+          if (!best || score > best.score) best = {route, score};
+        });
+      });
+      return best && best.route ? best.route : [start, end];
     }
     function compactRoutePoints(points) {
       return (points || []).filter(Boolean).reduce((list, point) => {
@@ -4430,11 +4590,9 @@ def render_index() -> str:
       return usable[Math.floor(usable.length / 2)];
     }
     function dispatchRouteClickTargetFor(points, cls, assignmentId = "", meta = {}, style = "") {
-      const midpoint = routeClickMidpoint(points);
-      if (!midpoint) return "";
-      const [x, y] = svgPoint(midpoint);
+      const d = dispatchPathFor(points);
+      if (!d) return "";
       const styleAttr = style ? ` style="${style}"` : "";
-      const d = `M${(x - 8).toFixed(1)} ${y.toFixed(1)} L${(x + 8).toFixed(1)} ${y.toFixed(1)}`;
       return `<path class="dispatch-link ${cls} route-click-target" data-assignment="${assignmentId}" data-route-role="main"${routeMetaAttributes(meta)}${styleAttr} d="${d}"></path>`;
     }
     function distanceToRouteAtClientPoint(path, clientX, clientY) {
@@ -4512,9 +4670,58 @@ def render_index() -> str:
       const styleAttr = style ? ` style="${style}"` : "";
       return `<polygon class="dispatch-arrow ${cls}${active ? " active-assignment" : ""}" data-assignment="${assignmentId}" data-route-role="arrow"${routeMetaAttributes(meta)}${styleAttr} points="${pointsAttr}"></polygon>`;
     }
+    function alignDispatchArrowsToRenderedPaths(svg) {
+      if (!svg) return;
+      const routes = [...svg.querySelectorAll(".dispatch-visual.pickup-leg")];
+      svg.querySelectorAll(".dispatch-arrow").forEach((arrow) => {
+        const route = routes.find((candidate) => (
+          candidate.dataset.assignment === arrow.dataset.assignment
+          && candidate.dataset.courier === arrow.dataset.courier
+          && candidate.dataset.legIndex === arrow.dataset.legIndex
+        ));
+        if (!route || typeof route.getTotalLength !== "function" || typeof route.getPointAtLength !== "function") return;
+        let total = 0;
+        try {
+          total = route.getTotalLength();
+        } catch (error) {
+          return;
+        }
+        if (!Number.isFinite(total) || total <= 0) return;
+        const target = total * 0.58;
+        const previous = route.getPointAtLength(Math.max(0, target - 2.2));
+        const tip = route.getPointAtLength(target);
+        const next = route.getPointAtLength(Math.min(total, target + 2.2));
+        const angle = Math.atan2(next.y - previous.y, next.x - previous.x);
+        const size = arrow.classList.contains("primary") || arrow.classList.contains("active-assignment") ? 9 : 6;
+        const leftX = tip.x - Math.cos(angle - 0.52) * size;
+        const leftY = tip.y - Math.sin(angle - 0.52) * size;
+        const rightX = tip.x - Math.cos(angle + 0.52) * size;
+        const rightY = tip.y - Math.sin(angle + 0.52) * size;
+        arrow.setAttribute("points", `${tip.x.toFixed(1)},${tip.y.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}`);
+        arrow.dataset.arrowAnchored = "rendered-path";
+      });
+    }
     function dispatchArrowPoints(points, primary = false) {
       const usable = points.filter(Boolean);
       if (usable.length < 2) return "";
+      if (Array.isArray(points.curveControl) && usable.length >= 2) {
+        const start = usable[0];
+        const control = points.curveControl;
+        const end = usable[usable.length - 1];
+        const t = 0.58;
+        const curveX = (1 - t) * (1 - t) * safeNumber(start[0], 0) + 2 * (1 - t) * t * safeNumber(control[0], 0) + t * t * safeNumber(end[0], 0);
+        const curveY = (1 - t) * (1 - t) * safeNumber(start[1], 0) + 2 * (1 - t) * t * safeNumber(control[1], 0) + t * t * safeNumber(end[1], 0);
+        const tangentX = 2 * (1 - t) * (safeNumber(control[0], 0) - safeNumber(start[0], 0)) + 2 * t * (safeNumber(end[0], 0) - safeNumber(control[0], 0));
+        const tangentY = 2 * (1 - t) * (safeNumber(control[1], 0) - safeNumber(start[1], 0)) + 2 * t * (safeNumber(end[1], 0) - safeNumber(control[1], 0));
+        const [tipX, tipY] = svgPoint([curveX, curveY]);
+        const angle = Math.atan2(tangentY * 6.4, tangentX * 9.8);
+        const size = primary ? 9 : 6;
+        const leftX = tipX - Math.cos(angle - 0.52) * size;
+        const leftY = tipY - Math.sin(angle - 0.52) * size;
+        const rightX = tipX - Math.cos(angle + 0.52) * size;
+        const rightY = tipY - Math.sin(angle + 0.52) * size;
+        return `${tipX.toFixed(1)},${tipY.toFixed(1)} ${leftX.toFixed(1)},${leftY.toFixed(1)} ${rightX.toFixed(1)},${rightY.toFixed(1)}`;
+      }
       const totalLength = routePolylineLength(usable);
       const targetLength = totalLength * 0.56;
       let accumulated = 0;
@@ -4558,6 +4765,10 @@ def render_index() -> str:
       const selectedAssignment = profile.selected || (profile.dispatchMap.assignments[0] && profile.dispatchMap.assignments[0].id) || "";
       const mapLayers = profile.dispatchMap.map_layers;
       const routePalette = ["#0f766e", "#11836e", "#147a64", "#0d9488", "#15803d", "#0f766e", "#11836e", "#147a64"];
+      const merchantObstacleEntries = (profile.dispatchMap.entities || [])
+        .filter((entity) => entity.kind === "merchant_order" || entity.kind === "pickup_cluster")
+        .map((entity) => [entity.id, entityPoints[entity.id]])
+        .filter(([, point]) => Array.isArray(point));
       const pathHtml = profile.dispatchMap.assignments.flatMap((assignment, index) => {
         const normalizedAssignment = (profile.assignments && profile.assignments[assignment.id]) || assignment;
         const couriers = finalCourierTokensForAssignment(normalizedAssignment);
@@ -4570,7 +4781,10 @@ def render_index() -> str:
         return couriers.map((courierId, courierIndex) => {
           const courierPoint = entityPoints[courierId];
           if (!courierPoint) return "";
-          const pickupRoute = dispatchRelationshipRoute(courierPoint, pickupPoint);
+          const obstacles = merchantObstacleEntries
+            .filter(([merchantId]) => merchantId !== assignment.pickup)
+            .map(([, point]) => point);
+          const pickupRoute = dispatchRelationshipRoute(courierPoint, pickupPoint, `${assignment.id}:${courierId}:${courierIndex}`, obstacles);
           const visiblePickupRoute = pickupRoute;
           const pickupD = dispatchPathFor(visiblePickupRoute);
           if (!pickupD) return "";
@@ -4600,6 +4814,7 @@ def render_index() -> str:
         });
       }).join("");
       svg.innerHTML = pathHtml;
+      alignDispatchArrowsToRenderedPaths(svg);
     }
     function applyMapFocus(profile, assignmentId, focusMap = true) {
       const assignments = (profile && profile.assignments) || {};
@@ -4714,11 +4929,11 @@ def render_index() -> str:
           : `<span class="chip">等待候选生成</span>`;
       $("detail-eta").textContent = merchant.expected_eta_min ? `${merchant.expected_eta_min} 分钟目标` : "-";
         $("right-cost").textContent = merchant.expected_price ? money(merchant.expected_price) : "-";
-        document.querySelector(".prob span").textContent = relatedCandidates[0] ? `${Math.round(safeNumber(relatedCandidates[0].accept_probability, 0) * 100)}%` : "--";
+        setProbabilityMetric("候选接单概率", relatedCandidates[0] ? `${Math.round(safeNumber(relatedCandidates[0].accept_probability, 0) * 100)}%` : "--");
         $("detail-reasons").innerHTML = [
           "<li>候选骑手按距离、接单意愿、价格和风险综合排序。</li>",
           "<li>当前仅展示输入侧候选，不提前显示最终派单。</li>",
-          "<li>接单概率用于判断该商家是否需要多派候选或风险平衡策略。</li>"
+          "<li>接单概率用于判断该商家是否需要单任务多派或低意愿自适应补充。</li>"
         ].join("");
         setEvidenceRows([
           ["▧ 商家类型", merchant.hotspot === "crossroad" ? "路口商圈" : "街区商家"],
@@ -4755,7 +4970,7 @@ def render_index() -> str:
         $("detail-orders").innerHTML = relatedCandidates.map((candidate) => `<span class="chip">${candidate.merchant_id} · ${candidate.risk}</span>`).join("");
         $("detail-eta").textContent = relatedCandidates[0] ? `${relatedCandidates[0].eta_min} 分钟最近候选` : "-";
         $("right-cost").textContent = relatedCandidates[0] ? money(relatedCandidates[0].cost) : "-";
-        document.querySelector(".prob span").textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
+        setProbabilityMetric("骑手接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`);
         $("detail-reasons").innerHTML = [
           `<li>候选商家：${relatedCandidates.map((candidate) => candidate.merchant_id).join("、") || "暂无"}。</li>`,
           "<li>系统优先避免把低意愿骑手绑定到高风险商家。</li>",
@@ -4796,7 +5011,7 @@ def render_index() -> str:
         $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
         $("detail-eta").textContent = assignment.eta;
         $("right-cost").textContent = assignment.cost;
-        document.querySelector(".prob span").textContent = assignment.probability;
+        setProbabilityMetric("接单概率", assignment.probability);
         $("detail-reasons").innerHTML = [
           `<li>派单对象：${entity.id} → ${assignment.courier}，覆盖该商家 ${orderCount} 单。</li>`,
           `<li>时效目标：${merchant.expected_eta_min ? merchant.expected_eta_min + " 分钟" : "-"}；预计派单成本 ${assignment.cost}。</li>`,
@@ -4827,7 +5042,7 @@ def render_index() -> str:
         $("detail-orders").innerHTML = courierAssignments.map(([, item]) => `<span class="chip">${item.pickup}</span>`).join("") || `<span class="chip">暂无最终派单</span>`;
         $("detail-eta").textContent = avgEta ? `${avgEta} 分钟平均` : etaText(assignment.eta);
         $("right-cost").textContent = money(totalCost || safeNumber(String(assignment.cost || "0").replace("$", ""), 0));
-        document.querySelector(".prob span").textContent = `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`;
+        setProbabilityMetric("骑手接单意愿", `${Math.round(safeNumber(courier.willingness, 0) * 100)}%`);
         $("detail-reasons").innerHTML = [
           `<li>骑手接单意愿 ${Math.round(safeNumber(courier.willingness, 0) * 100)}%，当前状态 ${courier.status || "available"}。</li>`,
           `<li>已分配商家：${courierAssignments.map(([, item]) => item.pickup).join("、") || "-"}。</li>`,
@@ -4857,6 +5072,12 @@ def render_index() -> str:
         if (value) value.textContent = item[1] || "-";
       });
     }
+    function setProbabilityMetric(label, value) {
+      const labelNode = $("prob-label");
+      if (labelNode) labelNode.textContent = label || "指标";
+      const valueNode = document.querySelector(".prob span");
+      if (valueNode) valueNode.textContent = value || "--";
+    }
     function renderRouteDetail(profile, assignmentId, routeDataset = {}) {
       const assignments = (profile && profile.assignments) || {};
       const assignment = assignments[assignmentId] || assignments[profile.selected] || assignments[Object.keys(assignments)[0]];
@@ -4878,13 +5099,13 @@ def render_index() -> str:
       const legLabel = "骑手到商家";
       const endpointText = `${courierId} → ${merchantId}`;
       setDetailContext("route", resolvedAssignment, merchantId, leg || "courier-to-merchant");
-      $("detail-title").textContent = "派单关系：" + legLabel;
-      $("detail-courier").textContent = courierId;
+      $("detail-title").textContent = `派单关系：${merchantId} → ${courierId}`;
+      $("detail-courier").textContent = `${merchantId} → ${courierId}`;
       $("detail-merchant").innerHTML = `最终派单 <code>${merchantId} → ${courierId}</code>；地图线 <code>${endpointText}</code> 表达骑手承接该商家，不作为骑行导航。`;
       $("detail-orders").innerHTML = [merchantId, courierId].filter(Boolean).map((item) => `<span class="chip">${item}</span>`).join("");
       $("detail-eta").textContent = etaText(assignment.eta);
       $("right-cost").textContent = assignment.cost;
-      document.querySelector(".prob span").textContent = assignment.probability;
+      setProbabilityMetric("接单概率", assignment.probability);
       $("detail-reasons").innerHTML = [
         `<li>该线属于最终派单 ${resolvedAssignment}：商家 ${merchantId} 派给骑手 ${courierId}。</li>`,
         `<li>派单线证据来自当前地图路网；采样节点 ${routePoints || "-"} 个，端点贴合校验 ${endpointConnectors} 段。</li>`,
@@ -4939,7 +5160,7 @@ def render_index() -> str:
       ].filter(Boolean).join("");
       $("detail-eta").textContent = revealDetail && sampleItem && sampleItem.score ? Number(sampleItem.score).toFixed(2) : (statusText === "评估中" ? "计算中" : "-");
       $("right-cost").textContent = isSelected && profile ? profile.cost : "-";
-      document.querySelector(".prob span").textContent = revealDetail && sampleItem && sampleItem.score ? `${Math.round(safeNumber(sampleItem.score, 0) * 100)}%` : "--";
+      setProbabilityMetric("策略评分", revealDetail && sampleItem && sampleItem.score ? `${Math.round(safeNumber(sampleItem.score, 0) * 100)}%` : "--");
       $("detail-reasons").innerHTML = [
         "<li>该卡片来自当前场景的策略评分链路，不是静态展示。</li>",
         `<li>策略说明：${branch.desc}。</li>`,
@@ -4971,7 +5192,7 @@ def render_index() -> str:
         "scene-summary": "该行说明当前调度场景输入，包括商家规模、骑手供给、天气/密度和风险画像。",
         "preview-strategy": "该行展示刷新位置后的预期策略倾向，只作为推理前输入，不提前泄露最终结果。",
         "strategy-candidate": "该行对比一种候选派单策略在覆盖率、ETA、成本、骑手占用和无人接单风险上的表现。",
-        "final-strategy": "该行是 AutoSolver 最终采纳方案，用于和贪心、合单、多派、修复、风险平衡策略做业务对比。",
+        "final-strategy": "该行是 AutoSolver 最终采纳方案，用于和贪心、组合搜索、多派、覆盖修复、自适应补充做业务对比。",
         "empty-state": "该行提示当前工作台状态：刷新位置可查看输入，运行推理后才生成最终派单。"
       };
       const title = rowType === "preview-candidate"
@@ -4989,7 +5210,7 @@ def render_index() -> str:
       $("detail-orders").innerHTML = cells.slice(0, 4).map((item) => `<span class="chip">${item || "-"}</span>`).join("");
       $("detail-eta").textContent = rowEtaText;
       $("right-cost").textContent = row.dataset.cost || cells[3] || "-";
-      document.querySelector(".prob span").textContent = row.dataset.probability || (row.dataset.score ? `${Math.round(safeNumber(row.dataset.score, 0) * 100)}%` : "--");
+      setProbabilityMetric(rowType === "final-strategy" || rowType === "strategy-candidate" ? "策略评分" : rowType === "scene-summary" ? "商家覆盖率" : "指标", row.dataset.probability || (row.dataset.score ? `${Math.round(safeNumber(row.dataset.score, 0) * 100)}%` : "--"));
       $("detail-reasons").innerHTML = [
         `<li>${rowDescriptions[rowType] || "该详情由表格行点击触发，用于说明候选/最终策略，不是纯视觉表格。"}</li>`,
         `<li>覆盖率：${cells[1] || "-"}；ETA：${cells[2] || "-"}；成本：${cells[3] || "-"}。</li>`,
@@ -5030,7 +5251,7 @@ def render_index() -> str:
       $("detail-orders").innerHTML = chips.join("");
       $("detail-eta").textContent = avgEta ? `${avgEta} 分钟平均` : "-";
       $("right-cost").textContent = money(totalCost);
-      document.querySelector(".prob span").textContent = `${coverage}%`;
+      setProbabilityMetric("商家覆盖率", `${coverage}%`);
       $("detail-reasons").innerHTML = [
         "<li>当前默认是全局派单总览：所有商家到骑手的派单线保持可见。</li>",
         "<li>点击任意商家、骑手或线路后，才进入单条派单聚焦模式。</li>",
@@ -5061,7 +5282,7 @@ def render_index() -> str:
       $("detail-orders").innerHTML = assignment.orders.map((order) => `<span class="chip">${order}</span>`).join("");
       $("detail-eta").textContent = etaText(assignment.eta);
       $("right-cost").textContent = assignment.cost;
-      document.querySelector(".prob span").textContent = assignment.probability;
+      setProbabilityMetric("接单概率", assignment.probability);
       $("detail-reasons").innerHTML = assignment.reason.map((item) => `<li>${item}</li>`).join("");
       if (assignment.merchantNote) $("detail-reasons").innerHTML += `<li>${assignment.merchantNote}</li>`;
       setEvidenceRows([
@@ -5115,16 +5336,23 @@ def render_index() -> str:
     }
     function strategyLabel(name) {
       const labels = {
-        greedy_baseline: "贪心基线",
-        single_task_multidispatch: "多派候选",
-        disjoint_then_multidispatch: "合单优先",
-        pair_potential_matching: "合单优先",
-        sparse_cover: "局部修复",
-        low_global_column_search: "局部修复",
-        low_column_search: "局部修复",
-        scarce_k2_column_search: "合单优先",
-        scarce_bundle_mcf_enum: "合单优先",
-        risk_balancing: "风险平衡",
+        greedy_baseline: "贪心基线 / 兜底",
+        fallback_official_greedy: "贪心基线 / 兜底",
+        single_task_multidispatch: "单任务多派",
+        single_multidispatch: "单任务多派",
+        disjoint_then_multidispatch: "组合搜索 / MCF",
+        disjoint_gain: "组合搜索 / MCF",
+        pair_potential_matching: "组合搜索 / MCF",
+        pair_matching: "组合搜索 / MCF",
+        sparse_cover: "覆盖修复搜索",
+        low_global_column_search: "低意愿 / 自适应补充",
+        low_column_search: "低意愿 / 自适应补充",
+        low_global_column: "低意愿 / 自适应补充",
+        low_single_column: "低意愿 / 自适应补充",
+        scarce_k2_column_search: "组合搜索 / MCF",
+        scarce_k2_column: "组合搜索 / MCF",
+        scarce_bundle_mcf: "组合搜索 / MCF",
+        scarce_bundle_mcf_enum: "组合搜索 / MCF",
         candidate_preview: "候选预览",
         production_solver: "最终 AutoSolver"
       };
@@ -5142,7 +5370,7 @@ def render_index() -> str:
         {name: "single_task_multidispatch", ["local" + "_cost"]: bestCost * 1.88, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 9, accepted: false, valid: true},
         {name: "sparse_cover", ["local" + "_cost"]: bestCost * 1.54, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
         {name: "greedy_baseline", ["local" + "_cost"]: bestCost * 3.2, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 8, accepted: false, valid: true},
-        {name: "risk_balancing", ["local" + "_cost"]: bestCost * 1.28, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
+        {name: "low_global_column_search", ["local" + "_cost"]: bestCost * 1.28, covered_tasks: totalTasks, total_tasks: totalTasks, groups: 7, accepted: false, valid: true},
       ];
       const usingFallbackRows = attempts.length === 0;
       const sourceRows = usingFallbackRows ? fallbackRows : attempts;
@@ -5164,20 +5392,26 @@ def render_index() -> str:
         const risk = coverage >= 100 && cost <= bestCost * 1.2 ? "Low" : coverage < 100 ? "High" : "Med";
         const status = item.accepted ? "可行" : "已淘汰";
         const statusClass = item.accepted ? "status-ok" : "status-bad";
-        const score = Math.max(0.35, Math.min(0.91, bestCost / Math.max(cost, 1))).toFixed(2);
+        const scoreValue = sampleScoreForBranch(branchId, Math.max(0.35, Math.min(0.91, bestCost / Math.max(cost, 1))));
+        const score = Math.max(0.35, Math.min(0.99, scoreValue)).toFixed(2);
         const insightByBranch = {
-          S1: item.accepted ? "订单集中度高，合单后骑手占用更稳定" : "合单收益不足或局部绕行偏大",
+          S1: item.accepted ? "组合候选在当前样本综合分最高" : "组合搜索收益不足或局部绕行偏大",
           S2: "保留多个骑手候选，适合距离接近但资源占用更高",
           S3: "可修复高风险派单，但整体成本仍高于当前方案",
           S4: "最近骑手优先，作为业务基线但容易放大无人接单风险",
-          S5: "降低低意愿/天气风险，但会牺牲部分成本或 ETA"
+          S5: "自适应低意愿/生产级补充降低无人接单风险"
         };
         const insight = insightByBranch[branchId] || (item.valid ? "成本或资源占用高于当前最优" : "覆盖或约束校验失败");
         const etaMinutes = (12 + safeNumber(item.groups, 6) * 0.7).toFixed(1);
         return `<tr data-row-type="strategy-candidate" data-branch="${escapeAttr(branchId)}" data-strategy="${escapeAttr(item.name || "")}" data-cost="${escapeAttr(money(cost))}" data-eta="${escapeAttr(etaMinutes + " 分钟")}" data-risk="${escapeAttr(risk)}" data-score="${score}" data-status="${escapeAttr(status)}"><td>${strategyLabel(item.name)}</td><td>${coverage}%</td><td>${etaMinutes} 分钟</td><td>${money(cost)}</td><td>${safeNumber(item.groups, 0)} 个骑手</td><td>${risk} (${profile.missedRisk})</td><td>${score}</td><td class="${statusClass}">${status}</td><td>${insight}</td></tr>`;
       });
       const used = safeNumber(best.used_couriers || best.groups, 6);
-      tableRows.push(`<tr class="emphasis" data-row-type="final-strategy" data-branch="${escapeAttr(selectedBranchForReport(report, profile))}" data-strategy="production_solver" data-cost="${escapeAttr(money(bestCost))}" data-eta="${escapeAttr(etaText(profile.eta))}" data-risk="Low" data-score="0.89" data-status="已选中"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>${totalTasks ? Math.round(safeNumber(best.covered_tasks, totalTasks) / totalTasks * 100) : 100}%</b></td><td><b>${etaText(profile.eta)}</b></td><td><b id="table-cost">${money(bestCost)}</b></td><td><b>${used} 个骑手</b></td><td><b>Low (${profile.missedRisk})</b></td><td><b>0.89</b></td><td><b>已选中</b></td><td><b>成本、风险、履约时效综合最优</b></td></tr>`);
+      const selectedBranch = selectedBranchForReport(report, profile);
+      const finalScore = Math.max(
+        currentSimulationSample ? sampleSelectedScore(currentSimulationSample) : 0.96,
+        ...rows.map((item) => sampleScoreForBranch(branchForStrategy(item.name, profile), Math.max(0.35, Math.min(0.91, bestCost / Math.max(safeNumber(item["local" + "_cost"], bestCost), 1)))))
+      );
+      tableRows.push(`<tr class="emphasis" data-row-type="final-strategy" data-branch="${escapeAttr(selectedBranch)}" data-strategy="production_solver" data-cost="${escapeAttr(money(bestCost))}" data-eta="${escapeAttr(etaText(profile.eta))}" data-risk="Low" data-score="${finalScore.toFixed(2)}" data-status="已选中"><td><span class="star">★</span><b>最终 AutoSolver<br>选中方案</b></td><td><b>${totalTasks ? Math.round(safeNumber(best.covered_tasks, totalTasks) / totalTasks * 100) : 100}%</b></td><td><b>${etaText(profile.eta)}</b></td><td><b id="table-cost">${money(bestCost)}</b></td><td><b>${used} 个骑手</b></td><td><b>Low (${profile.missedRisk})</b></td><td><b>${finalScore.toFixed(2)}</b></td><td><b>已选中</b></td><td><b>动态策略路径最高分，成本、风险、履约时效综合最优</b></td></tr>`);
       tbody.innerHTML = tableRows.join("");
     }
     function applyScene(caseId, source) {
@@ -5467,8 +5701,10 @@ def render_index() -> str:
       $("expand-graph").addEventListener("click", (event) => {
         document.querySelector(".left-panel").classList.toggle("expanded");
         event.currentTarget.classList.toggle("active");
-        event.currentTarget.textContent = event.currentTarget.classList.contains("active") ? "收起" : "展开全部";
-        setStatus(event.currentTarget.classList.contains("active") ? "推理树已展开" : "推理树已收起", false);
+        const expanded = event.currentTarget.classList.contains("active");
+        event.currentTarget.setAttribute("aria-expanded", expanded ? "true" : "false");
+        event.currentTarget.textContent = expanded ? "收起" : "展开全部";
+        setStatus(expanded ? "推理树已展开" : "推理树已收起", false);
       });
       $("layer-mode").addEventListener("change", (event) => setLayerMode(event.target.value));
       document.querySelectorAll("[data-map-action]").forEach((button) => {
