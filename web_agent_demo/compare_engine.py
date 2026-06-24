@@ -5,6 +5,7 @@ import math
 from dataclasses import dataclass, replace
 from typing import Any, Callable
 
+from web_agent_demo.memory_engine import MemoryRecallBundle, PredictorTrace, rank_algorithms_with_predictor
 from web_agent_demo.simulation_engine import (
     CourierState,
     MerchantState,
@@ -97,6 +98,7 @@ class AlgorithmResult:
     route_overlays: tuple[dict[str, Any], ...]
     reason: str
     risk_flags: tuple[str, ...]
+    source_algorithm_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -133,6 +135,8 @@ class CompareRunResult:
     results: tuple[AlgorithmResult, ...]
     selected: AlgorithmResult
     decision_points: tuple[DecisionPoint, ...]
+    memory: MemoryRecallBundle
+    predictor: PredictorTrace
     timeline_delta: tuple[TimelineEvent, ...]
 
 
@@ -154,6 +158,9 @@ def run_comparison(
     tick: SimulationTick,
     time_budget_ms: int = 10_000,
     algorithms: tuple[str, ...] | list[str] | None = None,
+    memory_store: Any | None = None,
+    memory_mode: str = "off",
+    predictor_mode: str = "fallback",
 ) -> CompareRunResult:
     requested = tuple(algorithms or DEFAULT_ALGORITHMS)
     if not requested:
@@ -164,11 +171,17 @@ def run_comparison(
         direct_requested = tuple(algorithm for algorithm in DEFAULT_ALGORITHMS if algorithm != "autosolver_agent")
 
     features = _scenario_features(session, tick)
+    recall = (
+        memory_store.recall_similar_context(features, direct_requested, mode=memory_mode)
+        if memory_store is not None
+        else MemoryRecallBundle.off()
+    )
     raw_results = tuple(_evaluate_algorithm(algorithm, tick, features) for algorithm in direct_requested)
     scored_results = _with_relative_scores(raw_results, baseline_algorithm_id="nearest_greedy")
+    predictor = rank_algorithms_with_predictor(features, scored_results, recall, mode=predictor_mode)
 
     if "autosolver_agent" in requested:
-        agent_result = _agent_result(scored_results, tick, features)
+        agent_result = _agent_result(scored_results, tick, features, recall, predictor)
         scored_results = (*scored_results, agent_result)
         scored_results = _with_relative_scores(scored_results, baseline_algorithm_id="nearest_greedy")
 
@@ -192,13 +205,18 @@ def run_comparison(
         baseline_algorithm_id="nearest_greedy",
         status=status,
     )
-    return CompareRunResult(
+    result = CompareRunResult(
         compare_run=compare_run,
         results=finalized_results,
         selected=selected,
         decision_points=_decision_points(compare_run, finalized_results, selected),
+        memory=recall,
+        predictor=predictor,
         timeline_delta=_timeline_delta(compare_run, finalized_results, selected, tick),
     )
+    if memory_store is not None and memory_mode == "read-write":
+        memory_store.record_compare_result(result)
+    return result
 
 
 def _evaluate_algorithm(algorithm_id: str, tick: SimulationTick, features: ScenarioFeatures) -> AlgorithmResult:
@@ -400,12 +418,23 @@ def _assign_from_sorted_pairs(
     return tuple(assignments)
 
 
-def _agent_result(results: tuple[AlgorithmResult, ...], tick: SimulationTick, features: ScenarioFeatures) -> AlgorithmResult:
+def _agent_result(
+    results: tuple[AlgorithmResult, ...],
+    tick: SimulationTick,
+    features: ScenarioFeatures,
+    recall: MemoryRecallBundle,
+    predictor: PredictorTrace,
+) -> AlgorithmResult:
     if not results:
         return _failed_result("autosolver_agent", tick, "No candidate algorithms were available for local critic selection.")
-    source = _select_result(results, prefer_agent=False)
+    source = _source_from_predictor(results, predictor) or _select_result(results, prefer_agent=False)
     family, label = ALGORITHM_META["autosolver_agent"]
     metrics = replace(source.metrics, runtime_ms=round(source.metrics.runtime_ms + _estimated_runtime_ms("autosolver_agent", features.active_order_count, features.courier_count), 3))
+    reason_parts = [f"{predictor.provider} selected {source.label}"]
+    if recall.strategy_memory:
+        reason_parts.append(recall.effect_on_ranking)
+    else:
+        reason_parts.append("No similar memory changed the ranking.")
     return AlgorithmResult(
         algorithm_id="autosolver_agent",
         algorithm_family=family,
@@ -414,9 +443,19 @@ def _agent_result(results: tuple[AlgorithmResult, ...], tick: SimulationTick, fe
         metrics=metrics,
         assignments=source.assignments,
         route_overlays=source.route_overlays,
-        reason=f"Local critic selected {source.label} because it had the best coverage-adjusted score.",
+        reason="; ".join(reason_parts),
         risk_flags=source.risk_flags,
+        source_algorithm_id=source.algorithm_id,
     )
+
+
+def _source_from_predictor(results: tuple[AlgorithmResult, ...], predictor: PredictorTrace) -> AlgorithmResult | None:
+    result_by_id = {result.algorithm_id: result for result in results if result.status not in {"failed", "timeout"}}
+    for item in predictor.ranked_algorithms:
+        algorithm_id = str(item.get("algorithm_id") or "")
+        if algorithm_id in result_by_id:
+            return result_by_id[algorithm_id]
+    return None
 
 
 def _select_result(results: tuple[AlgorithmResult, ...], prefer_agent: bool) -> AlgorithmResult:
