@@ -10,5 +10,6 @@ autosolver_agent/evolution_state/
 autosolver_agent/evolution_state/generated_strategies/
 autosolver_agent/evolution_state/evolution_memory.jsonl
 autosolver_agent/evolution_state/strategy_registry.json
+web_agent_demo/.simulation_memory/
 submission_dryrun/
 submission_final/

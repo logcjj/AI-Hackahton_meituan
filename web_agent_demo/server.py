@@ -4,8 +4,11 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import sys
+import threading
 import traceback
+from dataclasses import replace
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -17,8 +20,18 @@ if str(ROOT) not in sys.path:
 
 from autosolver_agent.system import get_agent_blueprint, run_case_agent as _run_case_agent
 from tools.agent_trace_demo import parse_candidates
+from web_agent_demo.compare_engine import run_comparison
 from web_agent_demo.delivery_routes_clone import autosolver_map_payload
+from web_agent_demo.memory_engine import SimulationMemoryStore, rank_algorithms_with_predictor
 from web_agent_demo.reasongraph_clone import autosolver_mermaid
+from web_agent_demo.simulation_engine import (
+    ENGINE_VERSION as SIMULATION_ENGINE_VERSION,
+    SimulationControls,
+    advance_simulation,
+    create_simulation_session,
+    scenario_catalog,
+    simulation_to_dict,
+)
 
 try:
     from web_agent_demo.sample_cases import SAMPLE_CASES, ensure_sample_cases
@@ -30,6 +43,10 @@ except ImportError:  # The demo can still run before optional synthetic cases ar
 DATA_DIR = ROOT / "data" / "official_cases"
 GENERATED_CASE_DIR = ROOT / "web_agent_demo" / "generated_cases"
 STATIC_DIR = ROOT / "web_agent_demo" / "static"
+SIMULATION_MEMORY_ROOT = Path(os.environ.get("AUTOSOLVER_MEMORY_ROOT", ROOT / "web_agent_demo" / ".simulation_memory"))
+_RUNTIME_LOCK = threading.RLock()
+_SIMULATION_RUNTIME: dict[str, dict[str, object]] = {}
+_COMPARE_RUNTIME: dict[str, object] = {}
 CASE_FILES = {
     "large_seed301": DATA_DIR / "large_seed301.txt",
 }
@@ -1408,6 +1425,204 @@ def build_agent_payload(case_id: str, budget_s: float = 10.0) -> dict[str, objec
     report["delivery_routes_map"] = autosolver_map_payload("final")
     report["dispatch_assignment_map"] = build_dispatch_assignment_map(case_id, report)
     return {"status": "ok", "report": report}
+
+
+def _controls_from_payload(payload: dict[str, object] | None) -> SimulationControls | None:
+    if not payload:
+        return None
+    return SimulationControls(
+        courier_count=int(payload.get("courier_count", SimulationControls.courier_count)),
+        order_intensity=float(payload.get("order_intensity", SimulationControls.order_intensity)),
+        burstiness=float(payload.get("burstiness", SimulationControls.burstiness)),
+        weather=str(payload.get("weather", SimulationControls.weather)),
+        congestion_level=float(payload.get("congestion_level", SimulationControls.congestion_level)),
+        playback_speed=float(payload.get("playback_speed", SimulationControls.playback_speed)),
+        compare_enabled=bool(payload.get("compare_enabled", SimulationControls.compare_enabled)),
+    ).normalized()
+
+
+def _simulation_scenarios_payload() -> dict[str, object]:
+    scenarios = scenario_catalog()
+    default_controls = scenarios[0].default_controls if scenarios else SimulationControls()
+    return {
+        "status": "ok",
+        "scenarios": simulation_to_dict(scenarios),
+        "defaults": simulation_to_dict(default_controls),
+        "engine": {
+            "version": SIMULATION_ENGINE_VERSION,
+            "routing_provider": "local-road-graph",
+            "map_provider": "maplibre-with-offline-schematic-fallback",
+        },
+    }
+
+
+def _memory_store() -> SimulationMemoryStore:
+    return SimulationMemoryStore(SIMULATION_MEMORY_ROOT)
+
+
+def _runtime_session(session_id: str) -> dict[str, object]:
+    with _RUNTIME_LOCK:
+        item = _SIMULATION_RUNTIME.get(session_id)
+        if item is None:
+            raise ValueError(f"unknown simulation session: {session_id}")
+        return dict(item)
+
+
+def _create_simulation_session_payload(payload: dict[str, object]) -> dict[str, object]:
+    start = create_simulation_session(
+        scenario_id=str(payload.get("scenario_id") or "commerce_peak"),
+        seed=str(payload.get("seed") or "demo"),
+        controls=_controls_from_payload(payload.get("controls") if isinstance(payload.get("controls"), dict) else None),
+        map_provider=str(payload.get("map_provider") or "maplibre"),
+    )
+    with _RUNTIME_LOCK:
+        _SIMULATION_RUNTIME[start.session.session_id] = {"session": start.session, "tick": start.tick, "timeline": list(start.timeline)}
+    return {
+        "status": "ok",
+        "session": simulation_to_dict(start.session),
+        "tick": simulation_to_dict(start.tick),
+        "timeline": simulation_to_dict(start.timeline),
+    }
+
+
+def _advance_simulation_payload(payload: dict[str, object]) -> dict[str, object]:
+    session_id = str(payload.get("session_id") or "")
+    if not session_id:
+        raise ValueError("session_id is required")
+    runtime = _runtime_session(session_id)
+    session = runtime["session"]
+    tick = runtime["tick"]
+    if not hasattr(session, "controls") or not hasattr(tick, "tick_id"):
+        raise ValueError(f"invalid simulation runtime for session: {session_id}")
+    controls_patch = payload.get("controls_patch") if isinstance(payload.get("controls_patch"), dict) else None
+    advanced = advance_simulation(
+        session,
+        tick,
+        advance_seconds=int(payload.get("advance_seconds") or 20),
+        controls_patch=controls_patch,
+        compare_if_due=bool(payload.get("compare_if_due", True)),
+    )
+    next_session = replace(session, controls=session.controls.with_patch(controls_patch))
+    with _RUNTIME_LOCK:
+        existing = _SIMULATION_RUNTIME.get(session_id, {})
+        timeline = list(existing.get("timeline", []))
+        timeline.extend(advanced.timeline_delta)
+        _SIMULATION_RUNTIME[session_id] = {"session": next_session, "tick": advanced.tick, "timeline": timeline}
+    return {
+        "status": "ok",
+        "tick": simulation_to_dict(advanced.tick),
+        "timeline_delta": simulation_to_dict(advanced.timeline_delta),
+        "compare_trigger": simulation_to_dict(advanced.compare_trigger),
+    }
+
+
+def _run_compare_payload(payload: dict[str, object]) -> dict[str, object]:
+    session_id = str(payload.get("session_id") or "")
+    if not session_id:
+        raise ValueError("session_id is required")
+    runtime = _runtime_session(session_id)
+    session = runtime["session"]
+    tick = runtime["tick"]
+    if payload.get("tick_id") and str(payload.get("tick_id")) != tick.tick_id:
+        raise ValueError(f"unknown tick for session {session_id}: {payload.get('tick_id')}")
+    memory_mode = str(payload.get("memory_mode") or "off")
+    predictor_mode = str(payload.get("predictor_mode") or "fallback")
+    store = _memory_store() if memory_mode != "off" else None
+    algorithms = payload.get("algorithms")
+    compare = run_comparison(
+        session,
+        tick,
+        time_budget_ms=int(payload.get("time_budget_ms") or 10_000),
+        algorithms=tuple(str(item) for item in algorithms) if isinstance(algorithms, list) else None,
+        memory_store=store,
+        memory_mode=memory_mode,
+        predictor_mode=predictor_mode,
+    )
+    with _RUNTIME_LOCK:
+        _COMPARE_RUNTIME[compare.compare_run.compare_run_id] = compare
+    return {
+        "status": "ok",
+        "compare_run": simulation_to_dict(compare.compare_run),
+        "results": simulation_to_dict(compare.results),
+        "selected": simulation_to_dict(compare.selected),
+        "decision_points": simulation_to_dict(compare.decision_points),
+        "memory": simulation_to_dict(compare.memory),
+        "predictor": simulation_to_dict(compare.predictor),
+        "timeline_delta": simulation_to_dict(compare.timeline_delta),
+    }
+
+
+def _get_compare_payload(compare_run_id: str) -> dict[str, object]:
+    with _RUNTIME_LOCK:
+        compare = _COMPARE_RUNTIME.get(compare_run_id)
+    if compare is None:
+        raise ValueError(f"unknown compare run: {compare_run_id}")
+    return {
+        "status": "ok",
+        "compare_run": simulation_to_dict(compare.compare_run),
+        "results": simulation_to_dict(compare.results),
+        "selected": simulation_to_dict(compare.selected),
+        "decision_points": simulation_to_dict(compare.decision_points),
+        "memory": simulation_to_dict(compare.memory),
+        "predictor": simulation_to_dict(compare.predictor),
+    }
+
+
+def _memory_recall_payload(query: dict[str, list[str]]) -> dict[str, object]:
+    features = {
+        "scenario_id": query.get("scenario_id", ["commerce_peak"])[0],
+        "scene_type": query.get("scene_type", ["dense_commerce"])[0],
+        "weather": query.get("weather", ["clear"])[0],
+        "traffic_profile": query.get("traffic_profile", ["normal"])[0],
+        "congestion_level": float(query.get("congestion_level", ["0.5"])[0]),
+        "order_pressure": float(query.get("order_pressure", ["0.5"])[0]),
+        "courier_pressure": float(query.get("courier_pressure", ["1.0"])[0]),
+        "active_order_count": int(query.get("active_order_count", ["0"])[0]),
+        "courier_count": int(query.get("courier_count", ["1"])[0]),
+        "avg_willingness": float(query.get("avg_willingness", ["0.6"])[0]),
+        "burst_active": query.get("burst_active", ["false"])[0].lower() == "true",
+    }
+    recall = _memory_store().recall_similar_context(features, mode="read-only")
+    return {"status": "ok", "recall": simulation_to_dict(recall)}
+
+
+def _memory_event_payload(payload: dict[str, object]) -> dict[str, object]:
+    event = payload.get("event") if isinstance(payload.get("event"), dict) else payload
+    accepted = _memory_store().append_memory_event(event, dry_run=bool(payload.get("dry_run", False)))
+    return {"status": "ok", "accepted": True, "event_id": accepted["event_id"], "write_mode": "append-only-jsonl"}
+
+
+def _predictor_rank_payload(payload: dict[str, object]) -> dict[str, object]:
+    compare_run_id = str(payload.get("compare_run_id") or "")
+    if compare_run_id:
+        with _RUNTIME_LOCK:
+            compare = _COMPARE_RUNTIME.get(compare_run_id)
+        if compare is None:
+            raise ValueError(f"unknown compare run: {compare_run_id}")
+        trace = rank_algorithms_with_predictor(
+            compare.compare_run.scenario_features,
+            compare.results,
+            compare.memory,
+            mode=str(payload.get("mode") or "fallback"),
+        )
+        return {"status": "ok", "predictor": simulation_to_dict(trace), "ranked_algorithms": simulation_to_dict(trace.ranked_algorithms)}
+    algorithms = payload.get("candidate_algorithms") if isinstance(payload.get("candidate_algorithms"), list) else []
+    ranked = tuple({"algorithm_id": str(algorithm), "rank": index + 1, "reason": "fallback order"} for index, algorithm in enumerate(algorithms))
+    return {
+        "status": "ok",
+        "predictor": {
+            "mode": str(payload.get("mode") or "fallback"),
+            "provider": "local-heuristic",
+            "model": "local-heuristic-v1",
+            "used_external_api": False,
+            "timeout_ms": 800,
+            "status": "fallback",
+            "secret_handling": "env-only-redacted",
+            "ranking_reason": "No compare run supplied; returned candidate fallback order.",
+            "ranked_algorithms": list(ranked),
+        },
+        "ranked_algorithms": list(ranked),
+    }
 
 
 def _sse(event: str, data: dict[str, object]) -> bytes:
@@ -6836,6 +7051,18 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
+    def _read_json(self) -> dict[str, object]:
+        length = int(self.headers.get("Content-Length", "0") or "0")
+        if length <= 0:
+            return {}
+        raw = self.rfile.read(length)
+        if not raw:
+            return {}
+        payload = json.loads(raw.decode("utf-8"))
+        if not isinstance(payload, dict):
+            raise ValueError("JSON request body must be an object")
+        return payload
+
     def _send_html(self, html: str) -> None:
         raw = html.encode("utf-8")
         self.send_response(200)
@@ -6889,6 +7116,9 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             if parsed.path == "/api/simulation-scenarios":
                 self._send_json({"status": "ok", "scenarios": list_simulated_scenarios()})
                 return
+            if parsed.path == "/api/simulation/scenarios":
+                self._send_json(_simulation_scenarios_payload())
+                return
             if parsed.path == "/api/simulation-sample":
                 qs = parse_qs(parsed.query)
                 scenario_id = qs.get("scenario", ["commerce_peak"])[0]
@@ -6920,6 +7150,13 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 budget_s = float(qs.get("budget", ["10"])[0])
                 self._send_json(build_agent_payload(case_id, budget_s=budget_s))
                 return
+            if parsed.path.startswith("/api/compare/run/"):
+                compare_run_id = parsed.path.rsplit("/", 1)[-1]
+                self._send_json(_get_compare_payload(compare_run_id))
+                return
+            if parsed.path == "/api/memory/recall":
+                self._send_json(_memory_recall_payload(parse_qs(parsed.query)))
+                return
             if parsed.path == "/api/stream":
                 qs = parse_qs(parsed.query)
                 case_id = qs.get("case", ["large_seed301"])[0]
@@ -6943,6 +7180,32 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(_sse("done", {"message": "stream complete"}))
                 self.wfile.flush()
                 self.close_connection = True
+                return
+            self._send_json({"status": "error", "error": "not found"}, status=404)
+        except Exception as exc:
+            self._send_json(
+                {"status": "error", "error": str(exc), "traceback": traceback.format_exc()},
+                status=500,
+            )
+
+    def do_POST(self) -> None:  # noqa: N802 - stdlib handler API.
+        parsed = urlparse(self.path)
+        try:
+            payload = self._read_json()
+            if parsed.path == "/api/simulation/session":
+                self._send_json(_create_simulation_session_payload(payload))
+                return
+            if parsed.path == "/api/simulation/tick":
+                self._send_json(_advance_simulation_payload(payload))
+                return
+            if parsed.path == "/api/compare/run":
+                self._send_json(_run_compare_payload(payload))
+                return
+            if parsed.path == "/api/memory/event":
+                self._send_json(_memory_event_payload(payload))
+                return
+            if parsed.path == "/api/predictor/rank":
+                self._send_json(_predictor_rank_payload(payload))
                 return
             self._send_json({"status": "error", "error": "not found"}, status=404)
         except Exception as exc:
