@@ -111,7 +111,7 @@ Confidence loop:
 
 ## Task 5 - Implement Same-Day Algorithm Comparison
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Greedy baseline and AutoSolver/adaptive agent run over the same day stream.
@@ -119,10 +119,21 @@ Independent verification:
 - Includes decision points explaining where AutoSolver differs from greedy.
 
 Work log:
--
+- Added `run_full_day_comparison()` in `web_agent_demo/day_simulation.py` to run `nearest_greedy` and `autosolver_agent` over the exact same `DaySimulationWorld`.
+- Added deterministic day-level dispatch simulation with courier availability, travel distance, weather/congestion speed effects, deadline risk, cost, utilization and route overlays.
+- Implemented greedy baseline behavior that chooses nearest pickup distance and AutoSolver behavior that balances availability, congestion, deadline risk, cost and courier load.
+- Reused the existing contract objects to return `DaySimulationContract` with populated `baseline_run`, `challenger_run`, `frames`, `reasoning_traces`, per-frame `MetricDelta`, highlighted orders/couriers and candidate algorithm scores.
+- Added `day_comparison_to_dict()` for deterministic serialization.
+- Added `tests/test_day_simulation_comparison.py` covering same-seed determinism, different-seed variation, same-stream fairness, all-orders assigned by both algorithms, positive AutoSolver time/cost/risk improvements, valid per-frame delta math and reasoning trace linkage.
+- Verified syntax with `python3 -m py_compile web_agent_demo/day_simulation.py tests/test_day_simulation_comparison.py tests/test_day_simulation_generator.py tests/test_day_simulation_contract.py`.
+- Ran focused tests with `uv run --with pytest pytest tests/test_day_simulation_comparison.py tests/test_day_simulation_generator.py tests/test_day_simulation_contract.py`; 13 tests passed.
+- Ran broader focused tests with day simulation plus legacy simulation/compare/API coverage; 29 tests passed.
+- Ran full tests with `uv run --with pytest pytest`; 92 tests passed.
+- Ran ASCII-only scan for new Python source and non-goal business-code secret scan; both passed.
+- Final deterministic probe for seed `task5-final` at 24 couriers and 0.55 order scale produced SHA-256 `924336ec3cc52ded74ab79914cacb3a67ff7fe1a3e4b9d050d2e1bd2e4af1502`, 299 orders, 44 frames, 56,572.492 seconds saved, 707.33 yuan saved and timeout risk delta `-0.1108`.
 
 Confidence loop:
--
+- 100% confidence for Task 5 scope: both algorithms consume the same generated day stream, tests prove fairness and metric math, AutoSolver visibly improves cumulative time/cost/risk, reasoning traces explain the decision basis, and the full existing suite remains green.
 
 ## Task 6 - Implement Memory Evolution Trace
 

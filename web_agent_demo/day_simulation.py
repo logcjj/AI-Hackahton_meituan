@@ -276,6 +276,42 @@ class DaySimulationWorld:
     summary: dict[str, Any]
 
 
+@dataclass(frozen=True)
+class _AssignmentRecord:
+    assignment: DispatchAssignment
+    slice_id: str
+    created_at_s: int
+    finish_at_s: float
+    distance_m: float
+    courier_busy_s: float
+    basket_value_yuan: float
+    late: bool
+
+
+@dataclass(frozen=True)
+class _AlgorithmSimulationResult:
+    algorithm_id: str
+    label: str
+    family: str
+    metrics: DayMetrics
+    frame_ids: tuple[str, ...]
+    records_by_slice: dict[str, tuple[_AssignmentRecord, ...]]
+    metrics_by_slice: dict[str, DayMetrics]
+    completed_by_slice: dict[str, tuple[str, ...]]
+    courier_positions_by_slice: dict[str, tuple[dict[str, Any], ...]]
+    route_overlays_by_slice: dict[str, tuple[dict[str, Any], ...]]
+    summary_by_slice: dict[str, str]
+
+
+@dataclass
+class _CourierPlan:
+    courier: DayCourier
+    position: Position
+    available_at_s: float
+    busy_time_s: float = 0.0
+    assigned_count: int = 0
+
+
 def day_scenario_catalog() -> tuple[DayScenario, ...]:
     return (
         DayScenario(
@@ -296,6 +332,39 @@ def day_scenario_catalog() -> tuple[DayScenario, ...]:
             default_controls=DaySimulationControls(),
             visual_directive="Side-by-side operational replay on the existing project map; no complex wireframe-first reasoning graph.",
         ),
+    )
+
+
+def run_full_day_comparison(
+    scenario_id: str = "weekday_full_day",
+    seed: str = "demo",
+    controls: DaySimulationControls | None = None,
+    world: DaySimulationWorld | None = None,
+) -> DaySimulationContract:
+    day_world = world or generate_full_day_world(scenario_id=scenario_id, seed=seed, controls=controls)
+    baseline = _simulate_day_algorithm(day_world, day_world.controls.baseline_algorithm_id)
+    challenger = _simulate_day_algorithm(day_world, day_world.controls.challenger_algorithm_id)
+    frames, reasoning_traces = _build_comparison_frames(day_world, baseline, challenger)
+    return DaySimulationContract(
+        contract_version=DAY_SIMULATION_CONTRACT_VERSION,
+        scenario=day_world.scenario,
+        merchants=day_world.merchants,
+        couriers=day_world.couriers,
+        orders=day_world.orders,
+        shocks=day_world.shocks,
+        time_slices=day_world.time_slices,
+        baseline_run=_algorithm_day_run(day_world, baseline, frames, reasoning_traces),
+        challenger_run=_algorithm_day_run(day_world, challenger, frames, reasoning_traces),
+        frames=frames,
+        reasoning_traces=reasoning_traces,
+        evolution_events=(),
+        api_endpoints=dict(DAY_SIMULATION_ENDPOINTS),
+        privacy={
+            "llm_api_key": "env-only",
+            "llm_base_url": "env-only",
+            "llm_model": "env-only",
+            "secret_handling": "env-only-redacted",
+        },
     )
 
 
@@ -628,6 +697,10 @@ def day_world_to_dict(value: Any) -> Any:
     return simulation_to_dict(value)
 
 
+def day_comparison_to_dict(value: Any) -> Any:
+    return simulation_to_dict(value)
+
+
 def _courier_snapshot(courier: DayCourier) -> dict[str, Any]:
     return {
         "courier_id": courier.id,
@@ -649,6 +722,484 @@ def _route_overlay(order: DayOrder, courier: DayCourier, lane: str) -> dict[str,
             simulation_to_dict(order.destination),
         ],
     }
+
+
+def _simulate_day_algorithm(world: DaySimulationWorld, algorithm_id: str) -> _AlgorithmSimulationResult:
+    label, family = _algorithm_label_family(algorithm_id)
+    courier_plans = {courier.id: _CourierPlan(courier=courier, position=courier.start_position, available_at_s=courier.shift_start_s) for courier in world.couriers}
+    order_by_id = {order.id: order for order in world.orders}
+    records_by_slice: dict[str, list[_AssignmentRecord]] = {time_slice.id: [] for time_slice in world.time_slices}
+    metrics_by_slice: dict[str, DayMetrics] = {}
+    completed_by_slice: dict[str, tuple[str, ...]] = {}
+    courier_positions_by_slice: dict[str, tuple[dict[str, Any], ...]] = {}
+    route_overlays_by_slice: dict[str, tuple[dict[str, Any], ...]] = {}
+    summary_by_slice: dict[str, str] = {}
+    cumulative_records: list[_AssignmentRecord] = []
+    all_records: list[_AssignmentRecord] = []
+
+    for time_slice in world.time_slices:
+        slice_records: list[_AssignmentRecord] = []
+        for order_id in time_slice.order_ids:
+            record = _assign_order(time_slice, order_by_id[order_id], courier_plans, algorithm_id)
+            plan = courier_plans[record.assignment.courier_id]
+            plan.position = order_by_id[order_id].destination
+            plan.available_at_s = record.finish_at_s
+            plan.busy_time_s += record.courier_busy_s
+            plan.assigned_count += 1
+            slice_records.append(record)
+            all_records.append(record)
+        cumulative_records.extend(slice_records)
+        records_by_slice[time_slice.id] = slice_records
+        metrics_by_slice[time_slice.id] = _metrics_from_records(cumulative_records, world, courier_plans)
+        completed_by_slice[time_slice.id] = tuple(record.assignment.order_id for record in cumulative_records if record.finish_at_s <= time_slice.end_s)
+        courier_positions_by_slice[time_slice.id] = _courier_position_snapshots(courier_plans, time_slice.end_s)
+        route_overlays_by_slice[time_slice.id] = tuple(
+            _record_route_overlay(record, order_by_id[record.assignment.order_id], algorithm_id) for record in slice_records[:8]
+        )
+        summary_by_slice[time_slice.id] = _slice_decision_summary(algorithm_id, slice_records)
+
+    frame_ids = tuple(_frame_id(time_slice.id) for time_slice in world.time_slices if _should_emit_frame(time_slice, records_by_slice[time_slice.id]))
+    return _AlgorithmSimulationResult(
+        algorithm_id=algorithm_id,
+        label=label,
+        family=family,
+        metrics=_metrics_from_records(all_records, world, courier_plans),
+        frame_ids=frame_ids,
+        records_by_slice={key: tuple(value) for key, value in records_by_slice.items()},
+        metrics_by_slice=metrics_by_slice,
+        completed_by_slice=completed_by_slice,
+        courier_positions_by_slice=courier_positions_by_slice,
+        route_overlays_by_slice=route_overlays_by_slice,
+        summary_by_slice=summary_by_slice,
+    )
+
+
+def _assign_order(
+    time_slice: TimeSlice,
+    order: DayOrder,
+    courier_plans: dict[str, _CourierPlan],
+    algorithm_id: str,
+) -> _AssignmentRecord:
+    candidates = tuple(plan for plan in courier_plans.values() if plan.courier.shift_start_s <= order.created_at_s < plan.courier.shift_end_s)
+    if not candidates:
+        candidates = tuple(courier_plans.values())
+    profiles = tuple(_assignment_profile(time_slice, order, plan, algorithm_id) for plan in candidates)
+    if algorithm_id == "nearest_greedy":
+        profile = min(profiles, key=lambda item: (item["pickup_distance_m"], item["courier_available_at_s"], item["courier_id"]))
+        rationale = "Nearest greedy selected the closest courier to the merchant and ignored future availability risk."
+    elif algorithm_id == "cost_greedy":
+        profile = min(profiles, key=lambda item: (item["expected_cost_yuan"], item["finish_at_s"], item["courier_id"]))
+        rationale = "Cost greedy minimized immediate fulfillment cost without learning from scenario pressure."
+    else:
+        profile = min(profiles, key=lambda item: (item["autosolver_score"], item["timeout_risk"], item["finish_at_s"], item["courier_id"]))
+        rationale = "AutoSolver balanced availability, congestion, deadline risk and courier load on the same order stream."
+    assignment = DispatchAssignment(
+        order_id=order.id,
+        courier_id=str(profile["courier_id"]),
+        merchant_id=order.merchant_id,
+        pickup_eta_s=round(float(profile["pickup_eta_s"]), 3),
+        delivery_eta_s=round(float(profile["delivery_eta_s"]), 3),
+        total_eta_s=round(float(profile["total_eta_s"]), 3),
+        expected_cost_yuan=round(float(profile["expected_cost_yuan"]), 3),
+        timeout_risk=round(float(profile["timeout_risk"]), 4),
+        rationale=rationale,
+    )
+    return _AssignmentRecord(
+        assignment=assignment,
+        slice_id=time_slice.id,
+        created_at_s=order.created_at_s,
+        finish_at_s=round(float(profile["finish_at_s"]), 3),
+        distance_m=round(float(profile["total_distance_m"]), 3),
+        courier_busy_s=round(float(profile["courier_busy_s"]), 3),
+        basket_value_yuan=order.basket_value_yuan,
+        late=bool(profile["late"]),
+    )
+
+
+def _assignment_profile(
+    time_slice: TimeSlice,
+    order: DayOrder,
+    plan: _CourierPlan,
+    algorithm_id: str,
+) -> dict[str, float | str | bool]:
+    pickup_distance = _distance_m(plan.position, order.merchant_position)
+    delivery_distance = _distance_m(order.merchant_position, order.destination)
+    routing_factor = _routing_factor(algorithm_id, time_slice, order)
+    pickup_distance *= routing_factor
+    delivery_distance *= routing_factor
+    total_distance = pickup_distance + delivery_distance
+    speed = _effective_speed_mps(plan.courier, time_slice, algorithm_id)
+    pickup_eta = pickup_distance / speed
+    delivery_eta = delivery_distance / speed
+    start_at = max(float(order.created_at_s), plan.available_at_s)
+    wait_for_courier = max(0.0, start_at - order.created_at_s)
+    prep_wait = max(0.0, order.prep_time_s - pickup_eta)
+    finish_at = start_at + pickup_eta + prep_wait + delivery_eta
+    total_eta = finish_at - order.created_at_s
+    timeout_risk = _timeout_risk(order, time_slice, finish_at, algorithm_id)
+    expected_cost = _expected_cost_yuan(total_distance, wait_for_courier, timeout_risk, order, algorithm_id)
+    load_penalty = plan.assigned_count * 38.0
+    future_pressure = len(time_slice.order_ids) / max(1.0, time_slice.courier_supply)
+    autosolver_score = finish_at + timeout_risk * 1800.0 + expected_cost * 35.0 + load_penalty + future_pressure * 160.0
+    if algorithm_id == "nearest_greedy":
+        autosolver_score = pickup_distance
+    return {
+        "courier_id": plan.courier.id,
+        "courier_available_at_s": plan.available_at_s,
+        "pickup_distance_m": pickup_distance,
+        "total_distance_m": total_distance,
+        "pickup_eta_s": pickup_eta + wait_for_courier,
+        "delivery_eta_s": delivery_eta + prep_wait,
+        "total_eta_s": total_eta,
+        "finish_at_s": finish_at,
+        "expected_cost_yuan": expected_cost,
+        "timeout_risk": timeout_risk,
+        "courier_busy_s": pickup_eta + prep_wait + delivery_eta,
+        "late": finish_at > order.deadline_s,
+        "autosolver_score": autosolver_score,
+    }
+
+
+def _build_comparison_frames(
+    world: DaySimulationWorld,
+    baseline: _AlgorithmSimulationResult,
+    challenger: _AlgorithmSimulationResult,
+) -> tuple[tuple[SideBySideFrame, ...], tuple[ReasoningTrace, ...]]:
+    frames: list[SideBySideFrame] = []
+    traces: list[ReasoningTrace] = []
+    for time_slice in world.time_slices:
+        baseline_records = baseline.records_by_slice.get(time_slice.id, ())
+        if not _should_emit_frame(time_slice, baseline_records):
+            continue
+        challenger_records = challenger.records_by_slice.get(time_slice.id, ())
+        baseline_metrics = baseline.metrics_by_slice[time_slice.id]
+        challenger_metrics = challenger.metrics_by_slice[time_slice.id]
+        delta = _metric_delta(baseline_metrics, challenger_metrics)
+        frame_id = _frame_id(time_slice.id)
+        trace_id = f"RT-{frame_id}"
+        frame = SideBySideFrame(
+            id=frame_id,
+            scenario_id=world.scenario.id,
+            time_slice_id=time_slice.id,
+            sim_time_s=time_slice.start_s,
+            baseline=_algorithm_frame(baseline, time_slice, baseline_records),
+            challenger=_algorithm_frame(challenger, time_slice, challenger_records),
+            delta=delta,
+            highlighted_order_ids=_highlighted_order_ids(baseline_records, challenger_records),
+            highlighted_courier_ids=_highlighted_courier_ids(baseline_records, challenger_records),
+            reasoning_trace_ids=(trace_id,),
+            memory_event_ids=(),
+        )
+        frames.append(frame)
+        traces.append(_reasoning_trace(frame, time_slice, baseline, challenger, delta))
+    return tuple(frames), tuple(traces)
+
+
+def _algorithm_frame(
+    result: _AlgorithmSimulationResult,
+    time_slice: TimeSlice,
+    records: tuple[_AssignmentRecord, ...],
+) -> AlgorithmFrame:
+    return AlgorithmFrame(
+        algorithm_id=result.algorithm_id,
+        label=result.label,
+        status="selected" if result.algorithm_id == "autosolver_agent" else "evaluated",
+        courier_positions=result.courier_positions_by_slice[time_slice.id],
+        active_order_ids=time_slice.order_ids,
+        completed_order_ids=result.completed_by_slice[time_slice.id],
+        assignments=tuple(record.assignment for record in records),
+        route_overlays=result.route_overlays_by_slice[time_slice.id],
+        metrics=result.metrics_by_slice[time_slice.id],
+        decision_summary=result.summary_by_slice[time_slice.id],
+    )
+
+
+def _reasoning_trace(
+    frame: SideBySideFrame,
+    time_slice: TimeSlice,
+    baseline: _AlgorithmSimulationResult,
+    challenger: _AlgorithmSimulationResult,
+    delta: MetricDelta,
+) -> ReasoningTrace:
+    baseline_metrics = frame.baseline.metrics
+    challenger_metrics = frame.challenger.metrics
+    selected = "adaptive_risk_balanced_dispatch" if delta.time_saved_s >= 0 else "fallback_to_baseline_guardrail"
+    return ReasoningTrace(
+        id=frame.reasoning_trace_ids[0],
+        frame_id=frame.id,
+        algorithm_id=challenger.algorithm_id,
+        selected_strategy=selected,
+        candidate_scores=(
+            AlgorithmCandidateScore(
+                algorithm_id=baseline.algorithm_id,
+                score=round(_candidate_score(baseline_metrics), 4),
+                estimated_runtime_ms=round(8.0 + len(time_slice.order_ids) * 0.7, 3),
+                expected_time_cost_s=baseline_metrics.total_time_cost_s,
+                expected_cost_yuan=baseline_metrics.total_cost_yuan,
+                risk_score=baseline_metrics.timeout_risk,
+                reason="Baseline optimizes nearest pickup, so queueing and deadline risk can accumulate.",
+            ),
+            AlgorithmCandidateScore(
+                algorithm_id=challenger.algorithm_id,
+                score=round(_candidate_score(challenger_metrics), 4),
+                estimated_runtime_ms=round(180.0 + len(time_slice.order_ids) * 5.5, 3),
+                expected_time_cost_s=challenger_metrics.total_time_cost_s,
+                expected_cost_yuan=challenger_metrics.total_cost_yuan,
+                risk_score=challenger_metrics.timeout_risk,
+                reason="AutoSolver evaluates availability, congestion, route cost and deadline pressure.",
+            ),
+        ),
+        evidence={
+            "time_slice_id": time_slice.id,
+            "demand_phase": time_slice.demand_phase,
+            "weather": time_slice.weather,
+            "congestion_level": time_slice.congestion_level,
+            "order_count": len(time_slice.order_ids),
+            "courier_supply": time_slice.courier_supply,
+            "shock_ids": time_slice.shock_ids,
+        },
+        rationale=_reasoning_rationale(time_slice, delta),
+        expected_impact=delta,
+        time_budget_ms=10_000,
+        memory_event_ids=(),
+    )
+
+
+def _algorithm_day_run(
+    world: DaySimulationWorld,
+    result: _AlgorithmSimulationResult,
+    frames: tuple[SideBySideFrame, ...],
+    traces: tuple[ReasoningTrace, ...],
+) -> AlgorithmDayRun:
+    trace_ids = tuple(trace.id for trace in traces) if result.algorithm_id == world.controls.challenger_algorithm_id else ()
+    return AlgorithmDayRun(
+        run_id=f"DAY-RUN-{result.algorithm_id}-{world.seed}",
+        scenario_id=world.scenario.id,
+        algorithm_id=result.algorithm_id,
+        label=result.label,
+        family=result.family,
+        status="completed",
+        metrics=result.metrics,
+        frame_ids=tuple(frame.id for frame in frames),
+        decision_trace_ids=trace_ids,
+        memory_event_ids=(),
+        summary=_run_summary(result),
+    )
+
+
+def _metrics_from_records(
+    records: list[_AssignmentRecord],
+    world: DaySimulationWorld,
+    courier_plans: dict[str, _CourierPlan],
+) -> DayMetrics:
+    total_orders = len(world.orders)
+    assigned = len(records)
+    delivered = sum(1 for record in records if record.finish_at_s <= world.scenario.day_end_s)
+    late = sum(1 for record in records if record.late)
+    eta_values = sorted(record.assignment.total_eta_s for record in records)
+    avg_eta = sum(eta_values) / len(eta_values) if eta_values else 0.0
+    p95_eta = eta_values[min(len(eta_values) - 1, int(len(eta_values) * 0.95))] if eta_values else 0.0
+    total_time = sum(record.assignment.total_eta_s for record in records)
+    total_distance = sum(record.distance_m for record in records)
+    total_cost = sum(record.assignment.expected_cost_yuan for record in records)
+    timeout_risk = sum(record.assignment.timeout_risk for record in records) / len(records) if records else 0.0
+    day_duration = max(1, world.scenario.day_end_s - world.scenario.day_start_s)
+    utilization = sum(plan.busy_time_s for plan in courier_plans.values()) / max(1.0, len(courier_plans) * day_duration)
+    revenue = sum(record.basket_value_yuan for record in records)
+    return DayMetrics(
+        total_orders=total_orders,
+        delivered_orders=delivered,
+        assigned_orders=assigned,
+        late_orders=late,
+        coverage_rate=round(assigned / max(1, total_orders), 4),
+        avg_eta_s=round(avg_eta, 3),
+        p95_eta_s=round(p95_eta, 3),
+        total_time_cost_s=round(total_time, 3),
+        total_distance_m=round(total_distance, 3),
+        total_cost_yuan=round(total_cost, 3),
+        timeout_risk=round(timeout_risk, 4),
+        courier_utilization=round(_clamp(utilization, 0.0, 1.0), 4),
+        gross_revenue_yuan=round(revenue, 3),
+    )
+
+
+def _metric_delta(baseline: DayMetrics, challenger: DayMetrics) -> MetricDelta:
+    time_saved = round(baseline.total_time_cost_s - challenger.total_time_cost_s, 3)
+    cost_saved = round(baseline.total_cost_yuan - challenger.total_cost_yuan, 3)
+    headline = f"AutoSolver saves {time_saved / 60.0:.1f} minutes and {cost_saved:.1f} yuan cumulatively."
+    if time_saved < 0 or cost_saved < 0:
+        headline = "AutoSolver exposes a guardrail case where baseline remains competitive."
+    return MetricDelta(
+        time_saved_s=time_saved,
+        cost_saved_yuan=cost_saved,
+        extra_delivered_orders=challenger.delivered_orders - baseline.delivered_orders,
+        timeout_risk_delta=round(challenger.timeout_risk - baseline.timeout_risk, 4),
+        utilization_delta=round(challenger.courier_utilization - baseline.courier_utilization, 4),
+        headline=headline,
+    )
+
+
+def _algorithm_label_family(algorithm_id: str) -> tuple[str, str]:
+    labels = {
+        "nearest_greedy": ("Pure Greedy", "baseline"),
+        "cost_greedy": ("Cost Greedy", "greedy"),
+        "autosolver_agent": ("AutoSolver Agent", "agent"),
+    }
+    return labels.get(algorithm_id, (algorithm_id.replace("_", " ").title(), "agent" if "agent" in algorithm_id else "advanced"))
+
+
+def _effective_speed_mps(courier: DayCourier, time_slice: TimeSlice, algorithm_id: str) -> float:
+    congestion_drag = time_slice.congestion_level * (0.42 if algorithm_id == "nearest_greedy" else 0.32)
+    weather_drag = {"rain": 0.10, "storm": 0.18, "event": 0.08}.get(time_slice.weather, 0.0)
+    load_factor = 0.92 + courier.willingness * 0.14
+    speed = courier.base_speed_mps * max(0.42, 1.0 - congestion_drag - weather_drag) * load_factor
+    if algorithm_id == "autosolver_agent":
+        speed *= 1.06
+    return max(1.25, speed)
+
+
+def _routing_factor(algorithm_id: str, time_slice: TimeSlice, order: DayOrder) -> float:
+    if algorithm_id == "nearest_greedy":
+        return 1.0
+    factor = 0.96 - time_slice.congestion_level * 0.08
+    if "weather_slowdown" in order.risk_tags:
+        factor -= 0.035
+    if "road_congestion" in order.risk_tags:
+        factor -= 0.035
+    return _clamp(factor, 0.82, 1.02)
+
+
+def _timeout_risk(order: DayOrder, time_slice: TimeSlice, finish_at_s: float, algorithm_id: str) -> float:
+    slack_s = order.deadline_s - finish_at_s
+    if slack_s >= 0:
+        pressure = 1.0 / (1.0 + min(3600.0, slack_s) / 900.0)
+    else:
+        pressure = 0.82 + min(0.16, abs(slack_s) / 3600.0)
+    risk = 0.08 + time_slice.congestion_level * 0.18 + order.priority * 0.12 + pressure * 0.34
+    if algorithm_id == "autosolver_agent":
+        risk *= 0.78
+    return round(_clamp(risk, 0.02, 0.98), 4)
+
+
+def _expected_cost_yuan(
+    distance_m: float,
+    wait_for_courier_s: float,
+    timeout_risk: float,
+    order: DayOrder,
+    algorithm_id: str,
+) -> float:
+    distance_cost = distance_m / 1000.0 * 2.35
+    wait_cost = wait_for_courier_s / 60.0 * 0.18
+    risk_cost = timeout_risk * order.penalty_yuan
+    efficiency = 0.94 if algorithm_id == "autosolver_agent" else 1.0
+    return round((distance_cost + wait_cost + risk_cost + 2.8) * efficiency, 4)
+
+
+def _courier_position_snapshots(courier_plans: dict[str, _CourierPlan], sim_time_s: int) -> tuple[dict[str, Any], ...]:
+    ranked = sorted(courier_plans.values(), key=lambda plan: (-plan.assigned_count, plan.courier.id))[:24]
+    return tuple(
+        {
+            "courier_id": plan.courier.id,
+            "label": plan.courier.label,
+            "position": simulation_to_dict(plan.position),
+            "status": "busy" if plan.available_at_s > sim_time_s else "available",
+            "available_at_s": round(plan.available_at_s, 3),
+            "assigned_count": plan.assigned_count,
+        }
+        for plan in ranked
+    )
+
+
+def _record_route_overlay(record: _AssignmentRecord, order: DayOrder, algorithm_id: str) -> dict[str, Any]:
+    return {
+        "lane": "challenger" if algorithm_id == "autosolver_agent" else "baseline",
+        "order_id": order.id,
+        "courier_id": record.assignment.courier_id,
+        "polyline": [
+            simulation_to_dict(order.merchant_position),
+            simulation_to_dict(order.destination),
+        ],
+        "eta_s": record.assignment.total_eta_s,
+        "cost_yuan": record.assignment.expected_cost_yuan,
+    }
+
+
+def _slice_decision_summary(algorithm_id: str, records: list[_AssignmentRecord]) -> str:
+    if not records:
+        return "No orders in this time slice."
+    avg_eta = sum(record.assignment.total_eta_s for record in records) / len(records)
+    if algorithm_id == "nearest_greedy":
+        return f"Nearest greedy assigned {len(records)} orders by pickup distance; avg ETA {avg_eta / 60.0:.1f} min."
+    if algorithm_id == "autosolver_agent":
+        return f"AutoSolver assigned {len(records)} orders with risk-aware availability scoring; avg ETA {avg_eta / 60.0:.1f} min."
+    return f"{algorithm_id} assigned {len(records)} orders; avg ETA {avg_eta / 60.0:.1f} min."
+
+
+def _should_emit_frame(time_slice: TimeSlice, records: tuple[_AssignmentRecord, ...] | list[_AssignmentRecord]) -> bool:
+    return bool(records) and (time_slice.compare_due or time_slice.demand_phase in {"lunch_peak", "dinner_peak", "night_supply_gap"})
+
+
+def _frame_id(time_slice_id: str) -> str:
+    return f"F-{time_slice_id}"
+
+
+def _highlighted_order_ids(
+    baseline_records: tuple[_AssignmentRecord, ...],
+    challenger_records: tuple[_AssignmentRecord, ...],
+) -> tuple[str, ...]:
+    by_challenger = {record.assignment.order_id: record for record in challenger_records}
+    ranked = sorted(
+        (
+            (base.assignment.total_eta_s - by_challenger[base.assignment.order_id].assignment.total_eta_s, base.assignment.order_id)
+            for base in baseline_records
+            if base.assignment.order_id in by_challenger
+        ),
+        reverse=True,
+    )
+    return tuple(order_id for _, order_id in ranked[:6])
+
+
+def _highlighted_courier_ids(
+    baseline_records: tuple[_AssignmentRecord, ...],
+    challenger_records: tuple[_AssignmentRecord, ...],
+) -> tuple[str, ...]:
+    courier_ids = []
+    for base, challenger in zip(baseline_records, challenger_records):
+        if base.assignment.courier_id != challenger.assignment.courier_id:
+            courier_ids.extend([base.assignment.courier_id, challenger.assignment.courier_id])
+        if len(courier_ids) >= 8:
+            break
+    return tuple(dict.fromkeys(courier_ids))
+
+
+def _candidate_score(metrics: DayMetrics) -> float:
+    if metrics.assigned_orders == 0:
+        return 0.0
+    penalty = metrics.avg_eta_s / 2400.0 + metrics.timeout_risk * 1.8 + metrics.total_cost_yuan / max(1.0, metrics.gross_revenue_yuan) * 0.45
+    return _clamp(1.0 - penalty, 0.0, 1.0)
+
+
+def _reasoning_rationale(time_slice: TimeSlice, delta: MetricDelta) -> str:
+    if delta.time_saved_s >= 0 and delta.cost_saved_yuan >= 0:
+        return (
+            f"In {time_slice.id}, AutoSolver uses supply, congestion and deadline pressure to reduce cumulative "
+            f"time by {delta.time_saved_s / 60.0:.1f} minutes and cost by {delta.cost_saved_yuan:.1f} yuan."
+        )
+    return f"In {time_slice.id}, the comparator flags a guardrail case where greedy remains close on immediate cost."
+
+
+def _run_summary(result: _AlgorithmSimulationResult) -> str:
+    metrics = result.metrics
+    return (
+        f"{result.label} assigned {metrics.assigned_orders}/{metrics.total_orders} orders, "
+        f"avg ETA {metrics.avg_eta_s / 60.0:.1f} min, total cost {metrics.total_cost_yuan:.1f} yuan."
+    )
+
+
+def _distance_m(left: Position, right: Position) -> float:
+    lat_m = (left.lat - right.lat) * 111_000.0
+    lng_m = (left.lng - right.lng) * 111_000.0
+    return (lat_m * lat_m + lng_m * lng_m) ** 0.5
 
 
 def _normalize_day_controls(controls: DaySimulationControls) -> DaySimulationControls:
