@@ -1,0 +1,537 @@
+{
+  "generatedAt": "2026-06-24T00:42:05.081Z",
+  "failureCount": 0,
+  "failures": [],
+  "observations": [
+    {
+      "scenario": "商圈十字路口高峰",
+      "stage": "after-scenario-switch",
+      "data": {
+        "stage": "after-scenario-switch",
+        "selectedLabel": "商圈十字路口高峰",
+        "selectedValue": "large_seed301",
+        "runtime": "--:--:--",
+        "status": "场景已刷新，等待推理",
+        "routeCount": 0,
+        "linkCount": 0,
+        "arrowCount": 0,
+        "merchantPins": 6,
+        "courierPins": 13,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。",
+        "detailText": "场景输入：商圈十字路口高峰\n对象 -\n已生成 6 个商家点和 13 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 6\n骑手 13\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "pending-run sample-preview",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": []
+      }
+    },
+    {
+      "scenario": "商圈十字路口高峰",
+      "stage": "after-zoom-refresh-position",
+      "data": {
+        "stage": "after-zoom-refresh-position",
+        "selectedLabel": "商圈十字路口高峰",
+        "selectedValue": "large_seed301",
+        "runtime": "--:--:--",
+        "status": "场景已刷新，等待推理",
+        "routeCount": 0,
+        "linkCount": 0,
+        "arrowCount": 0,
+        "merchantPins": 6,
+        "courierPins": 13,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。",
+        "detailText": "场景输入：商圈十字路口高峰\n对象 -\n已生成 6 个商家点和 13 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 6\n骑手 13\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "pending-run sample-preview",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": []
+      }
+    },
+    {
+      "scenario": "商圈十字路口高峰",
+      "stage": "final",
+      "data": {
+        "stage": "final",
+        "selectedLabel": "商圈十字路口高峰",
+        "selectedValue": "large_seed301",
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "routeCount": 6,
+        "linkCount": 6,
+        "arrowCount": 6,
+        "merchantPins": 6,
+        "courierPins": 6,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。",
+        "detailText": "派单总览：全部商家已自动连线\n对象 6 个骑手\n运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。\nM0201 → R0213\nM0202 → R0203\nM0203 → R0202\nM0204 → R0208\n派单履约 ETA\n16 分钟平均\n预计派单成本\n$165.90\n接单 / 覆盖概率\n100%",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "selectedAssignment": "A0201"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": [
+          {
+            "assignment": "A0201",
+            "courier": "R0213",
+            "merchant": "M0201",
+            "finalCourier": "R0213",
+            "d": "M501.8 239.9 Q504.7 264.6 541.1 271.5"
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0203",
+            "merchant": "M0202",
+            "finalCourier": "R0203",
+            "d": "M230.3 422.1 Q203.4 406.6 173.3 419.2"
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0202",
+            "merchant": "M0203",
+            "finalCourier": "R0202",
+            "d": "M563.0 419.3 Q564.3 441.4 597.9 444.9"
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0208",
+            "merchant": "M0204",
+            "finalCourier": "R0208",
+            "d": "M325.3 411.6 Q368.6 407.5 385.6 381.2"
+          },
+          {
+            "assignment": "A0205",
+            "courier": "R0201",
+            "merchant": "M0205",
+            "finalCourier": "R0201",
+            "d": "M500.4 211.5 Q495.1 178.8 453.1 160.8"
+          },
+          {
+            "assignment": "A0206",
+            "courier": "R0207",
+            "merchant": "M0206",
+            "finalCourier": "R0207",
+            "d": "M531.5 375.4 Q548.9 353.9 585.8 357.4"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "雨天低接单意愿",
+      "stage": "after-scenario-switch",
+      "data": {
+        "stage": "after-scenario-switch",
+        "selectedLabel": "雨天低接单意愿",
+        "selectedValue": "low_willingness_seed501",
+        "runtime": "--:--:--",
+        "status": "场景已刷新，等待推理",
+        "routeCount": 0,
+        "linkCount": 0,
+        "arrowCount": 0,
+        "merchantPins": 5,
+        "courierPins": 11,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n拥堵\n天气\n雨天 · 路面湿滑\n履约影响\nETA 上浮\n调度建议：提高近场骑手权重，避免跨区派单。",
+        "detailText": "场景输入：雨天低接单意愿\n对象 -\n已生成 5 个商家点和 11 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 5\n骑手 11\n路况 heavy\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "fullscreen": "false"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "pending-run sample-preview",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": []
+      }
+    },
+    {
+      "scenario": "雨天低接单意愿",
+      "stage": "after-zoom-refresh-position",
+      "data": {
+        "stage": "after-zoom-refresh-position",
+        "selectedLabel": "雨天低接单意愿",
+        "selectedValue": "low_willingness_seed501",
+        "runtime": "--:--:--",
+        "status": "场景已刷新，等待推理",
+        "routeCount": 0,
+        "linkCount": 0,
+        "arrowCount": 0,
+        "merchantPins": 4,
+        "courierPins": 13,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n拥堵\n天气\n雨天 · 路面湿滑\n履约影响\nETA 上浮\n调度建议：提高近场骑手权重，避免跨区派单。",
+        "detailText": "场景输入：雨天低接单意愿\n对象 -\n已生成 4 个商家点和 13 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 4\n骑手 13\n路况 heavy\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "fullscreen": "false"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "pending-run sample-preview",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": []
+      }
+    },
+    {
+      "scenario": "雨天低接单意愿",
+      "stage": "final",
+      "data": {
+        "stage": "final",
+        "selectedLabel": "雨天低接单意愿",
+        "selectedValue": "low_willingness_seed501",
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "routeCount": 4,
+        "linkCount": 4,
+        "arrowCount": 4,
+        "merchantPins": 4,
+        "courierPins": 4,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n拥堵\n天气\n雨天 · 路面湿滑\n履约影响\nETA 上浮\n调度建议：提高近场骑手权重，避免跨区派单。",
+        "detailText": "派单总览：全部商家已自动连线\n对象 4 个骑手\n运行完成后，地图已自动展示 4 个商家分别派给哪个骑手；商家点同时代表该商家的 6 单。\nM0201 → R0210\nM0202 → R0209\nM0203 → R0201\nM0204 → R0207\n派单履约 ETA\n21 分钟平均\n预计派单成本\n$163.60\n接单 / 覆盖概率\n100%",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "fullscreen": "false",
+          "selectedAssignment": "A0201"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": [
+          {
+            "assignment": "A0201",
+            "courier": "R0210",
+            "merchant": "M0201",
+            "finalCourier": "R0210",
+            "d": "M481.2 413.4 Q438.0 409.6 411.0 431.9"
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0209",
+            "merchant": "M0202",
+            "finalCourier": "R0209",
+            "d": "M496.7 223.3 Q497.9 194.1 460.8 177.7"
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0201",
+            "merchant": "M0203",
+            "finalCourier": "R0201",
+            "d": "M503.0 268.2 Q504.2 297.5 542.6 312.6"
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0207",
+            "merchant": "M0204",
+            "finalCourier": "R0207",
+            "d": "M305.8 408.5 Q271.4 386.8 224.1 391.9"
+          }
+        ]
+      }
+    },
+    {
+      "scenario": "骑手稀缺修复",
+      "stage": "after-scenario-switch",
+      "data": {
+        "stage": "after-scenario-switch",
+        "selectedLabel": "骑手稀缺修复",
+        "selectedValue": "scarce_couriers_seed401",
+        "runtime": "--:--:--",
+        "status": "场景已刷新，等待推理",
+        "routeCount": 0,
+        "linkCount": 0,
+        "arrowCount": 0,
+        "merchantPins": 4,
+        "courierPins": 8,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。",
+        "detailText": "场景输入：骑手稀缺修复\n对象 -\n已生成 4 个商家点和 8 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 4\n骑手 8\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "fullscreen": "false"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "pending-run sample-preview",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": []
+      }
+    },
+    {
+      "scenario": "骑手稀缺修复",
+      "stage": "after-zoom-refresh-position",
+      "data": {
+        "stage": "after-zoom-refresh-position",
+        "selectedLabel": "骑手稀缺修复",
+        "selectedValue": "scarce_couriers_seed401",
+        "runtime": "--:--:--",
+        "status": "场景已刷新，等待推理",
+        "routeCount": 0,
+        "linkCount": 0,
+        "arrowCount": 0,
+        "merchantPins": 6,
+        "courierPins": 7,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。",
+        "detailText": "场景输入：骑手稀缺修复\n对象 -\n已生成 6 个商家点和 7 个骑手点；当前仅展示输入，不提前生成派单结果。\n商家 6\n骑手 7\n路况 moderate\n派单履约 ETA\n-\n预计派单成本\n-\n接单 / 覆盖概率\n--",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "fullscreen": "false"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "pending-run sample-preview",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": []
+      }
+    },
+    {
+      "scenario": "骑手稀缺修复",
+      "stage": "final",
+      "data": {
+        "stage": "final",
+        "selectedLabel": "骑手稀缺修复",
+        "selectedValue": "scarce_couriers_seed401",
+        "runtime": "00:00:10",
+        "status": "当前场景派单完成",
+        "routeCount": 6,
+        "linkCount": 6,
+        "arrowCount": 6,
+        "merchantPins": 6,
+        "courierPins": 6,
+        "hitAreas": 0,
+        "oldWeatherRows": 0,
+        "duplicateCouriers": [],
+        "mismatches": [],
+        "weatherText": "气象与路况\n缓行\n天气\n晴朗 · 正常履约\n履约影响\n正常履约\n调度建议：按常规成本与时效权重派单。",
+        "detailText": "派单总览：全部商家已自动连线\n对象 6 个骑手\n运行完成后，地图已自动展示 6 个商家分别派给哪个骑手；商家点同时代表该商家的 9 单。\nM0201 → R0205\nM0202 → R0206\nM0203 → R0203\nM0204 → R0202\n派单履约 ETA\n20 分钟平均\n预计派单成本\n$252.70\n接单 / 覆盖概率\n100%",
+        "frameDataset": {
+          "dragFallbackBound": "native-maplibre",
+          "dragPan": "native",
+          "zoomLevel": "13.35",
+          "controlState": "all",
+          "locating": "false",
+          "routesHidden": "false",
+          "entitiesMuted": "false",
+          "mapRegion": "运营分析浅色区域 A",
+          "mapStyle": "运营分析浅色图",
+          "lastViewportSync": "viewport-live",
+          "mapCenter": "121.46200,31.22900",
+          "fullscreen": "false",
+          "selectedAssignment": "A0204"
+        },
+        "mapPanelActive": false,
+        "fullscreenButtonActive": false,
+        "bodyClasses": "",
+        "overflow": {
+          "scrollWidth": 1280,
+          "clientWidth": 1280,
+          "scrollHeight": 720,
+          "clientHeight": 720
+        },
+        "routes": [
+          {
+            "assignment": "A0201",
+            "courier": "R0205",
+            "merchant": "M0201",
+            "finalCourier": "R0205",
+            "d": "M230.3 422.1 Q293.3 436.7 356.7 423.0"
+          },
+          {
+            "assignment": "A0202",
+            "courier": "R0206",
+            "merchant": "M0202",
+            "finalCourier": "R0206",
+            "d": "M496.7 223.3 Q485.1 188.4 515.9 158.8"
+          },
+          {
+            "assignment": "A0203",
+            "courier": "R0203",
+            "merchant": "M0203",
+            "finalCourier": "R0203",
+            "d": "M562.9 419.3 Q596.6 413.0 614.1 432.9"
+          },
+          {
+            "assignment": "A0204",
+            "courier": "R0202",
+            "merchant": "M0204",
+            "finalCourier": "R0202",
+            "d": "M494.3 164.9 Q459.1 230.2 466.7 299.2"
+          },
+          {
+            "assignment": "A0205",
+            "courier": "R0201",
+            "merchant": "M0205",
+            "finalCourier": "R0201",
+            "d": "M325.2 411.6 Q250.9 429.4 173.3 419.2"
+          },
+          {
+            "assignment": "A0206",
+            "courier": "R0204",
+            "merchant": "M0206",
+            "finalCourier": "R0204",
+            "d": "M504.4 296.6 Q561.4 317.7 585.8 357.4"
+          }
+        ]
+      }
+    }
+  ],
+  "screenshot": "goal/goal-9/task16-final.png"
+}

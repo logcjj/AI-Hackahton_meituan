@@ -219,3 +219,22 @@
 - 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
 - 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
 - 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
+
+## Task 16: 企业级验收循环 8：多场景状态复位、实体点击和视觉细节终检
+
+验证标准：使用独立 Playwright 浏览器在最新提交基础上覆盖至少 3 个典型场景，包括普通高峰、雨天低接单意愿、骑手稀缺/拥堵场景；验证刷新位置、刷新地图、缩放后刷新、运行 10 秒推理、路线点击、商家点击、骑手点击、策略点击、表格点击、线路/点位/适配/定位/全屏按钮；场景切换后不得残留上一场景的最终线、详情、天气、收益或按钮状态；商家/骑手点击优先级不得被最近路线覆盖；雨天/拥堵天气文案与地图状态一致；最终截图应达到 To B 可演示观感；如果发现任何不一致、按钮无效、视觉遮挡、卡顿或业务解释不合理，必须修复并补测试。
+
+完成记录：
+- 已新增可复跑的 Playwright 验收脚本：`goal/goal-9/task16-playwright-audit-runner.js`，覆盖 3 个场景：商圈十字路口高峰、雨天低接单意愿、骑手稀缺修复。
+- 初次审计发现全屏断言使用了错误语义：产品实际使用 `.map-panel.active`、`frame.dataset.fullscreen=true` 和全屏按钮 active 状态，而不是 `body.map-focus`；已修正审计脚本，未改业务逻辑。
+- 最终审计通过：`goal/goal-9/task16-audit.json` 中 `failureCount=0`、`observations=9`。
+- 审计覆盖：场景切换后最终派单线清空、详情不残留“派单总览”、缩放后刷新位置重置 zoom、10 秒推理完成、路线数/箭头数/商家数一致、无重复最终骑手、无 `finalCourier` mismatch、无旧 `.dispatch-hit-area`、无旧天气 `.row/.bar/weather-bar`。
+- 审计覆盖交互：路线点击进入对应“派单关系：骑手到商家”，商家/骑手 pin 点击保持实体详情优先级，策略卡点击进入策略详情，表格点击可出详情，线路/点位/适配/定位/全屏按钮状态与 `map-frame.dataset` 一致。
+- 雨天低接单意愿场景通过：天气文案包含“雨天 · 路面湿滑”，拥堵/ETA 上浮等履约影响随场景变化。
+- 视觉证据已保存：`goal/goal-9/task16-final.png`，目视为当前最终派单工作台，地图、右侧详情、收益量化和表格均在 1280x720 内完整显示。
+- 验证通过：`node --check goal/goal-9/task16-playwright-audit-runner.js`。
+- 验证通过：`python3 -m json.tool goal/goal-9/task16-audit.json`。
+- 验证通过：`python3 -m py_compile web_agent_demo/server.py tests/test_web_agent_demo.py`。
+- 验证通过：提取内联脚本后 `node --check /tmp/autosolver-inline.js`。
+- 验证通过：`python3 -m unittest tests.test_web_agent_demo`，13 个测试通过。
+- 验证通过：`python3 -m unittest`，全仓 59 个测试通过。
