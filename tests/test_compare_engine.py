@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import unittest
 
 from web_agent_demo.compare_engine import DEFAULT_ALGORITHMS, run_comparison
@@ -36,6 +37,27 @@ class CompareEngineTest(unittest.TestCase):
         baseline = results_by_id["nearest_greedy"]
         self.assertEqual(baseline.metrics.relative_to_baseline["cost_delta_pct"], 0.0)
         self.assertEqual(baseline.metrics.relative_to_baseline["eta_delta_pct"], 0.0)
+
+    def test_interactive_burst_compare_stays_within_demo_budget(self):
+        start = create_simulation_session(
+            "commerce_peak",
+            seed="compare-interactive-budget",
+            controls=SimulationControls(courier_count=14, order_intensity=0.68, burstiness=0.62, congestion_level=0.58),
+        )
+        session = start.session
+        tick = start.tick
+        for _ in range(7):
+            advanced = advance_simulation(session, tick, advance_seconds=20)
+            tick = advanced.tick
+
+        self.assertGreaterEqual(len(tick.active_order_ids), 10)
+        started = time.perf_counter()
+        comparison = run_comparison(session, tick, time_budget_ms=10_000)
+        elapsed_ms = (time.perf_counter() - started) * 1000
+
+        self.assertEqual(comparison.compare_run.status, "completed")
+        self.assertLess(elapsed_ms, 5_000.0)
+        self.assertEqual(len(comparison.results), len(DEFAULT_ALGORITHMS))
 
     def test_empty_tick_returns_completed_noop_compare(self):
         start = create_simulation_session("commerce_peak", seed="compare-empty", controls=SimulationControls(courier_count=4))

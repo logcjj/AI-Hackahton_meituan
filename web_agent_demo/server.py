@@ -1995,6 +1995,7 @@ def render_index() -> str:
               <span class="stat-chip" id="active-orders">订单 0</span>
               <span class="stat-chip" id="active-couriers">骑手 0</span>
               <span class="stat-chip" id="weather-state">天气 clear</span>
+              <span class="stat-chip" id="compare-budget">对比预算 10.0s</span>
             </div>
           </div>
           <div class="map-viewport" id="map-viewport">
@@ -2082,7 +2083,22 @@ def render_index() -> str:
     });
     const ALGORITHM_ORDER = ["nearest_greedy", "cost_greedy", "risk_aware_greedy", "min_cost_matching", "sparse_cover", "flow_mcf", "autosolver_agent"];
     const $ = (id) => document.getElementById(id);
-    const appState = {scenarios: [], session: null, tick: null, compare: null, timeline: [], map: null, playing: false};
+    const appState = {
+      scenarios: [],
+      session: null,
+      tick: null,
+      compare: null,
+      timeline: [],
+      map: null,
+      playing: false,
+      advancing: false,
+      comparing: false,
+      playTimer: null,
+      compareTimer: null,
+      controlApplyTimer: null,
+      lastControlSignature: "",
+      lastCompareElapsedMs: 0
+    };
 
     function syncSandboxScale() {
       const shell = $("simulation-sandbox");
@@ -2115,6 +2131,10 @@ def render_index() -> str:
       };
     }
 
+    function controlSignature() {
+      return JSON.stringify(controlPayload());
+    }
+
     function bindControlLabels() {
       const pairs = [["courier-count", 0], ["order-intensity", 2], ["burstiness", 2], ["congestion-level", 2]];
       pairs.forEach(([id, digits]) => {
@@ -2124,6 +2144,22 @@ def render_index() -> str:
         input.addEventListener("input", update);
         update();
       });
+    }
+
+    function setControlsDisabled(disabled) {
+      ["scenario-select", "play-sim", "pause-sim", "reset-sim", "run-compare"].forEach((id) => {
+        const node = $(id);
+        if (node) node.disabled = Boolean(disabled && id !== "pause-sim");
+      });
+    }
+
+    function setStatus(message) {
+      $("engine-status").textContent = message;
+    }
+
+    function reportInteractionError(error, context = "交互异常") {
+      console.error(context, error);
+      setStatus(`${context}: ${error && error.message ? error.message : error}`);
     }
 
     async function apiJson(path, options = {}) {
@@ -2219,6 +2255,9 @@ def render_index() -> str:
       $("weather-state").textContent = `天气 ${traffic.weather || controlPayload().weather}`;
       $("weather-zone").style.opacity = ["rain", "storm"].includes(traffic.weather) ? ".95" : ".38";
       $("congestion-band").style.opacity = Math.max(.22, Number(traffic.congestion_level || 0.45)).toFixed(2);
+      if (appState.map && tick.map_state && tick.map_state.center) {
+        appState.map.easeTo({center: [tick.map_state.center.lng, tick.map_state.center.lat], duration: 320});
+      }
     }
 
     function appendTimeline(events) {
@@ -2258,10 +2297,42 @@ def render_index() -> str:
           <td>${delta}</td>
         </tr>`;
       }).join("");
-      $("compare-status").textContent = selectedId ? `当前采纳 ${selectedId}` : "等待对比运行";
+      const elapsed = appState.lastCompareElapsedMs ? `${(appState.lastCompareElapsedMs / 1000).toFixed(2)}s` : "实时";
+      $("compare-status").textContent = selectedId ? `当前采纳 ${selectedId} · ${elapsed}` : "等待对比运行";
       renderRoutes(compare);
       renderDecisionPoints(compare && compare.decision_points || []);
       renderMemory(compare && compare.memory, compare && compare.predictor);
+    }
+
+    function resetCompareView() {
+      appState.compare = null;
+      appState.lastCompareElapsedMs = 0;
+      $("compare-budget").textContent = "对比预算 10.0s";
+      $("compare-status").textContent = "等待对比运行";
+      $("route-layer").innerHTML = "";
+      $("compare-body").innerHTML = ALGORITHM_ORDER.map((id) => `<tr data-algorithm="${id}"><td>${id}<div class="family">pending</div></td><td colspan="4">等待运行</td></tr>`).join("");
+      $("decision-point-list").innerHTML = `<div class="decision"><b>关键决策点</b>等待实时求解后展示候选策略胜负、风险变化和 Agent 选择理由。</div>`;
+      $("memory-source").textContent = "source: external-disabled";
+      $("predictor-source").textContent = "predictor: local-heuristic";
+      $("memory-summary").textContent = "Memory 默认使用本地 fallback；外部 predictor 只允许环境变量接入，界面只展示 env-only-redacted。";
+      $("memory-list").innerHTML = `<div class="memory-item"><b>Scenario Memory</b>历史画像会沉淀为雨天、骑手稀缺、订单爆发、拥堵等可 recall 的经验。</div>`;
+    }
+
+    function stopCompareCountdown(finalText = null) {
+      if (appState.compareTimer) window.clearInterval(appState.compareTimer);
+      appState.compareTimer = null;
+      if (finalText) $("compare-budget").textContent = finalText;
+    }
+
+    function startCompareCountdown(startedAt, budgetMs = 10000) {
+      stopCompareCountdown();
+      const update = () => {
+        const elapsed = Date.now() - startedAt;
+        const remaining = Math.max(0, budgetMs - elapsed);
+        $("compare-budget").textContent = `对比预算 ${(remaining / 1000).toFixed(1)}s`;
+      };
+      update();
+      appState.compareTimer = window.setInterval(update, 120);
     }
 
     function renderDecisionPoints(points) {
@@ -2286,36 +2357,113 @@ def render_index() -> str:
 
     async function createSession() {
       const scenarioId = $("scenario-select").value || "commerce_peak";
-      $("engine-status").textContent = "创建仿真会话";
+      setStatus("创建仿真会话");
       const payload = await apiJson(API_ENDPOINTS.session, {method: "POST", body: {scenario_id: scenarioId, seed: `ui-${scenarioId}`, controls: controlPayload()}});
       appState.session = payload.session;
       appState.timeline = [];
+      appState.lastControlSignature = controlSignature();
+      resetCompareView();
       renderTick(payload.tick);
       appendTimeline(payload.timeline);
-      $("engine-status").textContent = "仿真会话就绪";
+      setStatus("仿真会话就绪");
       return payload;
     }
 
     async function advanceSimulation(seconds = 20) {
       if (!appState.session) await createSession();
-      $("engine-status").textContent = "推进仿真 tick";
-      const payload = await apiJson(API_ENDPOINTS.tick, {method: "POST", body: {session_id: appState.session.session_id, advance_seconds: seconds, controls_patch: controlPayload(), compare_if_due: true}});
-      renderTick(payload.tick);
-      appendTimeline(payload.timeline_delta);
-      $("engine-status").textContent = payload.compare_trigger ? "已触发实时对比" : "仿真推进完成";
-      return payload;
+      if (appState.advancing) return null;
+      appState.advancing = true;
+      const controlsChanged = controlSignature() !== appState.lastControlSignature;
+      setStatus("推进仿真 tick");
+      try {
+        const payload = await apiJson(API_ENDPOINTS.tick, {method: "POST", body: {session_id: appState.session.session_id, advance_seconds: seconds, controls_patch: controlPayload(), compare_if_due: true}});
+        appState.lastControlSignature = controlSignature();
+        renderTick(payload.tick);
+        if (controlsChanged) resetCompareView();
+        appendTimeline(payload.timeline_delta);
+        setStatus(payload.compare_trigger ? "已触发实时对比" : (controlsChanged ? "参数已应用" : "仿真推进完成"));
+        return payload;
+      } finally {
+        appState.advancing = false;
+      }
     }
 
     async function runComparison() {
       if (!appState.session) await createSession();
       if (!appState.tick || !(appState.tick.active_order_ids || []).length) await advanceSimulation(60);
+      if (appState.comparing) return null;
+      appState.comparing = true;
       $("compare-status").textContent = "10 秒预算内并行评估算法";
-      $("engine-status").textContent = "运行多算法对比";
-      const payload = await apiJson(API_ENDPOINTS.compare, {method: "POST", body: {session_id: appState.session.session_id, tick_id: appState.tick.tick_id, time_budget_ms: 10000, memory_mode: "off", predictor_mode: "fallback"}});
-      renderCompare(payload);
-      appendTimeline(payload.timeline_delta);
-      $("engine-status").textContent = "对比完成";
-      return payload;
+      setStatus("运行多算法对比");
+      const startedAt = Date.now();
+      startCompareCountdown(startedAt, 10000);
+      try {
+        const payload = await apiJson(API_ENDPOINTS.compare, {method: "POST", body: {session_id: appState.session.session_id, tick_id: appState.tick.tick_id, time_budget_ms: 10000, memory_mode: "off", predictor_mode: "fallback"}});
+        appState.lastCompareElapsedMs = Date.now() - startedAt;
+        renderCompare(payload);
+        appendTimeline(payload.timeline_delta);
+        const elapsedText = `${(appState.lastCompareElapsedMs / 1000).toFixed(2)}s`;
+        stopCompareCountdown(`对比完成 ${elapsedText}`);
+        setStatus(appState.lastCompareElapsedMs <= 10000 ? "对比完成" : "对比超出10秒预算");
+        return payload;
+      } finally {
+        appState.comparing = false;
+      }
+    }
+
+    function scheduleNextPlaybackTick(delayMs = 1350) {
+      if (appState.playTimer) window.clearTimeout(appState.playTimer);
+      if (!appState.playing) return;
+      appState.playTimer = window.setTimeout(playbackStep, delayMs);
+    }
+
+    async function playbackStep() {
+      if (!appState.playing) return;
+      try {
+        const payload = await advanceSimulation(20);
+        if (payload && payload.compare_trigger) await runComparison();
+      } catch (error) {
+        appState.playing = false;
+        reportInteractionError(error, "播放推演失败");
+      } finally {
+        scheduleNextPlaybackTick();
+      }
+    }
+
+    function startPlaybackLoop() {
+      if (appState.playing) return;
+      appState.playing = true;
+      setStatus("播放推演中");
+      appendTimeline([{sim_time_s: appState.tick ? appState.tick.sim_time_s : 0, event_type: "playback_started", title: "播放推演", summary: "时间线开始自动推进，控制台参数会在下一 tick 生效。"}]);
+      scheduleNextPlaybackTick(10);
+    }
+
+    function pausePlayback() {
+      appState.playing = false;
+      if (appState.playTimer) window.clearTimeout(appState.playTimer);
+      appState.playTimer = null;
+      setStatus("已暂停");
+      appendTimeline([{sim_time_s: appState.tick ? appState.tick.sim_time_s : 0, event_type: "playback_paused", title: "暂停推演", summary: "时间线已暂停，当前地图态势保留。"}]);
+    }
+
+    async function resetSimulation() {
+      pausePlayback();
+      stopCompareCountdown("对比预算 10.0s");
+      await createSession();
+      appendTimeline([{sim_time_s: 0, event_type: "simulation_reset", title: "重置推演", summary: "已清空路线、对比结果与事件缓存，重新初始化当前场景。"}]);
+    }
+
+    function scheduleControlPatch() {
+      if (appState.controlApplyTimer) window.clearTimeout(appState.controlApplyTimer);
+      appState.controlApplyTimer = window.setTimeout(async () => {
+        if (!appState.session || appState.advancing || controlSignature() === appState.lastControlSignature) return;
+        try {
+          const payload = await advanceSimulation(1);
+          if (payload && payload.compare_trigger) await runComparison();
+        } catch (error) {
+          reportInteractionError(error, "参数应用失败");
+        }
+      }, 420);
     }
 
     async function bootstrapSimulationSandbox() {
@@ -2342,15 +2490,33 @@ def render_index() -> str:
 
     $("scenario-select").addEventListener("change", async () => {
       applyScenarioDefaults(scenarioById($("scenario-select").value));
-      await createSession();
+      try {
+        await resetSimulation();
+      } catch (error) {
+        reportInteractionError(error, "切换场景失败");
+      }
     });
-    $("play-sim").addEventListener("click", async () => { appState.playing = true; await advanceSimulation(20); });
-    $("pause-sim").addEventListener("click", () => { appState.playing = false; $("engine-status").textContent = "已暂停"; });
-    $("reset-sim").addEventListener("click", createSession);
-    $("run-compare").addEventListener("click", runComparison);
+    ["courier-count", "order-intensity", "burstiness", "weather-mode", "congestion-level"].forEach((id) => {
+      $(id).addEventListener("change", scheduleControlPatch);
+      $(id).addEventListener("input", () => { if (appState.playing) scheduleControlPatch(); });
+    });
+    $("play-sim").addEventListener("click", startPlaybackLoop);
+    $("pause-sim").addEventListener("click", pausePlayback);
+    $("reset-sim").addEventListener("click", () => resetSimulation().catch((error) => reportInteractionError(error, "重置推演失败")));
+    $("run-compare").addEventListener("click", () => runComparison().catch((error) => reportInteractionError(error, "决策对比失败")));
     window.addEventListener("resize", syncSandboxScale);
     document.addEventListener("DOMContentLoaded", bootstrapSimulationSandbox);
-    window.__AUTO_SOLVER_SIMULATION_SANDBOX__ = {API_ENDPOINTS, ALGORITHM_ORDER, appState, handleProgressEvent};
+    window.__AUTO_SOLVER_SIMULATION_SANDBOX__ = {
+      API_ENDPOINTS,
+      ALGORITHM_ORDER,
+      appState,
+      handleProgressEvent,
+      startPlaybackLoop,
+      pausePlayback,
+      resetSimulation,
+      scheduleControlPatch,
+      runComparison
+    };
   </script>
 </body>
 </html>"""

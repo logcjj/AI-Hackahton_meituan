@@ -358,8 +358,18 @@ def _assignment_dp(
     couriers = _available_couriers(tick)
     if not orders or not couriers:
         return ()
-    if len(orders) > 12 or len(couriers) > 18:
-        pairs = [(fallback_sort(_assignment_profile(order, courier, tick)), _assignment_profile(order, courier, tick)) for order in orders for courier in couriers]
+    profile_cache: dict[tuple[str, str], _AssignmentProfile] = {}
+
+    def profile_for(order: OrderState, courier: CourierState) -> _AssignmentProfile:
+        key = (order.id, courier.id)
+        cached = profile_cache.get(key)
+        if cached is None:
+            cached = _assignment_profile(order, courier, tick)
+            profile_cache[key] = cached
+        return cached
+
+    if len(orders) > 12 or len(couriers) > 18 or _dp_state_estimate(len(orders), len(couriers)) > 10_000:
+        pairs = [(fallback_sort(profile_for(order, courier)), profile_for(order, courier)) for order in orders for courier in couriers]
         return _assign_from_sorted_pairs(tick, sorted(pairs, key=lambda item: item[0]), rationale)
 
     states: dict[int, tuple[float, tuple[_AssignmentProfile, ...]]] = {0: (0.0, ())}
@@ -375,7 +385,7 @@ def _assignment_dp(
                 courier_bit = 1 << index
                 if mask & courier_bit:
                     continue
-                profile = _assignment_profile(order, courier, tick)
+                profile = profile_for(order, courier)
                 _keep_best(next_states, mask | courier_bit, cost + score_fn(profile), (*chosen_profiles, profile))
         states = next_states
 
@@ -396,6 +406,11 @@ def _keep_best(
         tuple(profile.order.id for profile in current[1]),
     ):
         states[mask] = (cost, profiles)
+
+
+def _dp_state_estimate(order_count: int, courier_count: int) -> int:
+    active_depth = min(order_count, courier_count)
+    return sum(math.comb(courier_count, depth) for depth in range(active_depth + 1))
 
 
 def _assign_from_sorted_pairs(
