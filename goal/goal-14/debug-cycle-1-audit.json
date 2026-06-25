@@ -1,0 +1,584 @@
+{
+  "passed": true,
+  "assertions": {
+    "realEngineAllStates": true,
+    "twoLeafletPanelsAllStates": true,
+    "nonZeroMarkersRoutesAllStates": true,
+    "tilesLoadedNoTileErrors": true,
+    "timelineChangesFrame": true,
+    "playPauseStable": true,
+    "compareStable": true,
+    "courierChangeRunsAndKeepsMap": true,
+    "noConsoleOrPageErrors": true,
+    "noMapEngineWarnings": true,
+    "viewportNoHorizontalOverflow": true,
+    "visibleMapBounds": true,
+    "fallbackWorksWithoutLeaflet": true
+  },
+  "qaInventory": [
+    "initial page renders fully loaded real Leaflet/OpenStreetMap tiles in both comparison panels",
+    "simulation lat/lng layers render merchants, couriers, active orders and assignment routes",
+    "timeline control updates frame id and map engine layer counts",
+    "play/pause keeps map engine mounted and stable",
+    "compare button keeps real map layers alive",
+    "courier count control rerun keeps real map layers alive",
+    "no horizontal overflow or clipped map regions at 1600x920",
+    "fallback schematic remains available when Leaflet asset is unavailable",
+    "no console/page errors in real-engine mode",
+    "no stale Leaflet invalidateSize warnings after repeated remounts"
+  ],
+  "states": {
+    "initial": {
+      "label": "initial",
+      "ready": true,
+      "hasLeaflet": true,
+      "engineStatus": "leaflet-osm",
+      "fallbackReason": "",
+      "engineLastFrameId": "F-TS-1000",
+      "engineCounts": {
+        "activePanels": 2,
+        "markerCount": 44,
+        "routeCount": 8,
+        "tileErrors": 0
+      },
+      "frameIndex": 0,
+      "playing": false,
+      "controls": {
+        "courierCount": "18",
+        "orderScale": "0.4",
+        "weather": "mixed",
+        "timeline": "0"
+      },
+      "labels": {
+        "frame": "",
+        "engineTitle": "",
+        "engineDetail": "",
+        "courierCount": "18"
+      },
+      "totalMarkers": 44,
+      "totalRoutes": 8,
+      "leafletContainerCount": 2,
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "clientWidth": 1600,
+        "clientHeight": 920,
+        "scrollWidth": 1600,
+        "scrollHeight": 1566,
+        "canScrollX": false,
+        "canScrollY": true
+      },
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 22,
+          "routeCount": 4,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0307898259705488,
+          "tileCoverageY": 1.6487685193922808,
+          "markerEls": 22,
+          "routeEls": 4,
+          "schematicPins": 22,
+          "rect": {
+            "x": 31,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 22,
+          "routeCount": 4,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.034805890227577,
+          "tileCoverageY": 1.6487685193922808,
+          "markerEls": 22,
+          "routeEls": 4,
+          "schematicPins": 22,
+          "rect": {
+            "x": 822,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        }
+      ]
+    },
+    "afterTimeline": {
+      "label": "after-timeline",
+      "ready": true,
+      "hasLeaflet": true,
+      "engineStatus": "leaflet-osm",
+      "fallbackReason": "",
+      "engineLastFrameId": "F-TS-1145",
+      "engineCounts": {
+        "activePanels": 2,
+        "markerCount": 46,
+        "routeCount": 10,
+        "tileErrors": 0
+      },
+      "frameIndex": 7,
+      "playing": false,
+      "controls": {
+        "courierCount": "18",
+        "orderScale": "0.4",
+        "weather": "mixed",
+        "timeline": "7"
+      },
+      "labels": {
+        "frame": "",
+        "engineTitle": "",
+        "engineDetail": "",
+        "courierCount": "18"
+      },
+      "totalMarkers": 46,
+      "totalRoutes": 10,
+      "leafletContainerCount": 2,
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "clientWidth": 1600,
+        "clientHeight": 920,
+        "scrollWidth": 1600,
+        "scrollHeight": 1566,
+        "canScrollX": false,
+        "canScrollY": true
+      },
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 23,
+          "routeCount": 5,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0307898259705488,
+          "tileCoverageY": 1.6306501840143437,
+          "markerEls": 23,
+          "routeEls": 5,
+          "schematicPins": 23,
+          "rect": {
+            "x": 31,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 23,
+          "routeCount": 5,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0441767068273093,
+          "tileCoverageY": 1.609512126073417,
+          "markerEls": 23,
+          "routeEls": 5,
+          "schematicPins": 23,
+          "rect": {
+            "x": 822,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        }
+      ]
+    },
+    "afterPlayPause": {
+      "label": "after-play-pause",
+      "ready": true,
+      "hasLeaflet": true,
+      "engineStatus": "leaflet-osm",
+      "fallbackReason": "",
+      "engineLastFrameId": "F-TS-1215",
+      "engineCounts": {
+        "activePanels": 2,
+        "markerCount": 52,
+        "routeCount": 16,
+        "tileErrors": 0
+      },
+      "frameIndex": 9,
+      "playing": false,
+      "controls": {
+        "courierCount": "18",
+        "orderScale": "0.4",
+        "weather": "mixed",
+        "timeline": "9"
+      },
+      "labels": {
+        "frame": "",
+        "engineTitle": "",
+        "engineDetail": "",
+        "courierCount": "18"
+      },
+      "totalMarkers": 52,
+      "totalRoutes": 16,
+      "leafletContainerCount": 2,
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "clientWidth": 1600,
+        "clientHeight": 920,
+        "scrollWidth": 1600,
+        "scrollHeight": 1583,
+        "canScrollX": false,
+        "canScrollY": true
+      },
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 26,
+          "routeCount": 8,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0481927710843373,
+          "tileCoverageY": 1.5732754553175428,
+          "markerEls": 26,
+          "routeEls": 8,
+          "schematicPins": 26,
+          "rect": {
+            "x": 31,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 26,
+          "routeCount": 8,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0575635876840697,
+          "tileCoverageY": 1.5762951778805323,
+          "markerEls": 26,
+          "routeEls": 8,
+          "schematicPins": 26,
+          "rect": {
+            "x": 822,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        }
+      ]
+    },
+    "afterCompare": {
+      "label": "after-compare",
+      "ready": true,
+      "hasLeaflet": true,
+      "engineStatus": "leaflet-osm",
+      "fallbackReason": "",
+      "engineLastFrameId": "F-TS-1000",
+      "engineCounts": {
+        "activePanels": 2,
+        "markerCount": 46,
+        "routeCount": 10,
+        "tileErrors": 0
+      },
+      "frameIndex": 0,
+      "playing": false,
+      "controls": {
+        "courierCount": "18",
+        "orderScale": "0.4",
+        "weather": "mixed",
+        "timeline": "0"
+      },
+      "labels": {
+        "frame": "",
+        "engineTitle": "",
+        "engineDetail": "",
+        "courierCount": "18"
+      },
+      "totalMarkers": 46,
+      "totalRoutes": 10,
+      "leafletContainerCount": 2,
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "clientWidth": 1600,
+        "clientHeight": 920,
+        "scrollWidth": 1600,
+        "scrollHeight": 1566,
+        "canScrollX": false,
+        "canScrollY": true
+      },
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 23,
+          "routeCount": 5,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0428380187416333,
+          "tileCoverageY": 1.558176842502595,
+          "markerEls": 23,
+          "routeEls": 5,
+          "schematicPins": 23,
+          "rect": {
+            "x": 31,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 23,
+          "routeCount": 5,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0548862115127176,
+          "tileCoverageY": 1.558176842502595,
+          "markerEls": 23,
+          "routeEls": 5,
+          "schematicPins": 23,
+          "rect": {
+            "x": 822,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        }
+      ]
+    },
+    "afterCourierChange": {
+      "label": "after-courier-change",
+      "ready": true,
+      "hasLeaflet": true,
+      "engineStatus": "leaflet-osm",
+      "fallbackReason": "",
+      "engineLastFrameId": "F-TS-1000",
+      "engineCounts": {
+        "activePanels": 2,
+        "markerCount": 46,
+        "routeCount": 10,
+        "tileErrors": 0
+      },
+      "frameIndex": 0,
+      "playing": false,
+      "controls": {
+        "courierCount": "20",
+        "orderScale": "0.4",
+        "weather": "mixed",
+        "timeline": "0"
+      },
+      "labels": {
+        "frame": "",
+        "engineTitle": "",
+        "engineDetail": "",
+        "courierCount": "20"
+      },
+      "totalMarkers": 46,
+      "totalRoutes": 10,
+      "leafletContainerCount": 2,
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "clientWidth": 1600,
+        "clientHeight": 920,
+        "scrollWidth": 1600,
+        "scrollHeight": 1566,
+        "canScrollX": false,
+        "canScrollY": true
+      },
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 23,
+          "routeCount": 5,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0441767068273093,
+          "tileCoverageY": 1.6306501840143437,
+          "markerEls": 23,
+          "routeEls": 5,
+          "schematicPins": 23,
+          "rect": {
+            "x": 31,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "openstreetmap",
+          "markerCount": 23,
+          "routeCount": 5,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": true,
+          "tileCount": 12,
+          "loadedTileCount": 12,
+          "tileCoverageX": 1.0441767068273093,
+          "tileCoverageY": 1.6306501840143437,
+          "markerEls": 23,
+          "routeEls": 5,
+          "schematicPins": 23,
+          "rect": {
+            "x": 822,
+            "y": 724,
+            "width": 747,
+            "height": 331
+          }
+        }
+      ]
+    },
+    "fallback": {
+      "label": "fallback-no-leaflet",
+      "ready": true,
+      "hasLeaflet": false,
+      "engineStatus": "fallback-schematic",
+      "fallbackReason": "Leaflet library unavailable",
+      "engineLastFrameId": "F-TS-1000",
+      "engineCounts": {
+        "activePanels": 0,
+        "markerCount": 0,
+        "routeCount": 0,
+        "tileErrors": 0
+      },
+      "frameIndex": 0,
+      "playing": false,
+      "controls": {
+        "courierCount": "18",
+        "orderScale": "0.4",
+        "weather": "mixed",
+        "timeline": "0"
+      },
+      "labels": {
+        "frame": "",
+        "engineTitle": "",
+        "engineDetail": "",
+        "courierCount": "18"
+      },
+      "totalMarkers": 0,
+      "totalRoutes": 0,
+      "leafletContainerCount": 0,
+      "viewport": {
+        "innerWidth": 1365,
+        "innerHeight": 768,
+        "clientWidth": 1365,
+        "clientHeight": 768,
+        "scrollWidth": 1365,
+        "scrollHeight": 1657,
+        "canScrollX": false,
+        "canScrollY": true
+      },
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "fallback-no-leaflet",
+          "tileProvider": "openstreetmap",
+          "markerCount": 0,
+          "routeCount": 0,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": false,
+          "tileCount": 0,
+          "loadedTileCount": 0,
+          "tileCoverageX": 0,
+          "tileCoverageY": 0,
+          "markerEls": 0,
+          "routeEls": 0,
+          "schematicPins": 22,
+          "rect": {
+            "x": 31,
+            "y": 756,
+            "width": 630,
+            "height": 312
+          }
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "fallback-no-leaflet",
+          "tileProvider": "openstreetmap",
+          "markerCount": 0,
+          "routeCount": 0,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "hasLeafletContainer": false,
+          "tileCount": 0,
+          "loadedTileCount": 0,
+          "tileCoverageX": 0,
+          "tileCoverageY": 0,
+          "markerEls": 0,
+          "routeEls": 0,
+          "schematicPins": 22,
+          "rect": {
+            "x": 705,
+            "y": 756,
+            "width": 630,
+            "height": 312
+          }
+        }
+      ]
+    }
+  },
+  "consoleMessages": [],
+  "pageErrors": [],
+  "fallbackConsole": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: net::ERR_FAILED"
+    }
+  ],
+  "fallbackErrors": [],
+  "screenshots": [
+    "goal/goal-14/debug-cycle-1-initial.png",
+    "goal/goal-14/debug-cycle-1-after-controls.png",
+    "goal/goal-14/debug-cycle-1-fallback.png"
+  ]
+}

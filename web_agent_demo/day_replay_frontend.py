@@ -1035,6 +1035,7 @@ def render_day_replay_index() -> str:
     function removeRealMapPanel(stageId) {{
       const panel = replayState.realMapEngine.panels[stageId];
       if (panel && panel.map) {{
+        panel.disposed = true;
         try {{ panel.map.remove(); }} catch (error) {{ /* best-effort cleanup before replacing DOM */ }}
       }}
       delete replayState.realMapEngine.panels[stageId];
@@ -1129,7 +1130,6 @@ def render_day_replay_index() -> str:
       }} else {{
         map.setView([31.2304, 121.4737], 14);
       }}
-      window.setTimeout(() => map.invalidateSize(false), 80);
 
       stage.dataset.mapEngineStatus = "leaflet-osm";
       stage.dataset.tileProvider = "openstreetmap";
@@ -1138,7 +1138,12 @@ def render_day_replay_index() -> str:
       target.dataset.mapEngineStatus = "leaflet-osm";
       target.dataset.markerCount = String(markerCount);
       target.dataset.routeCount = String(routeCount);
-      replayState.realMapEngine.panels[stageId] = {{map, layerGroup, tileLayer, markerCount, routeCount, tileErrors, frameId: frame.id}};
+      replayState.realMapEngine.panels[stageId] = {{map, layerGroup, tileLayer, markerCount, routeCount, tileErrors, frameId: frame.id, disposed: false}};
+      window.setTimeout(() => {{
+        const currentPanel = replayState.realMapEngine.panels[stageId];
+        if (!currentPanel || currentPanel.map !== map || currentPanel.disposed || !target.isConnected) return;
+        try {{ map.invalidateSize(false); }} catch (error) {{ stage.dataset.mapEngineWarning = "invalidate-size-skipped"; }}
+      }}, 80);
       return {{stageId, status: "leaflet-osm", markerCount, routeCount, tileErrors}};
     }}
 

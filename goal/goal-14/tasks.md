@@ -69,14 +69,30 @@ Confidence loop:
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-run critical checks after implementation.
 - Any defect found is fixed before ending.
 
 Work log:
--
+- Re-read `goal/goal-14/input.md`, `goal/goal-14/plan.md`, and `goal/goal-14/tasks.md` before starting the debug cycle.
+- Confirmed local service was running on `http://127.0.0.1:8794/` and serving the real-map engine source markers.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/day_simulation.py web_agent_demo/server.py tests/test_web_agent_demo.py`: passed.
+- Ran focused regression suite `uv run --with pytest pytest tests/test_web_agent_demo.py tests/test_day_simulation_contract.py tests/test_day_simulation_comparison.py tests/test_day_engine_adapters.py`: 26 passed.
+- Ran full regression suite `uv run --with pytest pytest`: 103 passed.
+- Ran business-code sensitive scan excluding `goal/**`, `output/**`, and `.playwright-cli/**`: zero matches for supplied key/domain/model patterns.
+- Ran browser QA covering initial real-map load, timeline keyboard changes, play/pause, compare button, courier-count control rerun, viewport fit, and no-Leaflet fallback.
+- Found a real browser defect during debug cycle: rapid map remounts produced Leaflet page errors `Cannot read properties of undefined (reading '_leaflet_pos')` from a stale delayed `invalidateSize` call after an old map had already been removed.
+- Fixed the lifecycle race by marking removed panels as `disposed` and guarding delayed `invalidateSize` so it only runs for the current still-connected map instance.
+- Restarted the `8794` service after the fix so browser QA used current code.
+- Re-ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`: passed.
+- Re-ran focused regression suite: 26 passed.
+- Re-ran full regression suite: 103 passed.
+- Re-ran sensitive scan: zero matches.
+- Re-ran browser QA and verified all assertions passed: real engine status is `leaflet-osm` across real-map states, both panels have Leaflet containers, marker/route counts stay non-zero, tile coverage is complete, tile errors are 0, console errors are 0, page errors are 0, map warnings are 0, timeline changes frame from `F-TS-1000` to `F-TS-1145`, courier-control rerun keeps `46` markers and `10` routes, and no-Leaflet fallback becomes `fallback-schematic`.
+- Captured final debug audit at `goal/goal-14/debug-cycle-1-audit.json`.
+- Captured final visual evidence at `goal/goal-14/debug-cycle-1-initial.png`, `goal/goal-14/debug-cycle-1-after-controls.png`, and `goal/goal-14/debug-cycle-1-fallback.png`.
 
 Confidence loop:
--
+- 100% confidence for Debug Cycle 1 scope: the debug cycle found and fixed a real runtime race, then re-ran compile checks, focused tests, full tests, sensitive scan, real browser interaction QA, fallback QA, and visual screenshot review with all final gates passing.
