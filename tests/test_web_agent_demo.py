@@ -33,6 +33,8 @@ class WebAgentDemoTest(unittest.TestCase):
             "no-label-real-map-tiles",
             "courier-motion-trail",
             "real-map-engine",
+            '.map-stage[data-map-engine-status="leaflet-osm"] .schematic-layer',
+            "display: none;",
             'data-real-map-engine="leaflet"',
             'data-tile-provider="cartodb-nolabels"',
             "data-map-engine-status",

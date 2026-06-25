@@ -130,3 +130,28 @@ Work log:
 
 Confidence loop:
 - 100% confidence for Task 4 scope: the map now reads as a true simulation rather than a static marker board, the visible label clutter has been removed, and the no-label base plus motion feedback were proven in both automated and browser QA.
+
+## Final Completion Review - Real Map Engine And Simulation Audit
+
+Status: Completed
+
+Independent verification:
+- The final implementation must prove the user's actual objection is resolved: the page is no longer a fake/schematic-only map and now exposes a visible real map/simulation engine.
+- The final review must cover product behavior, frontend visuals, runtime stability, fallback behavior, mobile layout, regression tests, and sensitive-data hygiene.
+
+Work log:
+- Re-read `goal/goal-14/input.md`, `goal/goal-14/plan.md`, and `goal/goal-14/tasks.md` after context continuation before final signoff.
+- Re-ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/day_simulation.py web_agent_demo/server.py tests/test_web_agent_demo.py`: passed.
+- Re-ran focused regression suite `uv run --with pytest pytest tests/test_web_agent_demo.py tests/test_day_simulation_contract.py tests/test_day_simulation_comparison.py tests/test_day_engine_adapters.py tests/test_simulation_api_contract.py`: 29 passed.
+- Re-ran full regression suite `uv run --with pytest pytest`: 103 passed.
+- Re-ran business-code sensitive scan excluding `goal/**`, `output/**`, and `.playwright-cli/**`: zero matches.
+- Ran final browser audit in system Chrome against `http://127.0.0.1:8794/` covering desktop real-map load, timeline motion, play/pause, compare, courier-count rerun, mobile layout, mobile map scroll evidence, and no-Leaflet fallback.
+- Found one final visual/implementation gap during signoff: the schematic layer was invisible but still `display: block` in real-map mode, which made the "real map is primary" proof weaker.
+- Fixed that gap by making `.map-stage[data-map-engine-status="leaflet-osm"] .schematic-layer` use `display: none;` and added a static test marker for the rule.
+- Re-ran compile checks, focused tests, full tests, sensitive scan, final browser audit, and visual screenshot review after the fix.
+- Final browser audit passed 14/14 assertions: Leaflet engine status, Carto no-label tile source, two real map containers, schematic layer removed in real-map mode, non-zero markers/routes, actual no-label tile images, timeline motion trails/arrows, interaction stability, desktop/mobile no horizontal overflow, no-Leaflet fallback, and zero browser runtime errors.
+- Captured final audit JSON at `goal/goal-14/final-completion-audit.json`.
+- Captured final screenshots at `goal/goal-14/final-desktop-initial.png`, `goal/goal-14/final-desktop-motion.png`, `goal/goal-14/final-desktop-after-controls.png`, `goal/goal-14/final-mobile-initial.png`, `goal/goal-14/final-mobile-map.png`, and `goal/goal-14/final-fallback-no-leaflet.png`.
+
+Confidence loop:
+- 100% confidence for Goal 14 completion: current source, automated tests, runtime browser state, screenshots, fallback path, mobile viewport checks, and security scan all prove the page now uses a visible real Leaflet/no-label tile map engine with simulation layers and motion instead of the old schematic-only fake map.

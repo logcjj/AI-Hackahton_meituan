@@ -1,0 +1,592 @@
+{
+  "generatedAt": "2026-06-25T11:44:06.631Z",
+  "targetUrl": "http://127.0.0.1:8794/",
+  "qaInventory": [
+    "real no-label tile map is visible in both comparison panels",
+    "browser runtime exposes Leaflet map engine state rather than schematic-only rendering",
+    "courier/order/merchant/route layers are generated from simulation data",
+    "timeline and play/control interactions update simulation tick and motion layers",
+    "map label clutter is suppressed with no-label tiles",
+    "mobile viewport has no horizontal overflow and keeps usable map stages",
+    "fallback schematic activates when Leaflet is unavailable without page errors"
+  ],
+  "desktopInitial": {
+    "title": "AutoSolver Agent - 全日配送模拟推演",
+    "engineStatus": "leaflet-osm",
+    "engineProvider": "leaflet",
+    "tileProvider": "CartoDB Positron NoLabels",
+    "tileUrl": "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+    "engineDetail": "2/2 panels · tick 1 · moving 0 · markers 44 · routes 8 · frame F-TS-1000",
+    "engineTitle": "Leaflet no-label simulation engine",
+    "frameId": "F-TS-1000",
+    "simulationTick": 1,
+    "lastLayerCounts": {
+      "activePanels": 2,
+      "markerCount": 44,
+      "routeCount": 8,
+      "motionCount": 0,
+      "tileErrors": 0
+    },
+    "lastMotionSummary": {
+      "movingCouriers": 0,
+      "avgSpeedKmh": 0
+    },
+    "stages": [
+      {
+        "id": "greedy-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "cartodb-nolabels",
+        "markers": 22,
+        "routes": 4,
+        "motion": 0,
+        "hasLeaflet": true,
+        "schematicDisplay": "none",
+        "schematicVisibility": "hidden",
+        "schematicOpacity": "0",
+        "realMapDisplay": "block"
+      },
+      {
+        "id": "autosolver-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "cartodb-nolabels",
+        "markers": 22,
+        "routes": 4,
+        "motion": 0,
+        "hasLeaflet": true,
+        "schematicDisplay": "none",
+        "schematicVisibility": "hidden",
+        "schematicOpacity": "0",
+        "realMapDisplay": "block"
+      }
+    ],
+    "leafletContainers": 2,
+    "leafletTiles": 24,
+    "tileSrcSamples": [
+      "https://b.basemaps.cartocdn.com/light_nolabels/14/13719/6694.png",
+      "https://c.basemaps.cartocdn.com/light_nolabels/14/13720/6694.png",
+      "https://a.basemaps.cartocdn.com/light_nolabels/14/13719/6693.png",
+      "https://b.basemaps.cartocdn.com/light_nolabels/14/13720/6693.png",
+      "https://c.basemaps.cartocdn.com/light_nolabels/14/13719/6695.png",
+      "https://a.basemaps.cartocdn.com/light_nolabels/14/13720/6695.png",
+      "https://a.basemaps.cartocdn.com/light_nolabels/14/13718/6694.png",
+      "https://a.basemaps.cartocdn.com/light_nolabels/14/13721/6694.png"
+    ],
+    "merchantMarkers": 16,
+    "courierMarkers": 20,
+    "orderMarkers": 8,
+    "movingMarkers": 0,
+    "motionTrails": 0,
+    "motionArrows": 0,
+    "timelineMax": 39,
+    "viewport": {
+      "innerWidth": 1600,
+      "innerHeight": 920,
+      "clientWidth": 1600,
+      "clientHeight": 920,
+      "scrollWidth": 1600,
+      "scrollHeight": 1561,
+      "canScrollX": false
+    },
+    "bounds": {
+      "#engine-status": {
+        "x": 1217.046875,
+        "y": 52.9453125,
+        "width": 345.953125,
+        "height": 85,
+        "visibleTop": true,
+        "visibleH": 85
+      },
+      "#replay-controls": {
+        "x": 16,
+        "y": 350.390625,
+        "width": 1568,
+        "height": 96.5,
+        "visibleTop": true,
+        "visibleH": 96.5
+      },
+      "#side-by-side-replay": {
+        "x": 16,
+        "y": 601.8203125,
+        "width": 1568,
+        "height": 540,
+        "visibleTop": true,
+        "visibleH": 318.1796875
+      },
+      "#reasoning-flow-panel": {
+        "x": 16,
+        "y": 1155.8203125,
+        "width": 924,
+        "height": 389.78125,
+        "visibleTop": false,
+        "visibleH": -235.8203125
+      }
+    }
+  },
+  "afterTimeline": {
+    "timelineValue": "39",
+    "timelineLabel": "22:45",
+    "engineStatus": "leaflet-osm",
+    "frameId": "F-TS-2245",
+    "simulationTick": 2,
+    "lastLayerCounts": {
+      "activePanels": 2,
+      "markerCount": 38,
+      "routeCount": 2,
+      "motionCount": 2,
+      "tileErrors": 0
+    },
+    "lastMotionSummary": {
+      "movingCouriers": 2,
+      "avgSpeedKmh": 21.367312048588133
+    },
+    "movingMarkers": 2,
+    "motionTrails": 2,
+    "motionArrows": 2,
+    "tileErrors": 0,
+    "stageMotionCounts": [
+      1,
+      1
+    ],
+    "routeCounts": [
+      1,
+      1
+    ],
+    "markerCounts": [
+      19,
+      19
+    ]
+  },
+  "afterControls": {
+    "courierControl": "42",
+    "courierOutput": "42",
+    "engineStatus": "leaflet-osm",
+    "frameId": "F-TS-1000",
+    "simulationTick": 6,
+    "lastLayerCounts": {
+      "activePanels": 2,
+      "markerCount": 46,
+      "routeCount": 10,
+      "motionCount": 0,
+      "tileErrors": 0
+    },
+    "lastMotionSummary": {
+      "movingCouriers": 0,
+      "avgSpeedKmh": 0
+    },
+    "activeHighlightCards": 1,
+    "movingMarkers": 0,
+    "motionTrails": 0,
+    "motionArrows": 0,
+    "engineDetail": "courier control · 208 orders · 40 frames · leaflet-osm"
+  },
+  "mobileState": {
+    "engineStatus": "leaflet-osm",
+    "leafletContainers": 2,
+    "markerCount": 44,
+    "routeCount": 8,
+    "motionCount": 0,
+    "viewport": {
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "clientWidth": 390,
+      "scrollWidth": 390,
+      "canScrollX": false
+    },
+    "replayGrid": {
+      "x": 10,
+      "y": 1802.4140625,
+      "width": 370,
+      "height": 1544.375
+    },
+    "controls": {
+      "x": 10,
+      "y": 719.484375,
+      "width": 370,
+      "height": 570
+    },
+    "stageWidths": [
+      340,
+      340
+    ]
+  },
+  "fallbackState": {
+    "engineStatus": "fallback-schematic",
+    "fallbackReason": "Leaflet library unavailable",
+    "stageStatuses": [
+      "fallback-no-leaflet",
+      "fallback-no-leaflet"
+    ],
+    "leafletContainers": 0,
+    "schematicPins": 44,
+    "realMapDisplay": [
+      "none",
+      "none"
+    ],
+    "schematicDisplay": [
+      "block",
+      "block"
+    ]
+  },
+  "errors": {
+    "desktopConsoleErrors": [],
+    "desktopPageErrors": [],
+    "mobileConsoleErrors": [],
+    "mobilePageErrors": [],
+    "fallbackConsoleErrors": [],
+    "fallbackPageErrors": [],
+    "mobileMapConsoleErrors": [],
+    "mobileMapPageErrors": []
+  },
+  "screenshots": {
+    "desktopInitial": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-14/final-desktop-initial.png",
+    "desktopMotion": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-14/final-desktop-motion.png",
+    "desktopAfterControls": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-14/final-desktop-after-controls.png",
+    "mobileInitial": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-14/final-mobile-initial.png",
+    "fallbackNoLeaflet": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-14/final-fallback-no-leaflet.png",
+    "mobileMap": "/Users/logcjj/Documents/GitHub/AI-Hackahton_meituan/goal/goal-14/final-mobile-map.png"
+  },
+  "assertions": [
+    {
+      "name": "desktop engine is Leaflet",
+      "passed": true,
+      "detail": "leaflet-osm"
+    },
+    {
+      "name": "no-label Carto tile provider is active",
+      "passed": true,
+      "detail": "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+    },
+    {
+      "name": "two Leaflet map containers visible",
+      "passed": true,
+      "detail": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markers": 22,
+          "routes": 4,
+          "motion": 0,
+          "hasLeaflet": true,
+          "schematicDisplay": "none",
+          "schematicVisibility": "hidden",
+          "schematicOpacity": "0",
+          "realMapDisplay": "block"
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markers": 22,
+          "routes": 4,
+          "motion": 0,
+          "hasLeaflet": true,
+          "schematicDisplay": "none",
+          "schematicVisibility": "hidden",
+          "schematicOpacity": "0",
+          "realMapDisplay": "block"
+        }
+      ]
+    },
+    {
+      "name": "real map layer is primary and schematic removed in real-map mode",
+      "passed": true,
+      "detail": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markers": 22,
+          "routes": 4,
+          "motion": 0,
+          "hasLeaflet": true,
+          "schematicDisplay": "none",
+          "schematicVisibility": "hidden",
+          "schematicOpacity": "0",
+          "realMapDisplay": "block"
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markers": 22,
+          "routes": 4,
+          "motion": 0,
+          "hasLeaflet": true,
+          "schematicDisplay": "none",
+          "schematicVisibility": "hidden",
+          "schematicOpacity": "0",
+          "realMapDisplay": "block"
+        }
+      ]
+    },
+    {
+      "name": "real simulation layers are non-zero",
+      "passed": true,
+      "detail": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markers": 22,
+          "routes": 4,
+          "motion": 0,
+          "hasLeaflet": true,
+          "schematicDisplay": "none",
+          "schematicVisibility": "hidden",
+          "schematicOpacity": "0",
+          "realMapDisplay": "block"
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markers": 22,
+          "routes": 4,
+          "motion": 0,
+          "hasLeaflet": true,
+          "schematicDisplay": "none",
+          "schematicVisibility": "hidden",
+          "schematicOpacity": "0",
+          "realMapDisplay": "block"
+        }
+      ]
+    },
+    {
+      "name": "tile images loaded from no-label provider",
+      "passed": true,
+      "detail": [
+        "https://b.basemaps.cartocdn.com/light_nolabels/14/13719/6694.png",
+        "https://c.basemaps.cartocdn.com/light_nolabels/14/13720/6694.png",
+        "https://a.basemaps.cartocdn.com/light_nolabels/14/13719/6693.png",
+        "https://b.basemaps.cartocdn.com/light_nolabels/14/13720/6693.png",
+        "https://c.basemaps.cartocdn.com/light_nolabels/14/13719/6695.png",
+        "https://a.basemaps.cartocdn.com/light_nolabels/14/13720/6695.png",
+        "https://a.basemaps.cartocdn.com/light_nolabels/14/13718/6694.png",
+        "https://a.basemaps.cartocdn.com/light_nolabels/14/13721/6694.png"
+      ]
+    },
+    {
+      "name": "timeline creates moving courier state",
+      "passed": true,
+      "detail": {
+        "timelineValue": "39",
+        "timelineLabel": "22:45",
+        "engineStatus": "leaflet-osm",
+        "frameId": "F-TS-2245",
+        "simulationTick": 2,
+        "lastLayerCounts": {
+          "activePanels": 2,
+          "markerCount": 38,
+          "routeCount": 2,
+          "motionCount": 2,
+          "tileErrors": 0
+        },
+        "lastMotionSummary": {
+          "movingCouriers": 2,
+          "avgSpeedKmh": 21.367312048588133
+        },
+        "movingMarkers": 2,
+        "motionTrails": 2,
+        "motionArrows": 2,
+        "tileErrors": 0,
+        "stageMotionCounts": [
+          1,
+          1
+        ],
+        "routeCounts": [
+          1,
+          1
+        ],
+        "markerCounts": [
+          19,
+          19
+        ]
+      }
+    },
+    {
+      "name": "controls keep engine stable after replay and rerun",
+      "passed": true,
+      "detail": {
+        "courierControl": "42",
+        "courierOutput": "42",
+        "engineStatus": "leaflet-osm",
+        "frameId": "F-TS-1000",
+        "simulationTick": 6,
+        "lastLayerCounts": {
+          "activePanels": 2,
+          "markerCount": 46,
+          "routeCount": 10,
+          "motionCount": 0,
+          "tileErrors": 0
+        },
+        "lastMotionSummary": {
+          "movingCouriers": 0,
+          "avgSpeedKmh": 0
+        },
+        "activeHighlightCards": 1,
+        "movingMarkers": 0,
+        "motionTrails": 0,
+        "motionArrows": 0,
+        "engineDetail": "courier control · 208 orders · 40 frames · leaflet-osm"
+      }
+    },
+    {
+      "name": "desktop has no horizontal overflow",
+      "passed": true,
+      "detail": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "clientWidth": 1600,
+        "clientHeight": 920,
+        "scrollWidth": 1600,
+        "scrollHeight": 1561,
+        "canScrollX": false
+      }
+    },
+    {
+      "name": "mobile has no horizontal overflow and real maps load",
+      "passed": true,
+      "detail": {
+        "engineStatus": "leaflet-osm",
+        "leafletContainers": 2,
+        "markerCount": 44,
+        "routeCount": 8,
+        "motionCount": 0,
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "canScrollX": false
+        },
+        "replayGrid": {
+          "x": 10,
+          "y": 1802.4140625,
+          "width": 370,
+          "height": 1544.375
+        },
+        "controls": {
+          "x": 10,
+          "y": 719.484375,
+          "width": 370,
+          "height": 570
+        },
+        "stageWidths": [
+          340,
+          340
+        ]
+      }
+    },
+    {
+      "name": "fallback works without Leaflet",
+      "passed": true,
+      "detail": {
+        "engineStatus": "fallback-schematic",
+        "fallbackReason": "Leaflet library unavailable",
+        "stageStatuses": [
+          "fallback-no-leaflet",
+          "fallback-no-leaflet"
+        ],
+        "leafletContainers": 0,
+        "schematicPins": 44,
+        "realMapDisplay": [
+          "none",
+          "none"
+        ],
+        "schematicDisplay": [
+          "block",
+          "block"
+        ]
+      }
+    },
+    {
+      "name": "no browser runtime errors",
+      "passed": true,
+      "detail": {
+        "desktopConsoleErrors": [],
+        "desktopPageErrors": [],
+        "mobileConsoleErrors": [],
+        "mobilePageErrors": [],
+        "fallbackConsoleErrors": [],
+        "fallbackPageErrors": []
+      }
+    },
+    {
+      "name": "mobile scrolled map evidence shows real map panels",
+      "passed": true,
+      "detail": {
+        "engineStatus": "leaflet-osm",
+        "leafletContainers": 2,
+        "markerCount": 44,
+        "routeCount": 8,
+        "mapStagesVisible": [
+          {
+            "id": "greedy-map-stage",
+            "x": 25,
+            "y": -167.8984375,
+            "width": 340,
+            "height": 280,
+            "intersectsViewport": true
+          },
+          {
+            "id": "autosolver-map-stage",
+            "x": 25,
+            "y": 611.2890625,
+            "width": 340,
+            "height": 280,
+            "intersectsViewport": true
+          }
+        ],
+        "viewport": {
+          "innerWidth": 390,
+          "innerHeight": 844,
+          "scrollY": 2152.5,
+          "scrollWidth": 390,
+          "clientWidth": 390
+        }
+      }
+    },
+    {
+      "name": "mobile scrolled map has no runtime errors",
+      "passed": true,
+      "detail": {
+        "consoleErrors": [],
+        "pageErrors": []
+      }
+    }
+  ],
+  "passed": true,
+  "mobileMapState": {
+    "engineStatus": "leaflet-osm",
+    "leafletContainers": 2,
+    "markerCount": 44,
+    "routeCount": 8,
+    "mapStagesVisible": [
+      {
+        "id": "greedy-map-stage",
+        "x": 25,
+        "y": -167.8984375,
+        "width": 340,
+        "height": 280,
+        "intersectsViewport": true
+      },
+      {
+        "id": "autosolver-map-stage",
+        "x": 25,
+        "y": 611.2890625,
+        "width": 340,
+        "height": 280,
+        "intersectsViewport": true
+      }
+    ],
+    "viewport": {
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "scrollY": 2152.5,
+      "scrollWidth": 390,
+      "clientWidth": 390
+    }
+  },
+  "updatedAt": "2026-06-25T11:46:17.932Z"
+}

@@ -343,6 +343,7 @@ def render_day_replay_index() -> str:
       background: #d8c49f;
     }}
     .map-stage[data-map-engine-status="leaflet-osm"] .schematic-layer {{
+      display: none;
       opacity: 0;
       visibility: hidden;
     }}
