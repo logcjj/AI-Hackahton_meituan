@@ -1,0 +1,699 @@
+{
+  "url": "http://127.0.0.1:8794/",
+  "qaInventory": [
+    "initial real OSM basemap in both algorithm panels",
+    "Leaflet runtime exposed at window.__AUTO_SOLVER_DAY_REPLAY__.realMapEngine",
+    "merchant/courier/order markers and assignment routes visible",
+    "timeline keyboard input updates frame and real-map engine state",
+    "play/pause interaction keeps real-map engine stable",
+    "no console errors or tile errors",
+    "viewport has no horizontal overflow and map regions are not clipped"
+  ],
+  "assertions": {
+    "ready": true,
+    "leafletLoaded": true,
+    "engineLeaflet": true,
+    "twoLeafletPanels": true,
+    "nonZeroMarkers": true,
+    "nonZeroRoutes": true,
+    "tilesLoaded": true,
+    "timelineUpdatedFrame": true,
+    "playbackKeepsEngineStable": true,
+    "noConsoleErrors": true,
+    "noHorizontalOverflow": true,
+    "visibleMapRegions": true
+  },
+  "passed": true,
+  "consoleMessages": [],
+  "pageErrors": [],
+  "initial": {
+    "label": "initial-load",
+    "title": "AutoSolver Agent - 全日配送模拟推演",
+    "ready": true,
+    "hasLeaflet": true,
+    "engineStatus": "leaflet-osm",
+    "engineLastFrameId": "F-TS-1000",
+    "engineCounts": {
+      "activePanels": 2,
+      "markerCount": 44,
+      "routeCount": 8,
+      "tileErrors": 0
+    },
+    "frameIndex": 0,
+    "frameLabel": "",
+    "engineTitle": "",
+    "engineDetail": "",
+    "mapRectsVisible": true,
+    "leafletContainerCount": 2,
+    "totalMarkers": 44,
+    "totalRoutes": 8,
+    "viewport": {
+      "innerWidth": 1600,
+      "innerHeight": 920,
+      "clientWidth": 1600,
+      "clientHeight": 920,
+      "scrollWidth": 1600,
+      "scrollHeight": 1566,
+      "canScrollX": false,
+      "canScrollY": true
+    },
+    "stages": [
+      {
+        "id": "greedy-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "openstreetmap",
+        "markerCount": 22,
+        "routeCount": 4,
+        "tileErrors": 0,
+        "hasLeafletContainer": true,
+        "leafletTileCount": 12,
+        "loadedTileCount": 11,
+        "markerEls": 22,
+        "routeEls": 4,
+        "fallbackOpacity": "0.18",
+        "rect": {
+          "x": 31,
+          "y": 724,
+          "width": 747,
+          "height": 331
+        },
+        "tiles": [
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13719/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13720/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13719/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13720/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13719/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13720/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13718/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13721/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13718/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13721/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13718/6695.png",
+            "complete": false,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13721/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          }
+        ]
+      },
+      {
+        "id": "autosolver-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "openstreetmap",
+        "markerCount": 22,
+        "routeCount": 4,
+        "tileErrors": 0,
+        "hasLeafletContainer": true,
+        "leafletTileCount": 12,
+        "loadedTileCount": 11,
+        "markerEls": 22,
+        "routeEls": 4,
+        "fallbackOpacity": "0.18",
+        "rect": {
+          "x": 822,
+          "y": 724,
+          "width": 747,
+          "height": 331
+        },
+        "tiles": [
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13719/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13720/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13719/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13720/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13719/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13720/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13718/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13721/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13718/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13721/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13718/6695.png",
+            "complete": false,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13721/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          }
+        ]
+      }
+    ]
+  },
+  "afterTimeline": {
+    "label": "after-keyboard-timeline",
+    "title": "AutoSolver Agent - 全日配送模拟推演",
+    "ready": true,
+    "hasLeaflet": true,
+    "engineStatus": "leaflet-osm",
+    "engineLastFrameId": "F-TS-1100",
+    "engineCounts": {
+      "activePanels": 2,
+      "markerCount": 46,
+      "routeCount": 10,
+      "tileErrors": 0
+    },
+    "frameIndex": 4,
+    "frameLabel": "",
+    "engineTitle": "",
+    "engineDetail": "",
+    "mapRectsVisible": true,
+    "leafletContainerCount": 2,
+    "totalMarkers": 46,
+    "totalRoutes": 10,
+    "viewport": {
+      "innerWidth": 1600,
+      "innerHeight": 920,
+      "clientWidth": 1600,
+      "clientHeight": 920,
+      "scrollWidth": 1600,
+      "scrollHeight": 1566,
+      "canScrollX": false,
+      "canScrollY": true
+    },
+    "stages": [
+      {
+        "id": "greedy-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "openstreetmap",
+        "markerCount": 23,
+        "routeCount": 5,
+        "tileErrors": 0,
+        "hasLeafletContainer": true,
+        "leafletTileCount": 12,
+        "loadedTileCount": 12,
+        "markerEls": 23,
+        "routeEls": 5,
+        "fallbackOpacity": "0.18",
+        "rect": {
+          "x": 31,
+          "y": 724,
+          "width": 747,
+          "height": 331
+        },
+        "tiles": [
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13719/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13720/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13719/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13720/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13719/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13720/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13718/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13721/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13718/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13721/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13718/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13721/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          }
+        ]
+      },
+      {
+        "id": "autosolver-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "openstreetmap",
+        "markerCount": 23,
+        "routeCount": 5,
+        "tileErrors": 0,
+        "hasLeafletContainer": true,
+        "leafletTileCount": 12,
+        "loadedTileCount": 12,
+        "markerEls": 23,
+        "routeEls": 5,
+        "fallbackOpacity": "0.18",
+        "rect": {
+          "x": 822,
+          "y": 724,
+          "width": 747,
+          "height": 331
+        },
+        "tiles": [
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13719/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13720/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13719/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13720/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13719/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13720/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13718/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13721/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13718/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13721/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13718/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13721/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          }
+        ]
+      }
+    ]
+  },
+  "afterPlayback": {
+    "label": "after-play-pause",
+    "title": "AutoSolver Agent - 全日配送模拟推演",
+    "ready": true,
+    "hasLeaflet": true,
+    "engineStatus": "leaflet-osm",
+    "engineLastFrameId": "F-TS-1130",
+    "engineCounts": {
+      "activePanels": 2,
+      "markerCount": 48,
+      "routeCount": 12,
+      "tileErrors": 0
+    },
+    "frameIndex": 6,
+    "frameLabel": "",
+    "engineTitle": "",
+    "engineDetail": "",
+    "mapRectsVisible": true,
+    "leafletContainerCount": 2,
+    "totalMarkers": 48,
+    "totalRoutes": 12,
+    "viewport": {
+      "innerWidth": 1600,
+      "innerHeight": 920,
+      "clientWidth": 1600,
+      "clientHeight": 920,
+      "scrollWidth": 1600,
+      "scrollHeight": 1583,
+      "canScrollX": false,
+      "canScrollY": true
+    },
+    "stages": [
+      {
+        "id": "greedy-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "openstreetmap",
+        "markerCount": 24,
+        "routeCount": 6,
+        "tileErrors": 0,
+        "hasLeafletContainer": true,
+        "leafletTileCount": 12,
+        "loadedTileCount": 12,
+        "markerEls": 24,
+        "routeEls": 6,
+        "fallbackOpacity": "0.18",
+        "rect": {
+          "x": 31,
+          "y": 724,
+          "width": 747,
+          "height": 331
+        },
+        "tiles": [
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13719/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13720/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13719/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13720/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13719/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13720/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13718/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13721/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13718/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13721/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13718/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13721/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          }
+        ]
+      },
+      {
+        "id": "autosolver-map-stage",
+        "status": "leaflet-osm",
+        "tileProvider": "openstreetmap",
+        "markerCount": 24,
+        "routeCount": 6,
+        "tileErrors": 0,
+        "hasLeafletContainer": true,
+        "leafletTileCount": 12,
+        "loadedTileCount": 12,
+        "markerEls": 24,
+        "routeEls": 6,
+        "fallbackOpacity": "0.18",
+        "rect": {
+          "x": 822,
+          "y": 724,
+          "width": 747,
+          "height": 331
+        },
+        "tiles": [
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13719/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13720/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13719/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13720/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13719/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13720/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13718/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://a.tile.openstreetmap.org/14/13721/6694.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13718/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://c.tile.openstreetmap.org/14/13721/6693.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13718/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          },
+          {
+            "src": "https://b.tile.openstreetmap.org/14/13721/6695.png",
+            "complete": true,
+            "naturalWidth": 256,
+            "naturalHeight": 256
+          }
+        ]
+      }
+    ]
+  },
+  "screenshots": [
+    "goal/goal-14/task3-browser-initial.png",
+    "goal/goal-14/task3-browser-timeline.png"
+  ]
+}

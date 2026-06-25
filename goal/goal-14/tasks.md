@@ -44,7 +44,7 @@ Confidence loop:
 
 ## Task 3 - Tests And Browser Verification
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Focused/full tests pass.
@@ -52,10 +52,20 @@ Independent verification:
 - Sensitive scan is clean.
 
 Work log:
--
+- Verified current service is running on `http://127.0.0.1:8794/` and serving the Leaflet/OpenStreetMap map markers.
+- Ran full automated suite with `uv run --with pytest pytest`: 103 passed.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`: passed.
+- Ran business-code sensitive scan excluding `goal/**`, `output/**`, and `.playwright-cli/**` for supplied key/domain/model patterns: zero matches.
+- Ran real browser QA in system Chrome using Playwright with normal keyboard/click inputs.
+- Verified initial browser state: `window.L` exists, `realMapEngine.status` is `leaflet-osm`, both map panels have Leaflet containers, marker count is 44, route count is 8, tile errors are 0, console/page errors are 0.
+- Verified timeline keyboard input updates engine state from `F-TS-1000` to `F-TS-1100`; marker count updates to 46 and route count updates to 10.
+- Verified play/pause interaction keeps the Leaflet map engine stable at `leaflet-osm` with non-zero markers/routes.
+- Verified viewport has no horizontal overflow and both map regions are visible without clipping in the checked 1600x920 viewport.
+- Captured browser audit JSON at `goal/goal-14/task3-browser-audit.json`.
+- Captured visual evidence at `goal/goal-14/task3-browser-initial.png` and `goal/goal-14/task3-browser-timeline.png`.
 
 Confidence loop:
--
+- 100% confidence for Task 3 scope: focused and full tests pass, browser evidence proves the real map engine and visible map layers before and after user interaction, screenshots confirm this is not the old schematic-only map, and sensitive business-code scan is clean.
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
