@@ -343,8 +343,8 @@ def render_day_replay_index() -> str:
       background: #d8c49f;
     }}
     .map-stage[data-map-engine-status="leaflet-osm"] .schematic-layer {{
-      opacity: .18;
-      mix-blend-mode: multiply;
+      opacity: 0;
+      visibility: hidden;
     }}
     .map-stage[data-map-engine-status^="fallback"] .real-map-engine {{
       display: none;
@@ -372,17 +372,46 @@ def render_day_replay_index() -> str:
       border: 2px solid rgba(255, 255, 255, .92);
       box-shadow: 0 10px 22px rgba(0, 0, 0, .28);
       font: 900 12px var(--ui);
+      transition: transform .65s cubic-bezier(.2, .86, .24, 1), filter .2s ease;
     }}
     .real-map-marker.merchant {{ background: var(--gold); }}
     .real-map-marker.courier {{ background: var(--blue); }}
     .agent .real-map-marker.courier {{ background: var(--green); }}
     .real-map-marker.order {{ background: var(--red); width: 24px; height: 24px; font-size: 10px; }}
+    .real-map-marker.moving {{
+      animation: rider-pulse 1.25s ease-in-out infinite;
+    }}
+    .real-map-marker .motion-arrow {{
+      position: absolute;
+      width: 0;
+      height: 0;
+      left: 50%;
+      top: -9px;
+      transform: translateX(-50%) rotate(var(--heading, 0deg));
+      transform-origin: 50% 16px;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 10px solid rgba(255, 243, 214, .95);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .28));
+    }}
     .real-map-marker.highlight {{
       outline: 4px solid rgba(255, 243, 214, .92);
       filter: drop-shadow(0 0 8px rgba(255, 243, 214, .78));
     }}
+    .courier-motion-trail {{
+      stroke-dasharray: 4 8;
+      animation: route-flow .85s linear infinite;
+      filter: drop-shadow(0 0 5px rgba(255, 243, 214, .72));
+    }}
     .real-map-route-highlight {{
       filter: drop-shadow(0 0 8px rgba(255, 243, 214, .8));
+    }}
+    @keyframes rider-pulse {{
+      0%, 100% {{ box-shadow: 0 10px 22px rgba(0, 0, 0, .28), 0 0 0 0 rgba(255, 243, 214, .55); }}
+      50% {{ box-shadow: 0 10px 22px rgba(0, 0, 0, .28), 0 0 0 9px rgba(255, 243, 214, 0); }}
+    }}
+    @keyframes route-flow {{
+      to {{ stroke-dashoffset: -24; }}
     }}
     .district {{
       position: absolute;
@@ -659,8 +688,8 @@ def render_day_replay_index() -> str:
         <p>重新抛弃旧前端小沙盘，把核心放在一天订单流、跨时间片推演、纯贪心和 AutoSolver 并排对比、指标节省、推理流程与 Memory 自进化。</p>
       </div>
       <aside class="hero-badge" id="engine-status">
-        <b>本地确定性仿真引擎</b>
-        <span>先使用 native discrete-event engine，后续可接 UXsim / SUMO adapter seam。所有 LLM 配置只走 env-only-redacted。</span>
+        <b id="engine-status-title">本地确定性仿真引擎</b>
+        <span id="engine-status-detail">先使用 native discrete-event engine，后续可接 UXsim / SUMO adapter seam。所有 LLM 配置只走 env-only-redacted。</span>
       </aside>
     </header>
 
@@ -751,7 +780,7 @@ def render_day_replay_index() -> str:
           </div>
           <span class="algorithm-pill">nearest_greedy</span>
         </div>
-        <div class="map-stage" id="greedy-map-stage" aria-label="贪心算法地图推演" data-map-engine-status="pending" data-tile-provider="openstreetmap" data-marker-count="0" data-route-count="0"></div>
+        <div class="map-stage" id="greedy-map-stage" aria-label="贪心算法地图推演" data-map-engine-status="pending" data-tile-provider="cartodb-nolabels" data-marker-count="0" data-route-count="0" data-motion-count="0"></div>
         <div class="theater-foot" id="greedy-metrics"></div>
       </article>
 
@@ -764,7 +793,7 @@ def render_day_replay_index() -> str:
           </div>
           <span class="algorithm-pill">autosolver_agent</span>
         </div>
-        <div class="map-stage" id="autosolver-map-stage" aria-label="AutoSolver 地图推演" data-map-engine-status="pending" data-tile-provider="openstreetmap" data-marker-count="0" data-route-count="0"></div>
+        <div class="map-stage" id="autosolver-map-stage" aria-label="AutoSolver 地图推演" data-map-engine-status="pending" data-tile-provider="cartodb-nolabels" data-marker-count="0" data-route-count="0" data-motion-count="0"></div>
         <div class="theater-foot" id="autosolver-metrics"></div>
       </article>
     </section>
@@ -808,10 +837,12 @@ def render_day_replay_index() -> str:
       highlight: {{orderIds: [], courierIds: [], sourceLabel: "current frame"}},
       realMapEngine: {{
         provider: "leaflet",
-        tileProvider: "OpenStreetMap",
-        tileUrl: "https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png",
+        tileProvider: "CartoDB Positron NoLabels",
+        tileUrl: "https://{{s}}.basemaps.cartocdn.com/light_nolabels/{{z}}/{{x}}/{{y}}{{r}}.png",
         status: "pending",
         fallbackReason: "",
+        simulationTick: 0,
+        lastMotionSummary: {{movingCouriers: 0, avgSpeedKmh: 0}},
         panels: {{}}
       }}
     }};
@@ -998,7 +1029,7 @@ def render_day_replay_index() -> str:
         return `<path class="${{isHot ? "highlight-route" : ""}}" data-order-id="${{escapeText(route.order_id, "")}}" data-courier-id="${{escapeText(route.courier_id, "")}}" d="${{routePath(route)}}"></path>`;
       }}).join("");
       return `
-        <div class="real-map-engine" data-real-map-engine="leaflet" data-map-engine-status="pending" data-tile-provider="openstreetmap" data-marker-count="0" data-route-count="0" aria-label="Leaflet OpenStreetMap real map engine"></div>
+        <div class="real-map-engine" data-real-map-engine="leaflet" data-map-engine-status="pending" data-tile-provider="cartodb-nolabels" data-marker-count="0" data-route-count="0" data-motion-count="0" aria-label="Leaflet no-label real map engine"></div>
         <div class="schematic-layer" aria-hidden="true">
         <div class="map-hud">
           <span>${{escapeText(timeSlice.label || frame.time_slice_id)}}</span>
@@ -1032,6 +1063,31 @@ def render_day_replay_index() -> str:
       return [lat, lng];
     }}
 
+    function distanceMeters(fromPoint, toPoint) {{
+      if (!fromPoint || !toPoint) return 0;
+      const latMeters = (toPoint[0] - fromPoint[0]) * 111_320;
+      const lngMeters = (toPoint[1] - fromPoint[1]) * 111_320 * Math.cos(((fromPoint[0] + toPoint[0]) / 2) * Math.PI / 180);
+      return Math.sqrt(latMeters * latMeters + lngMeters * lngMeters);
+    }}
+
+    function headingDeg(fromPoint, toPoint) {{
+      if (!fromPoint || !toPoint) return 0;
+      return Math.round(Math.atan2(toPoint[1] - fromPoint[1], toPoint[0] - fromPoint[0]) * 180 / Math.PI + 90);
+    }}
+
+    function frameIndexFor(frame) {{
+      const found = replayState.contract.frames.findIndex((item) => item.id === frame.id);
+      return found >= 0 ? found : replayState.frameIndex;
+    }}
+
+    function previousCourierPositions(frame, lane) {{
+      const index = frameIndexFor(frame);
+      if (index <= 0) return new Map();
+      const previousFrame = replayState.contract.frames[index - 1];
+      const previousAlgorithmFrame = lane === "agent" ? previousFrame.challenger : previousFrame.baseline;
+      return new Map((previousAlgorithmFrame.courier_positions || []).map((courier) => [courier.courier_id, latLng(courier.position)]));
+    }}
+
     function removeRealMapPanel(stageId) {{
       const panel = replayState.realMapEngine.panels[stageId];
       if (panel && panel.map) {{
@@ -1041,12 +1097,15 @@ def render_day_replay_index() -> str:
       delete replayState.realMapEngine.panels[stageId];
     }}
 
-    function realMapIcon(kind, label, highlighted) {{
+    function realMapIcon(kind, label, highlighted, motion = {{}}) {{
+      const movingClass = motion.moving ? " moving" : "";
+      const arrow = motion.moving ? `<span class="motion-arrow" style="transform: translateX(-50%) rotate(${{Number(motion.headingDeg || 0)}}deg)" aria-hidden="true"></span>` : "";
       return L.divIcon({{
-        className: `real-map-marker ${{kind}}${{highlighted ? " highlight" : ""}}`,
-        html: escapeText(label, kind.slice(0, 1)),
+        className: `real-map-marker ${{kind}}${{highlighted ? " highlight" : ""}}${{movingClass}}`,
+        html: `<span>${{escapeText(label, kind.slice(0, 1))}}</span>${{arrow}}`,
         iconSize: kind === "order" ? [24, 24] : [30, 30],
-        iconAnchor: kind === "order" ? [12, 12] : [15, 15]
+        iconAnchor: kind === "order" ? [12, 12] : [15, 15],
+        popupAnchor: [0, -14]
       }});
     }}
 
@@ -1074,37 +1133,59 @@ def render_day_replay_index() -> str:
       }});
       const layerGroup = L.layerGroup().addTo(map);
       const bounds = L.latLngBounds([]);
+      const motionAnimations = [];
+      const motionSpeeds = [];
       let markerCount = 0;
       let routeCount = 0;
+      let motionCount = 0;
       let tileErrors = 0;
 
       const tileLayer = L.tileLayer(replayState.realMapEngine.tileUrl, {{
         maxZoom: 18,
         minZoom: 11,
-        attribution: "© OpenStreetMap contributors",
-        className: "osm-real-map-tiles"
+        attribution: "© OpenStreetMap contributors © CARTO",
+        className: "osm-real-map-tiles no-label-real-map-tiles"
       }});
       tileLayer.on("tileerror", () => {{
         tileErrors += 1;
         stage.dataset.tileErrors = String(tileErrors);
-        replayState.realMapEngine.fallbackReason = "OpenStreetMap tile request failed";
+        replayState.realMapEngine.fallbackReason = "No-label basemap tile request failed";
       }});
       tileLayer.addTo(map);
 
-      function addMarker(position, kind, label, highlighted, title) {{
+      function addMarker(position, kind, label, highlighted, title, motion = {{}}) {{
         const point = latLng(position);
         if (!point) return;
-        const marker = L.marker(point, {{icon: realMapIcon(kind, label, highlighted), title: title || label}});
+        const startPoint = motion.fromPoint || point;
+        const moving = Boolean(motion.fromPoint && distanceMeters(motion.fromPoint, point) > 4);
+        const heading = moving ? headingDeg(motion.fromPoint, point) : 0;
+        const marker = L.marker(startPoint, {{icon: realMapIcon(kind, label, highlighted, {{moving, headingDeg: heading}}), title: title || label}});
         marker.addTo(layerGroup);
         bounds.extend(point);
+        if (moving) {{
+          bounds.extend(startPoint);
+          const meters = distanceMeters(startPoint, point);
+          motionSpeeds.push(meters / 90 * 3.6);
+          motionCount += 1;
+          L.polyline([startPoint, point], {{
+            color: lane === "agent" ? "#2f7054" : "#b54435",
+            weight: 4,
+            opacity: .62,
+            className: "courier-motion-trail"
+          }}).addTo(layerGroup);
+          motionAnimations.push(() => marker.setLatLng(point));
+        }}
         markerCount += 1;
       }}
 
       replayState.contract.merchants.slice(0, 8).forEach((merchant) => {{
         addMarker(merchant.position, "merchant", "商", false, merchant.id);
       }});
+      const previousPositions = previousCourierPositions(frame, lane);
       (algorithmFrame.courier_positions || []).slice(0, 10).forEach((courier) => {{
-        addMarker(courier.position, "courier", "骑", highlightedCouriers.has(courier.courier_id), courier.courier_id);
+        addMarker(courier.position, "courier", "骑", highlightedCouriers.has(courier.courier_id), courier.courier_id, {{
+          fromPoint: previousPositions.get(courier.courier_id)
+        }});
       }});
       const orderIds = new Set(algorithmFrame.active_order_ids || []);
       replayState.contract.orders.filter((order) => orderIds.has(order.id)).slice(0, 10).forEach((order) => {{
@@ -1132,31 +1213,40 @@ def render_day_replay_index() -> str:
       }}
 
       stage.dataset.mapEngineStatus = "leaflet-osm";
-      stage.dataset.tileProvider = "openstreetmap";
+      stage.dataset.tileProvider = "cartodb-nolabels";
       stage.dataset.markerCount = String(markerCount);
       stage.dataset.routeCount = String(routeCount);
+      stage.dataset.motionCount = String(motionCount);
       target.dataset.mapEngineStatus = "leaflet-osm";
       target.dataset.markerCount = String(markerCount);
       target.dataset.routeCount = String(routeCount);
-      replayState.realMapEngine.panels[stageId] = {{map, layerGroup, tileLayer, markerCount, routeCount, tileErrors, frameId: frame.id, disposed: false}};
+      target.dataset.motionCount = String(motionCount);
+      const avgSpeedKmh = motionSpeeds.length ? motionSpeeds.reduce((sum, value) => sum + value, 0) / motionSpeeds.length : 0;
+      replayState.realMapEngine.panels[stageId] = {{map, layerGroup, tileLayer, markerCount, routeCount, motionCount, avgSpeedKmh, tileErrors, frameId: frame.id, disposed: false}};
       window.setTimeout(() => {{
         const currentPanel = replayState.realMapEngine.panels[stageId];
         if (!currentPanel || currentPanel.map !== map || currentPanel.disposed || !target.isConnected) return;
         try {{ map.invalidateSize(false); }} catch (error) {{ stage.dataset.mapEngineWarning = "invalidate-size-skipped"; }}
+        motionAnimations.forEach((animate) => animate());
       }}, 80);
-      return {{stageId, status: "leaflet-osm", markerCount, routeCount, tileErrors}};
+      return {{stageId, status: "leaflet-osm", markerCount, routeCount, motionCount, avgSpeedKmh, tileErrors}};
     }}
 
     function setRealMapEngineStatus(frame, summaries) {{
       const activePanels = summaries.filter((item) => item.status === "leaflet-osm").length;
       const markerCount = summaries.reduce((total, item) => total + Number(item.markerCount || 0), 0);
       const routeCount = summaries.reduce((total, item) => total + Number(item.routeCount || 0), 0);
+      const motionCount = summaries.reduce((total, item) => total + Number(item.motionCount || 0), 0);
+      const speedSamples = summaries.map((item) => Number(item.avgSpeedKmh || 0)).filter((value) => value > 0);
+      const avgSpeedKmh = speedSamples.length ? speedSamples.reduce((sum, value) => sum + value, 0) / speedSamples.length : 0;
       const tileErrors = summaries.reduce((total, item) => total + Number(item.tileErrors || 0), 0);
+      replayState.realMapEngine.simulationTick += 1;
       replayState.realMapEngine.status = activePanels ? "leaflet-osm" : "fallback-schematic";
       replayState.realMapEngine.lastFrameId = frame.id;
-      replayState.realMapEngine.lastLayerCounts = {{activePanels, markerCount, routeCount, tileErrors}};
-      const title = activePanels ? "Leaflet OSM real map engine" : "Fallback schematic map engine";
-      const detail = `${{activePanels}}/2 panels · markers ${{markerCount}} · routes ${{routeCount}} · frame ${{frame.id}}${{tileErrors ? ` · tile errors ${{tileErrors}}` : ""}}`;
+      replayState.realMapEngine.lastLayerCounts = {{activePanels, markerCount, routeCount, motionCount, tileErrors}};
+      replayState.realMapEngine.lastMotionSummary = {{movingCouriers: motionCount, avgSpeedKmh}};
+      const title = activePanels ? "Leaflet no-label simulation engine" : "Fallback schematic map engine";
+      const detail = `${{activePanels}}/2 panels · tick ${{replayState.realMapEngine.simulationTick}} · moving ${{motionCount}} · markers ${{markerCount}} · routes ${{routeCount}} · frame ${{frame.id}}${{avgSpeedKmh ? ` · avg ${{avgSpeedKmh.toFixed(1)}}km/h` : ""}}${{tileErrors ? ` · tile errors ${{tileErrors}}` : ""}}`;
       setEngineStatus(title, detail);
     }}
 

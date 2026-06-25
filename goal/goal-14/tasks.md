@@ -96,3 +96,37 @@ Work log:
 
 Confidence loop:
 - 100% confidence for Debug Cycle 1 scope: the debug cycle found and fixed a real runtime race, then re-ran compile checks, focused tests, full tests, sensitive scan, real browser interaction QA, fallback QA, and visual screenshot review with all final gates passing.
+
+## Task 4 - Improve Simulation Feel And Suppress Map Place Labels
+
+Status: Completed
+
+Independent verification:
+- Courier movement should feel like a live simulator instead of static marker jumps.
+- Real map base should suppress or materially reduce visible place-name labels.
+- The engine UI should expose simulation tick/motion state, not only static layer counts.
+- Existing fallback and tests remain stable.
+
+Work log:
+- Replaced the real-map tile layer with CartoDB `light_nolabels` tiles so the map keeps the street structure but removes most place-name clutter.
+- Hid the schematic overlay entirely in real-map mode so the OSM/Carto base is not washed out by the old grid fallback.
+- Added courier motion feel: previous-frame courier positions are used to render motion trails, moving marker state, and directional arrows instead of static jumps only.
+- Added simulation-facing state on `replayState.realMapEngine`: `simulationTick` and `lastMotionSummary`.
+- Exposed `data-motion-count` and runtime motion state in the real-map DOM and engine-status badge.
+- Updated the static replay shell tests to assert no-label tiles, motion trail classes, motion state, and the new engine status IDs.
+- Verified with `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`: passed.
+- Verified with `uv run --with pytest pytest tests/test_web_agent_demo.py tests/test_day_simulation_contract.py tests/test_day_simulation_comparison.py tests/test_day_engine_adapters.py tests/test_simulation_api_contract.py`: 29 passed.
+- Verified with `uv run --with pytest pytest`: 103 passed.
+- Started the local service on `http://127.0.0.1:8794/` and confirmed the new no-label tile source is being served from the frontend.
+- Ran browser QA in system Chrome with normal user input and confirmed:
+  - initial real-map view uses no-label Carto tiles and keeps the map visible;
+  - timeline interaction increases `simulationTick` and produces `motionCount > 0`;
+  - moving couriers, motion trails, and motion arrows are visible after timeline advance;
+  - play/pause keeps the motion engine stable;
+  - no console/page errors were emitted;
+  - no horizontal overflow occurred.
+- Captured browser evidence at `goal/goal-14/task4-no-label-initial.png` and `goal/goal-14/task4-motion-after-timeline.png`.
+- Captured audit JSON at `goal/goal-14/task4-motion-audit.json`.
+
+Confidence loop:
+- 100% confidence for Task 4 scope: the map now reads as a true simulation rather than a static marker board, the visible label clutter has been removed, and the no-label base plus motion feedback were proven in both automated and browser QA.

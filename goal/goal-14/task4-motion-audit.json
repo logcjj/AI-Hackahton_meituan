@@ -1,0 +1,292 @@
+{
+  "passed": true,
+  "assertions": {
+    "noLabelTiles": true,
+    "schematicHiddenInRealMode": true,
+    "initialRealMapStillVisible": true,
+    "motionAppearsAfterTimeline": true,
+    "motionStateExposed": true,
+    "playPauseKeepsMotionEngine": true,
+    "noRuntimeErrors": true,
+    "noHorizontalOverflow": true
+  },
+  "userFeedback": "骑手仿真效果太木；需要更像真实仿真器；地图地名可以抹去。",
+  "states": {
+    "initial": {
+      "label": "initial-no-label",
+      "ready": true,
+      "engineStatus": "leaflet-osm",
+      "provider": "leaflet",
+      "tileProvider": "CartoDB Positron NoLabels",
+      "tileUrl": "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+      "simulationTick": 1,
+      "motionSummary": {
+        "movingCouriers": 0,
+        "avgSpeedKmh": 0
+      },
+      "layerCounts": {
+        "activePanels": 2,
+        "markerCount": 44,
+        "routeCount": 8,
+        "motionCount": 0,
+        "tileErrors": 0
+      },
+      "frameId": "F-TS-1000",
+      "frameIndex": 0,
+      "engineTitle": "Leaflet no-label simulation engine",
+      "engineDetail": "2/2 panels · tick 1 · moving 0 · markers 44 · routes 8 · frame F-TS-1000",
+      "totalMovingMarkers": 0,
+      "totalMotionTrails": 0,
+      "totalArrows": 0,
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markerCount": 22,
+          "routeCount": 4,
+          "motionCount": 0,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "realMarkers": 22,
+          "movingMarkers": 0,
+          "motionTrails": 0,
+          "arrows": 0,
+          "schematicOpacity": "0",
+          "schematicVisibility": "hidden",
+          "tileHosts": [
+            "b.basemaps.cartocdn.com",
+            "c.basemaps.cartocdn.com",
+            "a.basemaps.cartocdn.com"
+          ],
+          "tilePaths": [
+            "/light_nolabels/14/13719/6694.png",
+            "/light_nolabels/14/13720/6694.png",
+            "/light_nolabels/14/13719/6693.png",
+            "/light_nolabels/14/13720/6693.png"
+          ],
+          "loadedTileCount": 12
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markerCount": 22,
+          "routeCount": 4,
+          "motionCount": 0,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "realMarkers": 22,
+          "movingMarkers": 0,
+          "motionTrails": 0,
+          "arrows": 0,
+          "schematicOpacity": "0",
+          "schematicVisibility": "hidden",
+          "tileHosts": [
+            "b.basemaps.cartocdn.com",
+            "c.basemaps.cartocdn.com",
+            "a.basemaps.cartocdn.com"
+          ],
+          "tilePaths": [
+            "/light_nolabels/14/13719/6694.png",
+            "/light_nolabels/14/13720/6694.png",
+            "/light_nolabels/14/13719/6693.png",
+            "/light_nolabels/14/13720/6693.png"
+          ],
+          "loadedTileCount": 12
+        }
+      ],
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "canScrollX": false
+      }
+    },
+    "afterTimeline": {
+      "label": "after-timeline-motion",
+      "ready": true,
+      "engineStatus": "leaflet-osm",
+      "provider": "leaflet",
+      "tileProvider": "CartoDB Positron NoLabels",
+      "tileUrl": "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+      "simulationTick": 7,
+      "motionSummary": {
+        "movingCouriers": 10,
+        "avgSpeedKmh": 16.319811587309538
+      },
+      "layerCounts": {
+        "activePanels": 2,
+        "markerCount": 48,
+        "routeCount": 12,
+        "motionCount": 10,
+        "tileErrors": 0
+      },
+      "frameId": "F-TS-1130",
+      "frameIndex": 6,
+      "engineTitle": "Leaflet no-label simulation engine",
+      "engineDetail": "2/2 panels · tick 7 · moving 10 · markers 48 · routes 12 · frame F-TS-1130 · avg 16.3km/h",
+      "totalMovingMarkers": 10,
+      "totalMotionTrails": 10,
+      "totalArrows": 10,
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markerCount": 24,
+          "routeCount": 6,
+          "motionCount": 4,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "realMarkers": 24,
+          "movingMarkers": 4,
+          "motionTrails": 4,
+          "arrows": 4,
+          "schematicOpacity": "0",
+          "schematicVisibility": "hidden",
+          "tileHosts": [
+            "b.basemaps.cartocdn.com",
+            "c.basemaps.cartocdn.com",
+            "a.basemaps.cartocdn.com"
+          ],
+          "tilePaths": [
+            "/light_nolabels/14/13719/6694.png",
+            "/light_nolabels/14/13720/6694.png",
+            "/light_nolabels/14/13719/6693.png",
+            "/light_nolabels/14/13720/6693.png"
+          ],
+          "loadedTileCount": 12
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markerCount": 24,
+          "routeCount": 6,
+          "motionCount": 6,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "realMarkers": 24,
+          "movingMarkers": 6,
+          "motionTrails": 6,
+          "arrows": 6,
+          "schematicOpacity": "0",
+          "schematicVisibility": "hidden",
+          "tileHosts": [
+            "b.basemaps.cartocdn.com",
+            "c.basemaps.cartocdn.com",
+            "a.basemaps.cartocdn.com"
+          ],
+          "tilePaths": [
+            "/light_nolabels/14/13719/6694.png",
+            "/light_nolabels/14/13720/6694.png",
+            "/light_nolabels/14/13719/6693.png",
+            "/light_nolabels/14/13720/6693.png"
+          ],
+          "loadedTileCount": 12
+        }
+      ],
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "canScrollX": false
+      }
+    },
+    "afterPlayPause": {
+      "label": "after-play-pause-motion",
+      "ready": true,
+      "engineStatus": "leaflet-osm",
+      "provider": "leaflet",
+      "tileProvider": "CartoDB Positron NoLabels",
+      "tileUrl": "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+      "simulationTick": 9,
+      "motionSummary": {
+        "movingCouriers": 12,
+        "avgSpeedKmh": 16.154411779477144
+      },
+      "layerCounts": {
+        "activePanels": 2,
+        "markerCount": 54,
+        "routeCount": 16,
+        "motionCount": 12,
+        "tileErrors": 0
+      },
+      "frameId": "F-TS-1200",
+      "frameIndex": 8,
+      "engineTitle": "推演已暂停",
+      "engineDetail": "frame 9/40",
+      "totalMovingMarkers": 12,
+      "totalMotionTrails": 12,
+      "totalArrows": 12,
+      "stages": [
+        {
+          "id": "greedy-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markerCount": 27,
+          "routeCount": 8,
+          "motionCount": 5,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "realMarkers": 27,
+          "movingMarkers": 5,
+          "motionTrails": 5,
+          "arrows": 5,
+          "schematicOpacity": "0",
+          "schematicVisibility": "hidden",
+          "tileHosts": [
+            "b.basemaps.cartocdn.com",
+            "c.basemaps.cartocdn.com",
+            "a.basemaps.cartocdn.com"
+          ],
+          "tilePaths": [
+            "/light_nolabels/14/13719/6694.png",
+            "/light_nolabels/14/13720/6694.png",
+            "/light_nolabels/14/13719/6693.png",
+            "/light_nolabels/14/13720/6693.png"
+          ],
+          "loadedTileCount": 12
+        },
+        {
+          "id": "autosolver-map-stage",
+          "status": "leaflet-osm",
+          "tileProvider": "cartodb-nolabels",
+          "markerCount": 27,
+          "routeCount": 8,
+          "motionCount": 7,
+          "tileErrors": 0,
+          "mapEngineWarning": "",
+          "realMarkers": 27,
+          "movingMarkers": 7,
+          "motionTrails": 7,
+          "arrows": 7,
+          "schematicOpacity": "0",
+          "schematicVisibility": "hidden",
+          "tileHosts": [
+            "b.basemaps.cartocdn.com",
+            "c.basemaps.cartocdn.com",
+            "a.basemaps.cartocdn.com"
+          ],
+          "tilePaths": [
+            "/light_nolabels/14/13719/6694.png",
+            "/light_nolabels/14/13720/6694.png",
+            "/light_nolabels/14/13719/6693.png",
+            "/light_nolabels/14/13720/6693.png"
+          ],
+          "loadedTileCount": 12
+        }
+      ],
+      "viewport": {
+        "innerWidth": 1600,
+        "innerHeight": 920,
+        "canScrollX": false
+      }
+    }
+  },
+  "consoleMessages": [],
+  "pageErrors": [],
+  "screenshots": [
+    "goal/goal-14/task4-no-label-initial.png",
+    "goal/goal-14/task4-motion-after-timeline.png"
+  ]
+}
