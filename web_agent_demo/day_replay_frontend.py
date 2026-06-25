@@ -69,10 +69,10 @@ def render_day_replay_index() -> str:
       min-height: 100vh;
       padding: 16px;
       display: grid;
-      grid-template-rows: auto auto auto minmax(540px, auto) auto;
+      grid-template-rows: auto auto auto auto minmax(540px, auto) auto;
       gap: 14px;
     }}
-    .hero, .kpi-strip, .control-strip, .replay-grid, .bottom-grid {{
+    .hero, .kpi-strip, .control-strip, .advantage-board, .replay-grid, .bottom-grid {{
       width: min(1720px, 100%);
       margin: 0 auto;
     }}
@@ -226,6 +226,48 @@ def render_day_replay_index() -> str:
       background: rgba(255, 243, 214, .14);
       border: 1px solid rgba(255, 243, 214, .16);
       box-shadow: none;
+    }}
+    .advantage-board {{
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }}
+    .advantage-card {{
+      min-height: 112px;
+      padding: 14px;
+      border: 1px solid rgba(255, 243, 214, .18);
+      border-radius: 22px;
+      color: var(--paper-strong);
+      background:
+        linear-gradient(145deg, rgba(23, 59, 49, .72), rgba(35, 25, 15, .78)),
+        radial-gradient(circle at 18% 10%, rgba(216, 154, 55, .18), transparent 42%);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, .18);
+    }}
+    .advantage-card[data-advantage-card="greedy_failure"] {{
+      background:
+        linear-gradient(145deg, rgba(111, 35, 27, .74), rgba(35, 25, 15, .82)),
+        radial-gradient(circle at 18% 10%, rgba(216, 154, 55, .14), transparent 42%);
+    }}
+    .advantage-card small {{
+      display: block;
+      margin-bottom: 9px;
+      color: rgba(255, 243, 214, .58);
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      font: 800 11px var(--mono);
+    }}
+    .advantage-card strong {{
+      display: block;
+      margin-bottom: 8px;
+      font: 900 24px var(--serif);
+      letter-spacing: -.04em;
+      line-height: 1.05;
+    }}
+    .advantage-card span {{
+      display: block;
+      color: rgba(255, 243, 214, .72);
+      font-size: 12px;
+      line-height: 1.42;
     }}
     .replay-grid {{
       min-height: 540px;
@@ -540,6 +582,7 @@ def render_day_replay_index() -> str:
       .day-replay-shell {{ height: auto; min-height: 100vh; }}
       .hero, .control-strip, .replay-grid, .bottom-grid {{ grid-template-columns: 1fr; }}
       .kpi-strip {{ grid-template-columns: repeat(3, 1fr); }}
+      .advantage-board {{ grid-template-columns: 1fr 1fr; }}
       .control-actions {{ min-height: 58px; }}
       .algorithm-theater {{ min-height: 560px; }}
       .memory-stack {{ grid-template-columns: 1fr; }}
@@ -549,6 +592,7 @@ def render_day_replay_index() -> str:
       .hero {{ grid-template-columns: 1fr; border-radius: 22px; }}
       .hero-badge {{ min-width: 0; }}
       .kpi-strip {{ grid-template-columns: 1fr 1fr; }}
+      .advantage-board {{ grid-template-columns: 1fr; }}
       .control-strip {{ padding: 8px; }}
       .control-actions {{ grid-template-columns: 1fr; }}
       .theater-head, .theater-foot {{ grid-template-columns: 1fr; }}
@@ -622,6 +666,29 @@ def render_day_replay_index() -> str:
         <button id="pause-replay" class="secondary">暂停</button>
         <button id="compare-algorithms">生成对比</button>
       </div>
+    </section>
+
+    <section class="advantage-board" id="advantage-board" aria-label="Why AutoSolver Wins / AutoSolver 优势解释">
+      <article class="advantage-card" data-advantage-card="current_pressure">
+        <small>Current Pressure</small>
+        <strong id="advantage-pressure">--</strong>
+        <span id="advantage-pressure-detail">等待时间片数据</span>
+      </article>
+      <article class="advantage-card" data-advantage-card="greedy_failure">
+        <small>Greedy Failure</small>
+        <strong id="advantage-greedy-failure">--</strong>
+        <span id="advantage-greedy-detail">等待贪心基线评估</span>
+      </article>
+      <article class="advantage-card" data-advantage-card="agent_advantage">
+        <small>Agent Advantage</small>
+        <strong id="advantage-agent">--</strong>
+        <span id="advantage-agent-detail">等待 AutoSolver 策略评估</span>
+      </article>
+      <article class="advantage-card" data-advantage-card="full_day_savings">
+        <small>Full-Day Savings</small>
+        <strong id="advantage-savings">--</strong>
+        <span id="advantage-savings-detail">等待全日累计指标</span>
+      </article>
     </section>
 
     <section class="replay-grid" id="side-by-side-replay" aria-label="左右同步算法仿真">
@@ -743,6 +810,10 @@ def render_day_replay_index() -> str:
     function traceForFrame(frame) {{
       const tracesById = new Map(replayState.contract.reasoning_traces.map((trace) => [trace.id, trace]));
       return tracesById.get((frame.reasoning_trace_ids || [])[0]);
+    }}
+
+    function timeSliceForFrame(frame) {{
+      return replayState.contract.time_slices.find((item) => item.id === frame.time_slice_id) || {{}};
     }}
 
     function finalDelta() {{
@@ -966,6 +1037,43 @@ def render_day_replay_index() -> str:
       $("timeline-label").textContent = clock(frame.sim_time_s);
     }}
 
+    function greedyFailureMode(timeSlice) {{
+      const congestion = Number(timeSlice.congestion_level || 0);
+      const supply = Number(timeSlice.courier_supply || 0);
+      const orderCount = (timeSlice.order_ids || []).length;
+      if (congestion >= 0.68) return "拥堵带里追最近距离";
+      if (supply > 0 && orderCount / supply >= 2.2) return "供给吃紧仍抢近单";
+      if ((timeSlice.shock_ids || []).some((id) => String(id).includes("merchant-burst"))) return "商家爆单时缺少缓冲";
+      if (timeSlice.weather && timeSlice.weather !== "clear") return "天气减速下低估 ETA";
+      return "只优化当前取餐距离";
+    }}
+
+    function agentAdvantageMode(trace, timeSlice) {{
+      const selected = trace && trace.selected_strategy ? trace.selected_strategy : "autosolver_agent";
+      if ((timeSlice.shock_ids || []).some((id) => String(id).includes("courier-shortage"))) return `${{selected}} · 先保 deadline`;
+      if (Number(timeSlice.congestion_level || 0) >= 0.68) return `${{selected}} · 绕开拥堵风险`;
+      if ((timeSlice.shock_ids || []).some((id) => String(id).includes("merchant-burst"))) return `${{selected}} · 分散爆单压力`;
+      return `${{selected}} · 记忆驱动择优`;
+    }}
+
+    function renderAdvantageBoard(frame) {{
+      const trace = traceForFrame(frame);
+      const timeSlice = timeSliceForFrame(frame);
+      const evidence = (trace && trace.evidence) || {{}};
+      const final = finalDelta();
+      const orderCount = (timeSlice.order_ids || []).length || Number(evidence.order_count || 0);
+      const supply = Number(timeSlice.courier_supply || evidence.courier_supply || 0);
+      const congestion = Number(timeSlice.congestion_level || evidence.congestion_level || 0);
+      $("advantage-pressure").textContent = `${{clock(frame.sim_time_s)}} · ${{escapeText(timeSlice.demand_phase || evidence.demand_phase)}}`;
+      $("advantage-pressure-detail").textContent = `${{orderCount}} 单进入窗口 · 骑手供给 ${{supply}} · 拥堵 ${{congestion.toFixed(2)}} · 天气 ${{escapeText(timeSlice.weather || evidence.weather)}}`;
+      $("advantage-greedy-failure").textContent = greedyFailureMode(timeSlice);
+      $("advantage-greedy-detail").textContent = `Greedy 当前 ETA ${{minutes(frame.baseline.metrics.avg_eta_s)}}，风险 ${{percent(frame.baseline.metrics.timeout_risk)}}，后续时间片容易累积延误。`;
+      $("advantage-agent").textContent = agentAdvantageMode(trace, timeSlice);
+      $("advantage-agent-detail").textContent = `AutoSolver 当前 ETA ${{minutes(frame.challenger.metrics.avg_eta_s)}}，风险 ${{percent(frame.challenger.metrics.timeout_risk)}}，本帧节省 ${{signedMinutes(frame.delta.time_saved_s)}} / ${{signedYuan(frame.delta.cost_saved_yuan)}}。`;
+      $("advantage-savings").textContent = `${{signedMinutes(final.time_saved_s)}} · ${{signedYuan(final.cost_saved_yuan)}}`;
+      $("advantage-savings-detail").textContent = `全日累计风险变化 ${{signedPercent(final.timeout_risk_delta)}}，多送 ${{final.delivered_delta >= 0 ? "+" : ""}}${{final.delivered_delta}} 单。`;
+    }}
+
     function businessCandidateReason(score, trace) {{
       const evidence = (trace && trace.evidence) || {{}};
       const phase = escapeText(evidence.demand_phase || "unknown");
@@ -1069,6 +1177,7 @@ def render_day_replay_index() -> str:
         sourceLabel: "关键决策点"
       }};
       renderKpis(frame);
+      renderAdvantageBoard(frame);
       renderMaps(frame);
       renderReasoning(frame);
       renderMemory(frame);
