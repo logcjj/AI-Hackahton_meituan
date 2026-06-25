@@ -30,6 +30,8 @@ def render_day_replay_index() -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AutoSolver Agent - 全日配送模拟推演</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {{
       --bg: #10100c;
@@ -333,6 +335,54 @@ def render_day_replay_index() -> str:
         radial-gradient(circle at 70% 62%, rgba(47, 112, 84, .2), transparent 24%),
         #e6d0aa;
       background-size: 56px 56px, 56px 56px, auto, auto, auto;
+    }}
+    .real-map-engine {{
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: #d8c49f;
+    }}
+    .map-stage[data-map-engine-status="leaflet-osm"] .schematic-layer {{
+      opacity: .18;
+      mix-blend-mode: multiply;
+    }}
+    .map-stage[data-map-engine-status^="fallback"] .real-map-engine {{
+      display: none;
+    }}
+    .schematic-layer {{
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }}
+    .leaflet-container {{
+      width: 100%;
+      height: 100%;
+      background: #d8c49f;
+      font-family: var(--ui);
+    }}
+    .real-map-marker {{
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #fff;
+      border: 2px solid rgba(255, 255, 255, .92);
+      box-shadow: 0 10px 22px rgba(0, 0, 0, .28);
+      font: 900 12px var(--ui);
+    }}
+    .real-map-marker.merchant {{ background: var(--gold); }}
+    .real-map-marker.courier {{ background: var(--blue); }}
+    .agent .real-map-marker.courier {{ background: var(--green); }}
+    .real-map-marker.order {{ background: var(--red); width: 24px; height: 24px; font-size: 10px; }}
+    .real-map-marker.highlight {{
+      outline: 4px solid rgba(255, 243, 214, .92);
+      filter: drop-shadow(0 0 8px rgba(255, 243, 214, .78));
+    }}
+    .real-map-route-highlight {{
+      filter: drop-shadow(0 0 8px rgba(255, 243, 214, .8));
     }}
     .district {{
       position: absolute;
@@ -701,7 +751,7 @@ def render_day_replay_index() -> str:
           </div>
           <span class="algorithm-pill">nearest_greedy</span>
         </div>
-        <div class="map-stage" id="greedy-map-stage" aria-label="贪心算法地图推演"></div>
+        <div class="map-stage" id="greedy-map-stage" aria-label="贪心算法地图推演" data-map-engine-status="pending" data-tile-provider="openstreetmap" data-marker-count="0" data-route-count="0"></div>
         <div class="theater-foot" id="greedy-metrics"></div>
       </article>
 
@@ -714,7 +764,7 @@ def render_day_replay_index() -> str:
           </div>
           <span class="algorithm-pill">autosolver_agent</span>
         </div>
-        <div class="map-stage" id="autosolver-map-stage" aria-label="AutoSolver 地图推演"></div>
+        <div class="map-stage" id="autosolver-map-stage" aria-label="AutoSolver 地图推演" data-map-engine-status="pending" data-tile-provider="openstreetmap" data-marker-count="0" data-route-count="0"></div>
         <div class="theater-foot" id="autosolver-metrics"></div>
       </article>
     </section>
@@ -755,7 +805,15 @@ def render_day_replay_index() -> str:
       timer: null,
       pendingRunToken: "",
       controlRunTimer: null,
-      highlight: {{orderIds: [], courierIds: [], sourceLabel: "current frame"}}
+      highlight: {{orderIds: [], courierIds: [], sourceLabel: "current frame"}},
+      realMapEngine: {{
+        provider: "leaflet",
+        tileProvider: "OpenStreetMap",
+        tileUrl: "https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png",
+        status: "pending",
+        fallbackReason: "",
+        panels: {{}}
+      }}
     }};
     const $ = (id) => document.getElementById(id);
 
@@ -880,7 +938,10 @@ def render_day_replay_index() -> str:
       replayState.frameIndex = 0;
       renderApiTags();
       setFrameIndex(0);
-      setEngineStatus("全日推演已更新", `${{reason}} · ${{contract.orders.length}} orders · ${{contract.frames.length}} frames`);
+      setEngineStatus(
+        "Leaflet OSM real map engine",
+        `${{reason}} · ${{contract.orders.length}} orders · ${{contract.frames.length}} frames · ${{replayState.realMapEngine.status}}`
+      );
       return contract;
     }}
 
@@ -937,6 +998,8 @@ def render_day_replay_index() -> str:
         return `<path class="${{isHot ? "highlight-route" : ""}}" data-order-id="${{escapeText(route.order_id, "")}}" data-courier-id="${{escapeText(route.courier_id, "")}}" d="${{routePath(route)}}"></path>`;
       }}).join("");
       return `
+        <div class="real-map-engine" data-real-map-engine="leaflet" data-map-engine-status="pending" data-tile-provider="openstreetmap" data-marker-count="0" data-route-count="0" aria-label="Leaflet OpenStreetMap real map engine"></div>
+        <div class="schematic-layer" aria-hidden="true">
         <div class="map-hud">
           <span>${{escapeText(timeSlice.label || frame.time_slice_id)}}</span>
           <span>weather ${{escapeText(timeSlice.weather)}}</span>
@@ -949,6 +1012,7 @@ def render_day_replay_index() -> str:
         ${{hasBurst ? `<div class="burst-marker">merchant_burst</div>` : ""}}
         <svg class="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${{routes}}</svg>
         ${{merchants}}${{couriers}}${{orders}}
+        </div>
       `;
     }}
 
@@ -961,11 +1025,148 @@ def render_day_replay_index() -> str:
       ].map(([label, value]) => `<div class="mini-metric"><small>${{label}}</small><strong>${{value}}</strong></div>`).join("");
     }}
 
+    function latLng(position) {{
+      const lat = Number(position && position.lat);
+      const lng = Number(position && position.lng);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+      return [lat, lng];
+    }}
+
+    function removeRealMapPanel(stageId) {{
+      const panel = replayState.realMapEngine.panels[stageId];
+      if (panel && panel.map) {{
+        try {{ panel.map.remove(); }} catch (error) {{ /* best-effort cleanup before replacing DOM */ }}
+      }}
+      delete replayState.realMapEngine.panels[stageId];
+    }}
+
+    function realMapIcon(kind, label, highlighted) {{
+      return L.divIcon({{
+        className: `real-map-marker ${{kind}}${{highlighted ? " highlight" : ""}}`,
+        html: escapeText(label, kind.slice(0, 1)),
+        iconSize: kind === "order" ? [24, 24] : [30, 30],
+        iconAnchor: kind === "order" ? [12, 12] : [15, 15]
+      }});
+    }}
+
+    function renderRealMapPanel(stageId, frame, algorithmFrame, lane) {{
+      const stage = $(stageId);
+      const target = stage && stage.querySelector(".real-map-engine");
+      const highlightedOrders = new Set(replayState.highlight.orderIds || frame.highlighted_order_ids || []);
+      const highlightedCouriers = new Set(replayState.highlight.courierIds || frame.highlighted_courier_ids || []);
+      const summary = {{stageId, status: "fallback-no-container", markerCount: 0, routeCount: 0, tileErrors: 0}};
+      if (!stage || !target) return summary;
+      if (!window.L) {{
+        stage.dataset.mapEngineStatus = "fallback-no-leaflet";
+        replayState.realMapEngine.status = "fallback-no-leaflet";
+        replayState.realMapEngine.fallbackReason = "Leaflet library unavailable";
+        return {{...summary, status: "fallback-no-leaflet"}};
+      }}
+
+      const map = L.map(target, {{
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false
+      }});
+      const layerGroup = L.layerGroup().addTo(map);
+      const bounds = L.latLngBounds([]);
+      let markerCount = 0;
+      let routeCount = 0;
+      let tileErrors = 0;
+
+      const tileLayer = L.tileLayer(replayState.realMapEngine.tileUrl, {{
+        maxZoom: 18,
+        minZoom: 11,
+        attribution: "© OpenStreetMap contributors",
+        className: "osm-real-map-tiles"
+      }});
+      tileLayer.on("tileerror", () => {{
+        tileErrors += 1;
+        stage.dataset.tileErrors = String(tileErrors);
+        replayState.realMapEngine.fallbackReason = "OpenStreetMap tile request failed";
+      }});
+      tileLayer.addTo(map);
+
+      function addMarker(position, kind, label, highlighted, title) {{
+        const point = latLng(position);
+        if (!point) return;
+        const marker = L.marker(point, {{icon: realMapIcon(kind, label, highlighted), title: title || label}});
+        marker.addTo(layerGroup);
+        bounds.extend(point);
+        markerCount += 1;
+      }}
+
+      replayState.contract.merchants.slice(0, 8).forEach((merchant) => {{
+        addMarker(merchant.position, "merchant", "商", false, merchant.id);
+      }});
+      (algorithmFrame.courier_positions || []).slice(0, 10).forEach((courier) => {{
+        addMarker(courier.position, "courier", "骑", highlightedCouriers.has(courier.courier_id), courier.courier_id);
+      }});
+      const orderIds = new Set(algorithmFrame.active_order_ids || []);
+      replayState.contract.orders.filter((order) => orderIds.has(order.id)).slice(0, 10).forEach((order) => {{
+        addMarker(order.destination, "order", "单", highlightedOrders.has(order.id), order.id);
+      }});
+
+      (algorithmFrame.route_overlays || []).slice(0, 8).forEach((route) => {{
+        const points = (route.polyline || []).map((point) => latLng(point)).filter(Boolean);
+        if (points.length < 2) return;
+        const isHot = highlightedOrders.has(route.order_id) || highlightedCouriers.has(route.courier_id);
+        L.polyline(points, {{
+          color: lane === "agent" ? "#2f7054" : "#b54435",
+          weight: isHot ? 6 : 3,
+          opacity: isHot ? .96 : .74,
+          className: isHot ? "real-map-route-highlight" : "real-map-route"
+        }}).addTo(layerGroup);
+        points.forEach((point) => bounds.extend(point));
+        routeCount += 1;
+      }});
+
+      if (bounds.isValid()) {{
+        map.fitBounds(bounds.pad(.22), {{animate: false, maxZoom: 15}});
+      }} else {{
+        map.setView([31.2304, 121.4737], 14);
+      }}
+      window.setTimeout(() => map.invalidateSize(false), 80);
+
+      stage.dataset.mapEngineStatus = "leaflet-osm";
+      stage.dataset.tileProvider = "openstreetmap";
+      stage.dataset.markerCount = String(markerCount);
+      stage.dataset.routeCount = String(routeCount);
+      target.dataset.mapEngineStatus = "leaflet-osm";
+      target.dataset.markerCount = String(markerCount);
+      target.dataset.routeCount = String(routeCount);
+      replayState.realMapEngine.panels[stageId] = {{map, layerGroup, tileLayer, markerCount, routeCount, tileErrors, frameId: frame.id}};
+      return {{stageId, status: "leaflet-osm", markerCount, routeCount, tileErrors}};
+    }}
+
+    function setRealMapEngineStatus(frame, summaries) {{
+      const activePanels = summaries.filter((item) => item.status === "leaflet-osm").length;
+      const markerCount = summaries.reduce((total, item) => total + Number(item.markerCount || 0), 0);
+      const routeCount = summaries.reduce((total, item) => total + Number(item.routeCount || 0), 0);
+      const tileErrors = summaries.reduce((total, item) => total + Number(item.tileErrors || 0), 0);
+      replayState.realMapEngine.status = activePanels ? "leaflet-osm" : "fallback-schematic";
+      replayState.realMapEngine.lastFrameId = frame.id;
+      replayState.realMapEngine.lastLayerCounts = {{activePanels, markerCount, routeCount, tileErrors}};
+      const title = activePanels ? "Leaflet OSM real map engine" : "Fallback schematic map engine";
+      const detail = `${{activePanels}}/2 panels · markers ${{markerCount}} · routes ${{routeCount}} · frame ${{frame.id}}${{tileErrors ? ` · tile errors ${{tileErrors}}` : ""}}`;
+      setEngineStatus(title, detail);
+    }}
+
     function renderMaps(frame) {{
+      removeRealMapPanel("greedy-map-stage");
+      removeRealMapPanel("autosolver-map-stage");
       $("greedy-map-stage").innerHTML = stageBaseHtml(frame, frame.baseline);
       $("autosolver-map-stage").innerHTML = stageBaseHtml(frame, frame.challenger);
       $("greedy-metrics").innerHTML = metricCards(frame.baseline.metrics);
       $("autosolver-metrics").innerHTML = metricCards(frame.challenger.metrics);
+      const summaries = [
+        renderRealMapPanel("greedy-map-stage", frame, frame.baseline, "greedy"),
+        renderRealMapPanel("autosolver-map-stage", frame, frame.challenger, "agent")
+      ];
+      setRealMapEngineStatus(frame, summaries);
     }}
 
     function renderKpis(frame) {{
@@ -1244,11 +1445,13 @@ def render_day_replay_index() -> str:
     document.addEventListener("DOMContentLoaded", bootstrapDayReplayShell);
     window.__AUTO_SOLVER_DAY_REPLAY__ = {{
       replayState,
+      realMapEngine: replayState.realMapEngine,
       bootstrapDayReplayShell,
       setFrameIndex,
       setKpiCard,
       applyDecisionHighlight,
       renderDecisionHighlights,
+      renderRealMapPanel,
       playReplay,
       pauseReplay,
       compareAlgorithms

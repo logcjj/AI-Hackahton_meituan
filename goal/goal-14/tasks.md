@@ -19,17 +19,28 @@ Confidence loop:
 
 ## Task 2 - Implement Real Map Engine Layer
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Frontend includes a real map engine integration and uses lat/lng simulation data.
 - Schematic map remains only as fallback, not the primary path.
 
 Work log:
--
+- Added Leaflet 1.9.4 CSS/JS and OpenStreetMap tile configuration to the day replay shell.
+- Added a `.real-map-engine` layer inside each map stage and wrapped the previous CSS map in `.schematic-layer` so the CSS map is now a fallback/overlay instead of the primary renderer.
+- Added `replayState.realMapEngine` with provider, tile provider, tile URL, status, fallback reason and per-panel runtime handles.
+- Implemented `latLng`, `removeRealMapPanel`, `realMapIcon`, `renderRealMapPanel`, and `setRealMapEngineStatus`.
+- Rendered merchants, couriers, active orders and route polylines from existing simulation `lat`/`lng` data into two Leaflet map instances, one for greedy and one for AutoSolver.
+- Added visible `data-map-engine-status`, `data-tile-provider`, `data-marker-count`, and `data-route-count` attributes so the runtime engine state is inspectable.
+- Updated focused web tests to assert Leaflet/OpenStreetMap markers and real-map engine functions.
+- Verified with `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`.
+- Verified with `uv run --with pytest pytest tests/test_web_agent_demo.py`: 15 passed.
+- Started local service on `http://127.0.0.1:8794/` and opened it in the system browser.
+- Verified in system Chrome via Playwright: `window.L` exists, `engineStatus` is `leaflet-osm`, two Leaflet containers exist, OSM tile images loaded at 256px, marker count is 44, route count is 8, tile errors are 0, console errors are 0.
+- Captured browser evidence at `goal/goal-14/task2-real-map-browser.png`.
 
 Confidence loop:
--
+- 100% confidence for Task 2 scope: the primary map renderer is now a real Leaflet/OpenStreetMap runtime using simulation lat/lng data, both comparison panels create real map instances, the old schematic layer is no longer the sole renderer, and automated plus browser verification confirms visible map tiles, markers and routes.
 
 ## Task 3 - Tests And Browser Verification
 
