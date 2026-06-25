@@ -23,8 +23,8 @@ class WebAgentDemoTest(unittest.TestCase):
             "算法推理流程",
             "Memory 自进化",
             "本地确定性仿真引擎",
-            "native discrete-event engine",
-            "Leaflet no-label simulation engine",
+            "CourierSim event simulator",
+            "CourierSim runtime + Leaflet renderer",
             "leaflet@1.9.4",
             "OpenStreetMap",
             "CartoDB Positron NoLabels",
@@ -43,6 +43,9 @@ class WebAgentDemoTest(unittest.TestCase):
             "data-route-count",
             "data-motion-count",
             "realMapEngine",
+            "simulationProvider",
+            "runtimeTick",
+            "lastTraceMeta",
             "simulationTick",
             "lastMotionSummary",
             "existing-project-operational-map",
@@ -114,9 +117,11 @@ class WebAgentDemoTest(unittest.TestCase):
             "function distanceMeters",
             "function headingDeg",
             "function frameIndexFor",
-            "function previousCourierPositions",
+            "function simulationTrace",
             "function removeRealMapPanel",
             "function realMapIcon",
+            "function trackTickPoints",
+            "function animatePanelTracks",
             "function renderRealMapPanel",
             "function setRealMapEngineStatus",
             "function renderReasoning",
@@ -196,6 +201,7 @@ class WebAgentDemoTest(unittest.TestCase):
             "Real-time Dispatch Assignment Optimization",
             "Relative Improvement vs Greedy",
             "AUTOSOLVER_LLM_API_KEY",
+            'title="${escapeText(shockIds.join(",") || frame.time_slice_id)}"',
         ]:
             self.assertNotIn(forbidden, html)
 
@@ -230,6 +236,11 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertEqual(contract["reasoning_traces"][0]["frame_id"], contract["frames"][0]["id"])
         self.assertEqual(contract["privacy"]["secret_handling"], "env-only-redacted")
         self.assertTrue(contract["frames"][0]["memory_event_ids"])
+        self.assertEqual(contract["frames"][0]["baseline"]["simulation_trace"]["engine_id"], "courier-agent-sim-v1")
+        self.assertEqual(contract["frames"][0]["challenger"]["simulation_trace"]["engine_mode"], "discrete-event-agent-simulation")
+        self.assertFalse(contract["frames"][0]["challenger"]["simulation_trace"]["map_labels_visible"])
+        self.assertTrue(contract["frames"][0]["challenger"]["simulation_trace"]["courier_tracks"])
+        self.assertTrue(contract["frames"][0]["challenger"]["simulation_trace"]["event_queue"])
 
     def test_day_simulation_api_payloads_support_replay_controls(self):
         from web_agent_demo.server import (
@@ -281,6 +292,7 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertEqual(run_payload["status"], "ok")
         self.assertEqual(run_payload["engine"]["selected_adapter_id"], "native-local")
         self.assertEqual(run_payload["engine"]["active_adapter"]["id"], "native-local")
+        self.assertEqual(run_payload["engine"]["version"], "courier-agent-sim-v1")
         self.assertGreater(run_payload["order_count"], 50)
         self.assertGreater(run_payload["frame_count"], 10)
         self.assertEqual(run_payload["memory_event_count"], run_payload["frame_count"] * 3)
@@ -292,6 +304,9 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertEqual(frame_payload["frame"]["baseline"]["active_order_ids"], frame_payload["frame"]["challenger"]["active_order_ids"])
         self.assertTrue(frame_payload["frame"]["highlighted_order_ids"])
         self.assertTrue(frame_payload["frame"]["highlighted_courier_ids"])
+        self.assertEqual(frame_payload["frame"]["challenger"]["simulation_trace"]["engine_id"], "courier-agent-sim-v1")
+        self.assertGreater(frame_payload["frame"]["challenger"]["simulation_trace"]["emitted_tick_count"], 0)
+        self.assertGreater(frame_payload["frame"]["challenger"]["simulation_trace"]["event_count"], 0)
         self.assertGreater(frame_payload["frame"]["delta"]["time_saved_s"], 0)
         self.assertIn("cumulatively", frame_payload["frame"]["delta"]["headline"])
         self.assertEqual(memory_payload["status"], "ok")

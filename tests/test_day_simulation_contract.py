@@ -66,6 +66,10 @@ class DaySimulationContractTest(unittest.TestCase):
         self.assertEqual(memory_event["chosen_algorithm_id"], "autosolver_agent")
         self.assertTrue(memory_event["writeback"])
         self.assertEqual(memory_event["secret_handling"], "env-only-redacted")
+        self.assertEqual(frame["baseline"]["simulation_trace"]["engine_id"], "courier-agent-sim-v1")
+        self.assertEqual(frame["challenger"]["simulation_trace"]["engine_provider"], "AutoSolver CourierSim in-process event simulator")
+        self.assertEqual(frame["challenger"]["simulation_trace"]["engine_mode"], "discrete-event-agent-simulation")
+        self.assertFalse(frame["challenger"]["simulation_trace"]["map_labels_visible"])
 
     def test_orders_time_slices_and_runs_share_stable_ids(self):
         payload = day_contract_to_dict(build_contract_preview())
@@ -80,6 +84,9 @@ class DaySimulationContractTest(unittest.TestCase):
         self.assertIn(frame["id"], payload["challenger_run"]["frame_ids"])
         self.assertEqual(frame["baseline"]["assignments"][0]["order_id"], payload["orders"][0]["id"])
         self.assertEqual(frame["challenger"]["assignments"][0]["order_id"], payload["orders"][0]["id"])
+        self.assertTrue(frame["challenger"]["simulation_trace"]["courier_tracks"])
+        self.assertTrue(frame["challenger"]["simulation_trace"]["event_queue"])
+        self.assertGreaterEqual(frame["challenger"]["simulation_trace"]["emitted_tick_count"], 3)
 
 
 if __name__ == "__main__":

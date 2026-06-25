@@ -369,10 +369,10 @@ def render_day_replay_index() -> str:
       display: grid;
       place-items: center;
       border-radius: 999px;
-      color: #fff;
+      color: transparent;
       border: 2px solid rgba(255, 255, 255, .92);
       box-shadow: 0 10px 22px rgba(0, 0, 0, .28);
-      font: 900 12px var(--ui);
+      font-size: 0;
       transition: transform .65s cubic-bezier(.2, .86, .24, 1), filter .2s ease;
     }}
     .real-map-marker.merchant {{ background: var(--gold); }}
@@ -491,15 +491,15 @@ def render_day_replay_index() -> str:
       display: grid;
       place-items: center;
       border-radius: 999px;
-      color: white;
-      font-weight: 900;
-      font-size: 12px;
+      color: transparent;
+      font-size: 0;
       border: 2px solid rgba(255, 255, 255, .82);
       transform: translate(-50%, -50%);
       box-shadow: 0 10px 22px rgba(0, 0, 0, .24);
     }}
     .pin::after {{
-      content: attr(data-label);
+      content: "";
+      display: none;
       position: absolute;
       left: 50%;
       top: 31px;
@@ -690,7 +690,7 @@ def render_day_replay_index() -> str:
       </div>
       <aside class="hero-badge" id="engine-status">
         <b id="engine-status-title">本地确定性仿真引擎</b>
-        <span id="engine-status-detail">先使用 native discrete-event engine，后续可接 UXsim / SUMO adapter seam。所有 LLM 配置只走 env-only-redacted。</span>
+        <span id="engine-status-detail">当前运行 CourierSim event simulator，Leaflet 只负责地图渲染。所有 LLM 配置只走 env-only-redacted。</span>
       </aside>
     </header>
 
@@ -837,13 +837,17 @@ def render_day_replay_index() -> str:
       controlRunTimer: null,
       highlight: {{orderIds: [], courierIds: [], sourceLabel: "current frame"}},
       realMapEngine: {{
-        provider: "leaflet",
+        provider: "CourierSim + Leaflet",
+        simulationProvider: "courier-agent-sim-v1",
+        rendererProvider: "leaflet",
         tileProvider: "CartoDB Positron NoLabels",
         tileUrl: "https://{{s}}.basemaps.cartocdn.com/light_nolabels/{{z}}/{{x}}/{{y}}{{r}}.png",
         status: "pending",
         fallbackReason: "",
         simulationTick: 0,
+        runtimeTick: 0,
         lastMotionSummary: {{movingCouriers: 0, avgSpeedKmh: 0}},
+        lastTraceMeta: null,
         panels: {{}}
       }}
     }};
@@ -1015,15 +1019,15 @@ def render_day_replay_index() -> str:
       const hasBurst = shockIds.some((id) => id.includes("merchant-burst"));
       const congestionOpacity = Math.max(.2, Math.min(.92, Number(timeSlice.congestion_level || 0.4) * .95)).toFixed(2);
       const merchants = replayState.contract.merchants.slice(0, 8).map((merchant) =>
-        `<span class="pin merchant" data-label="${{escapeText(merchant.id)}}" style="${{positionStyle(merchant.position)}}">商</span>`
+        `<span class="pin merchant" data-entity-kind="merchant" style="${{positionStyle(merchant.position)}}"></span>`
       ).join("");
       const couriers = (algorithmFrame.courier_positions || []).slice(0, 10).map((courier) => {{
         const isHot = highlightedCouriers.has(courier.courier_id);
-        return `<span class="pin courier${{isHot ? " highlight" : ""}}" data-courier-id="${{escapeText(courier.courier_id, "")}}" data-label="${{escapeText(courier.courier_id)}}" style="${{positionStyle(courier.position)}}">骑</span>`;
+        return `<span class="pin courier${{isHot ? " highlight" : ""}}" data-courier-id="${{escapeText(courier.courier_id, "")}}" data-entity-kind="courier" style="${{positionStyle(courier.position)}}"></span>`;
       }}).join("");
       const orders = replayState.contract.orders.filter((order) => orderIds.has(order.id)).slice(0, 10).map((order) => {{
         const isHot = highlightedOrders.has(order.id);
-        return `<span class="pin order${{isHot ? " highlight" : ""}}" data-order-id="${{escapeText(order.id, "")}}" data-label="${{escapeText(order.id)}}" style="${{positionStyle(order.destination)}}">单</span>`;
+        return `<span class="pin order${{isHot ? " highlight" : ""}}" data-order-id="${{escapeText(order.id, "")}}" data-entity-kind="order" style="${{positionStyle(order.destination)}}"></span>`;
       }}).join("");
       const routes = (algorithmFrame.route_overlays || []).slice(0, 8).map((route) => {{
         const isHot = highlightedOrders.has(route.order_id) || highlightedCouriers.has(route.courier_id);
@@ -1040,8 +1044,8 @@ def render_day_replay_index() -> str:
         </div>
         <div class="district one"></div><div class="district two"></div><div class="district three"></div>
         <div class="road r1"></div><div class="road r2"></div><div class="road r3"></div>
-        <div class="shock-band" data-shock-ids="${{escapeText(shockIds.join(","))}}" title="${{escapeText(shockIds.join(",") || frame.time_slice_id)}}" style="opacity:${{congestionOpacity}}"></div>
-        ${{hasBurst ? `<div class="burst-marker">merchant_burst</div>` : ""}}
+        <div class="shock-band" data-shock-ids="${{escapeText(shockIds.join(","))}}" style="opacity:${{congestionOpacity}}"></div>
+        ${{hasBurst ? `<div class="burst-marker" aria-hidden="true"></div>` : ""}}
         <svg class="route-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${{routes}}</svg>
         ${{merchants}}${{couriers}}${{orders}}
         </div>
@@ -1081,16 +1085,24 @@ def render_day_replay_index() -> str:
       return found >= 0 ? found : replayState.frameIndex;
     }}
 
-    function previousCourierPositions(frame, lane) {{
-      const index = frameIndexFor(frame);
-      if (index <= 0) return new Map();
-      const previousFrame = replayState.contract.frames[index - 1];
-      const previousAlgorithmFrame = lane === "agent" ? previousFrame.challenger : previousFrame.baseline;
-      return new Map((previousAlgorithmFrame.courier_positions || []).map((courier) => [courier.courier_id, latLng(courier.position)]));
+    function simulationTrace(algorithmFrame) {{
+      return algorithmFrame && algorithmFrame.simulation_trace ? algorithmFrame.simulation_trace : {{
+        engine_id: "courier-agent-sim-v1",
+        engine_provider: "AutoSolver CourierSim in-process event simulator",
+        engine_mode: "discrete-event-agent-simulation",
+        emitted_tick_count: 0,
+        event_count: 0,
+        avg_speed_mps: 0,
+        courier_tracks: [],
+        event_queue: []
+      }};
     }}
 
     function removeRealMapPanel(stageId) {{
       const panel = replayState.realMapEngine.panels[stageId];
+      if (panel && panel.animationFrameId) {{
+        try {{ window.cancelAnimationFrame(panel.animationFrameId); }} catch (error) {{ /* best-effort cleanup */ }}
+      }}
       if (panel && panel.map) {{
         panel.disposed = true;
         try {{ panel.map.remove(); }} catch (error) {{ /* best-effort cleanup before replacing DOM */ }}
@@ -1098,16 +1110,63 @@ def render_day_replay_index() -> str:
       delete replayState.realMapEngine.panels[stageId];
     }}
 
-    function realMapIcon(kind, label, highlighted, motion = {{}}) {{
+    function realMapIcon(kind, highlighted, motion = {{}}) {{
       const movingClass = motion.moving ? " moving" : "";
       const arrow = motion.moving ? `<span class="motion-arrow" style="transform: translateX(-50%) rotate(${{Number(motion.headingDeg || 0)}}deg)" aria-hidden="true"></span>` : "";
       return L.divIcon({{
         className: `real-map-marker ${{kind}}${{highlighted ? " highlight" : ""}}${{movingClass}}`,
-        html: `<span>${{escapeText(label, kind.slice(0, 1))}}</span>${{arrow}}`,
+        html: `${{arrow}}`,
         iconSize: kind === "order" ? [24, 24] : [30, 30],
         iconAnchor: kind === "order" ? [12, 12] : [15, 15],
         popupAnchor: [0, -14]
       }});
+    }}
+
+    function trackTickPoints(track) {{
+      return (track && track.ticks ? track.ticks : []).map((tick) => {{
+        const point = latLng(tick.position);
+        return point ? {{point, phase: tick.phase, elapsed_s: Number(tick.elapsed_s || 0)}} : null;
+      }}).filter(Boolean);
+    }}
+
+    function animatePanelTracks(stageId, trace, animatedTracks) {{
+      const panel = replayState.realMapEngine.panels[stageId];
+      if (!panel || panel.disposed || !animatedTracks.length) return;
+      const totalTicks = Math.max(1, Number(trace.emitted_tick_count || 0));
+      const durationMs = Math.max(650, Math.min(2200, totalTicks * 48));
+      const startedAt = performance.now();
+      const step = (now) => {{
+        const currentPanel = replayState.realMapEngine.panels[stageId];
+        if (!currentPanel || currentPanel.disposed) return;
+        const progress = Math.min(1, (now - startedAt) / durationMs);
+        const tickFloat = progress * Math.max(0, totalTicks - 1);
+        const leftIndex = Math.floor(tickFloat);
+        const rightIndex = Math.min(totalTicks - 1, leftIndex + 1);
+        const mix = tickFloat - leftIndex;
+        animatedTracks.forEach((track) => {{
+          const left = track.points[leftIndex] || track.points[track.points.length - 1];
+          const right = track.points[rightIndex] || left;
+          if (!left || !right) return;
+          const interpolated = [
+            left.point[0] + (right.point[0] - left.point[0]) * mix,
+            left.point[1] + (right.point[1] - left.point[1]) * mix
+          ];
+          track.marker.setLatLng(interpolated);
+        }});
+        replayState.realMapEngine.runtimeTick = Math.min(totalTicks, leftIndex + 1);
+        currentPanel.runtimeTick = replayState.realMapEngine.runtimeTick;
+        if (replayState.realMapEngine.lastTraceMeta && replayState.realMapEngine.lastLayerCounts) {{
+          const meta = replayState.realMapEngine.lastTraceMeta;
+          const layers = replayState.realMapEngine.lastLayerCounts;
+          const avgSpeedKmh = Number(replayState.realMapEngine.lastMotionSummary && replayState.realMapEngine.lastMotionSummary.avgSpeedKmh || 0);
+          const detail = `${{layers.activePanels}}/2 panels · engine ${{meta.engineId}} · emitted ticks ${{meta.emittedTicks}} · runtime tick ${{replayState.realMapEngine.runtimeTick}} · events ${{meta.eventCount}} · moving ${{layers.motionCount}} · markers ${{layers.markerCount}} · routes ${{layers.routeCount}} · frame ${{replayState.realMapEngine.lastFrameId}}${{avgSpeedKmh ? ` · avg ${{avgSpeedKmh.toFixed(1)}}km/h` : ""}}${{layers.tileErrors ? ` · tile errors ${{layers.tileErrors}}` : ""}}`;
+          $("engine-status-detail").textContent = detail;
+        }}
+        if (progress < 1) {{
+          currentPanel.animationFrameId = window.requestAnimationFrame(step);
+        }}
+      }};
+      panel.animationFrameId = window.requestAnimationFrame(step);
     }}
 
     function renderRealMapPanel(stageId, frame, algorithmFrame, lane) {{
@@ -1115,6 +1174,8 @@ def render_day_replay_index() -> str:
       const target = stage && stage.querySelector(".real-map-engine");
       const highlightedOrders = new Set(replayState.highlight.orderIds || frame.highlighted_order_ids || []);
       const highlightedCouriers = new Set(replayState.highlight.courierIds || frame.highlighted_courier_ids || []);
+      const trace = simulationTrace(algorithmFrame);
+      const trackByCourier = new Map((trace.courier_tracks || []).map((track) => [track.courier_id, track]));
       const summary = {{stageId, status: "fallback-no-container", markerCount: 0, routeCount: 0, tileErrors: 0}};
       if (!stage || !target) return summary;
       if (!window.L) {{
@@ -1134,8 +1195,8 @@ def render_day_replay_index() -> str:
       }});
       const layerGroup = L.layerGroup().addTo(map);
       const bounds = L.latLngBounds([]);
-      const motionAnimations = [];
       const motionSpeeds = [];
+      const animatedTracks = [];
       let markerCount = 0;
       let routeCount = 0;
       let motionCount = 0;
@@ -1154,43 +1215,51 @@ def render_day_replay_index() -> str:
       }});
       tileLayer.addTo(map);
 
-      function addMarker(position, kind, label, highlighted, title, motion = {{}}) {{
-        const point = latLng(position);
-        if (!point) return;
-        const startPoint = motion.fromPoint || point;
-        const moving = Boolean(motion.fromPoint && distanceMeters(motion.fromPoint, point) > 4);
-        const heading = moving ? headingDeg(motion.fromPoint, point) : 0;
-        const marker = L.marker(startPoint, {{icon: realMapIcon(kind, label, highlighted, {{moving, headingDeg: heading}}), title: title || label}});
+      function addMarker(position, kind, highlighted, motion = {{}}) {{
+        const fallbackPoint = latLng(position);
+        if (!fallbackPoint) return;
+        const points = motion.tickPoints || [];
+        const startPoint = points[0] ? points[0].point : fallbackPoint;
+        const endPoint = points.length ? points[points.length - 1].point : fallbackPoint;
+        const moving = kind === "courier" && points.length > 1;
+        const heading = moving ? headingDeg(startPoint, endPoint) : 0;
+        const marker = L.marker(startPoint, {{icon: realMapIcon(kind, highlighted, {{moving, headingDeg: heading}})}});
         marker.addTo(layerGroup);
-        bounds.extend(point);
+        bounds.extend(startPoint);
+        bounds.extend(endPoint);
         if (moving) {{
-          bounds.extend(startPoint);
-          const meters = distanceMeters(startPoint, point);
-          motionSpeeds.push(meters / 90 * 3.6);
+          const meters = points.reduce((sum, current, index) => {{
+            if (index === 0) return 0;
+            return sum + distanceMeters(points[index - 1].point, current.point);
+          }}, 0);
+          const durationS = Math.max(1, Number(motion.durationS || 0));
+          motionSpeeds.push(meters / durationS * 3.6);
           motionCount += 1;
-          L.polyline([startPoint, point], {{
+          L.polyline(points.map((item) => item.point), {{
             color: lane === "agent" ? "#2f7054" : "#b54435",
             weight: 4,
             opacity: .62,
             className: "courier-motion-trail"
           }}).addTo(layerGroup);
-          motionAnimations.push(() => marker.setLatLng(point));
+          animatedTracks.push({{marker, points}});
         }}
         markerCount += 1;
       }}
 
       replayState.contract.merchants.slice(0, 8).forEach((merchant) => {{
-        addMarker(merchant.position, "merchant", "商", false, merchant.id);
+        addMarker(merchant.position, "merchant", false);
       }});
-      const previousPositions = previousCourierPositions(frame, lane);
       (algorithmFrame.courier_positions || []).slice(0, 10).forEach((courier) => {{
-        addMarker(courier.position, "courier", "骑", highlightedCouriers.has(courier.courier_id), courier.courier_id, {{
-          fromPoint: previousPositions.get(courier.courier_id)
+        const courierTrack = trackByCourier.get(courier.courier_id);
+        const tickPoints = trackTickPoints(courierTrack);
+        addMarker(courier.position, "courier", highlightedCouriers.has(courier.courier_id), {{
+          tickPoints,
+          durationS: Number(courierTrack && courierTrack.duration_s || 0)
         }});
       }});
       const orderIds = new Set(algorithmFrame.active_order_ids || []);
       replayState.contract.orders.filter((order) => orderIds.has(order.id)).slice(0, 10).forEach((order) => {{
-        addMarker(order.destination, "order", "单", highlightedOrders.has(order.id), order.id);
+        addMarker(order.destination, "order", highlightedOrders.has(order.id));
       }});
 
       (algorithmFrame.route_overlays || []).slice(0, 8).forEach((route) => {{
@@ -1222,15 +1291,41 @@ def render_day_replay_index() -> str:
       target.dataset.markerCount = String(markerCount);
       target.dataset.routeCount = String(routeCount);
       target.dataset.motionCount = String(motionCount);
-      const avgSpeedKmh = motionSpeeds.length ? motionSpeeds.reduce((sum, value) => sum + value, 0) / motionSpeeds.length : 0;
-      replayState.realMapEngine.panels[stageId] = {{map, layerGroup, tileLayer, markerCount, routeCount, motionCount, avgSpeedKmh, tileErrors, frameId: frame.id, disposed: false}};
+      const traceAvgSpeedKmh = Number(trace.avg_speed_mps || 0) * 3.6;
+      const avgSpeedKmh = motionSpeeds.length ? motionSpeeds.reduce((sum, value) => sum + value, 0) / motionSpeeds.length : traceAvgSpeedKmh;
+      replayState.realMapEngine.panels[stageId] = {{
+        map,
+        layerGroup,
+        tileLayer,
+        markerCount,
+        routeCount,
+        motionCount,
+        avgSpeedKmh,
+        tileErrors,
+        frameId: frame.id,
+        trace,
+        runtimeTick: 0,
+        animationFrameId: null,
+        disposed: false
+      }};
       window.setTimeout(() => {{
         const currentPanel = replayState.realMapEngine.panels[stageId];
         if (!currentPanel || currentPanel.map !== map || currentPanel.disposed || !target.isConnected) return;
         try {{ map.invalidateSize(false); }} catch (error) {{ stage.dataset.mapEngineWarning = "invalidate-size-skipped"; }}
-        motionAnimations.forEach((animate) => animate());
+        animatePanelTracks(stageId, trace, animatedTracks);
       }}, 80);
-      return {{stageId, status: "leaflet-osm", markerCount, routeCount, motionCount, avgSpeedKmh, tileErrors}};
+      return {{
+        stageId,
+        status: "leaflet-osm",
+        markerCount,
+        routeCount,
+        motionCount,
+        avgSpeedKmh,
+        tileErrors,
+        engineId: trace.engine_id,
+        eventCount: Number(trace.event_count || 0),
+        emittedTicks: Number(trace.emitted_tick_count || 0)
+      }};
     }}
 
     function setRealMapEngineStatus(frame, summaries) {{
@@ -1241,13 +1336,18 @@ def render_day_replay_index() -> str:
       const speedSamples = summaries.map((item) => Number(item.avgSpeedKmh || 0)).filter((value) => value > 0);
       const avgSpeedKmh = speedSamples.length ? speedSamples.reduce((sum, value) => sum + value, 0) / speedSamples.length : 0;
       const tileErrors = summaries.reduce((total, item) => total + Number(item.tileErrors || 0), 0);
+      const eventCount = summaries.reduce((total, item) => total + Number(item.eventCount || 0), 0);
+      const emittedTicks = Math.max(0, ...summaries.map((item) => Number(item.emittedTicks || 0)));
+      const engineId = summaries.find((item) => item.engineId)?.engineId || replayState.realMapEngine.simulationProvider;
       replayState.realMapEngine.simulationTick += 1;
+      replayState.realMapEngine.runtimeTick = 0;
       replayState.realMapEngine.status = activePanels ? "leaflet-osm" : "fallback-schematic";
       replayState.realMapEngine.lastFrameId = frame.id;
       replayState.realMapEngine.lastLayerCounts = {{activePanels, markerCount, routeCount, motionCount, tileErrors}};
       replayState.realMapEngine.lastMotionSummary = {{movingCouriers: motionCount, avgSpeedKmh}};
-      const title = activePanels ? "Leaflet no-label simulation engine" : "Fallback schematic map engine";
-      const detail = `${{activePanels}}/2 panels · tick ${{replayState.realMapEngine.simulationTick}} · moving ${{motionCount}} · markers ${{markerCount}} · routes ${{routeCount}} · frame ${{frame.id}}${{avgSpeedKmh ? ` · avg ${{avgSpeedKmh.toFixed(1)}}km/h` : ""}}${{tileErrors ? ` · tile errors ${{tileErrors}}` : ""}}`;
+      replayState.realMapEngine.lastTraceMeta = {{engineId, eventCount, emittedTicks}};
+      const title = activePanels ? "CourierSim runtime + Leaflet renderer" : "Fallback schematic map engine";
+      const detail = `${{activePanels}}/2 panels · engine ${{engineId}} · emitted ticks ${{emittedTicks}} · runtime tick ${{replayState.realMapEngine.runtimeTick || 0}} · events ${{eventCount}} · moving ${{motionCount}} · markers ${{markerCount}} · routes ${{routeCount}} · frame ${{frame.id}}${{avgSpeedKmh ? ` · avg ${{avgSpeedKmh.toFixed(1)}}km/h` : ""}}${{tileErrors ? ` · tile errors ${{tileErrors}}` : ""}}`;
       setEngineStatus(title, detail);
     }}
 

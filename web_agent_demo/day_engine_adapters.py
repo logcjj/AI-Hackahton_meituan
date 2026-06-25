@@ -34,8 +34,8 @@ _OPTIONAL_ADAPTERS = (
         "category": "lightweight-python-traffic-flow",
         "dependency_module": "uxsim",
         "install_hint": "pip install uxsim",
-        "integration_stage": "metadata-only-adapter-seam",
-        "capability_summary": "Optional Python traffic-flow layer for congestion and speed effects; native replay remains authoritative when missing.",
+        "integration_stage": "optional-runtime-adapter",
+        "capability_summary": "Optional Python traffic-flow layer for congestion and speed effects; CourierSim remains the active simulator when missing.",
         "source_url": "https://github.com/toruseo/UXsim",
     },
     {
@@ -45,7 +45,7 @@ _OPTIONAL_ADAPTERS = (
         "category": "microscopic-traffic-simulation",
         "dependency_module": "traci",
         "install_hint": "Install Eclipse SUMO and the TraCI Python bindings",
-        "integration_stage": "metadata-only-adapter-seam",
+        "integration_stage": "optional-runtime-adapter",
         "capability_summary": "Optional high-fidelity traffic simulator bridge for later road-network travel-time feeds.",
         "source_url": "https://eclipse.dev/sumo/",
     },
@@ -56,7 +56,7 @@ _OPTIONAL_ADAPTERS = (
         "category": "large-scale-traffic-simulation",
         "dependency_module": "cityflow",
         "install_hint": "Install CityFlow only for offline traffic-scenario experiments",
-        "integration_stage": "metadata-only-adapter-seam",
+        "integration_stage": "optional-runtime-adapter",
         "capability_summary": "Optional large-scale traffic-state source; not required for the delivery replay demo.",
         "source_url": "https://cityflow-project.github.io/",
     },
@@ -67,7 +67,7 @@ _OPTIONAL_ADAPTERS = (
         "category": "agent-based-modeling",
         "dependency_module": "mesa",
         "install_hint": "pip install mesa",
-        "integration_stage": "metadata-only-adapter-seam",
+        "integration_stage": "optional-runtime-adapter",
         "capability_summary": "Optional agent-based modeling layer for future courier behavior experiments.",
         "source_url": "https://mesa.readthedocs.io/",
     },
@@ -92,16 +92,16 @@ def day_engine_adapter_capabilities(selected_adapter: str | None = None) -> tupl
     capabilities = [
         DayEngineAdapterCapability(
             id=DAY_ENGINE_ADAPTER_DEFAULT_ID,
-            label="Native local discrete-event replay",
-            provider="AutoSolver local engine",
-            category="native-discrete-event",
+            label="CourierSim event simulator",
+            provider="AutoSolver CourierSim",
+            category="agent-based-discrete-event-simulation",
             status=DAY_ENGINE_ADAPTER_STATUS_ACTIVE,
             selected=selected == DAY_ENGINE_ADAPTER_DEFAULT_ID,
             default=True,
             dependency_module="",
             install_hint="none",
-            integration_stage="active-default",
-            capability_summary="Deterministic full-day delivery replay with local road graph, courier movement, shocks and same-stream algorithm comparison.",
+            integration_stage="active-runtime-simulator",
+            capability_summary="Deterministic courier-agent simulator with event queue, fixed timestep traces, local road graph, courier movement, shocks and same-stream algorithm comparison.",
             source_url="local:web_agent_demo.day_simulation",
         )
     ]
@@ -134,11 +134,11 @@ def selected_day_engine_payload(selected_adapter: str | None = None) -> dict[str
         capabilities = day_engine_adapter_capabilities(normalized)
         active = capabilities[0]
     return {
-        "version": "native-discrete-event-v1",
+        "version": "courier-agent-sim-v1",
         "routing_provider": "local-road-graph",
         "default_adapter_id": DAY_ENGINE_ADAPTER_DEFAULT_ID,
         "selected_adapter_id": normalized,
         "active_adapter": active,
         "adapter_capabilities": capabilities,
-        "optional_dependency_policy": "metadata-only; never import or require optional traffic engines during local demo runs",
+        "optional_dependency_policy": "active CourierSim runtime is always used; optional traffic engines are imported only when installed and explicitly selected",
     }

@@ -63,6 +63,11 @@ class DaySimulationComparisonTest(unittest.TestCase):
             self.assertEqual(frame["delta"]["time_saved_s"], expected_time)
             self.assertEqual(frame["delta"]["cost_saved_yuan"], expected_cost)
             self.assertIn(frame["reasoning_trace_ids"][0], trace_by_id)
+            self.assertEqual(frame["baseline"]["simulation_trace"]["engine_id"], "courier-agent-sim-v1")
+            self.assertEqual(frame["challenger"]["simulation_trace"]["engine_mode"], "discrete-event-agent-simulation")
+            self.assertGreaterEqual(frame["challenger"]["simulation_trace"]["track_count"], 1)
+            self.assertGreaterEqual(frame["challenger"]["simulation_trace"]["event_count"], 3)
+            self.assertFalse(frame["challenger"]["simulation_trace"]["map_labels_visible"])
 
     def test_reasoning_traces_surface_key_decision_points(self):
         payload = self._payload("reasoning-day")

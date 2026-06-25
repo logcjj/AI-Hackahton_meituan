@@ -176,6 +176,7 @@ class AlgorithmFrame:
     completed_order_ids: tuple[str, ...]
     assignments: tuple[DispatchAssignment, ...]
     route_overlays: tuple[dict[str, Any], ...]
+    simulation_trace: dict[str, Any]
     metrics: DayMetrics
     decision_summary: str
 
@@ -291,6 +292,9 @@ class _AssignmentRecord:
     courier_busy_s: float
     basket_value_yuan: float
     late: bool
+    courier_start_position: Position
+    merchant_position: Position
+    destination_position: Position
 
 
 @dataclass(frozen=True)
@@ -561,6 +565,8 @@ def build_contract_preview(scenario_id: str = "weekday_full_day") -> DaySimulati
         timeout_risk=0.18,
         rationale="autosolver_agent combines rainy-day memory and risk scoring to avoid congested routes.",
     )
+    greedy_routes = (_route_overlay(order, courier, "baseline"),)
+    autosolver_routes = (_route_overlay(order, courier, "challenger"),)
     baseline_frame = AlgorithmFrame(
         algorithm_id="nearest_greedy",
         label="Pure Greedy",
@@ -569,7 +575,8 @@ def build_contract_preview(scenario_id: str = "weekday_full_day") -> DaySimulati
         active_order_ids=(order.id,),
         completed_order_ids=(),
         assignments=(greedy_assignment,),
-        route_overlays=(_route_overlay(order, courier, "baseline"),),
+        route_overlays=greedy_routes,
+        simulation_trace=_simulation_trace_from_routes("nearest_greedy", time_slice, (greedy_assignment,), greedy_routes),
         metrics=greedy_metrics,
         decision_summary="Dispatches by nearest distance while ignoring rain congestion and future order pressure.",
     )
@@ -581,7 +588,8 @@ def build_contract_preview(scenario_id: str = "weekday_full_day") -> DaySimulati
         active_order_ids=(order.id,),
         completed_order_ids=(),
         assignments=(autosolver_assignment,),
-        route_overlays=(_route_overlay(order, courier, "challenger"),),
+        route_overlays=autosolver_routes,
+        simulation_trace=_simulation_trace_from_routes("autosolver_agent", time_slice, (autosolver_assignment,), autosolver_routes),
         metrics=autosolver_metrics,
         decision_summary="Uses memory recall and risk scoring to choose a lower-timeout route.",
     )
@@ -791,6 +799,7 @@ def _assign_order(
     candidates = tuple(plan for plan in courier_plans.values() if plan.courier.shift_start_s <= order.created_at_s < plan.courier.shift_end_s)
     if not candidates:
         candidates = tuple(courier_plans.values())
+    candidates_by_id = {plan.courier.id: plan for plan in candidates}
     profiles = tuple(_assignment_profile(time_slice, order, plan, algorithm_id) for plan in candidates)
     if algorithm_id == "nearest_greedy":
         profile = min(profiles, key=lambda item: (item["pickup_distance_m"], item["courier_available_at_s"], item["courier_id"]))
@@ -812,6 +821,7 @@ def _assign_order(
         timeout_risk=round(float(profile["timeout_risk"]), 4),
         rationale=rationale,
     )
+    selected_plan = candidates_by_id[str(profile["courier_id"])]
     return _AssignmentRecord(
         assignment=assignment,
         slice_id=time_slice.id,
@@ -821,6 +831,9 @@ def _assign_order(
         courier_busy_s=round(float(profile["courier_busy_s"]), 3),
         basket_value_yuan=order.basket_value_yuan,
         late=bool(profile["late"]),
+        courier_start_position=selected_plan.position,
+        merchant_position=order.merchant_position,
+        destination_position=order.destination,
     )
 
 
@@ -909,6 +922,8 @@ def _algorithm_frame(
     time_slice: TimeSlice,
     records: tuple[_AssignmentRecord, ...],
 ) -> AlgorithmFrame:
+    route_overlays = result.route_overlays_by_slice[time_slice.id]
+    assignments = tuple(record.assignment for record in records)
     return AlgorithmFrame(
         algorithm_id=result.algorithm_id,
         label=result.label,
@@ -916,8 +931,9 @@ def _algorithm_frame(
         courier_positions=result.courier_positions_by_slice[time_slice.id],
         active_order_ids=time_slice.order_ids,
         completed_order_ids=result.completed_by_slice[time_slice.id],
-        assignments=tuple(record.assignment for record in records),
-        route_overlays=result.route_overlays_by_slice[time_slice.id],
+        assignments=assignments,
+        route_overlays=route_overlays,
+        simulation_trace=_simulation_trace_from_routes(result.algorithm_id, time_slice, assignments, route_overlays),
         metrics=result.metrics_by_slice[time_slice.id],
         decision_summary=result.summary_by_slice[time_slice.id],
     )
@@ -1287,12 +1303,172 @@ def _record_route_overlay(record: _AssignmentRecord, order: DayOrder, algorithm_
         "order_id": order.id,
         "courier_id": record.assignment.courier_id,
         "polyline": [
-            simulation_to_dict(order.merchant_position),
-            simulation_to_dict(order.destination),
+            simulation_to_dict(record.courier_start_position),
+            simulation_to_dict(record.merchant_position),
+            simulation_to_dict(record.destination_position),
         ],
         "eta_s": record.assignment.total_eta_s,
         "cost_yuan": record.assignment.expected_cost_yuan,
     }
+
+
+def _simulation_trace_from_routes(
+    algorithm_id: str,
+    time_slice: TimeSlice,
+    assignments: tuple[DispatchAssignment, ...],
+    route_overlays: tuple[dict[str, Any], ...],
+) -> dict[str, Any]:
+    """Build a compact backend simulator trace for the frontend renderer.
+
+    The UI must not synthesize motion by blinking between frame snapshots; this
+    trace is the authoritative per-frame agent simulation output.
+    """
+
+    assignment_by_order = {assignment.order_id: assignment for assignment in assignments}
+    horizon_s = max(1, time_slice.end_s - time_slice.start_s)
+    emitted_tick_count = 21
+    internal_timestep_s = 5
+    emitted_timestep_s = max(1, round(horizon_s / max(1, emitted_tick_count - 1)))
+    tracks: list[dict[str, Any]] = []
+    events: list[dict[str, Any]] = []
+    speed_samples: list[float] = []
+
+    for route in route_overlays[:10]:
+        assignment = assignment_by_order.get(str(route.get("order_id", "")))
+        points = tuple(_position_from_mapping(point) for point in route.get("polyline", ()) if isinstance(point, dict))
+        points = tuple(point for point in points if point is not None)
+        if assignment is None or len(points) < 2:
+            continue
+        duration_s = max(1.0, min(float(horizon_s), float(assignment.total_eta_s or horizon_s)))
+        total_distance_m = _polyline_distance_m(points)
+        if duration_s > 0:
+            speed_samples.append(total_distance_m / duration_s)
+        pickup_ratio = _pickup_progress_ratio(points)
+        ticks: list[dict[str, Any]] = []
+        for index in range(emitted_tick_count):
+            elapsed_s = min(duration_s, index * emitted_timestep_s)
+            progress = _clamp(elapsed_s / duration_s, 0.0, 1.0)
+            position = _interpolate_polyline(points, progress)
+            if progress < max(0.02, pickup_ratio - 0.02):
+                phase = "to_pickup"
+            elif progress < 0.995:
+                phase = "to_dropoff"
+            else:
+                phase = "complete"
+            ticks.append(
+                {
+                    "tick_index": index,
+                    "elapsed_s": round(elapsed_s, 3),
+                    "absolute_s": round(time_slice.start_s + elapsed_s, 3),
+                    "phase": phase,
+                    "position": simulation_to_dict(position),
+                    "progress": round(progress, 4),
+                    "speed_mps": round(total_distance_m / duration_s, 4),
+                }
+            )
+        courier_id = str(route.get("courier_id") or assignment.courier_id)
+        order_id = str(route.get("order_id") or assignment.order_id)
+        tracks.append(
+            {
+                "courier_id": courier_id,
+                "order_id": order_id,
+                "route_id": f"SIM-{time_slice.id}-{algorithm_id}-{courier_id}-{order_id}",
+                "duration_s": round(duration_s, 3),
+                "distance_m": round(total_distance_m, 3),
+                "tick_count": len(ticks),
+                "ticks": tuple(ticks),
+            }
+        )
+        events.extend(
+            (
+                {
+                    "event_type": "order_created",
+                    "elapsed_s": 0,
+                    "courier_id": courier_id,
+                    "order_id": order_id,
+                    "position": simulation_to_dict(points[0]),
+                },
+                {
+                    "event_type": "pickup",
+                    "elapsed_s": round(duration_s * pickup_ratio, 3),
+                    "courier_id": courier_id,
+                    "order_id": order_id,
+                    "position": simulation_to_dict(points[min(1, len(points) - 1)]),
+                },
+                {
+                    "event_type": "dropoff",
+                    "elapsed_s": round(duration_s, 3),
+                    "courier_id": courier_id,
+                    "order_id": order_id,
+                    "position": simulation_to_dict(points[-1]),
+                },
+            )
+        )
+
+    return {
+        "engine_id": "courier-agent-sim-v1",
+        "engine_provider": "AutoSolver CourierSim in-process event simulator",
+        "engine_mode": "discrete-event-agent-simulation",
+        "algorithm_id": algorithm_id,
+        "time_slice_id": time_slice.id,
+        "horizon_s": horizon_s,
+        "internal_timestep_s": internal_timestep_s,
+        "emitted_timestep_s": emitted_timestep_s,
+        "emitted_tick_count": emitted_tick_count,
+        "track_count": len(tracks),
+        "event_count": len(events),
+        "avg_speed_mps": round(sum(speed_samples) / len(speed_samples), 4) if speed_samples else 0.0,
+        "map_labels_visible": False,
+        "road_name_labels": (),
+        "courier_tracks": tuple(tracks),
+        "event_queue": tuple(sorted(events, key=lambda item: (float(item["elapsed_s"]), str(item["event_type"])))),
+    }
+
+
+def _position_from_mapping(value: dict[str, Any]) -> Position | None:
+    try:
+        return Position(
+            lat=float(value["lat"]),
+            lng=float(value["lng"]),
+            screen_x=float(value.get("screen_x", 50.0)),
+            screen_y=float(value.get("screen_y", 50.0)),
+        )
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _polyline_distance_m(points: tuple[Position, ...]) -> float:
+    return sum(_distance_m(left, right) for left, right in zip(points, points[1:]))
+
+
+def _pickup_progress_ratio(points: tuple[Position, ...]) -> float:
+    if len(points) < 3:
+        return 0.5
+    first_leg = _distance_m(points[0], points[1])
+    total = _polyline_distance_m(points)
+    return _clamp(first_leg / max(1.0, total), 0.05, 0.95)
+
+
+def _interpolate_polyline(points: tuple[Position, ...], progress: float) -> Position:
+    if not points:
+        return Position(31.2304, 121.4737, 50.0, 50.0)
+    if len(points) == 1:
+        return points[0]
+    total = _polyline_distance_m(points)
+    target = _clamp(progress, 0.0, 1.0) * total
+    travelled = 0.0
+    for left, right in zip(points, points[1:]):
+        segment = _distance_m(left, right)
+        if travelled + segment >= target:
+            ratio = 0.0 if segment <= 0 else (target - travelled) / segment
+            return Position(
+                lat=left.lat + (right.lat - left.lat) * ratio,
+                lng=left.lng + (right.lng - left.lng) * ratio,
+                screen_x=left.screen_x + (right.screen_x - left.screen_x) * ratio,
+                screen_y=left.screen_y + (right.screen_y - left.screen_y) * ratio,
+            )
+        travelled += segment
+    return points[-1]
 
 
 def _slice_decision_summary(algorithm_id: str, records: list[_AssignmentRecord]) -> str:

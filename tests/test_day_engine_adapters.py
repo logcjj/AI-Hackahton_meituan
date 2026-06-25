@@ -33,8 +33,10 @@ def test_day_engine_adapters_keep_native_default_without_optional_imports():
         by_id[adapter_id]["status"] in {DAY_ENGINE_ADAPTER_STATUS_OPTIONAL_INSTALLED, DAY_ENGINE_ADAPTER_STATUS_OPTIONAL_MISSING}
         for adapter_id in ("uxsim", "sumo-traci", "cityflow", "mesa-abm")
     )
-    assert all(by_id[adapter_id]["integration_stage"] == "metadata-only-adapter-seam" for adapter_id in ("uxsim", "sumo-traci", "cityflow", "mesa-abm"))
-    assert "metadata-only" in payload["optional_dependency_policy"]
+    assert by_id[DAY_ENGINE_ADAPTER_DEFAULT_ID]["integration_stage"] == "active-runtime-simulator"
+    assert payload["version"] == "courier-agent-sim-v1"
+    assert all(by_id[adapter_id]["integration_stage"] == "optional-runtime-adapter" for adapter_id in ("uxsim", "sumo-traci", "cityflow", "mesa-abm"))
+    assert "active CourierSim runtime is always used" in payload["optional_dependency_policy"]
 
 
 def test_optional_or_unknown_day_engine_adapter_requests_fall_back_to_native():
