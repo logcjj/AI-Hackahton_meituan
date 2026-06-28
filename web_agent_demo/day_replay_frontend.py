@@ -240,8 +240,107 @@ def render_day_replay_index() -> str:
     .page-head p { margin: 0; max-width: 820px; color: var(--muted); line-height: 1.55; }
     .page-grid { display: grid; gap: 14px; }
     .live-grid {
-      grid-template-columns: minmax(0, 1.4fr) 360px;
+      grid-template-columns: 1fr;
       align-items: start;
+    }
+    .live-advantage-hero {
+      display: grid;
+      grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid rgba(15,118,110,.24);
+      border-radius: 22px;
+      background:
+        linear-gradient(120deg, rgba(15,118,110,.12), rgba(255,255,255,.88) 42%),
+        radial-gradient(circle at 14% 8%, rgba(34,197,94,.16), transparent 34%),
+        var(--surface-glass);
+      box-shadow: var(--shadow-float);
+      backdrop-filter: blur(14px);
+    }
+    .advantage-lead {
+      display: grid;
+      align-content: center;
+      gap: 11px;
+      padding: 8px 6px;
+    }
+    .advantage-kicker {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 9px;
+      border: 1px solid rgba(15,118,110,.20);
+      border-radius: 999px;
+      color: var(--accent-2);
+      background: rgba(255,255,255,.70);
+      font: 800 11px var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .advantage-kicker::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(15,118,110,.10);
+      content: "";
+    }
+    .advantage-lead h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(30px, 4.2vw, 56px);
+      line-height: .96;
+      letter-spacing: -.06em;
+    }
+    .advantage-lead p {
+      margin: 0;
+      max-width: 560px;
+      color: var(--ink-2);
+      font-size: 14px;
+      line-height: 1.58;
+    }
+    .advantage-target-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .advantage-target-row span {
+      padding: 6px 8px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,.72);
+      font: 800 11px var(--mono);
+    }
+    .live-advantage-metrics {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+    .live-ops-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 336px;
+      gap: 14px;
+      align-items: start;
+    }
+    .live-primary-column,
+    .live-side-rail {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+    .live-side-rail {
+      position: sticky;
+      top: 88px;
+      align-self: start;
+    }
+    .live-run-panel .card-body {
+      display: grid;
+      gap: 12px;
+    }
+    .live-run-panel .event-list {
+      max-height: 250px;
+      overflow: auto;
     }
     .decision-grid {
       grid-template-columns: 280px minmax(0, 1fr) 340px;
@@ -279,6 +378,7 @@ def render_day_replay_index() -> str:
     }
     .card-head h3 { margin: 0; font-size: 15px; }
     .card-head span { color: var(--muted); font-size: 12px; }
+    .card-head span em { font-style: normal; }
     .card-body { padding: 14px 16px; }
     .control-dock {
       display: flex;
@@ -293,6 +393,21 @@ def render_day_replay_index() -> str:
       top: 88px;
       z-index: 12;
       backdrop-filter: blur(14px);
+    }
+    .live-control-dock {
+      position: relative;
+      top: auto;
+      z-index: 7;
+      align-items: center;
+      box-shadow: var(--shadow-tight);
+    }
+    .live-control-dock .runtime-strip {
+      flex: 1 1 420px;
+      width: auto;
+      grid-template-columns: repeat(5, minmax(86px, 1fr));
+    }
+    .live-control-dock .inference-progress {
+      flex: 1 0 100%;
     }
     .runtime-strip {
       display: grid;
@@ -615,7 +730,7 @@ def render_day_replay_index() -> str:
       white-space: nowrap;
     }
     .score-stack { display: grid; gap: 10px; }
-    .live-grid > aside,
+    .live-side-rail,
     .decision-grid > aside,
     .operations-grid > aside {
       position: sticky;
@@ -639,15 +754,49 @@ def render_day_replay_index() -> str:
     .score-card[data-tone="good"] { background: var(--green-soft); border-color: rgba(15,118,110,.24); }
     .score-card[data-tone="warn"] { background: var(--amber-soft); border-color: rgba(183,121,31,.24); }
     .score-card[data-tone="risk"] { background: var(--red-soft); border-color: rgba(180,35,24,.22); }
+    .live-advantage-hero .algorithm-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .live-advantage-hero .score-card {
+      min-height: 0;
+      padding: 10px;
+      background: rgba(255,255,255,.78);
+    }
+    .live-advantage-hero .score-card b {
+      margin: 3px 0 2px;
+      font-size: 21px;
+    }
+    .live-advantage-hero .score-card span:last-child {
+      display: block;
+      max-height: 34px;
+      overflow: hidden;
+      line-height: 1.35;
+    }
+    .live-advantage-hero .score-card[data-tone="good"] {
+      background: linear-gradient(180deg, rgba(230,244,241,.98), rgba(255,255,255,.86));
+      border-color: rgba(15,118,110,.34);
+    }
+    .live-advantage-hero .score-card[data-tone="warn"] {
+      background: linear-gradient(180deg, rgba(251,241,219,.98), rgba(255,255,255,.84));
+    }
     .delta-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
+    .live-advantage-hero .delta-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .live-advantage-hero .delta-grid .score-card {
+      min-height: 0;
+    }
     .metric-strip {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 9px;
+    }
+    .live-run-panel .metric-strip {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .metric-chip {
       padding: 10px;
@@ -1003,11 +1152,13 @@ def render_day_replay_index() -> str:
       .brand strong, .brand span, .nav-link span:not(.nav-icon), .nav-section-title, .nav-meta { display: none; }
       .nav-link { grid-template-columns: 1fr; justify-items: center; }
       .live-grid, .decision-grid, .memory-grid, .rider-grid { grid-template-columns: 1fr; }
-      .live-grid > aside, .decision-grid > aside, .operations-grid > aside, .control-dock { position: static; }
+      .live-advantage-hero, .live-ops-shell, .decision-grid { grid-template-columns: 1fr; }
+      .live-side-rail, .decision-grid > aside, .operations-grid > aside, .control-dock { position: static; }
       .topbar { grid-template-columns: 1fr; }
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .runtime-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .live-advantage-hero .delta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .operations-overview, .operations-grid, .rider-board { grid-template-columns: 1fr; }
       .memory-overview, .memory-section-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -1022,6 +1173,9 @@ def render_day_replay_index() -> str:
       .filter-bar .filter-count { width: 100%; margin-left: 0; }
       .page-head { grid-template-columns: 1fr; }
       .algorithm-pair, .delta-grid, .metric-strip { grid-template-columns: 1fr; }
+      .live-advantage-hero { padding: 12px; border-radius: 18px; }
+      .live-advantage-hero .algorithm-pair, .live-advantage-hero .delta-grid { grid-template-columns: 1fr; }
+      .live-control-dock .runtime-strip { flex-basis: 100%; grid-template-columns: 1fr; }
       .operations-overview { grid-template-columns: 1fr; }
       .memory-overview, .memory-section-grid, .recall-lane, .memory-field-grid, .context-metric-grid { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
@@ -1572,6 +1726,8 @@ def render_day_replay_index() -> str:
       setText("inference-speed-label", `${inferenceState.speed}x`);
       setText("inference-mode-label", inferenceModeLabels[inferenceState.mode]);
       setText("inference-event-count", events.length);
+      setText("live-advantage-headline", liveAdvantageHeadline(currentScore));
+      setText("live-advantage-copy", liveAdvantageCopy(currentScore));
       setText("map-runtime-hint", `${stateLabel} / ${clock(inferenceState.currentTimeS)} / ${inferenceModeLabels[inferenceState.mode]}`);
       setText("event-flow-caption", `${events.length} events released automatically`);
       setText("cumulative-metrics-caption", `${currentScore.time_label} 累计优势`);
@@ -1602,11 +1758,11 @@ def render_day_replay_index() -> str:
       const scoreStack = document.getElementById("live-score-stack");
       if (scoreStack) scoreStack.innerHTML = renderLiveScoreCards(currentScore);
       const eventFlow = document.getElementById("live-event-flow");
-      if (eventFlow) eventFlow.innerHTML = events.slice(-9).reverse().map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>点击开始推理后，订单进入、候选分配和累计结果将自动释放。</p></div>`;
+      if (eventFlow) eventFlow.innerHTML = events.slice(-4).reverse().map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>点击开始推理后，订单进入、候选分配和累计结果将自动释放。</p></div>`;
       const cumulativeMetrics = document.getElementById("live-cumulative-metrics");
       if (cumulativeMetrics) cumulativeMetrics.innerHTML = renderLiveCumulativeMetrics(currentScore);
       const summary = document.getElementById("live-round-summary");
-      if (summary) summary.innerHTML = renderRoundSummary(currentDecision);
+      if (summary) summary.innerHTML = renderRoundSummary(currentDecision, true);
     }
 
     function setText(id, value) {
@@ -1625,6 +1781,29 @@ def render_day_replay_index() -> str:
       ].map(([label, value]) => `
         <div class="stat-pill"><b>${escapeHtml(value)}</b><span>${escapeHtml(label)}</span></div>
       `).join("");
+    }
+
+    function liveAdvantageHeadline(score) {
+      const delta = score.deltas || {};
+      const finalDelta = workbench.metrics.final.deltas;
+      const timeSaved = Number(delta.time_saved_min || 0);
+      const moneySaved = Number(delta.money_saved_yuan || 0);
+      if (!inferenceState.started || timeSaved <= 0) {
+        return `全日可节省 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟`;
+      }
+      return `已节省 ${fmtNumber(timeSaved, 1)} 分钟`;
+    }
+
+    function liveAdvantageCopy(score) {
+      const delta = score.deltas || {};
+      const finalDelta = workbench.metrics.final.deltas;
+      const timeSaved = Number(delta.time_saved_min || 0);
+      const moneySaved = Number(delta.money_saved_yuan || 0);
+      const timeoutText = fmtFewer(delta.timeout_order_delta || 0, "单");
+      if (!inferenceState.started || timeSaved <= 0) {
+        return `当前等待首轮 Planner 评分。全日回放最终显示：我方比基线少 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟、少 ${fmtNumber(finalDelta.money_saved_yuan, 1)} 元成本，超时单${fmtFewer(finalDelta.timeout_order_delta, "单")}。`;
+      }
+      return `推理正在自动推进：当前累计少 ${fmtNumber(moneySaved, 1)} 元成本，超时单${timeoutText}，地图只展示我方动作和差异路线。`;
     }
 
     function renderNav() {
@@ -1681,14 +1860,31 @@ def render_day_replay_index() -> str:
 
     function renderLivePage() {
       const currentScore = scoreForTime(inferenceState.currentTimeS);
-      const events = releasedEvents(inferenceState.currentTimeS).slice(-9).reverse();
+      const events = releasedEvents(inferenceState.currentTimeS).slice(-4).reverse();
       const currentDecision = decisionForTime(inferenceState.currentTimeS);
       const currentFrame = frameForTime(inferenceState.currentTimeS);
+      const finalScore = workbench.metrics.final;
       return `
-        ${pageHeader("live", "Live Map / GanttMap", "主工作台只展示对调度有用的内容：实时地图、累计优势、事件流和当前轮摘要。")}
+        ${pageHeader("live", "Live Map / Advantage Console", "首屏先回答算法是否更强：实时地图承接推理动作，右侧只保留当前决策和运行信号。")}
         <div class="page-grid live-grid" data-page="live" data-inference-state="${inferenceState.running ? "running" : inferenceState.started ? "paused" : "ready"}">
-          <div class="page-grid">
-            <div class="control-dock" data-control-strip="live">
+          <section id="live-advantage-hero" class="live-advantage-hero" data-live-priority="advantage-first">
+            <div class="advantage-lead">
+              <span class="advantage-kicker">实时累计对比栏</span>
+              <h3 id="live-advantage-headline">${escapeHtml(liveAdvantageHeadline(currentScore))}</h3>
+              <p id="live-advantage-copy">${escapeHtml(liveAdvantageCopy(currentScore))}</p>
+              <div class="advantage-target-row" aria-label="full day final advantage target">
+                <span>全日目标 ${fmtNumber(finalScore.deltas.time_saved_min, 1)} min</span>
+                <span>成本优势 ${fmtNumber(finalScore.deltas.money_saved_yuan, 1)} 元</span>
+                <span>超时单${fmtFewer(finalScore.deltas.timeout_order_delta, "单")}</span>
+              </div>
+            </div>
+            <div id="live-score-stack" class="live-advantage-metrics" data-score-role="dominant-advantage">
+              ${renderLiveScoreCards(currentScore)}
+            </div>
+          </section>
+          <div class="live-ops-shell">
+            <div class="live-primary-column">
+              <div class="control-dock live-control-dock" data-control-strip="live">
               <button id="start-inference" class="primary-button" data-control="start-inference">开始推理</button>
               <button id="pause-inference" class="ghost-button" data-control="pause-resume">暂停/继续</button>
               <select id="playback-speed" class="select-control" data-control="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select>
@@ -1701,38 +1897,32 @@ def render_day_replay_index() -> str:
                 <div class="runtime-cell"><span>释放事件</span><b id="inference-event-count">${releasedEvents(inferenceState.currentTimeS).length}</b></div>
               </div>
               <div class="inference-progress" aria-label="full day inference progress"><span id="inference-progress-bar" style="--progress:${inferenceProgressPct()}%"></span></div>
-            </div>
-            <div class="card map-panel">
+              </div>
+              <div class="card map-panel">
               <div class="card-head"><h3>实时地图层</h3><span id="map-runtime-hint">merchants / orders / riders / routes / hotspots</span></div>
               <div id="live-map-stage" class="real-map-stage schematic-map" data-map-layer="primary" data-real-map-provider="leaflet" data-tile-layer="cartodb-light-nolabels" data-real-map-status="loading" data-map-mode="${escapeHtml(inferenceState.mode)}" data-frame-id="${escapeHtml(currentFrame.id)}">
                 ${renderLiveMapLayer(currentFrame)}
               </div>
-            </div>
-            <div class="card">
-              <div class="card-head"><h3>轻量事件流</h3><span id="event-flow-caption">按全天推演时间释放</span></div>
-              <div id="live-event-flow" class="card-body event-list">${events.map(renderEventItem).join("")}</div>
-            </div>
-            <div class="card">
-              <div class="card-head"><h3>累积指标区</h3><span id="cumulative-metrics-caption">${escapeHtml(currentScore.time_label)} 累计优势</span></div>
-              <div id="live-cumulative-metrics" class="card-body metric-strip">
-                ${renderLiveCumulativeMetrics(currentScore)}
               </div>
             </div>
+            <aside class="live-side-rail">
+              <div class="card">
+                <div class="card-head"><h3>当前决策摘要</h3><span id="round-summary-time">${escapeHtml(currentDecision.trigger_time_label)}</span></div>
+                <div id="live-round-summary" class="card-body compact-list">
+                  ${renderRoundSummary(currentDecision, true)}
+                </div>
+              </div>
+              <div class="card live-run-panel">
+                <div class="card-head"><h3>运行信号</h3><span><em id="cumulative-metrics-caption">${escapeHtml(currentScore.time_label)} 累计优势</em> / <em id="event-flow-caption">按全天推演时间释放</em></span></div>
+                <div class="card-body">
+                  <div id="live-cumulative-metrics" class="metric-strip" aria-label="compact cumulative advantage">
+                    ${renderLiveCumulativeMetrics(currentScore)}
+                  </div>
+                  <div id="live-event-flow" class="event-list">${events.map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>点击开始推理后，订单进入、候选分配和累计结果将自动释放。</p></div>`}</div>
+                </div>
+              </div>
+            </aside>
           </div>
-          <aside class="page-grid">
-            <div class="card">
-              <div class="card-head"><h3>实时累计对比栏</h3><span>baseline vs ours</span></div>
-              <div id="live-score-stack" class="card-body score-stack">
-                ${renderLiveScoreCards(currentScore)}
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-head"><h3>本轮摘要</h3><span id="round-summary-time">${escapeHtml(currentDecision.trigger_time_label)}</span></div>
-              <div id="live-round-summary" class="card-body compact-list">
-                ${renderRoundSummary(currentDecision)}
-              </div>
-            </div>
-          </aside>
         </div>
       `;
     }
@@ -2321,12 +2511,23 @@ def render_day_replay_index() -> str:
       `;
     }
 
-    function renderRoundSummary(decision) {
+    function renderRoundSummary(decision, compact = false) {
       const finalActions = actionSummary(decision.final_actions, 3);
       const abandonedActions = actionSummary(decision.abandoned_actions, 3);
       const filterSummary = decision.filtering_process.slice(0, 3).map((stage) => `${stage.stage}: ${stage.remaining}`).join(" / ");
       const scoreSummary = decision.scoring_process.slice(0, 3).map((item) => `${item.algorithm_id} ${fmtNumber(item.score, 3)}`).join(" / ") || "等待评分";
       const writebackIds = decision.result_writeback.memory_event_ids.slice(0, 4).join(", ") || "无";
+      if (compact) {
+        return `
+          <div class="round-summary-grid" data-decision-id="${escapeHtml(decision.id)}" data-density="compact">
+            <div class="list-item" id="round-trigger"><strong>触发原因</strong><p>${escapeHtml(decision.trigger_reason)}</p></div>
+            <div class="list-item" id="round-final-actions"><strong>最终动作</strong><p>${escapeHtml(finalActions)}</p></div>
+            <div class="list-item" id="round-abandoned-actions"><strong>被放弃动作</strong><p>${escapeHtml(abandonedActions)}</p></div>
+            <div class="list-item" id="round-writeback"><strong>结果回写</strong><p>${decision.result_writeback.writeback_count} writebacks / ${escapeHtml(writebackIds)}</p></div>
+            <div class="list-item" id="round-metric-impact"><strong>本轮结果</strong><p>${escapeHtml(decision.round_result.summary)}；节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，成本优势 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元。</p></div>
+          </div>
+        `;
+      }
       return `
         <div class="round-summary-grid" data-decision-id="${escapeHtml(decision.id)}">
           <div class="list-item" id="round-trigger"><strong>触发原因</strong><p>${escapeHtml(decision.trigger_reason)}</p></div>

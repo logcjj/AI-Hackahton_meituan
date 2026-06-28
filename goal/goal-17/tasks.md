@@ -109,7 +109,7 @@ Confidence loop:
 
 ## Task 3 - Live Page Advantage-First Simplification
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - First viewport clearly shows our algorithm advantage over baseline.
@@ -118,8 +118,50 @@ Independent verification:
 - Live page no longer feels like a noisy grid of equal cards.
 
 Work log:
+- Rebuilt the Live page around an advantage-first hero:
+  - added `#live-advantage-hero` with `data-live-priority="advantage-first"`;
+  - made the first visible message show full-day final advantage before replay starts: 433.0 minutes saved, 424.7 yuan cost advantage, and 3 fewer timeout orders;
+  - switched the hero headline dynamically after replay starts, e.g. browser QA showed `已节省 12.1 分钟` at the first decision window.
+- Moved `#live-score-stack` into the hero as the dominant comparison surface instead of leaving it as a secondary right-rail card.
+- Kept all required scorecard metrics visible while visually compressing them:
+  - baseline/our cumulative cards;
+  - time, money, timeout, empty mileage, and profit/cost deltas.
+- Simplified the Live page structure:
+  - reduced the visible Live card count from the previously audited 17-card-like presentation to 3 primary cards in browser DOM;
+  - merged event flow and cumulative metrics into a single `运行信号` panel;
+  - collapsed the round summary to 5 high-value items: trigger, final action, abandoned action, writeback, result.
+- Preserved and verified all inference controls:
+  - `start-inference`;
+  - `pause-inference`;
+  - `playback-speed`;
+  - `inference-mode`.
+- Kept the real map from Task 2 in the main operations area and retained the same map IDs and Leaflet/fallback behavior.
+- Added responsive CSS so the hero, map, and side rail collapse cleanly on narrower widths.
+- Updated static tests for the new Live structure:
+  - `#live-advantage-hero`;
+  - `data-live-priority="advantage-first"`;
+  - `#live-advantage-headline`;
+  - `#live-advantage-copy`;
+  - `data-score-role="dominant-advantage"`;
+  - `live-ops-shell`, `live-side-rail`, and `live-run-panel`;
+  - `liveAdvantageHeadline` and `liveAdvantageCopy`.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Browser QA on `http://127.0.0.1:18772/?v=goal17-task3c#/live`:
+  - hero appeared before the map;
+  - initial headline was `全日可节省 433.0 分钟`;
+  - target chips showed `全日目标 433.0 min`, `成本优势 424.7 元`, and `超时单少 3 单`;
+  - Live DOM had 3 primary `.card` blocks under `[data-page=live]`;
+  - starting replay and jumping to the first decision window changed headline to `已节省 12.1 分钟`;
+  - event flow displayed 4 recent events instead of 9;
+  - compact round summary displayed 5 items instead of the old dense 8-item set;
+  - map stayed on Leaflet with route/marker counts;
+  - browser console reported 0 errors.
 
 Confidence loop:
+- 100% confidence for Task 3 scope: the first visible Live information layer now states the algorithm advantage directly, low-value panels are merged or compacted, live controls still render and function, the map remains intact, automated tests pass, and browser QA proves the page is no longer an equal-weight noisy grid.
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
