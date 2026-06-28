@@ -110,7 +110,7 @@ Confidence loop:
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -118,8 +118,34 @@ Independent verification:
 - Run compile/static checks and fix any issue found before continuing.
 
 Work log:
+- Re-read `goal/goal-16/input.md`, `goal/goal-16/plan.md`, and `goal/goal-16/tasks.md` before starting the debug cycle.
+- Confirmed current branch is `codex/kandbox-dispatch-workbench` and the worktree was clean at cycle start.
+- Revalidated rendered HTML and bootstrap payload from `web_agent_demo.server.render_index()`:
+  - new shell markers exist: `dispatch-workbench-shell`, `dispatch-workbench-bootstrap`, all five route paths and `window.__DISPATCH_WORKBENCH__`;
+  - bootstrap mode is `dispatch-workbench-shell`;
+  - workbench routes are exactly `live`, `decisions`, `memory`, `orders`, `riders`;
+  - workbench inspection shows 207 orders, 18 riders, 40 decisions, 120 memory entries and full-day preloading.
+- Rechecked old primary-shell markers are absent from rendered frontend HTML:
+  - `day-replay-shell`;
+  - `side-by-side-replay`;
+  - `greedy-map-panel`;
+  - `autosolver-map-panel`;
+  - `bootstrapDayReplayShell`;
+  - `__AUTO_SOLVER_DAY_REPLAY__`.
+- Ran `rg` over implementation/tests/goal files and confirmed old shell markers only remain as forbidden test strings or historical task log text, not in frontend implementation.
+- Executed the actual generated frontend script in Node VM with a DOM stub and verified five route transitions:
+  - `live: ok`;
+  - `decisions: ok`;
+  - `memory: ok`;
+  - `orders: ok`;
+  - `riders: ok`.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`.
+- Ran `uv run --with pytest pytest -q tests/test_dispatch_workbench_data.py tests/test_web_agent_demo.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
+- No defects were found that required code fixes in this debug cycle.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 1 scope: Tasks 1-3 are consistent with the goal workflow, the Kandbox-style workbench data and shell are present, the old single-page replay shell is not the visible frontend structure, and compile/static/full-test verification all pass.
 
 ## Task 4 - Real-Time Inference Control Loop
 
