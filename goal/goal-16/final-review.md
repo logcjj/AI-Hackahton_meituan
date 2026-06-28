@@ -1,6 +1,6 @@
 # Goal 16 Final Review And Archive Prep
 
-Status: Task 12 review complete; final Debug Cycle 4 still pending before the thread goal is marked complete.
+Status: Task 12 review complete; Debug Cycle 4 complete; goal archived in `goal/goal-16/GOAL_COMPLETED.md`.
 
 ## Scope Reviewed
 
@@ -28,4 +28,4 @@ Status: Task 12 review complete; final Debug Cycle 4 still pending before the th
 
 - Task 11 QA artifacts are stored under `goal/goal-16/artifacts/task-11/`.
 - This final review note records the Task 12 review and fix.
-- Final goal completion should be declared only after Debug Cycle 4 re-reads the goal files, reruns final automated/browser checks, and confirms no high-risk issue remains.
+- Final goal completion was declared after Debug Cycle 4 re-read the goal files, reran final automated/browser checks, and confirmed no high-risk issue remains.

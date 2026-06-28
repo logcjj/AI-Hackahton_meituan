@@ -109,6 +109,7 @@ class WebAgentDemoTest(unittest.TestCase):
             'id="rider-resource-board"',
             'id="rider-context-panel"',
             "资源盘点上下文",
+            "骑手编号",
             "当前任务链",
             "预计空闲时间",
             "历史表现摘要",

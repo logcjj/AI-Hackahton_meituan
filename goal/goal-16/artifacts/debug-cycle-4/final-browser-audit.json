@@ -1,0 +1,209 @@
+{
+  "ok": true,
+  "startedAt": "2026-06-28T15:15:58.757Z",
+  "base": "http://127.0.0.1:18771",
+  "routes": {
+    "default": {
+      "route": "live",
+      "hash": "#/live",
+      "routeView": "live",
+      "title": "实时推理页",
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5,
+      "width": 1028,
+      "overflowX": 0,
+      "navWidth": 252
+    },
+    "decisions": {
+      "route": "decisions",
+      "hash": "#/decisions",
+      "routeView": "decisions",
+      "title": "决策页",
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5,
+      "width": 1028,
+      "overflowX": 0,
+      "navWidth": 252
+    },
+    "memory": {
+      "route": "memory",
+      "hash": "#/memory",
+      "routeView": "memory",
+      "title": "Memory 页",
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5,
+      "width": 1028,
+      "overflowX": 0,
+      "navWidth": 252
+    },
+    "orders": {
+      "route": "orders",
+      "hash": "#/orders",
+      "routeView": "orders",
+      "title": "订单页",
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5,
+      "width": 1028,
+      "overflowX": 0,
+      "navWidth": 252
+    },
+    "riders": {
+      "route": "riders",
+      "hash": "#/riders",
+      "routeView": "riders",
+      "title": "骑手页",
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5,
+      "width": 1028,
+      "overflowX": 0,
+      "navWidth": 252
+    }
+  },
+  "live": {
+    "clockAfterStart": "14:00",
+    "mode": "叠加",
+    "scoreEmptyMileage": "空驶里程差异增加 9.82 km对比/叠加模式只强调差异路线",
+    "chipEmptyMileage": "空驶里程差异增加 9.82 km总距离差异 -9,821 m",
+    "routeCount": 14,
+    "differenceRoutes": 5,
+    "baselineRoutes": 5,
+    "previousRoutes": 4,
+    "movingRiders": 5,
+    "newOrders": 5,
+    "merchants": 18,
+    "hotspots": 4,
+    "eventRows": 9,
+    "hasFinalActions": true,
+    "hasWriteback": true,
+    "clockAfterStartControl": "07:42",
+    "pausedClock": "07:42",
+    "pausedClockAfterWait": "07:42",
+    "clockAfterResume": "08:24"
+  },
+  "decisions": {
+    "rounds": 40,
+    "selected": "D-F-TS-1300",
+    "stages": 10,
+    "required": true
+  },
+  "memory": {
+    "routeKind": "hermes-long-term",
+    "sections": [
+      "new",
+      "curated",
+      "active",
+      "feedback"
+    ],
+    "recallCards": 3,
+    "requiredLabels": true
+  },
+  "orders": {
+    "hasRouteKind": true,
+    "requiredLabels": true,
+    "defaultRows": 207,
+    "highRiskRows": 100,
+    "allHighRisk": true
+  },
+  "riders": {
+    "hasRouteKind": true,
+    "miniMaps": 12,
+    "requiredLabels": true,
+    "defaultCards": 18,
+    "endingShiftCards": 12,
+    "allEndingShift": true
+  },
+  "responsive": {
+    "desktop": {
+      "live": {
+        "width": 1028,
+        "overflowX": 0,
+        "navWidth": 252
+      },
+      "decisions": {
+        "width": 1028,
+        "overflowX": 0,
+        "navWidth": 252
+      },
+      "memory": {
+        "width": 1028,
+        "overflowX": 0,
+        "navWidth": 252
+      },
+      "orders": {
+        "width": 1028,
+        "overflowX": 0,
+        "navWidth": 252
+      },
+      "riders": {
+        "width": 1028,
+        "overflowX": 0,
+        "navWidth": 252
+      }
+    },
+    "tablet": {
+      "live": {
+        "width": 682,
+        "overflowX": 0,
+        "navWidth": 78
+      },
+      "decisions": {
+        "width": 682,
+        "overflowX": 0,
+        "navWidth": 78
+      },
+      "memory": {
+        "width": 682,
+        "overflowX": 0,
+        "navWidth": 78
+      },
+      "orders": {
+        "width": 682,
+        "overflowX": 0,
+        "navWidth": 78
+      },
+      "riders": {
+        "width": 682,
+        "overflowX": 0,
+        "navWidth": 78
+      }
+    },
+    "phone": {
+      "live": {
+        "width": 390,
+        "overflowX": 0,
+        "navWidth": 390
+      },
+      "decisions": {
+        "width": 390,
+        "overflowX": 0,
+        "navWidth": 390
+      },
+      "memory": {
+        "width": 390,
+        "overflowX": 0,
+        "navWidth": 390
+      },
+      "orders": {
+        "width": 390,
+        "overflowX": 0,
+        "navWidth": 390
+      },
+      "riders": {
+        "width": 390,
+        "overflowX": 0,
+        "navWidth": 390
+      }
+    }
+  },
+  "artifacts": [
+    "goal/goal-16/artifacts/debug-cycle-4/debug-cycle-4-live.png",
+    "goal/goal-16/artifacts/debug-cycle-4/debug-cycle-4-riders-phone.png"
+  ],
+  "runtimeErrors": [],
+  "finishedAt": "2026-06-28T15:16:06.079Z"
+}

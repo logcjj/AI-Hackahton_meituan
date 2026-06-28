@@ -2306,7 +2306,7 @@ def render_day_replay_index() -> str:
       const loadRatio = clamp(rider.current_load / Math.max(1, rider.capacity), 0, 1);
       return `
         <article class="card rider-card" data-rider-id="${escapeHtml(rider.id)}" data-state="${escapeHtml(rider.online_state)}" data-area="${escapeHtml(rider.business_area)}">
-          <div class="card-head"><h3>${escapeHtml(rider.name)}</h3><span>${escapeHtml(rider.online_state)}</span></div>
+          <div class="card-head"><h3>${escapeHtml(rider.name)}</h3><span>骑手编号 ${escapeHtml(rider.id)} / ${escapeHtml(rider.online_state)}</span></div>
           <div class="card-body">
             ${renderRiderMiniMap(rider)}
             <div class="rider-load" style="--load:${loadRatio}"><span></span></div>

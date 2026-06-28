@@ -805,7 +805,7 @@ Confidence loop:
 
 ## Debug Cycle 4 - Tasks 10-12 Final Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -813,5 +813,56 @@ Independent verification:
 - Confirm all tasks are complete and no high-risk issue remains.
 
 Work log:
+- Re-read `goal/goal-16/input.md`, `goal/goal-16/plan.md`, and full `goal/goal-16/tasks.md` in chunks before starting Debug Cycle 4.
+- Re-read the Playwright skill instructions before final browser QA.
+- Confirmed current branch is `codex/kandbox-dispatch-workbench`.
+- Confirmed `npx` and the Playwright wrapper are available.
+- Confirmed no stale local `web_agent_demo.server` process was running before the final browser run.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py web_agent_demo/server.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
+- Ran an explicit final static requirement audit against `web_agent_demo.server.render_index()` and saved it to `goal/goal-16/artifacts/debug-cycle-4/final-static-audit.json`.
+- Final static audit passed 15 requirement checks:
+  - dispatch workbench shell mode;
+  - five routes;
+  - Kandbox module mapping labels;
+  - old frontend shell removal;
+  - full-day preloaded counts;
+  - live controls;
+  - live map layers;
+  - required scorecard fields;
+  - corrected empty-mileage copy;
+  - decision page fields;
+  - Memory page fields;
+  - orders page fields;
+  - riders page fields;
+  - enterprise visual system;
+  - secret/robustness marker and no browser storage/cookie/eval primitives.
+- The first final static audit surfaced a real requirement gap:
+  - the Riders page displayed rider names and ids but did not explicitly label the id as `骑手编号`;
+  - fixed `web_agent_demo/day_replay_frontend.py` so rider cards render `骑手编号 {id} / {state}`;
+  - added the `骑手编号` regression marker in `tests/test_web_agent_demo.py`.
+- Re-ran compile, full tests, final static audit, and robustness primitive audit after the fix; all passed.
+- Started a fresh local server at `http://127.0.0.1:18771`.
+- Ran final direct cached-Playwright Chromium QA and saved it to `goal/goal-16/artifacts/debug-cycle-4/final-browser-audit.json`.
+- Final browser QA verified:
+  - default route renders the Live workspace;
+  - five route nav remains present;
+  - live start, pause, resume, speed, and overlay mode work;
+  - scorecard and cumulative chip show corrected `空驶里程差异增加 9.82 km`;
+  - map renders merchants, riders, new orders, hotspots, previous routes, baseline routes, and difference routes;
+  - live event stream, final actions, and writeback summary render;
+  - Decisions page renders 40 rounds and all required reasoning stages;
+  - Memory page renders Hermes long-term sections and required fields;
+  - Orders page renders 207 orders and high-risk filtering works;
+  - Riders page renders 18 riders, ending-shift filtering works, mini maps remain visible, and required labels including `骑手编号` render;
+  - desktop, tablet, and phone widths have usable route widths and no horizontal overflow above threshold.
+- Browser QA captured 0 browser runtime errors, 0 page errors, and 0 `console.error` events.
+- Saved final browser screenshots:
+  - `goal/goal-16/artifacts/debug-cycle-4/debug-cycle-4-live.png`;
+  - `goal/goal-16/artifacts/debug-cycle-4/debug-cycle-4-riders-phone.png`.
+- Stopped the local server after browser QA.
+- Checked process state after QA; no stale app server or Playwright browser process remained from this run. Chromium-like processes reported by `pgrep` belonged to WPS Office, not the workbench QA.
+- Added goal completion/archive note in `goal/goal-16/GOAL_COMPLETED.md`.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 4 scope: final automated checks, static requirement coverage, robustness audit, and browser QA all pass after fixing the only requirement gap found in this final cycle; every task in `tasks.md` is complete, and no high-risk issue remains.

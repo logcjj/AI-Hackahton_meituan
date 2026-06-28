@@ -1,0 +1,85 @@
+{
+  "ok": true,
+  "checks": {
+    "branch_product_shell": {
+      "passed": true,
+      "evidence": "dispatch-workbench-shell"
+    },
+    "five_routes": {
+      "passed": true,
+      "evidence": [
+        "live",
+        "decisions",
+        "memory",
+        "orders",
+        "riders"
+      ]
+    },
+    "module_mapping_visible": {
+      "passed": true,
+      "evidence": "Kandbox module labels visible"
+    },
+    "old_frontend_removed": {
+      "passed": true,
+      "evidence": "old shell markers absent"
+    },
+    "preloaded_data_counts": {
+      "passed": true,
+      "evidence": {
+        "orders": 207,
+        "riders": 18,
+        "decisions": 40,
+        "memory": 120
+      }
+    },
+    "live_controls": {
+      "passed": true,
+      "evidence": "start/pause/speed/mode controls"
+    },
+    "live_map_layers": {
+      "passed": true,
+      "evidence": "map routes/dots/hotspots markers"
+    },
+    "scorecard_fields": {
+      "passed": true,
+      "evidence": "baseline/ours and required deltas"
+    },
+    "empty_mileage_copy_fixed": {
+      "passed": true,
+      "evidence": "signed distance formatter active"
+    },
+    "decision_page_fields": {
+      "passed": true,
+      "evidence": "all required decision stage markers"
+    },
+    "memory_page_fields": {
+      "passed": true,
+      "evidence": "Hermes memory sections and fields"
+    },
+    "orders_page_fields": {
+      "passed": true,
+      "evidence": "orders input fields and filters"
+    },
+    "riders_page_fields": {
+      "passed": true,
+      "evidence": "riders resource fields and mini map"
+    },
+    "visual_system": {
+      "passed": true,
+      "evidence": "enterprise visual tokens and reduced motion"
+    },
+    "security_robustness": {
+      "passed": true,
+      "evidence": "secret marker present; no eval/storage/cookie usage"
+    }
+  },
+  "inspection": {
+    "decision_count": 40,
+    "deterministic": true,
+    "event_count": 407,
+    "full_day_preloaded": true,
+    "memory_count": 120,
+    "order_count": 207,
+    "rider_count": 18
+  }
+}
