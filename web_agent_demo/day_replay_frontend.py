@@ -248,12 +248,55 @@ def render_day_replay_index() -> str:
       background: var(--surface);
       box-shadow: var(--shadow);
     }
+    .runtime-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+    }
+    .runtime-cell {
+      min-height: 58px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-2);
+    }
+    .runtime-cell b {
+      display: block;
+      font: 800 15px var(--mono);
+      color: var(--ink);
+    }
+    .runtime-cell span {
+      color: var(--muted);
+      font: 700 10px var(--mono);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .inference-progress {
+      width: 100%;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #dbe4ed;
+    }
+    .inference-progress span {
+      display: block;
+      width: var(--progress, 0%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+      transition: width .28s ease;
+    }
     .primary-button {
       border: 0;
       border-radius: 11px;
       padding: 9px 13px;
       color: #fff;
       background: var(--accent);
+    }
+    .primary-button[disabled] {
+      cursor: default;
+      opacity: .62;
     }
     .ghost-button, .select-control {
       border: 1px solid var(--line-strong);
@@ -328,6 +371,16 @@ def render_day_replay_index() -> str:
     .score-card span { color: var(--muted); font-size: 12px; }
     .score-card[data-tone="good"] { background: var(--green-soft); border-color: rgba(15,118,110,.24); }
     .score-card[data-tone="warn"] { background: var(--amber-soft); border-color: rgba(183,121,31,.24); }
+    .live-grid[data-inference-state="running"] .map-panel {
+      outline: 2px solid rgba(15,118,110,.14);
+    }
+    .live-grid[data-inference-state="running"] .map-dot[data-kind="order"] {
+      animation: order-enter-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes order-enter-pulse {
+      0%, 100% { box-shadow: 0 5px 16px rgba(15,23,42,.18); }
+      50% { box-shadow: 0 0 0 7px rgba(183,121,31,.14), 0 5px 16px rgba(15,23,42,.18); }
+    }
     .event-list, .timeline-list, .memory-list, .compact-list {
       display: grid;
       gap: 9px;
@@ -411,6 +464,7 @@ def render_day_replay_index() -> str:
       .live-grid, .decision-grid, .memory-grid, .rider-grid { grid-template-columns: 1fr; }
       .topbar { grid-template-columns: 1fr; }
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .runtime-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .workbench-shell { display: block; }
@@ -483,6 +537,21 @@ def render_day_replay_index() -> str:
       }
     };
     const routeOrder = ["live", "decisions", "memory", "orders", "riders"];
+    const inferenceState = {
+      started: false,
+      running: false,
+      currentTimeS: workbench.timeline.start_s,
+      speed: 1,
+      mode: "current",
+      timerId: null,
+      tickMs: 700,
+      lastTickAt: 0
+    };
+    const inferenceModeLabels = {
+      current: "当前算法",
+      compare: "对比",
+      overlay: "叠加"
+    };
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -497,6 +566,45 @@ def render_day_replay_index() -> str:
     function fmtNumber(value, digits = 0) {
       if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
       return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: digits, minimumFractionDigits: digits });
+    }
+
+    function clock(seconds) {
+      const value = Math.max(0, Math.floor(Number(seconds) || 0));
+      const hours = String(Math.floor(value / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((value % 3600) / 60)).padStart(2, "0");
+      return `${hours}:${minutes}`;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function inferenceProgressPct() {
+      const span = Math.max(1, workbench.timeline.end_s - workbench.timeline.start_s);
+      return Math.round(clamp((inferenceState.currentTimeS - workbench.timeline.start_s) / span, 0, 1) * 1000) / 10;
+    }
+
+    function scoreForTime(simTimeS) {
+      const series = workbench.metrics.series;
+      let selected = series[0] || workbench.metrics.final;
+      for (const item of series) {
+        if (item.time_s <= simTimeS) selected = item;
+        else break;
+      }
+      return selected;
+    }
+
+    function decisionForTime(simTimeS) {
+      let selected = workbench.decisions[0];
+      for (const item of workbench.decisions) {
+        if (item.trigger_time_s <= simTimeS) selected = item;
+        else break;
+      }
+      return selected || workbench.decisions[0];
+    }
+
+    function releasedEvents(simTimeS) {
+      return workbench.timeline.events.filter((event) => event.time_s <= simTimeS);
     }
 
     function routeFromHash() {
@@ -516,6 +624,131 @@ def render_day_replay_index() -> str:
           <div class="badge">${escapeHtml(workbench.source.scenario_name)}</div>
         </div>
       `;
+    }
+
+    function hydrateLivePage() {
+      bindLiveControls();
+      renderLiveRuntimeState();
+    }
+
+    function bindLiveControls() {
+      const startButton = document.getElementById("start-inference");
+      const pauseButton = document.getElementById("pause-inference");
+      const speedSelect = document.getElementById("playback-speed");
+      const modeSelect = document.getElementById("inference-mode");
+      if (!startButton || !pauseButton || !speedSelect || !modeSelect) return;
+      startButton.addEventListener("click", startInference);
+      pauseButton.addEventListener("click", toggleInferencePause);
+      speedSelect.value = String(inferenceState.speed);
+      modeSelect.value = inferenceState.mode;
+      speedSelect.addEventListener("change", () => setInferenceSpeed(Number(speedSelect.value)));
+      modeSelect.addEventListener("change", () => setInferenceMode(modeSelect.value));
+    }
+
+    function startInference() {
+      inferenceState.started = true;
+      inferenceState.running = true;
+      inferenceState.currentTimeS = workbench.timeline.start_s;
+      inferenceState.lastTickAt = Date.now();
+      scheduleInferenceTick();
+      renderLiveRuntimeState();
+    }
+
+    function toggleInferencePause() {
+      if (!inferenceState.started) {
+        startInference();
+        return;
+      }
+      inferenceState.running = !inferenceState.running;
+      if (inferenceState.running) {
+        inferenceState.lastTickAt = Date.now();
+        scheduleInferenceTick();
+      } else {
+        clearInferenceTimer();
+      }
+      renderLiveRuntimeState();
+    }
+
+    function setInferenceSpeed(speed) {
+      inferenceState.speed = [1, 2, 4].includes(speed) ? speed : 1;
+      if (inferenceState.running) {
+        inferenceState.lastTickAt = Date.now();
+        scheduleInferenceTick();
+      }
+      renderLiveRuntimeState();
+    }
+
+    function setInferenceMode(mode) {
+      inferenceState.mode = Object.prototype.hasOwnProperty.call(inferenceModeLabels, mode) ? mode : "current";
+      renderLiveRuntimeState();
+    }
+
+    function clearInferenceTimer() {
+      if (inferenceState.timerId !== null) {
+        clearInterval(inferenceState.timerId);
+        inferenceState.timerId = null;
+      }
+    }
+
+    function scheduleInferenceTick() {
+      clearInferenceTimer();
+      inferenceState.timerId = setInterval(advanceInferenceTick, inferenceState.tickMs);
+    }
+
+    function advanceInferenceTick() {
+      if (!inferenceState.running) return;
+      const now = Date.now();
+      const elapsedMs = inferenceState.lastTickAt ? now - inferenceState.lastTickAt : inferenceState.tickMs;
+      inferenceState.lastTickAt = now;
+      const simulatedStepS = Math.max(60, elapsedMs / 1000 * 900 * inferenceState.speed);
+      setInferenceTime(inferenceState.currentTimeS + simulatedStepS);
+    }
+
+    function setInferenceTime(nextTimeS) {
+      inferenceState.currentTimeS = clamp(nextTimeS, workbench.timeline.start_s, workbench.timeline.end_s);
+      if (inferenceState.currentTimeS >= workbench.timeline.end_s) {
+        inferenceState.running = false;
+        clearInferenceTimer();
+      }
+      renderLiveRuntimeState();
+    }
+
+    function renderLiveRuntimeState() {
+      const liveGrid = document.querySelector("[data-page='live']");
+      if (!liveGrid) return;
+      const stateLabel = inferenceState.running ? "自动推理中" : inferenceState.started ? "已暂停" : "未开始";
+      const events = releasedEvents(inferenceState.currentTimeS);
+      const currentScore = scoreForTime(inferenceState.currentTimeS);
+      const currentDecision = decisionForTime(inferenceState.currentTimeS);
+      liveGrid.dataset.inferenceState = inferenceState.running ? "running" : inferenceState.started ? "paused" : "ready";
+      setText("inference-state-label", stateLabel);
+      setText("inference-clock", clock(inferenceState.currentTimeS));
+      setText("inference-speed-label", `${inferenceState.speed}x`);
+      setText("inference-mode-label", inferenceModeLabels[inferenceState.mode]);
+      setText("inference-event-count", events.length);
+      setText("map-runtime-hint", `${stateLabel} / ${clock(inferenceState.currentTimeS)} / ${inferenceModeLabels[inferenceState.mode]}`);
+      setText("event-flow-caption", `${events.length} events released automatically`);
+      setText("round-summary-time", currentDecision.trigger_time_label);
+      const progressBar = document.getElementById("inference-progress-bar");
+      if (progressBar) progressBar.style.setProperty("--progress", `${inferenceProgressPct()}%`);
+      const startButton = document.getElementById("start-inference");
+      if (startButton) {
+        startButton.disabled = inferenceState.started && inferenceState.running;
+        startButton.textContent = inferenceState.started ? "重新开始" : "开始推理";
+      }
+      const pauseButton = document.getElementById("pause-inference");
+      if (pauseButton) pauseButton.textContent = inferenceState.running ? "暂停" : "继续";
+      const scoreStack = document.getElementById("live-score-stack");
+      if (scoreStack) scoreStack.innerHTML = renderLiveScoreCards(currentScore);
+      const eventFlow = document.getElementById("live-event-flow");
+      if (eventFlow) eventFlow.innerHTML = events.slice(-9).reverse().map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>点击开始推理后，订单进入、候选分配和累计结果将自动释放。</p></div>`;
+      const summary = document.getElementById("live-round-summary");
+      if (summary) summary.innerHTML = renderRoundSummary(currentDecision);
+    }
+
+    function setText(id, value) {
+      const node = document.getElementById(id);
+      if (node) node.textContent = String(value);
     }
 
     function renderTopbarStats() {
@@ -571,24 +804,35 @@ def render_day_replay_index() -> str:
         riders: renderRidersPage
       };
       view.innerHTML = renderers[routeId]();
+      if (routeId === "live") {
+        hydrateLivePage();
+      }
     }
 
     function renderLivePage() {
-      const finalScore = workbench.metrics.final;
-      const events = workbench.timeline.events.slice(0, 9);
-      const currentDecision = workbench.decisions[0];
+      const currentScore = scoreForTime(inferenceState.currentTimeS);
+      const events = releasedEvents(inferenceState.currentTimeS).slice(-9).reverse();
+      const currentDecision = decisionForTime(inferenceState.currentTimeS);
       return `
         ${pageHeader("live", "Live Map / GanttMap", "主工作台只展示对调度有用的内容：实时地图、累计优势、事件流和当前轮摘要。")}
-        <div class="page-grid live-grid" data-page="live">
+        <div class="page-grid live-grid" data-page="live" data-inference-state="${inferenceState.running ? "running" : inferenceState.started ? "paused" : "ready"}">
           <div class="page-grid">
             <div class="control-dock" data-control-strip="live">
               <button id="start-inference" class="primary-button" data-control="start-inference">开始推理</button>
-              <button class="ghost-button" data-control="pause-resume">暂停/继续</button>
-              <select class="select-control" data-control="speed"><option>1x</option><option>2x</option><option>4x</option></select>
-              <select class="select-control" data-control="mode"><option>当前算法</option><option>对比</option><option>叠加</option></select>
+              <button id="pause-inference" class="ghost-button" data-control="pause-resume">暂停/继续</button>
+              <select id="playback-speed" class="select-control" data-control="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select>
+              <select id="inference-mode" class="select-control" data-control="mode"><option value="current">当前算法</option><option value="compare">对比</option><option value="overlay">叠加</option></select>
+              <div class="runtime-strip" data-inference-runtime="status">
+                <div class="runtime-cell"><span>状态</span><b id="inference-state-label">未开始</b></div>
+                <div class="runtime-cell"><span>推演时间</span><b id="inference-clock">${escapeHtml(clock(inferenceState.currentTimeS))}</b></div>
+                <div class="runtime-cell"><span>倍速</span><b id="inference-speed-label">${inferenceState.speed}x</b></div>
+                <div class="runtime-cell"><span>模式</span><b id="inference-mode-label">${escapeHtml(inferenceModeLabels[inferenceState.mode])}</b></div>
+                <div class="runtime-cell"><span>释放事件</span><b id="inference-event-count">${releasedEvents(inferenceState.currentTimeS).length}</b></div>
+              </div>
+              <div class="inference-progress" aria-label="full day inference progress"><span id="inference-progress-bar" style="--progress:${inferenceProgressPct()}%"></span></div>
             </div>
             <div class="card map-panel">
-              <div class="card-head"><h3>实时地图层</h3><span>merchants / orders / riders / routes / hotspots</span></div>
+              <div class="card-head"><h3>实时地图层</h3><span id="map-runtime-hint">merchants / orders / riders / routes / hotspots</span></div>
               <div class="schematic-map" data-map-layer="primary">
                 ${renderMapRoutes()}
                 ${renderHotspots()}
@@ -598,27 +842,21 @@ def render_day_replay_index() -> str:
               </div>
             </div>
             <div class="card">
-              <div class="card-head"><h3>轻量事件流</h3><span>按全天推演时间释放</span></div>
-              <div class="card-body event-list">${events.map(renderEventItem).join("")}</div>
+              <div class="card-head"><h3>轻量事件流</h3><span id="event-flow-caption">按全天推演时间释放</span></div>
+              <div id="live-event-flow" class="card-body event-list">${events.map(renderEventItem).join("")}</div>
             </div>
           </div>
           <aside class="page-grid">
             <div class="card">
               <div class="card-head"><h3>实时累计对比栏</h3><span>baseline vs ours</span></div>
-              <div class="card-body score-stack">
-                ${renderScoreCard("基线/弹金算法累计", `${fmtNumber(finalScore.baseline.total_cost_yuan, 1)} 元`, `${fmtNumber(finalScore.baseline.total_time_cost_min, 1)} 分钟成本`, "warn")}
-                ${renderScoreCard("我们的算法累计", `${fmtNumber(finalScore.ours.total_cost_yuan, 1)} 元`, `${fmtNumber(finalScore.ours.total_time_cost_min, 1)} 分钟成本`, "good")}
-                ${renderScoreCard("时间差异", `${fmtNumber(finalScore.deltas.time_saved_min, 1)} 分钟`, finalScore.deltas.headline, "good")}
-                ${renderScoreCard("金钱差异", `${fmtNumber(finalScore.deltas.money_saved_yuan, 1)} 元`, `收益/成本差异 ${fmtNumber(finalScore.deltas.profit_delta_yuan, 1)} 元`, "good")}
-                ${renderScoreCard("超时单差异", `${fmtNumber(finalScore.deltas.timeout_order_delta, 0)} 单`, `风险差异 ${fmtNumber(finalScore.deltas.timeout_risk_delta, 3)}`, "good")}
-                ${renderScoreCard("空驶里程差异", `${fmtNumber(finalScore.deltas.empty_mileage_saved_km, 2)} km`, "只强调差异部分，不铺满两套路由", "good")}
+              <div id="live-score-stack" class="card-body score-stack">
+                ${renderLiveScoreCards(currentScore)}
               </div>
             </div>
             <div class="card">
-              <div class="card-head"><h3>本轮摘要</h3><span>${escapeHtml(currentDecision.trigger_time_label)}</span></div>
-              <div class="card-body compact-list">
-                <div class="list-item"><strong>${escapeHtml(currentDecision.trigger_reason)}</strong><p>${escapeHtml(currentDecision.round_result.summary)}</p></div>
-                <div class="list-item"><strong>候选集合</strong><p>${currentDecision.input_order_ids.length} orders / ${currentDecision.candidate_rider_ids.length} riders</p></div>
+              <div class="card-head"><h3>本轮摘要</h3><span id="round-summary-time">${escapeHtml(currentDecision.trigger_time_label)}</span></div>
+              <div id="live-round-summary" class="card-body compact-list">
+                ${renderRoundSummary(currentDecision)}
               </div>
             </div>
           </aside>
@@ -749,6 +987,25 @@ def render_day_replay_index() -> str:
       return `<div class="score-card" data-tone="${escapeHtml(tone)}"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b><span>${escapeHtml(detail)}</span></div>`;
     }
 
+    function renderLiveScoreCards(score) {
+      return [
+        renderScoreCard("基线/弹金算法累计", `${fmtNumber(score.baseline.total_cost_yuan, 1)} 元`, `${fmtNumber(score.baseline.total_time_cost_min, 1)} 分钟成本`, "warn"),
+        renderScoreCard("我们的算法累计", `${fmtNumber(score.ours.total_cost_yuan, 1)} 元`, `${fmtNumber(score.ours.total_time_cost_min, 1)} 分钟成本`, "good"),
+        renderScoreCard("时间差异", `${fmtNumber(score.deltas.time_saved_min, 1)} 分钟`, score.deltas.headline, "good"),
+        renderScoreCard("金钱差异", `${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, `收益/成本差异 ${fmtNumber(score.deltas.profit_delta_yuan, 1)} 元`, "good"),
+        renderScoreCard("超时单差异", `${fmtNumber(score.deltas.timeout_order_delta, 0)} 单`, `风险差异 ${fmtNumber(score.deltas.timeout_risk_delta, 3)}`, "good"),
+        renderScoreCard("空驶里程差异", `${fmtNumber(score.deltas.empty_mileage_saved_km, 2)} km`, "只强调差异部分，不铺满两套路由", "good")
+      ].join("");
+    }
+
+    function renderRoundSummary(decision) {
+      return `
+        <div class="list-item"><strong>${escapeHtml(decision.trigger_reason)}</strong><p>${escapeHtml(decision.round_result.summary)}</p></div>
+        <div class="list-item"><strong>候选集合</strong><p>${decision.input_order_ids.length} orders / ${decision.candidate_rider_ids.length} riders</p></div>
+        <div class="list-item"><strong>本轮累计优势</strong><p>节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，节省 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元。</p></div>
+      `;
+    }
+
     function renderEventItem(event) {
       return `<div class="list-item" data-event-type="${escapeHtml(event.type)}"><strong>${escapeHtml(event.time_label)} ${escapeHtml(event.type)}</strong><p>${escapeHtml(event.summary)}</p></div>`;
     }
@@ -822,7 +1079,17 @@ def render_day_replay_index() -> str:
       renderDecisionsPage,
       renderMemoryPage,
       renderOrdersPage,
-      renderRidersPage
+      renderRidersPage,
+      inferenceState,
+      startInference,
+      toggleInferencePause,
+      setInferenceSpeed,
+      setInferenceMode,
+      setInferenceTime,
+      advanceInferenceTick,
+      scoreForTime,
+      decisionForTime,
+      releasedEvents
     };
   </script>
 </body>
