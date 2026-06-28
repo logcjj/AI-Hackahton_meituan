@@ -374,7 +374,7 @@ Confidence loop:
 
 ## Task 7 - Decision Page
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Decision page has left round timeline, middle reasoning flow, and right context/result pane.
@@ -382,8 +382,73 @@ Independent verification:
 - Page works as an independent planning/reasoning route, not a local detail drawer only.
 
 Work log:
+- Reworked `#/decisions` in `web_agent_demo/day_replay_frontend.py` from a static first-round scaffold into an independent Planner / Chart / Gantt-style reasoning route.
+- Added route-level decision selection state:
+  - `selectedDecisionId`;
+  - `decisionById()`;
+  - `selectedDecision()`;
+  - `selectDecisionRound()`;
+  - `hydrateDecisionPage()`.
+- Added three stable Decisions page containers:
+  - `decision-timeline` for the left decision-round timeline;
+  - `decision-reasoning-canvas` for the middle推导过程;
+  - `decision-context-pane` for the right input/output/result pane.
+- The left timeline now renders all 40 decision rounds with time, id, trigger reason, order count, candidate rider count, and demand phase.
+- The middle reasoning canvas now renders the required decision fields as explicit stages:
+  - trigger time;
+  - trigger reason;
+  - input order set;
+  - candidate rider set;
+  - filtering process;
+  - scoring process;
+  - final actions;
+  - abandoned actions;
+  - round result;
+  - result writeback.
+- The right pane now renders:
+  - input context;
+  - output result;
+  - this-round metric summary;
+  - round summary;
+  - writeback summary and linked memory ids.
+- Added compact visual components for the decision route:
+  - scrollable timeline;
+  - decision-stage cards;
+  - order/rider chips;
+  - score rows with score bars;
+  - final/abandoned action cards;
+  - context metric cards.
+- Exposed decision render/hydration helpers through `window.__DISPATCH_WORKBENCH__` for runtime inspection:
+  - `renderDecisionTimeline`;
+  - `renderDecisionReasoning`;
+  - `renderDecisionContext`;
+  - `hydrateDecisionPage`;
+  - `selectDecisionRound`.
+- Added regression markers to `tests/test_web_agent_demo.py` for the independent planner route, three containers, required stage ids, context/output sections, and new functions.
+- Verified all 40 workbench decision records contain the required fields:
+  - trigger time;
+  - trigger reason;
+  - input orders;
+  - candidate riders;
+  - filtering;
+  - scoring;
+  - final actions;
+  - abandoned actions;
+  - round result;
+  - writeback.
+- Verified actual generated JavaScript in Node VM:
+  - `#/decisions` renders as an independent route;
+  - initial status tracks the first decision;
+  - timeline rendering can mark the selected round active;
+  - `selectDecisionRound()` changes the middle reasoning canvas and right context pane;
+  - selected status, phase and time slice update with the chosen decision;
+  - required reasoning and context fields remain visible after selection.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Task 7 scope: the Decisions page is now a standalone, interactive planning/reasoning workspace with the required timeline/canvas/context layout and all required decision fields; data completeness, generated-JS selection behavior, focused tests and full test suite all pass.
 
 ## Task 8 - Memory Page
 

@@ -517,6 +517,88 @@ def render_day_replay_index() -> str:
     }
     .timeline-item { text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 10px; }
     .timeline-item[data-active="true"] { border-color: rgba(15,118,110,.42); background: var(--green-soft); }
+    .timeline-item strong { display: block; margin-bottom: 4px; font-size: 13px; }
+    .timeline-item span { display: block; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .timeline-meta {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 7px;
+      color: var(--muted);
+      font: 700 10px var(--mono);
+    }
+    .decision-scroll { max-height: 690px; overflow: auto; }
+    .decision-canvas { display: grid; gap: 12px; }
+    .decision-stage {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-2);
+      overflow: hidden;
+    }
+    .decision-stage-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.62);
+    }
+    .decision-stage-head b { color: var(--accent-2); font-size: 13px; }
+    .decision-stage-head span { color: var(--muted); font: 800 10px var(--mono); }
+    .decision-stage-body { display: grid; gap: 8px; padding: 11px 12px; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .data-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: #fff;
+      font: 700 11px var(--mono);
+    }
+    .score-row {
+      display: grid;
+      grid-template-columns: 138px 1fr auto;
+      gap: 9px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fff;
+    }
+    .score-bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    .score-bar span {
+      display: block;
+      width: calc(var(--score) * 100%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .action-card {
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fff;
+    }
+    .action-card strong { display: block; margin-bottom: 4px; font-size: 12px; }
+    .action-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .context-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
     .stage-row {
       display: grid;
       grid-template-columns: 130px 1fr auto;
@@ -672,6 +754,7 @@ def render_day_replay_index() -> str:
       tickMs: 700,
       lastTickAt: 0
     };
+    let selectedDecisionId = workbench.decisions[0]?.id || "";
     const inferenceModeLabels = {
       current: "当前算法",
       compare: "对比",
@@ -1197,6 +1280,8 @@ def render_day_replay_index() -> str:
       view.innerHTML = renderers[routeId]();
       if (routeId === "live") {
         hydrateLivePage();
+      } else if (routeId === "decisions") {
+        hydrateDecisionPage();
       }
     }
 
@@ -1259,39 +1344,26 @@ def render_day_replay_index() -> str:
     }
 
     function renderDecisionsPage() {
-      const decision = workbench.decisions[0];
+      const decision = selectedDecision();
       return `
         ${pageHeader("decisions", "Planner / Chart / Gantt", "把规划视图重构为推导过程页：左侧轮次，中间推导，右侧上下文和回写。")}
-        <div class="page-grid decision-grid" data-page="decisions">
+        <div class="page-grid decision-grid" data-page="decisions" data-decision-route="planner">
           <div class="card">
-            <div class="card-head"><h3>决策轮次时间线</h3><span>${workbench.decisions.length} rounds</span></div>
-            <div class="card-body timeline-list">
-              ${workbench.decisions.slice(0, 16).map((item, index) => `
-                <button class="timeline-item" data-decision-id="${escapeHtml(item.id)}" data-active="${index === 0}">
-                  <strong>${escapeHtml(item.trigger_time_label)} ${escapeHtml(item.id)}</strong>
-                  <span>${escapeHtml(item.trigger_reason)}</span>
-                </button>
-              `).join("")}
+            <div class="card-head"><h3>决策轮次时间线</h3><span id="decision-route-status">${workbench.decisions.length} rounds</span></div>
+            <div id="decision-timeline" class="card-body timeline-list decision-scroll">
+              ${renderDecisionTimeline(decision.id)}
             </div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>当前轮推导过程</h3><span>${escapeHtml(decision.context.demand_phase)}</span></div>
-            <div class="card-body">
-              ${renderStageRow("输入订单集合", `${decision.input_orders.length} orders`, decision.input_orders.slice(0, 5).map((item) => item.id).join(", "))}
-              ${renderStageRow("候选骑手集合", `${decision.candidate_riders.length} riders`, decision.candidate_riders.slice(0, 5).map((item) => item.id).join(", "))}
-              ${decision.filtering_process.map((stage) => renderStageRow(stage.stage, `${stage.remaining} remain`, stage.summary)).join("")}
-              ${renderStageRow("评分过程", `${decision.scoring_process.length} algorithms`, decision.scoring_process.map((item) => `${item.algorithm_id}: ${fmtNumber(item.score, 3)}`).join(" / "))}
-              ${renderStageRow("最终动作", `${decision.final_actions.length} assignments`, decision.final_actions.slice(0, 5).map((item) => `${item.order_id}->${item.courier_id}`).join(", "))}
-              ${renderStageRow("被放弃动作", `${decision.abandoned_actions.length} baseline actions`, decision.abandoned_actions.slice(0, 4).map((item) => `${item.order_id}->${item.courier_id}`).join(", "))}
-              ${renderStageRow("结果回写", `${decision.result_writeback.writeback_count} writebacks`, decision.result_writeback.summary)}
+            <div class="card-head"><h3>当前轮推导过程</h3><span id="decision-reasoning-phase">${escapeHtml(decision.context.demand_phase)}</span></div>
+            <div id="decision-reasoning-canvas" class="card-body decision-canvas">
+              ${renderDecisionReasoning(decision)}
             </div>
           </div>
           <aside class="card">
-            <div class="card-head"><h3>输入上下文 + 输出结果</h3><span>${escapeHtml(decision.context.time_slice_id)}</span></div>
-            <div class="card-body compact-list">
-              <div class="list-item"><strong>上下文</strong><p>${escapeHtml(decision.context.weather)} / congestion ${fmtNumber(decision.context.congestion_level, 2)} / supply ${decision.context.courier_supply}</p></div>
-              <div class="list-item"><strong>本轮结果</strong><p>节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，节省 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元。</p></div>
-              <div class="list-item"><strong>结果回写</strong><p>${decision.result_writeback.memory_event_ids.map(escapeHtml).join(", ")}</p></div>
+            <div class="card-head"><h3>输入上下文 + 输出结果</h3><span id="decision-context-slice">${escapeHtml(decision.context.time_slice_id)}</span></div>
+            <div id="decision-context-pane" class="card-body compact-list">
+              ${renderDecisionContext(decision)}
             </div>
           </aside>
         </div>
@@ -1450,6 +1522,152 @@ def render_day_replay_index() -> str:
       return actions.length > limit ? `${preview} +${actions.length - limit} more` : preview;
     }
 
+    function decisionById(decisionId) {
+      return workbench.decisions.find((item) => item.id === decisionId) || workbench.decisions[0];
+    }
+
+    function selectedDecision() {
+      const decision = decisionById(selectedDecisionId);
+      selectedDecisionId = decision?.id || "";
+      return decision;
+    }
+
+    function hydrateDecisionPage() {
+      const timeline = document.getElementById("decision-timeline");
+      if (!timeline) return;
+      timeline.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-decision-id]");
+        if (button) selectDecisionRound(button.dataset.decisionId);
+      });
+      selectDecisionRound(selectedDecisionId || workbench.decisions[0]?.id);
+    }
+
+    function selectDecisionRound(decisionId) {
+      const decision = decisionById(decisionId);
+      if (!decision) return;
+      selectedDecisionId = decision.id;
+      const timeline = document.getElementById("decision-timeline");
+      if (timeline) {
+        for (const item of timeline.querySelectorAll("[data-decision-id]")) {
+          item.dataset.active = item.dataset.decisionId === decision.id ? "true" : "false";
+        }
+      }
+      setText("decision-route-status", `${decision.trigger_time_label} / ${decision.id}`);
+      setText("decision-reasoning-phase", decision.context.demand_phase);
+      setText("decision-context-slice", decision.context.time_slice_id);
+      const reasoning = document.getElementById("decision-reasoning-canvas");
+      if (reasoning) reasoning.innerHTML = renderDecisionReasoning(decision);
+      const contextPane = document.getElementById("decision-context-pane");
+      if (contextPane) contextPane.innerHTML = renderDecisionContext(decision);
+    }
+
+    function renderDecisionTimeline(activeId) {
+      return workbench.decisions.map((item) => `
+        <button class="timeline-item" data-decision-id="${escapeHtml(item.id)}" data-active="${item.id === activeId}">
+          <strong>${escapeHtml(item.trigger_time_label)} ${escapeHtml(item.id)}</strong>
+          <span>${escapeHtml(item.trigger_reason)}</span>
+          <span class="timeline-meta">
+            <em>${item.input_order_ids.length} orders</em>
+            <em>${item.candidate_rider_ids.length} riders</em>
+            <em>${escapeHtml(item.context.demand_phase)}</em>
+          </span>
+        </button>
+      `).join("");
+    }
+
+    function renderDecisionStage(stageId, title, count, body) {
+      return `
+        <section class="decision-stage" id="${escapeHtml(stageId)}" data-decision-stage="${escapeHtml(stageId)}">
+          <div class="decision-stage-head"><b>${escapeHtml(title)}</b><span>${escapeHtml(count)}</span></div>
+          <div class="decision-stage-body">${body}</div>
+        </section>
+      `;
+    }
+
+    function renderChipList(items, emptyLabel = "None") {
+      const values = (items || []).filter(Boolean);
+      if (!values.length) return `<p>${escapeHtml(emptyLabel)}</p>`;
+      return `<div class="chip-list">${values.map((item) => `<span class="data-chip">${escapeHtml(item)}</span>`).join("")}</div>`;
+    }
+
+    function renderDecisionScoreRows(scores) {
+      if (!scores.length) return `<p>等待评分</p>`;
+      const maxScore = Math.max(...scores.map((item) => Number(item.score) || 0), 1);
+      return scores.map((item) => {
+        const normalized = clamp((Number(item.score) || 0) / maxScore, 0.04, 1);
+        return `
+          <div class="score-row" data-algorithm-id="${escapeHtml(item.algorithm_id)}">
+            <b>${escapeHtml(item.algorithm_id)}</b>
+            <div>
+              <div class="score-bar" style="--score:${normalized}"><span></span></div>
+              <p>${escapeHtml(item.reason)}</p>
+            </div>
+            <em>${fmtNumber(item.score, 3)}</em>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderDecisionActions(actions, kind) {
+      if (!actions.length) return `<p>暂无动作</p>`;
+      return `<div class="action-grid">${actions.map((item) => {
+        const detail = kind === "final"
+          ? `ETA ${fmtNumber(item.total_eta_min, 1)} min / cost ${fmtNumber(item.expected_cost_yuan, 1)} yuan / risk ${fmtNumber(item.timeout_risk, 3)}`
+          : item.reason || "Rejected by current scoring policy.";
+        return `
+          <div class="action-card" data-action-kind="${escapeHtml(kind)}">
+            <strong>${escapeHtml(item.order_id)} -> ${escapeHtml(item.courier_id)}</strong>
+            <p>${escapeHtml(detail)}</p>
+          </div>
+        `;
+      }).join("")}</div>`;
+    }
+
+    function renderDecisionReasoning(decision) {
+      const inputOrderIds = decision.input_orders.length ? decision.input_orders.map((item) => item.id) : decision.input_order_ids;
+      const candidateRiderIds = decision.candidate_riders.length ? decision.candidate_riders.map((item) => item.id) : decision.candidate_rider_ids;
+      return `
+        ${renderDecisionStage("decision-trigger-time", "触发时间", decision.trigger_time_label, `<p>${escapeHtml(decision.trigger_time_label)} / ${escapeHtml(decision.id)}</p>`)}
+        ${renderDecisionStage("decision-trigger-reason", "触发原因", decision.context.time_slice_id, `<p>${escapeHtml(decision.trigger_reason)}</p>`)}
+        ${renderDecisionStage("decision-input-orders", "输入订单集合", `${inputOrderIds.length} orders`, renderChipList(inputOrderIds, "当前轮无释放订单"))}
+        ${renderDecisionStage("decision-candidate-riders", "候选骑手集合", `${candidateRiderIds.length} riders`, renderChipList(candidateRiderIds, "暂无候选骑手"))}
+        ${renderDecisionStage("decision-filtering-process", "过滤过程", `${decision.filtering_process.length} stages`, decision.filtering_process.map((stage) => renderStageRow(stage.stage, `${stage.remaining} remain`, stage.summary)).join(""))}
+        ${renderDecisionStage("decision-scoring-process", "评分过程", `${decision.scoring_process.length} algorithms`, renderDecisionScoreRows(decision.scoring_process))}
+        ${renderDecisionStage("decision-final-actions", "最终动作", `${decision.final_actions.length} assignments`, renderDecisionActions(decision.final_actions, "final"))}
+        ${renderDecisionStage("decision-abandoned-actions", "被放弃动作", `${decision.abandoned_actions.length} alternatives`, renderDecisionActions(decision.abandoned_actions, "abandoned"))}
+        ${renderDecisionStage("decision-round-result", "本轮结果", `${fmtNumber(decision.round_result.time_saved_min, 1)} min saved`, `<p>${escapeHtml(decision.round_result.summary)}</p>`)}
+        ${renderDecisionStage("decision-result-writeback", "结果回写", `${decision.result_writeback.writeback_count} writebacks`, `<p>${escapeHtml(decision.result_writeback.summary)}</p>${renderChipList(decision.result_writeback.memory_event_ids, "无回写记忆")}`)}
+      `;
+    }
+
+    function renderDecisionContext(decision) {
+      return `
+        <div class="list-item" id="decision-context-input">
+          <strong>输入上下文</strong>
+          <p>${escapeHtml(decision.context.demand_phase)} / ${escapeHtml(decision.context.weather)} / congestion ${fmtNumber(decision.context.congestion_level, 2)} / supply ${decision.context.courier_supply}</p>
+          <p>shocks: ${decision.context.shock_ids.length ? decision.context.shock_ids.map(escapeHtml).join(", ") : "none"}</p>
+        </div>
+        <div class="list-item" id="decision-output-result">
+          <strong>输出结果</strong>
+          <p>${escapeHtml(decision.round_result.summary)}</p>
+        </div>
+        <div class="context-metric-grid">
+          ${renderMetricChip("decision-time-saved", "时间收益", `${fmtNumber(decision.round_result.time_saved_min, 1)} min`, "this round")}
+          ${renderMetricChip("decision-cost-saved", "成本收益", `${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元`, "this round")}
+          ${renderMetricChip("decision-risk-delta", "风险变化", fmtSigned(decision.round_result.timeout_risk_delta, 3), "timeout risk")}
+          ${renderMetricChip("decision-extra-delivered", "额外交付", `${decision.round_result.extra_delivered_orders} 单`, "vs baseline")}
+        </div>
+        <div class="list-item" id="decision-round-summary">
+          <strong>本轮摘要</strong>
+          <p>输入 ${decision.input_order_ids.length} 单，候选 ${decision.candidate_rider_ids.length} 名骑手，最终 ${decision.final_actions.length} 个动作，放弃 ${decision.abandoned_actions.length} 个基线动作。</p>
+        </div>
+        <div class="list-item" id="decision-writeback-summary">
+          <strong>结果回写</strong>
+          <p>${decision.result_writeback.writeback_count} writebacks / ${decision.result_writeback.memory_event_ids.map(escapeHtml).join(", ") || "无"}</p>
+        </div>
+      `;
+    }
+
     function renderRoundSummary(decision) {
       const finalActions = actionSummary(decision.final_actions, 3);
       const abandonedActions = actionSummary(decision.abandoned_actions, 3);
@@ -1559,6 +1777,11 @@ def render_day_replay_index() -> str:
       renderRoute,
       renderLivePage,
       renderDecisionsPage,
+      renderDecisionTimeline,
+      renderDecisionReasoning,
+      renderDecisionContext,
+      hydrateDecisionPage,
+      selectDecisionRound,
       renderMemoryPage,
       renderOrdersPage,
       renderRidersPage,
