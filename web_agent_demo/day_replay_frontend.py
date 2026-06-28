@@ -436,15 +436,218 @@ def render_day_replay_index() -> str:
     }
     .memory-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .memory-workspace { grid-template-columns: 1fr; }
+    .hermes-memory-workspace {
+      gap: 16px;
+    }
     .memory-overview {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
     }
-    .memory-section-grid {
+    .memory-command-center {
+      display: grid;
+      grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr);
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid rgba(183,121,31,.26);
+      border-radius: 22px;
+      background:
+        linear-gradient(120deg, rgba(251,241,219,.92), rgba(255,255,255,.88) 46%),
+        radial-gradient(circle at 12% 12%, rgba(183,121,31,.16), transparent 34%),
+        var(--surface-glass);
+      box-shadow: var(--shadow-float);
+      backdrop-filter: blur(14px);
+    }
+    .memory-command-copy {
+      display: grid;
+      align-content: center;
+      gap: 11px;
+      padding: 6px;
+    }
+    .memory-command-copy h3 {
+      margin: 0;
+      font-size: clamp(28px, 3.4vw, 48px);
+      line-height: 1;
+      letter-spacing: -.055em;
+    }
+    .memory-command-copy p {
+      margin: 0;
+      max-width: 620px;
+      color: var(--ink-2);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .memory-kicker {
+      width: fit-content;
+      padding: 6px 9px;
+      border: 1px solid rgba(183,121,31,.25);
+      border-radius: 999px;
+      color: var(--route-ink);
+      background: rgba(255,255,255,.74);
+      font: 800 11px var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .memory-model-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .memory-model-row span {
+      padding: 6px 8px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,.74);
+      font: 800 11px var(--mono);
+    }
+    .memory-command-metrics {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-content: stretch;
+    }
+    .memory-operating-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
       gap: 14px;
+      align-items: start;
+    }
+    .memory-layer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .memory-layer-card,
+    .memory-profile,
+    .memory-flow-step {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-2);
+    }
+    .memory-layer-card {
+      display: grid;
+      gap: 9px;
+      min-height: 176px;
+    }
+    .memory-layer-top,
+    .memory-profile-top,
+    .memory-flow-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .memory-layer-top strong,
+    .memory-profile-top strong,
+    .memory-flow-top strong {
+      font-size: 14px;
+      letter-spacing: -.01em;
+    }
+    .memory-scope,
+    .memory-profile-type,
+    .memory-flow-index {
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: var(--route-ink);
+      background: var(--route-soft);
+      font: 800 10px var(--mono);
+      white-space: nowrap;
+    }
+    .memory-layer-card p,
+    .memory-profile p,
+    .memory-flow-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.48;
+    }
+    .memory-layer-meta,
+    .memory-profile-meta,
+    .memory-effect-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .memory-layer-meta span,
+    .memory-profile-meta span,
+    .memory-effect-line span {
+      padding: 5px 7px;
+      border: 1px solid rgba(15,23,42,.07);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      font: 800 10px var(--mono);
+    }
+    .memory-profile-board {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, #fff, var(--surface-2));
+      box-shadow: var(--shadow);
+    }
+    .memory-profile-board h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+    .memory-profile-board > p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .memory-profile-list {
+      display: grid;
+      gap: 10px;
+    }
+    .memory-flow-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+      gap: 14px;
+      align-items: start;
+    }
+    .memory-flow-lane {
+      display: grid;
+      gap: 10px;
+    }
+    .memory-flow-step {
+      display: grid;
+      gap: 9px;
+      position: relative;
+      overflow: hidden;
+    }
+    .memory-flow-step::before {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: var(--route-accent);
+      opacity: .65;
+      content: "";
+    }
+    .memory-evidence {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,.76);
+    }
+    .memory-evidence-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+    .memory-evidence-head strong {
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+    .memory-evidence-head span {
+      color: var(--muted);
+      font: 800 10px var(--mono);
     }
     .rider-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .card {
@@ -1146,10 +1349,6 @@ def render_day_replay_index() -> str:
     }
     .mini-map .map-dot[data-kind="home"] { --size: 9px; background: #64748b; }
     .mini-map .map-dot[data-kind="linked-order"] { --size: 8px; background: var(--amber); }
-    .memory-card { min-height: 220px; }
-    .memory-card[data-memory-section] .card-head span {
-      font: 800 11px var(--mono);
-    }
     .memory-item {
       display: grid;
       gap: 8px;
@@ -1241,7 +1440,7 @@ def render_day_replay_index() -> str:
       .brand strong, .brand span, .nav-copy, .nav-section-title, .nav-meta { display: none; }
       .nav-link { grid-template-columns: 1fr; justify-items: center; }
       .live-grid, .decision-grid, .memory-grid, .rider-grid { grid-template-columns: 1fr; }
-      .live-advantage-hero, .live-ops-shell, .decision-grid { grid-template-columns: 1fr; }
+      .live-advantage-hero, .live-ops-shell, .decision-grid, .memory-command-center, .memory-operating-grid, .memory-flow-grid { grid-template-columns: 1fr; }
       .live-side-rail, .decision-grid > aside, .operations-grid > aside, .control-dock { position: static; }
       .topbar { grid-template-columns: 1fr; }
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1249,7 +1448,7 @@ def render_day_replay_index() -> str:
       .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .live-advantage-hero .delta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .operations-overview, .operations-grid, .rider-board { grid-template-columns: 1fr; }
-      .memory-overview, .memory-section-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .workbench-shell { display: block; }
@@ -1266,7 +1465,7 @@ def render_day_replay_index() -> str:
       .live-advantage-hero .algorithm-pair, .live-advantage-hero .delta-grid { grid-template-columns: 1fr; }
       .live-control-dock .runtime-strip { flex-basis: 100%; grid-template-columns: 1fr; }
       .operations-overview { grid-template-columns: 1fr; }
-      .memory-overview, .memory-section-grid, .recall-lane, .memory-field-grid, .context-metric-grid { grid-template-columns: 1fr; }
+      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
       .action-grid, .runtime-strip { grid-template-columns: 1fr; }
       .score-row, .stage-row, .time-lane-item { grid-template-columns: 1fr; }
@@ -2079,36 +2278,60 @@ def render_day_replay_index() -> str:
     }
 
     function renderMemoryPage() {
-      const sections = [
-        ["new", "新沉淀记忆"],
-        ["curated", "已整理记忆"],
-        ["active", "当前命中的记忆"],
-        ["feedback", "记忆效果反馈"]
-      ];
       const byId = Object.fromEntries(workbench.memory.items.map((item) => [item.id, item]));
       const stats = memoryStats();
-      const activeHits = memoryItemsForSection("active", byId).slice(0, 3);
+      const system = workbench.memory.system || {};
+      const layers = workbench.memory.layers || [];
+      const profiles = workbench.memory.profiles || [];
+      const recallChain = workbench.memory.recall_chain || [];
+      const writebackLoop = workbench.memory.writeback_loop || [];
       return `
-        ${pageHeader("memory", "Hermes-style Memory", "这里展示系统长期记忆的形成、整理、命中和反馈，不做资产表或文档中心。")}
-        <div class="page-grid memory-workspace" data-page="memory" data-memory-route="hermes-long-term">
-          <div id="memory-overview" class="memory-overview">
-            ${renderMemoryOverview(stats)}
-          </div>
-          <div class="card" id="memory-current-recall">
-            <div class="card-head"><h3>当前召回链路</h3><span>${activeHits.length} active hits</span></div>
-            <div class="card-body recall-lane">
-              ${activeHits.map(renderMemoryRecallCard).join("")}
-            </div>
-          </div>
-          <div class="memory-section-grid">
-            ${sections.map(([sectionId, title]) => `
-              <div class="card memory-card" id="memory-section-${escapeHtml(sectionId)}" data-memory-section="${escapeHtml(sectionId)}">
-                <div class="card-head"><h3>${escapeHtml(title)}</h3><span>${workbench.memory.sections[sectionId].length} memories</span></div>
-                <div class="card-body memory-list">
-                  ${memoryItemsForSection(sectionId, byId).slice(0, 5).map(renderMemoryItem).join("")}
-                </div>
+        ${pageHeader("memory", "Hermes Memory Hub", "把调度经验组织为长期记忆、画像、召回链和回写反馈，展示记忆如何让下一轮派单更强。")}
+        <div class="page-grid memory-workspace hermes-memory-workspace" data-page="memory" data-memory-route="hermes-long-term" data-memory-model="global-profile-recall-feedback">
+          <section id="memory-command-center" class="memory-command-center" aria-label="Hermes-style long term memory command center">
+            <div class="memory-command-copy">
+              <span class="memory-kicker">Hermes-style Long-Term Memory</span>
+              <h3>长期记忆中枢</h3>
+              <p>这里不是日志列表、资产表或文档中心。系统把每天推理中的有效经验沉淀为全局策略记忆和画像记忆，再在新一轮 Planner 评分前召回，最后用调度结果回写置信度。</p>
+              <div class="memory-model-row">
+                <span>全局记忆</span>
+                <span>画像记忆</span>
+                <span>召回链</span>
+                <span>回写反馈</span>
               </div>
-            `).join("")}
+            </div>
+            <div id="memory-overview" class="memory-command-metrics">
+              ${renderMemoryOverview(stats, system)}
+            </div>
+          </section>
+          <div class="memory-operating-grid">
+            <section id="memory-layer-board" class="card" data-memory-surface="memory-layers">
+              <div class="card-head"><h3>记忆层结构</h3><span>global / profile memory layers</span></div>
+              <div class="card-body memory-layer-grid">
+                ${layers.map(renderMemoryLayerCard).join("")}
+              </div>
+            </section>
+            <aside id="memory-profile-board" class="memory-profile-board" data-memory-surface="profiles">
+              <h3>画像记忆</h3>
+              <p>画像不是人员档案，而是系统在历史推理中沉淀的供给、商圈和订单风险模式。</p>
+              <div class="memory-profile-list">
+                ${profiles.map(renderMemoryProfile).join("")}
+              </div>
+            </aside>
+          </div>
+          <div class="memory-flow-grid">
+            <section id="memory-recall-chain" class="card" data-memory-surface="recall-chain">
+              <div class="card-head"><h3>当前召回链路</h3><span>hit → inject → decide → writeback</span></div>
+              <div class="card-body memory-flow-lane">
+                ${recallChain.map((step, index) => renderMemoryRecallStep(step, byId, index)).join("")}
+              </div>
+            </section>
+            <section id="memory-writeback-loop" class="card" data-memory-surface="writeback-loop">
+              <div class="card-head"><h3>记忆形成与反馈闭环</h3><span>new / curated / active / feedback</span></div>
+              <div class="card-body memory-flow-lane">
+                ${writebackLoop.map((step, index) => renderMemoryWritebackStep(step, byId, index)).join("")}
+              </div>
+            </section>
           </div>
         </div>
       `;
@@ -2728,13 +2951,119 @@ def render_day_replay_index() -> str:
       };
     }
 
-    function renderMemoryOverview(stats) {
+    function renderMemoryOverview(stats, system = {}) {
+      const total = system.memory_count ?? stats.total;
+      const avgConfidence = system.avg_confidence ?? stats.avgConfidence;
+      const totalRecalls = system.recall_count ?? stats.totalRecalls;
+      const latestHit = system.latest_hit_time_label || stats.latestHitLabel;
       return [
-        renderMetricChip("memory-total", "长期记忆总量", `${stats.total}`, "new / curated / active / feedback"),
-        renderMetricChip("memory-confidence", "平均置信度", fmtNumber(stats.avgConfidence, 2), "confidence after feedback"),
-        renderMetricChip("memory-recalls", "累计召回", `${stats.totalRecalls}`, "historical case hits"),
-        renderMetricChip("memory-latest-hit", "最近命中", stats.latestHitLabel, `${stats.linkedDecisionCount} linked decisions`)
+        renderMetricChip("memory-total", "长期记忆总量", `${total}`, system.source_of_truth || "day-replay evolution events"),
+        renderMetricChip("memory-confidence", "平均置信度", fmtNumber(avgConfidence, 2), system.operating_model || "global / profile / recall / feedback"),
+        renderMetricChip("memory-recalls", "累计召回", `${totalRecalls}`, "historical case hits before scoring"),
+        renderMetricChip("memory-latest-hit", "最近命中", latestHit, `${system.linked_decision_count ?? stats.linkedDecisionCount} linked decisions`)
       ].join("");
+    }
+
+    function renderMemoryLayerCard(layer) {
+      const confidence = Number(layer.avg_confidence || 0);
+      return `
+        <article class="memory-layer-card" data-memory-layer="${escapeHtml(layer.id)}">
+          <div class="memory-layer-top">
+            <strong>${escapeHtml(layer.label)}</strong>
+            <span class="memory-scope">${escapeHtml(layer.scope)}</span>
+          </div>
+          <div class="memory-layer-meta">
+            <span>${escapeHtml(layer.memory_count)} memories</span>
+            <span>${escapeHtml(layer.recall_count)} recalls</span>
+            <span>${escapeHtml(layer.latest_hit_time_label)}</span>
+          </div>
+          <p>${escapeHtml(layer.summary)}</p>
+          <div class="memory-meter" style="--confidence:${clamp(confidence, 0, 1)}"><span></span></div>
+          <p><b>用于调度：</b>${escapeHtml(layer.dispatch_use)}</p>
+          <div class="memory-effect-line"><span>${escapeHtml(layer.effect)}</span></div>
+        </article>
+      `;
+    }
+
+    function renderMemoryProfile(profile) {
+      return `
+        <article class="memory-profile" data-memory-profile="${escapeHtml(profile.id)}" data-profile-type="${escapeHtml(profile.profile_type)}">
+          <div class="memory-profile-top">
+            <strong>${escapeHtml(profile.label)}</strong>
+            <span class="memory-profile-type">${escapeHtml(profile.profile_type)}</span>
+          </div>
+          <p>${escapeHtml(profile.context)}</p>
+          <p><b>策略摘要：</b>${escapeHtml(profile.strategy)}</p>
+          <div class="memory-profile-meta">
+            <span>置信度 ${fmtNumber(profile.confidence || 0, 2)}</span>
+            <span>最近命中 ${escapeHtml(profile.latest_hit_time_label)}</span>
+          </div>
+          <p>${escapeHtml(profile.dispatch_effect)}</p>
+        </article>
+      `;
+    }
+
+    function memoryItemsByIds(itemIds, byId, limit = 1) {
+      return (itemIds || [])
+        .map((id) => byId[id])
+        .filter(Boolean)
+        .slice(0, limit);
+    }
+
+    function renderMemoryRecallStep(step, byId, index) {
+      const evidence = memoryItemsByIds(step.item_ids, byId, 1)[0];
+      return `
+        <article class="memory-flow-step" data-memory-chain-step="${escapeHtml(step.id)}">
+          <div class="memory-flow-top">
+            <strong>${escapeHtml(step.label)}</strong>
+            <span class="memory-flow-index">${index + 1}</span>
+          </div>
+          <p>${escapeHtml(step.summary)}</p>
+          <p>${escapeHtml(step.evidence)}</p>
+          ${renderMemoryEvidenceItem(evidence)}
+        </article>
+      `;
+    }
+
+    function renderMemoryWritebackStep(step, byId, index) {
+      const evidence = memoryItemsByIds(step.item_ids, byId, 1)[0];
+      const sectionId = step.id.replace("-memory", "");
+      return `
+        <article class="memory-flow-step" data-memory-section="${escapeHtml(sectionId)}" data-memory-loop-step="${escapeHtml(step.id)}">
+          <div class="memory-flow-top">
+            <strong>${escapeHtml(step.label)}</strong>
+            <span class="memory-flow-index">${index + 1}</span>
+          </div>
+          <p>${escapeHtml(step.summary)}</p>
+          ${renderMemoryEvidenceItem(evidence)}
+        </article>
+      `;
+    }
+
+    function renderMemoryEvidenceItem(item) {
+      if (!item) {
+        return `<div class="memory-evidence"><p>等待推理产生可验证的记忆证据。</p></div>`;
+      }
+      return `
+        <div class="memory-evidence" data-memory-id="${escapeHtml(item.id)}" data-memory-stage="${escapeHtml(item.stage)}" data-memory-scope="${escapeHtml(item.memory_scope || "")}">
+          <div class="memory-evidence-head">
+            <strong>${escapeHtml(item.latest_hit_time_label)} / ${escapeHtml(item.id)}</strong>
+            <span>${escapeHtml(item.formation_channel || item.event_type)}</span>
+          </div>
+          <div class="memory-field-grid">
+            ${renderMemoryField("触发场景", item.trigger_scenario)}
+            ${renderMemoryField("上下文摘要", item.context_summary)}
+            ${renderMemoryField("策略摘要", item.strategy_summary)}
+            ${renderMemoryField("决策结果", item.decision_result)}
+            ${renderMemoryField("效果反馈", item.effect_feedback)}
+            ${renderMemoryField("最近命中时间", item.latest_hit_time_label)}
+          </div>
+          <div class="context-metric-grid">
+            ${renderMetricChip(`${item.id}-confidence`, "置信度", fmtNumber(item.confidence, 2), `before ${fmtNumber(item.confidence_before, 2)} / after ${fmtNumber(item.confidence_after, 2)}`)}
+            ${renderMetricChip(`${item.id}-recall`, "召回次数", `${item.recall_count}`, item.recalled_case_ids.join(", ") || "no recalled cases")}
+          </div>
+        </div>
+      `;
     }
 
     function renderMemoryRecallCard(item) {
@@ -3033,6 +3362,11 @@ def render_day_replay_index() -> str:
       renderMemoryPage,
       memoryStats,
       memoryItemsForSection,
+      renderMemoryLayerCard,
+      renderMemoryProfile,
+      renderMemoryRecallStep,
+      renderMemoryWritebackStep,
+      renderMemoryEvidenceItem,
       renderMemoryRecallCard,
       renderMemoryItem,
       renderOrdersPage,

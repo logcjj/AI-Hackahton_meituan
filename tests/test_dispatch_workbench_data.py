@@ -31,6 +31,23 @@ class DispatchWorkbenchDataTest(unittest.TestCase):
         self.assertEqual(len(payload["entities"]["merchants"]), len(contract.merchants))
         self.assertEqual(len(payload["decisions"]), len(contract.frames))
         self.assertEqual(len(payload["memory"]["items"]), len(contract.evolution_events))
+        self.assertEqual(payload["memory"]["system"]["operating_model"], "global policy + profile memories + active recall + writeback feedback")
+        self.assertEqual(
+            [layer["id"] for layer in payload["memory"]["layers"]],
+            ["global-policy", "rider-profile", "area-demand-profile", "order-risk-profile"],
+        )
+        self.assertEqual(
+            [profile["profile_type"] for profile in payload["memory"]["profiles"]],
+            ["rider", "area", "order"],
+        )
+        self.assertEqual(
+            [step["id"] for step in payload["memory"]["recall_chain"]],
+            ["hit", "inject", "decide", "writeback"],
+        )
+        self.assertEqual(
+            [step["id"] for step in payload["memory"]["writeback_loop"]],
+            ["new-memory", "curated-memory", "active-memory", "feedback-memory"],
+        )
         self.assertEqual(payload["map"]["tile_provider"], "cartodb-light-nolabels-leaflet")
         self.assertEqual(payload["map"]["privacy"]["entity_labels"], "anonymized")
         self.assertEqual(payload["map"]["privacy"]["road_labels"], "hidden_by_default")
@@ -98,9 +115,12 @@ class DispatchWorkbenchDataTest(unittest.TestCase):
             self.assertIn(key, decision)
         for key in (
             "trigger_scenario",
+            "memory_scope",
+            "formation_channel",
             "context_summary",
             "strategy_summary",
             "decision_result",
+            "dispatch_effect",
             "effect_feedback",
             "confidence",
             "recall_count",

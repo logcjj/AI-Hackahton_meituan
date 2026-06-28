@@ -61,6 +61,7 @@ def build_dispatch_workbench_payload(contract: DaySimulationContract) -> dict[st
         )
         for event in contract.evolution_events
     ]
+    memory_sections = _memory_sections(memories)
 
     final_frame = contract.frames[-1]
     return {
@@ -117,12 +118,12 @@ def build_dispatch_workbench_payload(contract: DaySimulationContract) -> dict[st
         "decisions": decisions,
         "memory": {
             "items": memories,
-            "sections": {
-                "new": [item["id"] for item in memories if item["stage"] == "new"],
-                "curated": [item["id"] for item in memories if item["stage"] == "curated"],
-                "active": [item["id"] for item in memories if item["stage"] == "active"],
-                "feedback": [item["id"] for item in memories if item["event_type"] in {"memory_writeback", "future_policy_shift"}],
-            },
+            "sections": memory_sections,
+            "system": _memory_system(memories),
+            "layers": _memory_layers(memories, memory_sections),
+            "profiles": _memory_profiles(memories, memory_sections),
+            "recall_chain": _memory_recall_chain(memories, memory_sections),
+            "writeback_loop": _memory_writeback_loop(memories, memory_sections),
         },
         "filters": {
             "order_time_bands": _order_time_bands(contract),
@@ -334,14 +335,27 @@ def _memory_payload(event: Any, frame: Any, time_slice: Any, decision_id: str) -
         effect_feedback = "Historical context recalled before scoring candidates."
     else:
         effect_feedback = "Writeback confidence updated after round outcome."
+    scope_by_type = {
+        "memory_recall": "profile",
+        "memory_writeback": "working",
+        "future_policy_shift": "global",
+    }
+    channel_by_type = {
+        "memory_recall": "recall-before-scoring",
+        "memory_writeback": "decision-result-writeback",
+        "future_policy_shift": "policy-curation",
+    }
     return {
         "id": event.id,
         "stage": stage,
         "event_type": event.event_type,
+        "memory_scope": scope_by_type.get(event.event_type, "working"),
+        "formation_channel": channel_by_type.get(event.event_type, "feedback"),
         "trigger_scenario": event.context_signature,
         "context_summary": _memory_context_summary(time_slice),
         "strategy_summary": event.learned_rule,
         "decision_result": frame.delta.headline,
+        "dispatch_effect": frame.delta.headline,
         "effect_feedback": effect_feedback,
         "confidence": event.confidence_after,
         "confidence_before": event.confidence_before,
@@ -353,6 +367,262 @@ def _memory_payload(event: Any, frame: Any, time_slice: Any, decision_id: str) -
         "linked_decision_id": decision_id,
         "tags": [time_slice.demand_phase, time_slice.weather, *time_slice.shock_ids],
     }
+
+
+def _memory_sections(memories: list[dict[str, Any]]) -> dict[str, list[str]]:
+    return {
+        "new": [item["id"] for item in memories if item["stage"] == "new"],
+        "curated": [item["id"] for item in memories if item["stage"] == "curated"],
+        "active": [item["id"] for item in memories if item["stage"] == "active"],
+        "feedback": [item["id"] for item in memories if item["event_type"] in {"memory_writeback", "future_policy_shift"}],
+    }
+
+
+def _memory_system(memories: list[dict[str, Any]]) -> dict[str, Any]:
+    latest = _latest_memory_items(memories, limit=1)
+    latest_item = latest[0] if latest else None
+    return {
+        "title": "Hermes Memory Command Center",
+        "source_of_truth": "day-replay evolution events",
+        "memory_count": len(memories),
+        "avg_confidence": _avg_memory_confidence(memories),
+        "recall_count": sum(int(item.get("recall_count", 0)) for item in memories),
+        "linked_decision_count": len({item.get("linked_decision_id", "") for item in memories if item.get("linked_decision_id")}),
+        "latest_hit_time_label": latest_item["latest_hit_time_label"] if latest_item else "-",
+        "improvement_summary": latest_item["decision_result"] if latest_item else "No memory effect has been recorded yet.",
+        "operating_model": "global policy + profile memories + active recall + writeback feedback",
+    }
+
+
+def _memory_layers(memories: list[dict[str, Any]], sections: dict[str, list[str]]) -> list[dict[str, Any]]:
+    item_by_id = {item["id"]: item for item in memories}
+    active_ids = sections["active"]
+    new_ids = sections["new"]
+    curated_ids = sections["curated"]
+    feedback_ids = sections["feedback"]
+    return [
+        _memory_layer_payload(
+            layer_id="global-policy",
+            label="全局策略记忆",
+            scope="GLOBAL",
+            item_ids=curated_ids,
+            items=item_by_id,
+            summary="跨时段保留的策略规则，用于在相似高峰、天气和供需结构中提前提高 AutoSolver 权重。",
+            dispatch_use="进入 Planner 前作为全局先验，避免重新从最近距离基线开始试错。",
+        ),
+        _memory_layer_payload(
+            layer_id="rider-profile",
+            label="骑手画像记忆",
+            scope="PROFILE",
+            item_ids=active_ids,
+            items=item_by_id,
+            summary="沉淀骑手供给、负载和可用时间的历史画像，召回后参与候选骑手过滤。",
+            dispatch_use="减少把近单派给即将满载或班次尾段骑手的概率。",
+        ),
+        _memory_layer_payload(
+            layer_id="area-demand-profile",
+            label="商圈/需求画像",
+            scope="PROFILE",
+            item_ids=new_ids,
+            items=item_by_id,
+            summary="把时段、天气、拥堵和商圈压力写成需求画像，供后续相似窗口复用。",
+            dispatch_use="在订单进入前预判压力区，优先保护高风险承诺时效。",
+        ),
+        _memory_layer_payload(
+            layer_id="order-risk-profile",
+            label="订单风险画像",
+            scope="PROFILE",
+            item_ids=feedback_ids,
+            items=item_by_id,
+            summary="根据回写反馈提升或削弱风险规则置信度，保留对超时、空驶和成本有效的经验。",
+            dispatch_use="评分时把超时风险和空驶代价并入同一策略记忆。",
+        ),
+    ]
+
+
+def _memory_profiles(memories: list[dict[str, Any]], sections: dict[str, list[str]]) -> list[dict[str, Any]]:
+    item_by_id = {item["id"]: item for item in memories}
+    return [
+        _memory_profile_payload(
+            profile_id="rider-supply",
+            label="骑手供给画像",
+            profile_type="rider",
+            item_ids=sections["active"],
+            items=item_by_id,
+            context="供给稀缺、班次尾段、负载变化",
+            strategy="候选骑手先按可用时间和后续连单能力过滤，再进入评分。",
+        ),
+        _memory_profile_payload(
+            profile_id="area-pressure",
+            label="商圈压力画像",
+            profile_type="area",
+            item_ids=sections["new"],
+            items=item_by_id,
+            context="午高峰、天气、拥堵、热点商圈订单密度",
+            strategy="高压商圈保留更短承诺时间窗口，避免最近距离策略造成局部堵塞。",
+        ),
+        _memory_profile_payload(
+            profile_id="order-risk",
+            label="订单风险画像",
+            profile_type="order",
+            item_ids=sections["feedback"],
+            items=item_by_id,
+            context="高优先级订单、超时惩罚、空驶里程和成本回写",
+            strategy="把风险收益比写入评分，使高风险单优先获得稳定骑手链路。",
+        ),
+    ]
+
+
+def _memory_recall_chain(memories: list[dict[str, Any]], sections: dict[str, list[str]]) -> list[dict[str, Any]]:
+    item_by_id = {item["id"]: item for item in memories}
+    active = _latest_ids(sections["active"], item_by_id, limit=1)
+    recalled_item = item_by_id[active[0]] if active else None
+    linked_decision_id = recalled_item.get("linked_decision_id", "") if recalled_item else ""
+    decision_items = [
+        item
+        for item in memories
+        if linked_decision_id and item.get("linked_decision_id") == linked_decision_id
+    ]
+    writeback_ids = [item["id"] for item in decision_items if item["stage"] == "new"]
+    policy_ids = [item["id"] for item in decision_items if item["stage"] == "curated"]
+    return [
+        {
+            "id": "hit",
+            "label": "命中长期记忆",
+            "item_ids": active,
+            "summary": recalled_item["trigger_scenario"] if recalled_item else "No active recall yet.",
+            "evidence": recalled_item["context_summary"] if recalled_item else "-",
+        },
+        {
+            "id": "inject",
+            "label": "注入候选评分",
+            "item_ids": active,
+            "summary": recalled_item["strategy_summary"] if recalled_item else "Recall waits for the first decision round.",
+            "evidence": f"linked decision {linked_decision_id}" if linked_decision_id else "-",
+        },
+        {
+            "id": "decide",
+            "label": "影响最终动作",
+            "item_ids": policy_ids or active,
+            "summary": recalled_item["decision_result"] if recalled_item else "-",
+            "evidence": "Scorecard keeps time/cost/timeout advantage against baseline.",
+        },
+        {
+            "id": "writeback",
+            "label": "结果回写记忆",
+            "item_ids": writeback_ids or policy_ids,
+            "summary": "Round outcome updates working memory and curated policy confidence.",
+            "evidence": "Only positive or useful policy shifts are retained for later recall.",
+        },
+    ]
+
+
+def _memory_writeback_loop(memories: list[dict[str, Any]], sections: dict[str, list[str]]) -> list[dict[str, Any]]:
+    item_by_id = {item["id"]: item for item in memories}
+    return [
+        {
+            "id": "new-memory",
+            "label": "新沉淀记忆",
+            "item_ids": _latest_ids(sections["new"], item_by_id, limit=2),
+            "summary": "每轮结果把有效策略、上下文和收益差异写成候选记忆。",
+        },
+        {
+            "id": "curated-memory",
+            "label": "已整理记忆",
+            "item_ids": _latest_ids(sections["curated"], item_by_id, limit=2),
+            "summary": "置信度提升后的规则进入全局策略记忆，供未来相似场景直接召回。",
+        },
+        {
+            "id": "active-memory",
+            "label": "当前命中的记忆",
+            "item_ids": _latest_ids(sections["active"], item_by_id, limit=2),
+            "summary": "当前窗口只展示与本轮推理相关的命中，不把历史日志全部铺开。",
+        },
+        {
+            "id": "feedback-memory",
+            "label": "记忆效果反馈",
+            "item_ids": _latest_ids(sections["feedback"], item_by_id, limit=2),
+            "summary": "用时间、成本、超时和空驶结果验证记忆是否继续保留。",
+        },
+    ]
+
+
+def _memory_layer_payload(
+    *,
+    layer_id: str,
+    label: str,
+    scope: str,
+    item_ids: list[str],
+    items: dict[str, dict[str, Any]],
+    summary: str,
+    dispatch_use: str,
+) -> dict[str, Any]:
+    selected = [items[item_id] for item_id in _latest_ids(item_ids, items, limit=6)]
+    return {
+        "id": layer_id,
+        "label": label,
+        "scope": scope,
+        "item_ids": [item["id"] for item in selected],
+        "memory_count": len(item_ids),
+        "avg_confidence": _avg_memory_confidence(selected),
+        "recall_count": sum(int(item.get("recall_count", 0)) for item in selected),
+        "latest_hit_time_label": selected[0]["latest_hit_time_label"] if selected else "-",
+        "summary": summary,
+        "dispatch_use": dispatch_use,
+        "effect": selected[0]["decision_result"] if selected else "Waiting for replay evidence.",
+    }
+
+
+def _memory_profile_payload(
+    *,
+    profile_id: str,
+    label: str,
+    profile_type: str,
+    item_ids: list[str],
+    items: dict[str, dict[str, Any]],
+    context: str,
+    strategy: str,
+) -> dict[str, Any]:
+    selected = [items[item_id] for item_id in _latest_ids(item_ids, items, limit=3)]
+    return {
+        "id": profile_id,
+        "label": label,
+        "profile_type": profile_type,
+        "item_ids": [item["id"] for item in selected],
+        "context": context,
+        "strategy": strategy,
+        "confidence": _avg_memory_confidence(selected),
+        "latest_hit_time_label": selected[0]["latest_hit_time_label"] if selected else "-",
+        "dispatch_effect": selected[0]["decision_result"] if selected else "No dispatch effect recorded yet.",
+    }
+
+
+def _latest_ids(item_ids: list[str], items: dict[str, dict[str, Any]], limit: int) -> list[str]:
+    return [
+        item["id"]
+        for item in sorted(
+            (items[item_id] for item_id in item_ids if item_id in items),
+            key=lambda item: (item.get("latest_hit_time_s", 0), item.get("id", "")),
+            reverse=True,
+        )[:limit]
+    ]
+
+
+def _latest_memory_items(memories: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    return sorted(
+        memories,
+        key=lambda item: (item.get("latest_hit_time_s", 0), item.get("id", "")),
+        reverse=True,
+    )[:limit]
+
+
+def _avg_memory_confidence(memories: list[dict[str, Any]]) -> float:
+    if not memories:
+        return 0.0
+    return round(
+        sum(float(item.get("confidence", item.get("confidence_after", 0))) for item in memories) / len(memories),
+        3,
+    )
 
 
 def _merchant_payload(merchant: Any) -> dict[str, Any]:

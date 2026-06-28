@@ -307,7 +307,7 @@ Confidence loop:
 
 ## Task 5 - Hermes-Style Memory Redesign
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Memory page is redesigned around global memory, profile memory, recall chain, writeback, and feedback.
@@ -315,8 +315,55 @@ Independent verification:
 - Memory page clearly shows how memory improves dispatch decisions.
 
 Work log:
+- Re-read `goal/goal-17/input.md`, `goal/goal-17/plan.md`, and `goal/goal-17/tasks.md` before code edits.
+- Read the Hermes evolve skill and used it conceptually for the USER/MEMORY-style split: long-term memory, accumulated workflow memory, recall, and feedback. No real Hermes user/project memory files were modified.
+- Extended the workbench memory payload in `dispatch_workbench_data.py`:
+  - kept existing full memory event items and required fields;
+  - added `memory.system` as a command-center summary;
+  - added `memory.layers` for global strategy memory, rider profile memory, area/demand profile, and order-risk profile;
+  - added `memory.profiles` for rider supply, area pressure, and order risk;
+  - added `memory.recall_chain` with hit, inject, decide, and writeback steps;
+  - added `memory.writeback_loop` with new, curated, active, and feedback memory stages;
+  - added per-item `memory_scope`, `formation_channel`, and `dispatch_effect`.
+- Rebuilt the Memory page in `day_replay_frontend.py` from the old four equal section lists into a Hermes-style long-term memory workspace:
+  - `#memory-command-center` explains that the page is not a log list, asset table, or document center;
+  - `#memory-layer-board` shows global/profile memory layers;
+  - `#memory-profile-board` shows rider, area, and order-risk profile memories;
+  - `#memory-recall-chain` shows how a memory is hit, injected into scoring, affects the decision, and leads to writeback;
+  - `#memory-writeback-loop` shows new memory, curated memory, active memory, and feedback;
+  - old `#memory-current-recall`, `.memory-section-grid`, and `.memory-card` output were removed.
+- Kept required Memory fields visible as compact evidence:
+  - trigger scene;
+  - context summary;
+  - strategy summary;
+  - decision result;
+  - effect feedback;
+  - confidence;
+  - recall count;
+  - latest hit time.
+- Reduced Memory route primary `.card` usage in browser QA to 3 high-level cards, replacing the previous 49 card-like audit pattern with command center + grouped memory surfaces.
+- Added/updated tests for:
+  - Hermes Memory DOM markers;
+  - old four-section DOM markers being absent;
+  - new memory payload system/layers/profiles/recall/writeback shape;
+  - new per-memory fields.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Browser QA on `http://127.0.0.1:18772/?v=goal17-task5#/memory` confirmed:
+  - route is `#/memory`;
+  - `data-memory-model="global-profile-recall-feedback"`;
+  - command center, layer board, profile board, recall chain, and writeback loop all render;
+  - 4 memory layers, 3 profiles, 4 recall steps, 4 writeback steps, and 8 compact evidence blocks render;
+  - all required Memory field labels render;
+  - page copy explicitly says it is not a log list, asset table, or document center;
+  - the page includes dispatch-use/effect copy showing how memory feeds scoring and writeback;
+  - old `#memory-current-recall` and `.memory-section-grid` are absent;
+  - browser console reported 0 errors.
 
 Confidence loop:
+- 100% confidence for Task 5 scope: the Memory page is no longer a dense list of logs/assets; the data model and UI now represent Hermes-style long-term memory with global memory, profile memory, active recall, writeback, and feedback; required fields remain visible; automated tests and browser QA prove the structure renders correctly with no console errors.
 
 ## Task 6 - Orders, Riders, Decisions, And Algorithm Reasoning Simplification
 
