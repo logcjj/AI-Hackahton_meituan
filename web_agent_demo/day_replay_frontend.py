@@ -1650,7 +1650,7 @@ def render_day_replay_index() -> str:
       .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
-      .workbench-shell { display: block; }
+      .workbench-shell { grid-template-columns: minmax(0, 1fr); }
       .workbench-nav { position: relative; height: auto; padding: 12px; }
       .nav-list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
       .nav-link { padding: 8px 4px; }

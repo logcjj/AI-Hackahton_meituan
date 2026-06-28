@@ -418,7 +418,7 @@ Confidence loop:
 
 ## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -427,8 +427,41 @@ Independent verification:
 - Fix any found defect before continuing.
 
 Work log:
+- Re-read `goal/goal-17/input.md`, `goal/goal-17/plan.md`, and `goal/goal-17/tasks.md` before starting the debug cycle.
+- Confirmed the current branch is `codex/kandbox-dispatch-workbench`, with latest feature commit `26c6483 feat: simplify dispatch reasoning pages`, and the worktree was clean before this debug cycle.
+- Automated verification passed before browser QA:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Browser QA on desktop width verified all five routes:
+  - all nav items expose Chinese labels, role badges, hints, Kandbox module mappings, and active route state;
+  - all pages expose `data-page-identity`, `data-page-module`, role strip, and page role card;
+  - `#/live` exposes the advantage-first hero, dominant score role, live controls, Leaflet map, anonymous map refs, and no sensitive merchant/rider title leaks;
+  - `#/decisions` exposes the advantage-first ReasonGraph surface, 6 reason nodes, 2 candidate paths, and all 10 required decision evidence fields;
+  - `#/memory` exposes the Hermes memory model with 4 layers, 3 profiles, 4 recall-chain steps, 4 writeback steps, and no old `#memory-current-recall` or `.memory-section-grid`;
+  - `#/orders` exposes the demand/risk input command center, 6 priority order cards, secondary full-day table evidence with 207 rows, and no old `调度输入上下文` copy;
+  - `#/riders` exposes the capacity/coverage command center, 6 rider focus cards, 8 secondary rider cards, and no old `资源盘点上下文` copy;
+  - desktop browser console reported 0 errors.
+- Browser QA found one responsive implementation defect:
+  - at 390px, the browser tool initially showed the mobile nav becoming a 5-column icon grid, but the outer shell retained an old `78px + main` computed grid column from the 1180px breakpoint when inspected through grid metadata;
+  - this made the mobile breakpoint less explicit and risked the nav reading as a narrow side rail instead of a top workbench nav.
+- Fixed the responsive defect:
+  - changed the 720px breakpoint for `.workbench-shell` from `display: block` to `grid-template-columns: minmax(0, 1fr)`;
+  - this makes the small-screen layout an explicit one-column grid while keeping the existing top nav behavior.
+- Re-ran verification after the fix:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Restarted the local preview server on `http://127.0.0.1:18772` so browser QA loaded the updated frontend generator.
+- Final browser QA after the fix confirmed:
+  - desktop five-route QA still passes with no horizontal overflow and 0 console errors;
+  - valid 390px mobile QA reports `innerWidth=390`, `matchMedia('(max-width: 720px)')=true`, `.workbench-shell` computed as one `390px` column, nav as five equal icon columns, and nav position `relative`;
+  - all five mobile routes keep their required page markers and page-specific structures;
+  - all five mobile routes report `bodyScrollWidth=390`, `docClientWidth=390`, and no horizontal overflow;
+  - mobile browser console reported 0 errors.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 2 scope: Tasks 4-6 were re-read and re-verified; navigation is clear and role-labeled, pages are differentiated, Memory remains Hermes-style rather than asset/log centered, Orders/Riders/Decisions are simplified into demand/capacity/reasoning workbench views, the found mobile breakpoint ambiguity was fixed, automated tests pass, desktop and 390px mobile browser QA pass across all five routes, and browser console errors are zero.
 
 ## Task 7 - Final Visual Polish, QA, And Archive
 
