@@ -165,7 +165,7 @@ Confidence loop:
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -174,8 +174,60 @@ Independent verification:
 - Fix any found defect before continuing.
 
 Work log:
+- Re-read `goal/goal-17/input.md`, `goal/goal-17/plan.md`, and `goal/goal-17/tasks.md` before starting the debug cycle.
+- Verified current branch and recent commits:
+  - branch `codex/kandbox-dispatch-workbench`;
+  - latest feature commit before debug cycle was `418ed49 feat: prioritize live advantage view`.
+- Automated checks passed before browser QA:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Static checks confirmed key Live markers exist:
+  - `#live-advantage-hero`;
+  - `data-live-priority="advantage-first"`;
+  - `#live-map-stage`;
+  - `data-real-map-provider="leaflet"`;
+  - `data-fallback-map="screen-coordinate"`;
+  - `cartodb-light-nolabels`;
+  - `data-score-role="dominant-advantage"`;
+  - `live-run-panel`.
+- Static leakage search found only `data-order-id` in the Orders table, not the map layer; old raw map title patterns were absent.
+- Browser QA on `http://127.0.0.1:18772/?v=goal17-debug1#/live` confirmed:
+  - initial headline `全日可节省 433.0 分钟`;
+  - target chips `全日目标 433.0 min`, `成本优势 424.7 元`, `超时单少 3 单`;
+  - advantage hero appears before the map;
+  - Live page has 3 primary `.card` blocks under `[data-page=live]`;
+  - Live controls `start-inference`, `pause-inference`, `playback-speed`, and `inference-mode` all exist.
+- Browser QA after starting inference and moving to the first decision window confirmed:
+  - headline updates to current cumulative advantage (`已节省 10.9 分钟`);
+  - event flow shows 4 recent events;
+  - compact round summary shows 5 high-value items;
+  - Leaflet map stays active with 4 routes and 26 markers;
+  - map title leakage check returned no sensitive merchant/rider names or area labels.
+- Browser QA for order release window confirmed:
+  - Leaflet order labels appear as anonymous `O-016`, `O-017`, `O-018`;
+  - fallback rebuild also exposes anonymous `O-xxx` order refs.
+- Visual map QA found one issue:
+  - order labels were still too dense in the center cluster;
+  - active route strokes were readable but could be stronger against the tile map.
+- Fixed the map readability issue:
+  - limited visible order text labels to the first four order markers while keeping all order dots and hover tooltips;
+  - added a white halo stroke behind Leaflet routes;
+  - added a subtle SVG fallback route shadow.
+- Re-ran verification after the fix:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Final browser QA after the fix on `http://127.0.0.1:18772/?v=goal17-debug1-fix#/live` confirmed:
+  - `mapStatus="leaflet"`;
+  - 4 routes and 26 markers at the decision window;
+  - only 4 visible order labels (`O-021` to `O-024`);
+  - no sensitive title leaks;
+  - fallback mode rebuilds with 4 routes, 28 markers, and anonymous `O-xxx` order refs;
+  - browser console reported 0 errors.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 1 scope: Tasks 1-3 were re-read and re-verified, the Live page now has a real readable map, anonymized marker labels, reduced map clutter, clear advantage-first first screen, functioning controls, deterministic fallback, passing automated tests, and zero browser console errors.
 
 ## Task 4 - Navigation Clarity And Page Differentiation
 

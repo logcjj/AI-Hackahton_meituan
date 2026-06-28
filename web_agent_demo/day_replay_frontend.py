@@ -610,6 +610,7 @@ def render_day_replay_index() -> str:
       stroke-width: 2.2;
       stroke-linecap: round;
       opacity: .76;
+      filter: drop-shadow(0 1px 2px rgba(255,255,255,.86));
       transition: opacity .32s ease, stroke-width .32s ease;
     }
     .route-line[data-lane="ours"] {
@@ -2104,7 +2105,7 @@ def render_day_replay_index() -> str:
         const release = kind === "order" && item.created_at_s >= inferenceState.currentTimeS - 900 ? "new" : "stable";
         const motion = kind === "rider" ? (item.motion || "snapshot") : "";
         const label = mapEntityLabel(kind, item, index);
-        const showLabel = kind === "rider" || kind === "order";
+        const showLabel = kind === "rider" || (kind === "order" && index < 4);
         return `<span class="map-dot" data-kind="${escapeHtml(kind)}" data-map-ref="${escapeHtml(label)}" data-map-label="${escapeHtml(label)}" data-show-label="${showLabel}" data-release="${escapeHtml(release)}" data-motion="${escapeHtml(motion)}" data-phase="${escapeHtml(item.phase || "")}" title="${escapeHtml(mapEntityTitle(kind, label, item))}" aria-label="${escapeHtml(mapEntityTitle(kind, label, item))}" style="--x:${pos.screen_x};--y:${pos.screen_y}"></span>`;
       }).join("");
     }
@@ -2269,6 +2270,7 @@ def render_day_replay_index() -> str:
         const points = (route.polyline || []).map(mapPoint).filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng));
         if (points.length < 2) continue;
         const lane = route.renderLane || route.lane;
+        window.L.polyline(points, routeHaloStyle(lane)).addTo(map);
         window.L.polyline(points, routeStyle(lane)).bindTooltip(escapeHtml(routeTooltip(route)), { sticky: true }).addTo(map);
       }
     }
@@ -2281,6 +2283,17 @@ def render_day_replay_index() -> str:
         difference: { color: "#b7791f", weight: 5, opacity: .82 }
       };
       return styles[lane] || styles.ours;
+    }
+
+    function routeHaloStyle(lane) {
+      const style = routeStyle(lane);
+      return {
+        color: "#ffffff",
+        weight: Number(style.weight || 3) + 5,
+        opacity: lane === "previous" ? .18 : .62,
+        dashArray: style.dashArray || null,
+        interactive: false
+      };
     }
 
     function routeTooltip(route) {
@@ -2301,15 +2314,15 @@ def render_day_replay_index() -> str:
         const release = kind === "order" && item.created_at_s >= inferenceState.currentTimeS - 900 ? "new" : "stable";
         const motion = kind === "rider" ? (item.motion || "snapshot") : "";
         window.L.marker(mapPoint(pos), {
-          icon: renderLeafletMarker(kind, label, release, motion),
+          icon: renderLeafletMarker(kind, label, release, motion, index),
           keyboard: false,
           zIndexOffset: kind === "rider" ? 500 : kind === "order" ? 300 : 100
         }).bindTooltip(escapeHtml(mapEntityTitle(kind, label, item)), { direction: "top", opacity: .92, sticky: true }).addTo(map);
       });
     }
 
-    function renderLeafletMarker(kind, label, release, motion) {
-      const showLabel = kind === "rider" || kind === "order";
+    function renderLeafletMarker(kind, label, release, motion, index = 0) {
+      const showLabel = kind === "rider" || (kind === "order" && index < 4);
       return window.L.divIcon({
         className: "leaflet-map-pin",
         html: `<span class="leaflet-map-pin-body" data-kind="${escapeHtml(kind)}" data-release="${escapeHtml(release)}" data-motion="${escapeHtml(motion)}"></span>${showLabel ? `<span class="leaflet-map-pin-label">${escapeHtml(label)}</span>` : ""}`,
