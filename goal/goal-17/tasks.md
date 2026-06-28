@@ -367,7 +367,7 @@ Confidence loop:
 
 ## Task 6 - Orders, Riders, Decisions, And Algorithm Reasoning Simplification
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Orders page emphasizes demand/risk input instead of a dense CRUD table.
@@ -378,8 +378,43 @@ Independent verification:
 - Required fields remain accessible.
 
 Work log:
+- Re-read `goal/goal-17/input.md`, `goal/goal-17/plan.md`, and `goal/goal-17/tasks.md` before code edits.
+- Inspected local references for reasoning-display patterns:
+  - no clear current-repository `man` project directory was found;
+  - `docs/deliverables/未来规划.md` provides the useful ReasonGraph plan: six sequential reasoning nodes, candidate paths, passed/rejected status, and short node text;
+  - `docs/deliverables/项目文档.md` provides the useful Planner / Executor / Critic / Controller pattern: adaptive strategy portfolio, candidate evaluation, acceptance/rejection, and anytime behavior;
+  - large unrelated sibling search hits were rejected because they are manuals, papers, or unrelated repositories, not dispatch-console references.
+- Reworked the Decisions page:
+  - renamed the planning surface to `ReasonGraph Planner`;
+  - changed the central panel from ten equal procedural stages into an advantage-first reasoning surface;
+  - added `data-reasoning-surface="advantage-first"` with headline metrics for time, cost, risk, and final actions;
+  - added a six-node ReasonGraph sequence with `data-reasoning-pattern="reasongraph-six-node"`;
+  - added `#decision-candidate-paths` with `data-reasoning-pattern="candidate-elimination"` so selected paths are retained and rejected paths show business-readable rejection reasons;
+  - preserved the required decision IDs and fields: trigger time, trigger reason, input orders, candidate riders, filtering process, scoring process, final actions, abandoned actions, round result, and result writeback.
+- Reworked the Orders page:
+  - renamed the route surface to `Demand Input Board`;
+  - added `#orders-input-command` and `data-orders-surface="demand-risk-input"` to explain that this is a dispatch input view, not manual CRUD;
+  - added `#orders-priority-panel` / `#orders-priority-list` to show the highest-risk and most algorithm-relevant orders first;
+  - kept filters and the full-day orders table, but moved the table to `data-evidence-role="secondary"` and reduced its visual dominance;
+  - changed the context panel to `需求输入雷达` with time, area, risk, and inference-state signals.
+- Reworked the Riders page:
+  - renamed the route surface to `Capacity Resource Board`;
+  - added `#riders-resource-command` and `data-riders-surface="capacity-coverage"` to frame riders as dispatch capacity, not personnel records;
+  - added `#riders-capacity-panel` / `#riders-capacity-list` for the most dispatch-relevant riders by state, load, task-chain and next-free signal;
+  - kept rider details as secondary evidence and limited the visible rider-card board to 8 cards instead of the previous full 18-card presentation;
+  - changed the context panel to `运力覆盖上下文` with area coverage bars and task-chain focus.
+- Updated static tests for the new ReasonGraph, demand input, and capacity coverage markers, and added forbidden checks for old `调度输入上下文` / `资源盘点上下文` copy.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Browser QA on `http://127.0.0.1:18772/?v=goal17-task6` confirmed:
+  - `#/decisions` renders 6 ReasonGraph nodes, 2 candidate paths, 3 primary cards, selected/rejected path copy, and no console errors;
+  - `#/orders` renders the demand command center, 6 priority order cards, secondary full-day table with 207 rows, no old `调度输入上下文` copy, and no console errors;
+  - `#/riders` renders the capacity command center, 6 rider focus cards, secondary rider board limited to 8 rider cards, no old `资源盘点上下文` copy, and no console errors.
 
 Confidence loop:
+- 100% confidence for Task 6 scope: local references were inspected and translated into the Decisions page; Orders now foregrounds demand/risk input instead of the table; Riders now foregrounds capacity/coverage instead of personnel inventory; required fields remain accessible as evidence; automated and browser checks prove all three routes render with the new structure and no console errors.
 
 ## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
 

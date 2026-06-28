@@ -1154,6 +1154,198 @@ def render_day_replay_index() -> str:
     }
     .decision-scroll { max-height: 690px; overflow: auto; }
     .decision-canvas { display: grid; gap: 12px; }
+    .decision-advantage-hero,
+    .input-command-center,
+    .resource-command-center {
+      display: grid;
+      grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr);
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 18px;
+      background:
+        linear-gradient(120deg, var(--route-soft, var(--green-soft)), rgba(255,255,255,.88) 44%),
+        var(--surface-glass);
+      box-shadow: var(--shadow-tight);
+    }
+    .decision-advantage-copy,
+    .input-command-copy,
+    .resource-command-copy {
+      display: grid;
+      align-content: center;
+      gap: 9px;
+    }
+    .decision-advantage-copy h3,
+    .input-command-copy h3,
+    .resource-command-copy h3 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 42px);
+      line-height: 1;
+      letter-spacing: -.05em;
+    }
+    .decision-advantage-copy p,
+    .input-command-copy p,
+    .resource-command-copy p {
+      margin: 0;
+      color: var(--ink-2);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .reason-kicker,
+    .input-kicker,
+    .resource-kicker {
+      width: fit-content;
+      padding: 5px 8px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 999px;
+      color: var(--route-ink, var(--accent-2));
+      background: rgba(255,255,255,.72);
+      font: 800 10px var(--mono);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .decision-advantage-metrics,
+    .input-signal-grid,
+    .resource-signal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+    .reason-graph {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .reason-node {
+      display: grid;
+      gap: 7px;
+      min-height: 146px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-2);
+      position: relative;
+      overflow: hidden;
+    }
+    .reason-node::before {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: var(--route-accent, var(--accent));
+      opacity: .76;
+      content: "";
+    }
+    .reason-node[data-status="passed"] {
+      border-color: rgba(15,118,110,.26);
+      background: linear-gradient(180deg, rgba(230,244,241,.78), #fff);
+    }
+    .reason-node[data-status="rejected"] {
+      border-color: rgba(148,163,184,.28);
+      background: #f1f5f9;
+      opacity: .76;
+    }
+    .reason-node[data-status="running"] {
+      border-color: rgba(37,99,235,.26);
+      background: linear-gradient(180deg, #dbeafe, #fff);
+    }
+    .reason-node-top,
+    .candidate-path-top,
+    .focus-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .reason-node-top strong,
+    .candidate-path-top strong,
+    .focus-card-top strong {
+      font-size: 13px;
+    }
+    .reason-node-index,
+    .path-status,
+    .focus-badge {
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: var(--route-ink, var(--accent-2));
+      background: var(--route-soft, var(--green-soft));
+      font: 800 10px var(--mono);
+      white-space: nowrap;
+    }
+    .reason-node p,
+    .candidate-path p,
+    .order-focus-card p,
+    .rider-focus-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .candidate-path-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .candidate-path {
+      display: grid;
+      gap: 8px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .candidate-path[data-status="selected"] {
+      border-color: rgba(15,118,110,.34);
+      background: linear-gradient(180deg, rgba(230,244,241,.90), #fff);
+      box-shadow: inset 0 0 0 1px rgba(15,118,110,.08);
+    }
+    .candidate-path[data-status="rejected"] {
+      background: #f8fafc;
+      opacity: .82;
+    }
+    .decision-evidence-grid,
+    .order-focus-list,
+    .rider-focus-list,
+    .coverage-grid {
+      display: grid;
+      gap: 9px;
+    }
+    .decision-evidence-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .order-focus-list,
+    .rider-focus-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .order-focus-card,
+    .rider-focus-card,
+    .coverage-card {
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-2);
+    }
+    .coverage-card {
+      display: grid;
+      gap: 8px;
+      background: #fff;
+    }
+    .coverage-card b {
+      display: block;
+      font-size: 13px;
+    }
+    .coverage-bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    .coverage-bar span {
+      display: block;
+      width: calc(var(--coverage) * 100%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--route-accent, var(--accent)), #22c55e);
+    }
     .decision-stage {
       border: 1px solid var(--line);
       border-radius: 14px;
@@ -1282,7 +1474,14 @@ def render_day_replay_index() -> str:
       gap: 14px;
       align-items: start;
     }
-    .orders-table-shell { max-height: 660px; }
+    .operations-grid[data-density="summary-first"] {
+      grid-template-columns: minmax(0, 1fr) 360px;
+    }
+    .orders-table-shell { max-height: 430px; }
+    .orders-table-shell[data-evidence-role="secondary"],
+    .rider-board[data-evidence-role="secondary"] {
+      box-shadow: var(--shadow-tight);
+    }
     .filter-bar .filter-count {
       margin-left: auto;
       align-self: center;
@@ -1440,14 +1639,14 @@ def render_day_replay_index() -> str:
       .brand strong, .brand span, .nav-copy, .nav-section-title, .nav-meta { display: none; }
       .nav-link { grid-template-columns: 1fr; justify-items: center; }
       .live-grid, .decision-grid, .memory-grid, .rider-grid { grid-template-columns: 1fr; }
-      .live-advantage-hero, .live-ops-shell, .decision-grid, .memory-command-center, .memory-operating-grid, .memory-flow-grid { grid-template-columns: 1fr; }
+      .live-advantage-hero, .live-ops-shell, .decision-grid, .decision-advantage-hero, .input-command-center, .resource-command-center, .memory-command-center, .memory-operating-grid, .memory-flow-grid { grid-template-columns: 1fr; }
       .live-side-rail, .decision-grid > aside, .operations-grid > aside, .control-dock { position: static; }
       .topbar { grid-template-columns: 1fr; }
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .runtime-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .live-advantage-hero .delta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .operations-overview, .operations-grid, .rider-board { grid-template-columns: 1fr; }
+      .operations-overview, .operations-grid, .operations-grid[data-density="summary-first"], .rider-board, .reason-graph, .candidate-path-board, .decision-evidence-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
       .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
@@ -1465,7 +1664,7 @@ def render_day_replay_index() -> str:
       .live-advantage-hero .algorithm-pair, .live-advantage-hero .delta-grid { grid-template-columns: 1fr; }
       .live-control-dock .runtime-strip { flex-basis: 100%; grid-template-columns: 1fr; }
       .operations-overview { grid-template-columns: 1fr; }
-      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid { grid-template-columns: 1fr; }
+      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid, .decision-advantage-metrics, .input-signal-grid, .resource-signal-grid, .reason-graph, .candidate-path-board, .decision-evidence-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
       .action-grid, .runtime-strip { grid-template-columns: 1fr; }
       .score-row, .stage-row, .time-lane-item { grid-template-columns: 1fr; }
@@ -2253,7 +2452,7 @@ def render_day_replay_index() -> str:
     function renderDecisionsPage() {
       const decision = selectedDecision();
       return `
-        ${pageHeader("decisions", "Planner / Chart / Gantt", "把规划视图重构为推导过程页：左侧轮次，中间推导，右侧上下文和回写。")}
+        ${pageHeader("decisions", "ReasonGraph Planner", "把规划视图压缩成可追溯推理链：先看本轮为什么赢，再看候选路径如何被接受或淘汰。")}
         <div class="page-grid decision-grid" data-page="decisions" data-decision-route="planner">
           <div class="card">
             <div class="card-head"><h3>决策轮次时间线</h3><span id="decision-route-status">${workbench.decisions.length} rounds</span></div>
@@ -2262,7 +2461,7 @@ def render_day_replay_index() -> str:
             </div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>当前轮推导过程</h3><span id="decision-reasoning-phase">${escapeHtml(decision.context.demand_phase)}</span></div>
+            <div class="card-head"><h3>优势推理链</h3><span id="decision-reasoning-phase">${escapeHtml(decision.context.demand_phase)}</span></div>
             <div id="decision-reasoning-canvas" class="card-body decision-canvas">
               ${renderDecisionReasoning(decision)}
             </div>
@@ -2340,11 +2539,18 @@ def render_day_replay_index() -> str:
     function renderOrdersPage() {
       const orders = filteredOrders();
       return `
-        ${pageHeader("orders", "Jobs / Orders", "全天订单全集已经预置，页面定位是调度输入视图，不是后台录入表。")}
+        ${pageHeader("orders", "Demand Input Board", "全天订单全集仍然预置，但首屏只回答需求压力、风险结构和我方相对基线的改善。")}
         <div class="page-grid input-workspace" data-page="orders" data-orders-route="jobs-input">
-          <div id="orders-overview" class="operations-overview">
-            ${renderOrdersOverview(orders)}
-          </div>
+          <section id="orders-input-command" class="input-command-center" data-orders-surface="demand-risk-input">
+            <div class="input-command-copy">
+              <span class="input-kicker">Jobs / Orders as Dispatch Input</span>
+              <h3>需求风险输入视图</h3>
+              <p>这里不是手工维护的 CRUD 表。全天订单已经预置，调度员先看哪些时间段、商圈和高风险订单会影响 Planner，而不是先扫 200 行明细。</p>
+            </div>
+            <div id="orders-overview" class="input-signal-grid">
+              ${renderOrdersOverview(orders)}
+            </div>
+          </section>
           <div id="orders-filter-bar" class="filter-bar" data-filter-bar="orders">
             <select id="orders-filter-time" class="select-control" data-order-filter="timeBand">
               <option value="all">全部时间段</option>
@@ -2364,16 +2570,23 @@ def render_day_replay_index() -> str:
             </select>
             <span id="orders-result-count" class="filter-count">${orders.length} / ${workbench.entities.orders.length} orders</span>
           </div>
-          <div class="operations-grid">
-            <div class="table-shell orders-table-shell" data-order-universe="full-day">
-              <table>
-                <thead><tr><th>订单编号</th><th>商家/提货点</th><th>下单时间</th><th>承诺送达</th><th>当前状态</th><th>风险等级</th><th>所属商圈</th><th>进入推理</th><th>基线算法结果</th><th>我方算法结果</th></tr></thead>
-                <tbody id="orders-table-body">${orders.map(renderOrderRow).join("")}</tbody>
-              </table>
+          <div class="operations-grid" data-density="summary-first">
+            <div class="card" id="orders-priority-panel" data-orders-surface="priority-demand">
+              <div class="card-head"><h3>重点订单队列</h3><span>risk / released / advantage first</span></div>
+              <div id="orders-priority-list" class="card-body order-focus-list">
+                ${renderOrderFocusList(orders)}
+              </div>
             </div>
             <aside class="card" id="orders-context-panel">
               ${renderOrdersContext(orders)}
             </aside>
+          </div>
+          <div class="table-shell orders-table-shell" data-order-universe="full-day" data-evidence-role="secondary">
+              <div class="card-head"><h3>订单全集明细</h3><span>secondary evidence, not data maintenance</span></div>
+              <table>
+                <thead><tr><th>订单编号</th><th>商家/提货点</th><th>下单时间</th><th>承诺送达</th><th>当前状态</th><th>风险等级</th><th>所属商圈</th><th>进入推理</th><th>基线算法结果</th><th>我方算法结果</th></tr></thead>
+                <tbody id="orders-table-body">${orders.map(renderOrderRow).join("")}</tbody>
+              </table>
           </div>
         </div>
       `;
@@ -2382,11 +2595,18 @@ def render_day_replay_index() -> str:
     function renderRidersPage() {
       const riders = filteredRiders();
       return `
-        ${pageHeader("riders", "Workers", "全天骑手资源预置为调度资源盘点：班次、状态、位置、负载和任务链。")}
+        ${pageHeader("riders", "Capacity Resource Board", "骑手页不是人事后台，而是运力覆盖、班次压力、负载和可承接链路的资源盘点。")}
         <div class="page-grid resource-workspace" data-page="riders" data-riders-route="workers-resource">
-          <div id="riders-overview" class="operations-overview">
-            ${renderRidersOverview(riders)}
-          </div>
+          <section id="riders-resource-command" class="resource-command-center" data-riders-surface="capacity-coverage">
+            <div class="resource-command-copy">
+              <span class="resource-kicker">Workers as Dispatch Capacity</span>
+              <h3>运力覆盖视图</h3>
+              <p>全天骑手资源已经预置。系统先看区域供给、班次尾段和负载链路，再决定哪些骑手适合进入候选集合。人员明细只作为二级证据。</p>
+            </div>
+            <div id="riders-overview" class="resource-signal-grid">
+              ${renderRidersOverview(riders)}
+            </div>
+          </section>
           <div id="riders-filter-bar" class="filter-bar" data-filter-bar="riders">
             <select id="riders-filter-area" class="select-control" data-rider-filter="area">
               <option value="all">全部区域</option>
@@ -2398,13 +2618,19 @@ def render_day_replay_index() -> str:
             </select>
             <span id="riders-result-count" class="filter-count">${riders.length} / ${workbench.entities.riders.length} riders</span>
           </div>
-          <div class="operations-grid">
-            <div id="rider-resource-board" class="rider-board">
-              ${riders.map(renderRiderCard).join("")}
+          <div class="operations-grid" data-density="summary-first">
+            <div class="card" id="riders-capacity-panel" data-riders-surface="capacity-focus">
+              <div class="card-head"><h3>可调度运力焦点</h3><span>coverage / load / next free</span></div>
+              <div id="riders-capacity-list" class="card-body rider-focus-list">
+                ${renderRiderFocusList(riders)}
+              </div>
             </div>
             <aside class="card" id="rider-context-panel">
               ${renderRidersContext(riders)}
             </aside>
+          </div>
+          <div id="rider-resource-board" class="rider-board" data-evidence-role="secondary">
+            ${riders.slice(0, 8).map(renderRiderCard).join("")}
           </div>
         </div>
       `;
@@ -2827,20 +3053,129 @@ def render_day_replay_index() -> str:
       }).join("")}</div>`;
     }
 
-    function renderDecisionReasoning(decision) {
+    function decisionAdvantageHeadline(decision) {
+      const result = decision.round_result || {};
+      return `本轮节省 ${fmtNumber(result.time_saved_min || 0, 1)} 分钟`;
+    }
+
+    function renderDecisionAdvantageHero(decision) {
+      const result = decision.round_result || {};
+      return `
+        <section class="decision-advantage-hero" data-reasoning-surface="advantage-first">
+          <div class="decision-advantage-copy">
+            <span class="reason-kicker">ReasonGraph Planner</span>
+            <h3>${escapeHtml(decisionAdvantageHeadline(decision))}</h3>
+            <p>先解释为什么我方方案优于基线：候选策略经过场景识别、可行性校验、风险评分和结果回写，最终保留能降低时间、成本和超时风险的动作。</p>
+          </div>
+          <div class="decision-advantage-metrics">
+            ${renderMetricChip("reason-time-advantage", "时间优势", `${fmtNumber(result.time_saved_min || 0, 1)} min`, "vs nearest baseline")}
+            ${renderMetricChip("reason-cost-advantage", "成本优势", `${fmtNumber(result.cost_saved_yuan || 0, 1)} 元`, "risk-balanced cost")}
+            ${renderMetricChip("reason-risk-advantage", "超时风险变化", fmtSigned(result.timeout_risk_delta || 0, 3), "negative is better")}
+            ${renderMetricChip("reason-actions", "最终动作", `${decision.final_actions.length}`, `${decision.abandoned_actions.length} rejected`)}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderReasonNode(nodeId, index, title, status, body, meta) {
+      return `
+        <article class="reason-node" id="${escapeHtml(nodeId)}" data-reason-node="${escapeHtml(nodeId)}" data-status="${escapeHtml(status)}">
+          <div class="reason-node-top"><strong>${escapeHtml(title)}</strong><span class="reason-node-index">${index}</span></div>
+          <p>${body}</p>
+          <div class="chip-list"><span class="data-chip">${escapeHtml(meta)}</span></div>
+        </article>
+      `;
+    }
+
+    function renderReasonGraph(decision) {
+      const inputOrderIds = decision.input_orders.length ? decision.input_orders.map((item) => item.id) : decision.input_order_ids;
+      const candidateRiderIds = decision.candidate_riders.length ? decision.candidate_riders.map((item) => item.id) : decision.candidate_rider_ids;
+      const bestScore = [...decision.scoring_process].sort((left, right) => Number(right.score || 0) - Number(left.score || 0))[0];
+      return `
+        <section class="reason-graph" data-reasoning-pattern="reasongraph-six-node">
+          ${renderReasonNode("decision-trigger-time", 1, "输入订单与骑手状态", "passed", `${escapeHtml(decision.trigger_time_label)} 触发 ${inputOrderIds.length} 单、${candidateRiderIds.length} 名候选骑手进入本轮。`, decision.id)}
+          ${renderReasonNode("decision-trigger-reason", 2, "场景识别与风险判断", "passed", `${escapeHtml(decision.trigger_reason)}；天气 ${escapeHtml(decision.context.weather)}，拥堵 ${fmtNumber(decision.context.congestion_level, 2)}。`, decision.context.time_slice_id)}
+          ${renderReasonNode("decision-input-orders", 3, "候选策略生成", "running", `生成最近距离基线与 AutoSolver 风险均衡候选，并保留订单/骑手集合用于复核。`, `${inputOrderIds.length} orders`)}
+          ${renderReasonNode("decision-filtering-process", 4, "路线可行性校验", "passed", `按供给、拥堵、班次和冲击事件过滤，剩余候选进入评分。`, `${decision.filtering_process.length} filters`)}
+          ${renderReasonNode("decision-scoring-process", 5, "成本与风险评估", "passed", `最高评分 ${escapeHtml(bestScore?.algorithm_id || "-")}，同时比较预计 ETA、成本和超时风险。`, `${decision.scoring_process.length} paths`)}
+          ${renderReasonNode("decision-final-actions", 6, "最终派单方案输出", "passed", `输出 ${decision.final_actions.length} 个动作，放弃 ${decision.abandoned_actions.length} 个基线动作，并回写记忆。`, `${fmtNumber(decision.round_result.time_saved_min, 1)} min saved`)}
+        </section>
+      `;
+    }
+
+    function candidateStatus(score, index, scores) {
+      const best = Math.max(...scores.map((item) => Number(item.score) || 0), 0);
+      if ((Number(score.score) || 0) >= best && best > 0) return "selected";
+      return index === 0 ? "rejected" : "rejected";
+    }
+
+    function candidateLabel(algorithmId) {
+      if (algorithmId === "nearest_greedy") return "贪心基线";
+      if (algorithmId === "autosolver_agent") return "最终 AutoSolver 方案";
+      return algorithmId.replaceAll("_", " ");
+    }
+
+    function candidateRejectReason(score) {
+      if (score.algorithm_id === "nearest_greedy") return "路线和距离局部最短，但没有同时保护承诺时效、骑手负载和后续风险。";
+      return "未成为当前最高综合评分候选。";
+    }
+
+    function renderCandidatePaths(decision) {
+      const scores = decision.scoring_process || [];
+      if (!scores.length) return `<p>等待候选策略评分。</p>`;
+      return `
+        <div class="list-item" data-reasoning-surface="candidate-summary">
+          <strong>候选路径对比与淘汰</strong>
+          <p>候选方案按综合评分、预计成本、运行耗时和无人/超时风险判断，失败路径灰化并写明业务原因。</p>
+        </div>
+        <section class="candidate-path-board" id="decision-candidate-paths" data-reasoning-pattern="candidate-elimination">
+          ${scores.map((score, index) => {
+            const status = candidateStatus(score, index, scores);
+            const selected = status === "selected";
+            return `
+              <article class="candidate-path" data-candidate-path="${escapeHtml(score.algorithm_id)}" data-status="${escapeHtml(status)}">
+                <div class="candidate-path-top">
+                  <strong>${escapeHtml(candidateLabel(score.algorithm_id))}</strong>
+                  <span class="path-status">${selected ? "保留" : "淘汰"}</span>
+                </div>
+                <p>${escapeHtml(score.reason)}</p>
+                <div class="context-metric-grid">
+                  ${renderMetricChip(`${score.algorithm_id}-score`, "综合评分", fmtNumber(score.score, 3), "higher retained")}
+                  ${renderMetricChip(`${score.algorithm_id}-risk`, "无人/超时风险", fmtNumber(score.risk_score, 3), "risk score")}
+                  ${renderMetricChip(`${score.algorithm_id}-cost`, "预计成本", `${fmtNumber(score.expected_cost_yuan, 1)} 元`, "expected")}
+                  ${renderMetricChip(`${score.algorithm_id}-runtime`, "运行耗时", `${fmtNumber(score.estimated_runtime_ms, 1)} ms`, "runtime")}
+                </div>
+                <p>${escapeHtml(selected ? "最终路径保留：综合时间、成本、风险和可用性后优于基线。" : candidateRejectReason(score))}</p>
+              </article>
+            `;
+          }).join("")}
+        </section>
+      `;
+    }
+
+    function renderDecisionEvidence(decision) {
       const inputOrderIds = decision.input_orders.length ? decision.input_orders.map((item) => item.id) : decision.input_order_ids;
       const candidateRiderIds = decision.candidate_riders.length ? decision.candidate_riders.map((item) => item.id) : decision.candidate_rider_ids;
       return `
-        ${renderDecisionStage("decision-trigger-time", "触发时间", decision.trigger_time_label, `<p>${escapeHtml(decision.trigger_time_label)} / ${escapeHtml(decision.id)}</p>`)}
-        ${renderDecisionStage("decision-trigger-reason", "触发原因", decision.context.time_slice_id, `<p>${escapeHtml(decision.trigger_reason)}</p>`)}
-        ${renderDecisionStage("decision-input-orders", "输入订单集合", `${inputOrderIds.length} orders`, renderChipList(inputOrderIds, "当前轮无释放订单"))}
-        ${renderDecisionStage("decision-candidate-riders", "候选骑手集合", `${candidateRiderIds.length} riders`, renderChipList(candidateRiderIds, "暂无候选骑手"))}
-        ${renderDecisionStage("decision-filtering-process", "过滤过程", `${decision.filtering_process.length} stages`, decision.filtering_process.map((stage) => renderStageRow(stage.stage, `${stage.remaining} remain`, stage.summary)).join(""))}
-        ${renderDecisionStage("decision-scoring-process", "评分过程", `${decision.scoring_process.length} algorithms`, renderDecisionScoreRows(decision.scoring_process))}
-        ${renderDecisionStage("decision-final-actions", "最终动作", `${decision.final_actions.length} assignments`, renderDecisionActions(decision.final_actions, "final"))}
-        ${renderDecisionStage("decision-abandoned-actions", "被放弃动作", `${decision.abandoned_actions.length} alternatives`, renderDecisionActions(decision.abandoned_actions, "abandoned"))}
-        ${renderDecisionStage("decision-round-result", "本轮结果", `${fmtNumber(decision.round_result.time_saved_min, 1)} min saved`, `<p>${escapeHtml(decision.round_result.summary)}</p>`)}
-        ${renderDecisionStage("decision-result-writeback", "结果回写", `${decision.result_writeback.writeback_count} writebacks`, `<p>${escapeHtml(decision.result_writeback.summary)}</p>${renderChipList(decision.result_writeback.memory_event_ids, "无回写记忆")}`)}
+        <section class="decision-evidence-grid" data-reasoning-surface="required-fields">
+          ${renderDecisionStage("decision-candidate-riders", "候选骑手集合", `${candidateRiderIds.length} riders`, renderChipList(candidateRiderIds, "暂无候选骑手"))}
+          ${renderDecisionStage("decision-abandoned-actions", "被放弃动作", `${decision.abandoned_actions.length} alternatives`, renderDecisionActions(decision.abandoned_actions.slice(0, 4), "abandoned"))}
+          ${renderDecisionStage("decision-round-result", "本轮结果", `${fmtNumber(decision.round_result.time_saved_min, 1)} min saved`, `<p>${escapeHtml(decision.round_result.summary)}</p>`)}
+          ${renderDecisionStage("decision-result-writeback", "结果回写", `${decision.result_writeback.writeback_count} writebacks`, `<p>${escapeHtml(decision.result_writeback.summary)}</p>${renderChipList(decision.result_writeback.memory_event_ids, "无回写记忆")}`)}
+        </section>
+        <section class="decision-stage" data-reasoning-surface="debug-evidence">
+          <div class="decision-stage-head"><b>输入订单集合</b><span>${inputOrderIds.length} orders</span></div>
+          <div class="decision-stage-body">${renderChipList(inputOrderIds.slice(0, 20), "当前轮无释放订单")}</div>
+        </section>
+      `;
+    }
+
+    function renderDecisionReasoning(decision) {
+      return `
+        ${renderDecisionAdvantageHero(decision)}
+        ${renderReasonGraph(decision)}
+        ${renderCandidatePaths(decision)}
+        ${renderDecisionEvidence(decision)}
       `;
     }
 
@@ -3156,6 +3491,46 @@ def render_day_replay_index() -> str:
       ].join("");
     }
 
+    function orderEtaAdvantage(order) {
+      const ours = Number(order.our_result?.eta_min);
+      const baseline = Number(order.baseline_result?.eta_min);
+      if (!Number.isFinite(ours) || !Number.isFinite(baseline)) return 0;
+      return baseline - ours;
+    }
+
+    function orderFocusScore(order) {
+      const riskWeight = order.risk_level === "high" ? 100 : order.risk_level === "medium" ? 45 : 0;
+      const enteredWeight = order.entered_inference ? 20 : 0;
+      return riskWeight + enteredWeight + Math.max(0, orderEtaAdvantage(order));
+    }
+
+    function renderOrderFocusList(orders) {
+      const focusOrders = [...orders]
+        .sort((left, right) => orderFocusScore(right) - orderFocusScore(left) || left.created_at_s - right.created_at_s)
+        .slice(0, 6);
+      if (!focusOrders.length) {
+        return `<div class="list-item"><strong>当前筛选无订单</strong><p>调整时间段、商圈、状态或风险筛选。</p></div>`;
+      }
+      return focusOrders.map((order) => {
+        const etaGain = orderEtaAdvantage(order);
+        const advantage = etaGain > 0 ? `我方 ETA 快 ${fmtNumber(etaGain, 1)} 分钟` : "等待或持平";
+        return `
+          <article class="order-focus-card" data-order-focus="${escapeHtml(order.id)}" data-risk="${escapeHtml(order.risk_level)}">
+            <div class="focus-card-top">
+              <strong>${escapeHtml(order.id)}</strong>
+              <span class="focus-badge">${escapeHtml(order.risk_level)}</span>
+            </div>
+            <p>${escapeHtml(order.created_at_label)} 下单 / ${escapeHtml(order.promised_at_label)} 承诺 / ${escapeHtml(order.business_area)}</p>
+            <p>${escapeHtml(advantage)}；${order.entered_inference ? "已进入推理" : "等待释放"}。</p>
+            <div class="chip-list">
+              <span class="data-chip">baseline ${escapeHtml(order.baseline_result?.state || "pending")}</span>
+              <span class="data-chip">ours ${escapeHtml(order.our_result?.state || "pending")}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
     function countBy(items, keyFn) {
       return items.reduce((counts, item) => {
         const key = keyFn(item) || "-";
@@ -3193,12 +3568,12 @@ def render_day_replay_index() -> str:
       const areaCounts = countBy(orders, (order) => order.business_area);
       const statusCounts = countBy(orders, (order) => order.entered_inference ? "entered_inference" : order.status);
       return `
-        <div class="card-head"><h3>调度输入上下文</h3><span id="orders-context-count">${orders.length} visible</span></div>
+        <div class="card-head"><h3>需求输入雷达</h3><span id="orders-context-count">${orders.length} visible</span></div>
         <div class="card-body order-context-list">
           <div class="list-item" id="orders-time-distribution"><strong>全天释放节奏</strong>${renderOrderTimeLane(orders)}</div>
           <div class="list-item" id="orders-area-distribution"><strong>商圈分布</strong>${renderCountChips(areaCounts)}</div>
           <div class="list-item" id="orders-risk-distribution"><strong>风险结构</strong>${renderCountChips(riskCounts)}</div>
-          <div class="list-item" id="orders-status-distribution"><strong>推理状态</strong>${renderCountChips(statusCounts)}</div>
+          <div class="list-item" id="orders-status-distribution"><strong>推理状态</strong>${renderCountChips(statusCounts)}<p>订单全集只作为调度输入证据，不作为数据维护主叙事。</p></div>
         </div>
       `;
     }
@@ -3229,11 +3604,30 @@ def render_day_replay_index() -> str:
       const orders = filteredOrders();
       const overview = document.getElementById("orders-overview");
       if (overview) overview.innerHTML = renderOrdersOverview(orders);
+      const priority = document.getElementById("orders-priority-list");
+      if (priority) priority.innerHTML = renderOrderFocusList(orders);
       const body = document.getElementById("orders-table-body");
       if (body) body.innerHTML = orders.map(renderOrderRow).join("") || `<tr><td colspan="10">当前筛选无订单，调整时间段、商圈、状态或风险。</td></tr>`;
       const context = document.getElementById("orders-context-panel");
       if (context) context.innerHTML = renderOrdersContext(orders);
       setText("orders-result-count", `${orders.length} / ${workbench.entities.orders.length} orders`);
+    }
+
+    function renderCoverageCards(counts, total, limit = 5) {
+      const rows = Object.entries(counts).sort((left, right) => right[1] - left[1]).slice(0, limit);
+      if (!rows.length) return `<p>当前筛选无区域供给。</p>`;
+      const max = Math.max(...rows.map((row) => row[1]), 1);
+      return `
+        <div class="coverage-grid">
+          ${rows.map(([area, value]) => `
+            <div class="coverage-card" data-coverage-area="${escapeHtml(area)}">
+              <b>${escapeHtml(area)}</b>
+              <div class="coverage-bar" style="--coverage:${value / max}"><span></span></div>
+              <p>${value} riders / ${fmtNumber(value / Math.max(1, total) * 100, 1)}% visible supply</p>
+            </div>
+          `).join("")}
+        </div>
+      `;
     }
 
     function renderRidersOverview(riders) {
@@ -3249,15 +3643,44 @@ def render_day_replay_index() -> str:
       ].join("");
     }
 
+    function riderFocusScore(rider) {
+      const stateWeight = rider.online_state === "available" ? 70 : rider.online_state === "busy" ? 42 : rider.online_state === "ending_shift" ? 12 : 0;
+      const loadRatio = rider.current_load / Math.max(1, rider.capacity);
+      return stateWeight + (1 - loadRatio) * 30 + Math.min(12, rider.task_chain_size);
+    }
+
+    function renderRiderFocusList(riders) {
+      const focusRiders = [...riders]
+        .sort((left, right) => riderFocusScore(right) - riderFocusScore(left) || left.id.localeCompare(right.id))
+        .slice(0, 6);
+      if (!focusRiders.length) {
+        return `<div class="list-item"><strong>当前筛选无骑手</strong><p>调整区域或在线状态筛选。</p></div>`;
+      }
+      return focusRiders.map((rider) => {
+        const loadRatio = clamp(rider.current_load / Math.max(1, rider.capacity), 0, 1);
+        return `
+          <article class="rider-focus-card" data-rider-focus="${escapeHtml(rider.id)}" data-state="${escapeHtml(rider.online_state)}">
+            <div class="focus-card-top">
+              <strong>${escapeHtml(rider.id)} / ${escapeHtml(rider.name)}</strong>
+              <span class="focus-badge">${escapeHtml(rider.online_state)}</span>
+            </div>
+            <div class="rider-load" style="--load:${loadRatio}"><span></span></div>
+            <p>${escapeHtml(rider.business_area)} / ${escapeHtml(rider.shift_label)} / ${rider.current_load}/${rider.capacity} load</p>
+            <p>预计空闲 ${escapeHtml(rider.estimated_free_at_label)}；任务链 ${rider.task_chain_size} 单。</p>
+          </article>
+        `;
+      }).join("");
+    }
+
     function renderRidersContext(riders) {
       const stateCounts = countBy(riders, (rider) => rider.online_state);
       const areaCounts = countBy(riders, (rider) => rider.business_area);
       const topChains = [...riders].sort((left, right) => right.task_chain_size - left.task_chain_size).slice(0, 5);
       return `
-        <div class="card-head"><h3>资源盘点上下文</h3><span id="riders-context-count">${riders.length} visible</span></div>
+        <div class="card-head"><h3>运力覆盖上下文</h3><span id="riders-context-count">${riders.length} visible</span></div>
         <div class="card-body rider-context-list">
           <div class="list-item" id="rider-state-distribution"><strong>在线状态</strong>${renderCountChips(stateCounts)}</div>
-          <div class="list-item" id="rider-area-distribution"><strong>区域供给</strong>${renderCountChips(areaCounts)}</div>
+          <div class="list-item" id="rider-area-distribution"><strong>区域供给覆盖</strong>${renderCoverageCards(areaCounts, riders.length)}</div>
           <div class="list-item" id="rider-chain-focus">
             <strong>任务链焦点</strong>
             ${topChains.length ? topChains.map((rider) => `<p>${escapeHtml(rider.id)} ${escapeHtml(rider.name)} / ${rider.task_chain_size} tasks / free ${escapeHtml(rider.estimated_free_at_label)}</p>`).join("") : "<p>当前筛选无骑手</p>"}
@@ -3280,8 +3703,10 @@ def render_day_replay_index() -> str:
       const riders = filteredRiders();
       const overview = document.getElementById("riders-overview");
       if (overview) overview.innerHTML = renderRidersOverview(riders);
+      const focus = document.getElementById("riders-capacity-list");
+      if (focus) focus.innerHTML = renderRiderFocusList(riders);
       const board = document.getElementById("rider-resource-board");
-      if (board) board.innerHTML = riders.map(renderRiderCard).join("") || `<div class="list-item"><strong>当前筛选无骑手</strong><p>调整区域或在线状态筛选。</p></div>`;
+      if (board) board.innerHTML = riders.slice(0, 8).map(renderRiderCard).join("") || `<div class="list-item"><strong>当前筛选无骑手</strong><p>调整区域或在线状态筛选。</p></div>`;
       const context = document.getElementById("rider-context-panel");
       if (context) context.innerHTML = renderRidersContext(riders);
       setText("riders-result-count", `${riders.length} / ${workbench.entities.riders.length} riders`);
@@ -3357,6 +3782,9 @@ def render_day_replay_index() -> str:
       renderDecisionTimeline,
       renderDecisionReasoning,
       renderDecisionContext,
+      renderDecisionAdvantageHero,
+      renderReasonGraph,
+      renderCandidatePaths,
       hydrateDecisionPage,
       selectDecisionRound,
       renderMemoryPage,
@@ -3374,6 +3802,7 @@ def render_day_replay_index() -> str:
       updateOrdersView,
       filteredOrders,
       orderFilterState,
+      renderOrderFocusList,
       renderOrdersOverview,
       renderOrdersContext,
       renderRidersPage,
@@ -3381,6 +3810,8 @@ def render_day_replay_index() -> str:
       updateRidersView,
       filteredRiders,
       riderFilterState,
+      renderCoverageCards,
+      renderRiderFocusList,
       renderRidersOverview,
       renderRidersContext,
       renderLiveCumulativeMetrics,
