@@ -320,6 +320,50 @@ def render_day_replay_index() -> str:
         #f8fafc;
       background-size: 44px 44px, 44px 44px, auto, auto;
     }
+    .map-mode-chip {
+      position: absolute;
+      z-index: 4;
+      right: 14px;
+      top: 14px;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--accent-2);
+      background: rgba(255,255,255,.86);
+      font: 800 11px var(--mono);
+      box-shadow: 0 8px 18px rgba(15,23,42,.10);
+    }
+    .map-legend {
+      position: absolute;
+      z-index: 4;
+      left: 14px;
+      bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      max-width: 72%;
+      padding: 7px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,.84);
+      box-shadow: 0 8px 18px rgba(15,23,42,.08);
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .legend-swatch {
+      width: 18px;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+    .legend-swatch[data-lane="baseline"] { background: var(--red); opacity: .48; }
+    .legend-swatch[data-lane="difference"] { background: var(--amber); }
+    .legend-swatch[data-lane="previous"] { background: #64748b; opacity: .36; }
     .map-route {
       position: absolute;
       inset: 0;
@@ -333,6 +377,29 @@ def render_day_replay_index() -> str:
       stroke-width: 2.2;
       stroke-linecap: round;
       opacity: .76;
+      transition: opacity .32s ease, stroke-width .32s ease;
+    }
+    .route-line[data-lane="ours"] {
+      stroke: var(--accent);
+      stroke-width: 2.6;
+      opacity: .82;
+    }
+    .route-line[data-lane="baseline"] {
+      stroke: var(--red);
+      stroke-width: 1.8;
+      stroke-dasharray: 4 5;
+      opacity: .34;
+    }
+    .route-line[data-lane="difference"] {
+      stroke: var(--amber);
+      stroke-width: 3.1;
+      opacity: .88;
+    }
+    .route-line[data-lane="previous"] {
+      stroke: #64748b;
+      stroke-width: 1.4;
+      stroke-dasharray: 2 7;
+      opacity: .23;
     }
     .map-dot {
       --size: 12px;
@@ -345,10 +412,17 @@ def render_day_replay_index() -> str:
       border-radius: 999px;
       border: 2px solid #fff;
       box-shadow: 0 5px 16px rgba(15,23,42,.18);
+      transition: left .55s linear, top .55s linear, opacity .25s ease;
     }
     .map-dot[data-kind="merchant"] { background: var(--blue); }
     .map-dot[data-kind="rider"] { --size: 14px; background: var(--accent); }
     .map-dot[data-kind="order"] { --size: 10px; background: var(--amber); }
+    .map-dot[data-motion="moving"] {
+      outline: 5px solid rgba(15,118,110,.10);
+    }
+    .map-dot[data-release="new"] {
+      animation: order-enter-pulse 1.8s ease-in-out infinite;
+    }
     .hotspot {
       position: absolute;
       left: calc(var(--x) * 1%);
@@ -359,6 +433,11 @@ def render_day_replay_index() -> str:
       border-radius: 999px;
       background: rgba(183,121,31,.13);
       border: 1px solid rgba(183,121,31,.24);
+    }
+    .hotspot[data-active="false"] {
+      opacity: .34;
+      background: rgba(148,163,184,.10);
+      border-color: rgba(148,163,184,.22);
     }
     .score-stack { display: grid; gap: 10px; }
     .score-card {
@@ -373,9 +452,6 @@ def render_day_replay_index() -> str:
     .score-card[data-tone="warn"] { background: var(--amber-soft); border-color: rgba(183,121,31,.24); }
     .live-grid[data-inference-state="running"] .map-panel {
       outline: 2px solid rgba(15,118,110,.14);
-    }
-    .live-grid[data-inference-state="running"] .map-dot[data-kind="order"] {
-      animation: order-enter-pulse 1.8s ease-in-out infinite;
     }
     @keyframes order-enter-pulse {
       0%, 100% { box-shadow: 0 5px 16px rgba(15,23,42,.18); }
@@ -509,6 +585,7 @@ def render_day_replay_index() -> str:
   <script>
     const dispatchBoot = JSON.parse(document.getElementById("dispatch-workbench-bootstrap").textContent);
     const workbench = dispatchBoot.workbench;
+    const contract = dispatchBoot.contract;
     const routeCopy = {
       live: {
         icon: "LM",
@@ -605,6 +682,119 @@ def render_day_replay_index() -> str:
 
     function releasedEvents(simTimeS) {
       return workbench.timeline.events.filter((event) => event.time_s <= simTimeS);
+    }
+
+    function frameForTime(simTimeS) {
+      const frames = contract.frames || [];
+      let selected = frames[0];
+      for (const frame of frames) {
+        if (frame.sim_time_s <= simTimeS) selected = frame;
+        else break;
+      }
+      return selected || { id: "", sim_time_s: workbench.timeline.start_s, highlighted_order_ids: [], challenger: { route_overlays: [], simulation_trace: { courier_tracks: [] }, courier_positions: [] }, baseline: { route_overlays: [], assignments: [] } };
+    }
+
+    function previousFrameFor(frame) {
+      const frames = contract.frames || [];
+      const index = frames.findIndex((item) => item.id === frame.id);
+      return index > 0 ? frames[index - 1] : null;
+    }
+
+    function routeRowsForFrame(frame, lane) {
+      const laneKey = lane === "baseline" ? "baseline" : "ours";
+      return workbench.map.routes.filter((route) => route.frame_id === frame.id && route.lane === laneKey);
+    }
+
+    function assignmentCourierMap(frame, lane) {
+      const algorithmFrame = lane === "baseline" ? frame.baseline : frame.challenger;
+      return Object.fromEntries((algorithmFrame.assignments || []).map((assignment) => [assignment.order_id, assignment.courier_id]));
+    }
+
+    function differentialOrderIds(frame) {
+      const baseline = assignmentCourierMap(frame, "baseline");
+      const ours = assignmentCourierMap(frame, "ours");
+      const highlighted = new Set(frame.highlighted_order_ids || []);
+      const diff = Object.keys(ours).filter((orderId) => baseline[orderId] && baseline[orderId] !== ours[orderId]);
+      return new Set([...diff, ...highlighted].slice(0, 8));
+    }
+
+    function mapRouteRows(frame) {
+      const previous = previousFrameFor(frame);
+      const previousRoutes = previous ? routeRowsForFrame(previous, "ours").slice(0, 4).map((route) => ({...route, renderLane: "previous"})) : [];
+      const ours = routeRowsForFrame(frame, "ours");
+      const baseline = routeRowsForFrame(frame, "baseline");
+      const diffIds = differentialOrderIds(frame);
+      if (inferenceState.mode === "overlay") {
+        const diffOurs = ours.filter((route) => diffIds.has(route.order_id)).slice(0, 7).map((route) => ({...route, renderLane: "difference"}));
+        const diffBaseline = baseline.filter((route) => diffIds.has(route.order_id)).slice(0, 5).map((route) => ({...route, renderLane: "baseline"}));
+        return [...previousRoutes, ...(diffOurs.length ? diffOurs : ours.slice(0, 5).map((route) => ({...route, renderLane: "ours"}))), ...diffBaseline];
+      }
+      if (inferenceState.mode === "compare") {
+        const diffBaseline = baseline.filter((route) => diffIds.has(route.order_id)).slice(0, 4).map((route) => ({...route, renderLane: "baseline"}));
+        return [...previousRoutes, ...ours.slice(0, 7).map((route) => ({...route, renderLane: "ours"})), ...diffBaseline];
+      }
+      return [...previousRoutes, ...ours.slice(0, 9).map((route) => ({...route, renderLane: "ours"}))];
+    }
+
+    function ordersForMap(frame) {
+      const anchorsById = Object.fromEntries(workbench.map.anchors.orders.map((order) => [order.id, order]));
+      const activeIds = new Set([...(frame.challenger.active_order_ids || []), ...(frame.highlighted_order_ids || [])]);
+      const recent = workbench.map.anchors.orders.filter((order) => order.created_at_s <= inferenceState.currentTimeS && order.created_at_s >= inferenceState.currentTimeS - 1800);
+      for (const order of recent) activeIds.add(order.id);
+      return [...activeIds].map((id) => anchorsById[id]).filter(Boolean).sort((a, b) => a.created_at_s - b.created_at_s).slice(-32);
+    }
+
+    function riderPositionsForFrame(frame) {
+      const moving = movingRiderPositions(frame);
+      if (moving.length) return moving;
+      return (frame.challenger.courier_positions || []).slice(0, 18).map((snapshot) => ({
+        id: snapshot.courier_id,
+        label: snapshot.label || snapshot.courier_id,
+        position: snapshot.position,
+        motion: "snapshot",
+        phase: snapshot.status || "available"
+      }));
+    }
+
+    function movingRiderPositions(frame) {
+      const tracks = frame.challenger?.simulation_trace?.courier_tracks || [];
+      return tracks.slice(0, 18).map((track) => {
+        const sample = trackPositionAt(track, inferenceState.currentTimeS);
+        return sample ? {
+          id: track.courier_id,
+          label: track.courier_id,
+          order_id: track.order_id,
+          position: sample.position,
+          motion: "moving",
+          phase: sample.phase,
+          progress: sample.progress
+        } : null;
+      }).filter(Boolean);
+    }
+
+    function trackPositionAt(track, simTimeS) {
+      const ticks = track.ticks || [];
+      if (!ticks.length) return null;
+      if (simTimeS <= ticks[0].absolute_s) return ticks[0];
+      for (let index = 1; index < ticks.length; index += 1) {
+        const left = ticks[index - 1];
+        const right = ticks[index];
+        if (simTimeS <= right.absolute_s) {
+          const span = Math.max(1, right.absolute_s - left.absolute_s);
+          const ratio = clamp((simTimeS - left.absolute_s) / span, 0, 1);
+          return {
+            phase: right.phase,
+            progress: left.progress + (right.progress - left.progress) * ratio,
+            position: {
+              lat: left.position.lat + (right.position.lat - left.position.lat) * ratio,
+              lng: left.position.lng + (right.position.lng - left.position.lng) * ratio,
+              screen_x: left.position.screen_x + (right.position.screen_x - left.position.screen_x) * ratio,
+              screen_y: left.position.screen_y + (right.position.screen_y - left.position.screen_y) * ratio
+            }
+          };
+        }
+      }
+      return ticks[ticks.length - 1];
     }
 
     function routeFromHash() {
@@ -731,6 +921,13 @@ def render_day_replay_index() -> str:
       setText("round-summary-time", currentDecision.trigger_time_label);
       const progressBar = document.getElementById("inference-progress-bar");
       if (progressBar) progressBar.style.setProperty("--progress", `${inferenceProgressPct()}%`);
+      const mapStage = document.getElementById("live-map-stage");
+      if (mapStage) {
+        const frame = frameForTime(inferenceState.currentTimeS);
+        mapStage.dataset.mapMode = inferenceState.mode;
+        mapStage.dataset.frameId = frame.id;
+        mapStage.innerHTML = renderLiveMapLayer(frame);
+      }
       const startButton = document.getElementById("start-inference");
       if (startButton) {
         startButton.disabled = inferenceState.started && inferenceState.running;
@@ -813,6 +1010,7 @@ def render_day_replay_index() -> str:
       const currentScore = scoreForTime(inferenceState.currentTimeS);
       const events = releasedEvents(inferenceState.currentTimeS).slice(-9).reverse();
       const currentDecision = decisionForTime(inferenceState.currentTimeS);
+      const currentFrame = frameForTime(inferenceState.currentTimeS);
       return `
         ${pageHeader("live", "Live Map / GanttMap", "主工作台只展示对调度有用的内容：实时地图、累计优势、事件流和当前轮摘要。")}
         <div class="page-grid live-grid" data-page="live" data-inference-state="${inferenceState.running ? "running" : inferenceState.started ? "paused" : "ready"}">
@@ -833,12 +1031,8 @@ def render_day_replay_index() -> str:
             </div>
             <div class="card map-panel">
               <div class="card-head"><h3>实时地图层</h3><span id="map-runtime-hint">merchants / orders / riders / routes / hotspots</span></div>
-              <div class="schematic-map" data-map-layer="primary">
-                ${renderMapRoutes()}
-                ${renderHotspots()}
-                ${renderMapDots("merchant", workbench.map.anchors.merchants.slice(0, 18), "position")}
-                ${renderMapDots("rider", workbench.map.anchors.riders.slice(0, 18), "position")}
-                ${renderMapDots("order", workbench.map.anchors.orders.slice(0, 28), "dropoff")}
+              <div id="live-map-stage" class="schematic-map" data-map-layer="primary" data-map-mode="${escapeHtml(inferenceState.mode)}" data-frame-id="${escapeHtml(currentFrame.id)}">
+                ${renderLiveMapLayer(currentFrame)}
               </div>
             </div>
             <div class="card">
@@ -957,14 +1151,28 @@ def render_day_replay_index() -> str:
       `;
     }
 
-    function renderMapRoutes() {
-      const routes = workbench.map.routes.filter((route) => route.lane === "ours").slice(0, 10);
+    function renderLiveMapLayer(frame) {
+      const routes = mapRouteRows(frame);
+      const riders = riderPositionsForFrame(frame);
+      const orders = ordersForMap(frame);
+      return `
+        <div class="map-mode-chip">${escapeHtml(inferenceModeLabels[inferenceState.mode])} / ${escapeHtml(frame.id)}</div>
+        ${renderMapRoutes(routes)}
+        ${renderHotspots()}
+        ${renderMapDots("merchant", workbench.map.anchors.merchants.slice(0, 18), "position")}
+        ${renderMapDots("rider", riders, "position")}
+        ${renderMapDots("order", orders, "dropoff")}
+        ${renderMapLegend()}
+      `;
+    }
+
+    function renderMapRoutes(routes) {
       if (!routes.length) return "";
       return `
-        <svg class="map-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <svg class="map-route" data-route-count="${routes.length}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           ${routes.map((route) => {
             const points = route.polyline.map((point) => `${point.screen_x},${point.screen_y}`).join(" ");
-            return `<polyline class="route-line" points="${escapeHtml(points)}"></polyline>`;
+            return `<polyline class="route-line" data-lane="${escapeHtml(route.renderLane || route.lane)}" data-order-id="${escapeHtml(route.order_id)}" data-courier-id="${escapeHtml(route.courier_id)}" points="${escapeHtml(points)}"></polyline>`;
           }).join("")}
         </svg>
       `;
@@ -972,15 +1180,27 @@ def render_day_replay_index() -> str:
 
     function renderHotspots() {
       return workbench.map.hotspots.map((hotspot) => `
-        <div class="hotspot" title="${escapeHtml(hotspot.summary)}" style="--x:${hotspot.center.screen_x};--y:${hotspot.center.screen_y};--severity:${hotspot.severity}"></div>
+        <div class="hotspot" data-active="${hotspot.start_s <= inferenceState.currentTimeS && inferenceState.currentTimeS <= hotspot.end_s}" title="${escapeHtml(hotspot.summary)}" style="--x:${hotspot.center.screen_x};--y:${hotspot.center.screen_y};--severity:${hotspot.severity}"></div>
       `).join("");
     }
 
     function renderMapDots(kind, items, positionKey) {
       return items.map((item) => {
         const pos = item[positionKey];
-        return `<span class="map-dot" data-kind="${escapeHtml(kind)}" data-id="${escapeHtml(item.id)}" title="${escapeHtml(item.label || item.id)}" style="--x:${pos.screen_x};--y:${pos.screen_y}"></span>`;
+        const release = kind === "order" && item.created_at_s >= inferenceState.currentTimeS - 900 ? "new" : "stable";
+        const motion = kind === "rider" ? (item.motion || "snapshot") : "";
+        return `<span class="map-dot" data-kind="${escapeHtml(kind)}" data-id="${escapeHtml(item.id)}" data-release="${escapeHtml(release)}" data-motion="${escapeHtml(motion)}" data-phase="${escapeHtml(item.phase || "")}" title="${escapeHtml(item.label || item.id)}" style="--x:${pos.screen_x};--y:${pos.screen_y}"></span>`;
       }).join("");
+    }
+
+    function renderMapLegend() {
+      const items = [
+        ["ours", "我方路线"],
+        ["previous", "旧路线淡出"],
+        ["baseline", "基线差异"],
+        ["difference", "叠加差异"]
+      ];
+      return `<div class="map-legend">${items.map(([lane, label]) => `<span class="legend-item"><i class="legend-swatch" data-lane="${escapeHtml(lane)}"></i>${escapeHtml(label)}</span>`).join("")}</div>`;
     }
 
     function renderScoreCard(label, value, detail, tone) {

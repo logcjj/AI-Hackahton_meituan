@@ -207,7 +207,7 @@ Confidence loop:
 
 ## Task 5 - Live Map, Route Motion, And Differential Overlay
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Map shows merchants, orders, riders, routes, and hotspots.
@@ -217,8 +217,41 @@ Independent verification:
 - Compare/overlay modes do not overload the map with two full route sets.
 
 Work log:
+- Reworked the live map stage in `web_agent_demo/day_replay_frontend.py` so it is driven by the current inference frame rather than a static first-screen map.
+- Added `contract = dispatchBoot.contract` to the frontend runtime so the map can consume backend-generated `simulation_trace.courier_tracks`.
+- Added dynamic map selectors:
+  - `frameForTime()`;
+  - `previousFrameFor()`;
+  - `routeRowsForFrame()`;
+  - `differentialOrderIds()`;
+  - `mapRouteRows()`;
+  - `ordersForMap()`;
+  - `riderPositionsForFrame()`;
+  - `movingRiderPositions()`;
+  - `trackPositionAt()`.
+- Implemented `renderLiveMapLayer()` and connected it to `renderLiveRuntimeState()`, so map content updates as inference time advances.
+- Added map lane rendering:
+  - `ours` for current algorithm routes;
+  - `previous` for old routes fading out;
+  - `baseline` for limited baseline comparison routes;
+  - `difference` for overlay-only route differences.
+- Added restrained order-entry effects with `data-release="new"` and pulse styling.
+- Added rider motion markers with `data-motion="moving"` based on authoritative backend courier track ticks.
+- Added active/inactive hotspot rendering while preserving all hotspot context.
+- Added map mode chip and map legend to clarify current, compare and overlay modes without turning the view into a big-screen display.
+- Updated frontend tests with Task 5 markers and functions.
+- Verified direct render markers include live map stage, motion functions, route lane markers, release markers and motion markers.
+- Verified actual generated JavaScript in Node VM across all live map modes:
+  - current mode: 12 route lines, 0 baseline routes, 4 previous routes, 8 moving riders, 14 new-order markers;
+  - compare mode: 15 route lines, 4 baseline routes, 4 previous routes, 8 moving riders, 14 new-order markers;
+  - overlay mode: 16 route lines, 5 baseline routes, 7 difference routes, 4 previous routes, 8 moving riders, 14 new-order markers.
+- Confirmed compare/overlay modes do not draw full baseline route sets; they limit baseline rendering to difference-focused routes.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Task 5 scope: the live map now renders merchants, orders, riders, routes and hotspots from current inference state; rider positions come from backend trace ticks; old routes fade while new routes take over; and compare/overlay modes emphasize differences instead of flooding the map with two full route sets.
 
 ## Task 6 - Real-Time Scorecard, Event Stream, And Round Summary
 
