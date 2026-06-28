@@ -310,7 +310,7 @@ Confidence loop:
 
 ## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -318,8 +318,59 @@ Independent verification:
 - Fix any runtime, visual, console, or data-flow defect before continuing.
 
 Work log:
+- Re-read `goal/goal-16/input.md`, `goal/goal-16/plan.md`, and `goal/goal-16/tasks.md` before starting the debug cycle.
+- Confirmed current branch is `codex/kandbox-dispatch-workbench` and the worktree was clean at cycle start.
+- Checked Playwright prerequisites:
+  - `npx` is available;
+  - Playwright wrapper exists at `$HOME/.codex/skills/playwright/scripts/playwright_cli.sh`.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Started local server at `http://127.0.0.1:18765`.
+- Browser-ran `http://127.0.0.1:18765/#/live` with Playwright and verified the page title and live workbench rendered.
+- Found a real browser data-flow defect:
+  - initial inference clock showed `07:00`;
+  - scorecard, cumulative metrics and round summary were already showing first planner frame `10:00`;
+  - this could make the live page appear to leak future decisions before time progression.
+- Fixed the defect in `web_agent_demo/day_replay_frontend.py` by adding pre-dispatch selectors:
+  - `preDispatchScore()`;
+  - `preDispatchDecision()`;
+  - `preDispatchFrame()`;
+  - these keep score, summary and map frame aligned with the current inference clock before the first planner frame.
+- Added regression markers to `tests/test_web_agent_demo.py` for the new pre-dispatch functions.
+- Restarted the server and browser-ran the live page again.
+- Verified initial browser state after the fix:
+  - clock is `07:00`;
+  - map frame is `pre-dispatch`;
+  - cumulative metrics caption is `07:00 累计优势`;
+  - scorecard values are zeroed;
+  - round summary says the first planner decision is pending;
+  - no future `10:00` score or decision is shown before time advances.
+- Verified live controls and integrated runtime behavior in Playwright:
+  - clicked `开始推理`;
+  - selected `4x`;
+  - selected `叠加`;
+  - automatic progression reached `23:00`;
+  - event count reached 407;
+  - scorecard includes `收益/成本差异`;
+  - bottom cumulative metrics include `时间差异`;
+  - event flow includes `累计更新`;
+  - summary includes `最终动作` and `结果回写`;
+  - map mode is `overlay`;
+  - route layers include difference and baseline routes;
+  - moving rider and new order markers are present.
+- Verified pause/resume in a controlled 1x browser run:
+  - running state became `自动推理中`;
+  - after pause, state became `已暂停`;
+  - clock stayed at `07:00` during pause;
+  - after continue, state returned to `自动推理中`;
+  - clock advanced to `07:10`.
+- Checked browser console through Playwright: 0 errors, 0 warnings.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 2 scope: Tasks 4-6 now work together in a real browser, including one-click automatic progression, pause/resume, speed, overlay mode, map route/motion layers, dynamic scorecard, typed event stream, cumulative metrics and round summary; the detected pre-dispatch future-frame bug was fixed and verified, browser console is clean, and focused/full tests pass.
 
 ## Task 7 - Decision Page
 

@@ -739,8 +739,52 @@ def render_day_replay_index() -> str:
       return Math.round(clamp((inferenceState.currentTimeS - workbench.timeline.start_s) / span, 0, 1) * 1000) / 10;
     }
 
+    function zeroMetrics() {
+      return {
+        total_orders: 0,
+        delivered_orders: 0,
+        assigned_orders: 0,
+        late_orders: 0,
+        coverage_rate: 0,
+        avg_eta_min: 0,
+        p95_eta_min: 0,
+        total_time_cost_min: 0,
+        total_distance_km: 0,
+        total_cost_yuan: 0,
+        timeout_risk: 0,
+        courier_utilization: 0,
+        gross_revenue_yuan: 0
+      };
+    }
+
+    function preDispatchScore(simTimeS) {
+      return {
+        frame_id: "pre-dispatch",
+        time_s: simTimeS,
+        time_label: clock(simTimeS),
+        baseline: zeroMetrics(),
+        ours: zeroMetrics(),
+        deltas: {
+          time_saved_s: 0,
+          time_saved_min: 0,
+          money_saved_yuan: 0,
+          timeout_order_delta: 0,
+          timeout_risk_delta: 0,
+          empty_mileage_saved_m: 0,
+          empty_mileage_saved_km: 0,
+          revenue_delta_yuan: 0,
+          profit_delta_yuan: 0,
+          extra_delivered_orders: 0,
+          utilization_delta: 0,
+          headline: "等待首轮规划评分，订单正在进入推理队列。"
+        }
+      };
+    }
+
     function scoreForTime(simTimeS) {
       const series = workbench.metrics.series;
+      if (!series.length) return workbench.metrics.final || preDispatchScore(simTimeS);
+      if (simTimeS < series[0].time_s) return preDispatchScore(simTimeS);
       let selected = series[0] || workbench.metrics.final;
       for (const item of series) {
         if (item.time_s <= simTimeS) selected = item;
@@ -749,7 +793,53 @@ def render_day_replay_index() -> str:
       return selected;
     }
 
+    function preDispatchDecision(simTimeS) {
+      const queuedOrders = workbench.map.anchors.orders.filter((order) => order.created_at_s <= simTimeS).slice(-8).map((order) => order.id);
+      const onlineRiders = workbench.entities.riders.slice(0, 6).map((rider) => rider.id);
+      return {
+        id: "D-pre-dispatch",
+        frame_id: "pre-dispatch",
+        trigger_time_s: simTimeS,
+        trigger_time_label: clock(simTimeS),
+        trigger_reason: "等待首轮 Planner 决策触发。",
+        input_order_ids: queuedOrders,
+        input_orders: [],
+        candidate_rider_ids: onlineRiders,
+        candidate_riders: [],
+        filtering_process: [
+          { stage: "order_release", remaining: queuedOrders.length, summary: "订单逐步进入推理队列，尚未触发首轮评分。" },
+          { stage: "rider_pool", remaining: onlineRiders.length, summary: "在线骑手资源已预载，等待规划窗口开启。" }
+        ],
+        scoring_process: [],
+        final_actions: [],
+        abandoned_actions: [],
+        round_result: {
+          summary: "首轮决策尚未生成；当前仅展示已进入队列的订单和资源上下文。",
+          time_saved_min: 0,
+          cost_saved_yuan: 0,
+          timeout_risk_delta: 0,
+          extra_delivered_orders: 0
+        },
+        result_writeback: {
+          memory_event_ids: [],
+          writeback_count: 0,
+          summary: "No memory writeback before first planner decision."
+        },
+        context: {
+          time_slice_id: "pre-dispatch",
+          demand_phase: "pre-dispatch",
+          weather: "pending",
+          congestion_level: 0,
+          courier_supply: onlineRiders.length,
+          shock_ids: []
+        }
+      };
+    }
+
     function decisionForTime(simTimeS) {
+      if (!workbench.decisions.length || simTimeS < workbench.decisions[0].trigger_time_s) {
+        return preDispatchDecision(simTimeS);
+      }
       let selected = workbench.decisions[0];
       for (const item of workbench.decisions) {
         if (item.trigger_time_s <= simTimeS) selected = item;
@@ -765,11 +855,34 @@ def render_day_replay_index() -> str:
     function frameForTime(simTimeS) {
       const frames = contract.frames || [];
       let selected = frames[0];
+      if (frames.length && simTimeS < frames[0].sim_time_s) {
+        return preDispatchFrame(simTimeS);
+      }
       for (const frame of frames) {
         if (frame.sim_time_s <= simTimeS) selected = frame;
         else break;
       }
       return selected || { id: "", sim_time_s: workbench.timeline.start_s, highlighted_order_ids: [], challenger: { route_overlays: [], simulation_trace: { courier_tracks: [] }, courier_positions: [] }, baseline: { route_overlays: [], assignments: [] } };
+    }
+
+    function preDispatchFrame(simTimeS) {
+      return {
+        id: "pre-dispatch",
+        sim_time_s: simTimeS,
+        highlighted_order_ids: [],
+        challenger: {
+          active_order_ids: [],
+          route_overlays: [],
+          simulation_trace: { courier_tracks: [] },
+          courier_positions: workbench.map.anchors.riders.slice(0, 18).map((rider) => ({
+            courier_id: rider.id,
+            label: rider.label,
+            position: rider.position,
+            status: "online"
+          }))
+        },
+        baseline: { route_overlays: [], assignments: [] }
+      };
     }
 
     function previousFrameFor(frame) {
