@@ -89,11 +89,18 @@ def build_dispatch_workbench_payload(contract: DaySimulationContract) -> dict[st
         },
         "map": {
             "provider": contract.scenario.map_provider,
+            "tile_provider": "cartodb-light-nolabels-leaflet",
             "center": _position_payload(contract.scenario.map_center),
             "bounds": [_position_payload(item) for item in contract.scenario.map_bounds],
             "anchors": _map_anchors(contract),
+            "aliases": _map_aliases(contract),
             "hotspots": _hotspots(contract),
             "routes": _route_payloads(contract),
+            "privacy": {
+                "entity_labels": "anonymized",
+                "road_labels": "hidden_by_default",
+                "label_schema": "M-01 / R-01 / O-001",
+            },
         },
         "timeline": {
             "start_s": contract.scenario.day_start_s,
@@ -499,32 +506,47 @@ def _map_anchors(contract: DaySimulationContract) -> dict[str, list[dict[str, An
             {
                 "id": merchant.id,
                 "label": merchant.label,
+                "map_label": _map_alias("M", index),
                 "area": merchant.zone_id,
                 "position": _position_payload(merchant.position),
             }
-            for merchant in contract.merchants
+            for index, merchant in enumerate(contract.merchants, start=1)
         ],
         "orders": [
             {
                 "id": order.id,
+                "map_label": _map_alias("O", index, width=3),
                 "merchant_id": order.merchant_id,
                 "created_at_s": order.created_at_s,
                 "pickup": _position_payload(order.merchant_position),
                 "dropoff": _position_payload(order.destination),
                 "risk_level": _risk_level(order),
             }
-            for order in contract.orders
+            for index, order in enumerate(contract.orders, start=1)
         ],
         "riders": [
             {
                 "id": courier.id,
                 "label": courier.label,
+                "map_label": _map_alias("R", index),
                 "area": courier.home_zone_id,
                 "position": _position_payload(courier.start_position),
             }
-            for courier in contract.couriers
+            for index, courier in enumerate(contract.couriers, start=1)
         ],
     }
+
+
+def _map_aliases(contract: DaySimulationContract) -> dict[str, dict[str, str]]:
+    return {
+        "merchants": {merchant.id: _map_alias("M", index) for index, merchant in enumerate(contract.merchants, start=1)},
+        "orders": {order.id: _map_alias("O", index, width=3) for index, order in enumerate(contract.orders, start=1)},
+        "riders": {courier.id: _map_alias("R", index) for index, courier in enumerate(contract.couriers, start=1)},
+    }
+
+
+def _map_alias(prefix: str, index: int, *, width: int = 2) -> str:
+    return f"{prefix}-{index:0{width}d}"
 
 
 def _hotspots(contract: DaySimulationContract) -> list[dict[str, Any]]:

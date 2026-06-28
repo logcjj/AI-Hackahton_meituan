@@ -32,6 +32,8 @@ def render_day_replay_index() -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>外卖配送智能调度工作台</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root {
       --bg: #eef2f5;
@@ -356,6 +358,7 @@ def render_day_replay_index() -> str:
       background: #fff;
     }
     .map-panel { min-height: 520px; position: relative; }
+    .real-map-stage,
     .schematic-map {
       position: relative;
       height: 458px;
@@ -363,6 +366,7 @@ def render_day_replay_index() -> str:
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: 18px;
+      isolation: isolate;
       background:
         linear-gradient(90deg, rgba(148,163,184,.16) 1px, transparent 1px),
         linear-gradient(0deg, rgba(148,163,184,.16) 1px, transparent 1px),
@@ -370,9 +374,58 @@ def render_day_replay_index() -> str:
         #f8fafc;
       background-size: 44px 44px, 44px 44px, auto, auto;
     }
+    .leaflet-live-map {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: #e8eef2;
+    }
+    .leaflet-container {
+      color: var(--ink);
+      font-family: var(--font);
+      filter: saturate(.78) contrast(.98);
+    }
+    .leaflet-control-attribution {
+      color: rgba(38,53,65,.62);
+      background: rgba(255,255,255,.74) !important;
+      font-size: 9px;
+    }
+    .fallback-map-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      opacity: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(148,163,184,.13) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(148,163,184,.13) 1px, transparent 1px),
+        radial-gradient(circle at 56% 38%, rgba(15,118,110,.10), transparent 30%);
+      background-size: 44px 44px, 44px 44px, auto;
+      transition: opacity .22s ease;
+    }
+    .real-map-stage[data-real-map-status="leaflet"] .fallback-map-overlay {
+      opacity: 0;
+    }
+    .real-map-stage[data-real-map-status="fallback"] .leaflet-live-map::after,
+    .real-map-stage[data-real-map-status="loading"] .leaflet-live-map::after {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      transform: translate(-50%, -50%);
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255,255,255,.82);
+      font: 800 11px var(--mono);
+      content: "匿名无标签底图加载中 / fallback ready";
+      white-space: nowrap;
+    }
+    .real-map-stage[data-real-map-status="fallback"] .leaflet-live-map::after {
+      content: "匿名 fallback map";
+    }
     .map-mode-chip {
       position: absolute;
-      z-index: 4;
+      z-index: 5;
       right: 14px;
       top: 14px;
       padding: 6px 9px;
@@ -385,7 +438,7 @@ def render_day_replay_index() -> str:
     }
     .map-legend {
       position: absolute;
-      z-index: 4;
+      z-index: 5;
       left: 14px;
       bottom: 14px;
       display: flex;
@@ -410,6 +463,21 @@ def render_day_replay_index() -> str:
       height: 3px;
       border-radius: 999px;
       background: var(--accent);
+    }
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      border: 1px solid #fff;
+      box-shadow: 0 0 0 1px rgba(15,23,42,.10);
+      background: var(--blue);
+    }
+    .legend-dot[data-kind="rider"] { background: var(--accent); }
+    .legend-dot[data-kind="merchant"] { background: var(--blue); }
+    .legend-dot[data-kind="order"] { background: var(--amber); }
+    .legend-dot[data-kind="hotspot"] {
+      background: rgba(183,121,31,.44);
+      box-shadow: 0 0 0 5px rgba(183,121,31,.12);
     }
     .legend-swatch[data-lane="baseline"] { background: var(--red); opacity: .48; }
     .legend-swatch[data-lane="difference"] { background: var(--amber); }
@@ -467,6 +535,21 @@ def render_day_replay_index() -> str:
     .map-dot[data-kind="merchant"] { background: var(--blue); }
     .map-dot[data-kind="rider"] { --size: 14px; background: var(--accent); }
     .map-dot[data-kind="order"] { --size: 10px; background: var(--amber); }
+    .map-dot[data-show-label="true"]::after {
+      position: absolute;
+      left: calc(100% + 4px);
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 2px 5px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 999px;
+      color: var(--ink-2);
+      background: rgba(255,255,255,.88);
+      box-shadow: 0 4px 10px rgba(15,23,42,.08);
+      content: attr(data-map-label);
+      font: 800 9px var(--mono);
+      white-space: nowrap;
+    }
     .map-dot[data-motion="moving"] {
       outline: 5px solid rgba(15,118,110,.10);
     }
@@ -488,6 +571,48 @@ def render_day_replay_index() -> str:
       opacity: .34;
       background: rgba(148,163,184,.10);
       border-color: rgba(148,163,184,.22);
+    }
+    .leaflet-map-pin {
+      border: 0;
+      background: transparent;
+    }
+    .leaflet-map-pin-body {
+      position: relative;
+      display: block;
+      width: 13px;
+      height: 13px;
+      border: 2px solid #fff;
+      border-radius: 999px;
+      background: var(--blue);
+      box-shadow: 0 5px 14px rgba(15,23,42,.20);
+    }
+    .leaflet-map-pin-body[data-kind="rider"] {
+      width: 16px;
+      height: 16px;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(15,118,110,.10), 0 7px 18px rgba(15,23,42,.18);
+    }
+    .leaflet-map-pin-body[data-kind="order"] {
+      width: 12px;
+      height: 12px;
+      background: var(--amber);
+    }
+    .leaflet-map-pin-body[data-release="new"] {
+      animation: order-enter-pulse 1.8s ease-in-out infinite;
+    }
+    .leaflet-map-pin-label {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 2px 5px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 999px;
+      color: var(--ink-2);
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 5px 12px rgba(15,23,42,.08);
+      font: 800 9px var(--mono);
+      white-space: nowrap;
     }
     .score-stack { display: grid; gap: 10px; }
     .live-grid > aside,
@@ -1017,6 +1142,15 @@ def render_day_replay_index() -> str:
       memory_recall: { label: "记忆命中", family: "memory" },
       future_policy_shift: { label: "策略整理", family: "memory" }
     };
+    const liveTileLayer = {
+      id: "cartodb-light-nolabels",
+      url: "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+      attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
+      subdomains: "abcd"
+    };
+    let liveLeafletMap = null;
+    let liveLeafletOverlayGroup = null;
+    let liveMapHydrationToken = "";
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -1242,20 +1376,20 @@ def render_day_replay_index() -> str:
 
     function mapRouteRows(frame) {
       const previous = previousFrameFor(frame);
-      const previousRoutes = previous ? routeRowsForFrame(previous, "ours").slice(0, 4).map((route) => ({...route, renderLane: "previous"})) : [];
+      const previousRoutes = previous ? routeRowsForFrame(previous, "ours").slice(0, 2).map((route) => ({...route, renderLane: "previous"})) : [];
       const ours = routeRowsForFrame(frame, "ours");
       const baseline = routeRowsForFrame(frame, "baseline");
       const diffIds = differentialOrderIds(frame);
       if (inferenceState.mode === "overlay") {
-        const diffOurs = ours.filter((route) => diffIds.has(route.order_id)).slice(0, 7).map((route) => ({...route, renderLane: "difference"}));
-        const diffBaseline = baseline.filter((route) => diffIds.has(route.order_id)).slice(0, 5).map((route) => ({...route, renderLane: "baseline"}));
-        return [...previousRoutes, ...(diffOurs.length ? diffOurs : ours.slice(0, 5).map((route) => ({...route, renderLane: "ours"}))), ...diffBaseline];
+        const diffOurs = ours.filter((route) => diffIds.has(route.order_id)).slice(0, 5).map((route) => ({...route, renderLane: "difference"}));
+        const diffBaseline = baseline.filter((route) => diffIds.has(route.order_id)).slice(0, 3).map((route) => ({...route, renderLane: "baseline"}));
+        return [...previousRoutes, ...(diffOurs.length ? diffOurs : ours.slice(0, 4).map((route) => ({...route, renderLane: "ours"}))), ...diffBaseline];
       }
       if (inferenceState.mode === "compare") {
-        const diffBaseline = baseline.filter((route) => diffIds.has(route.order_id)).slice(0, 4).map((route) => ({...route, renderLane: "baseline"}));
-        return [...previousRoutes, ...ours.slice(0, 7).map((route) => ({...route, renderLane: "ours"})), ...diffBaseline];
+        const diffBaseline = baseline.filter((route) => diffIds.has(route.order_id)).slice(0, 3).map((route) => ({...route, renderLane: "baseline"}));
+        return [...previousRoutes, ...ours.slice(0, 5).map((route) => ({...route, renderLane: "ours"})), ...diffBaseline];
       }
-      return [...previousRoutes, ...ours.slice(0, 9).map((route) => ({...route, renderLane: "ours"}))];
+      return [...previousRoutes, ...ours.slice(0, 6).map((route) => ({...route, renderLane: "ours"}))];
     }
 
     function ordersForMap(frame) {
@@ -1447,9 +1581,16 @@ def render_day_replay_index() -> str:
       const mapStage = document.getElementById("live-map-stage");
       if (mapStage) {
         const frame = frameForTime(inferenceState.currentTimeS);
+        const routes = mapRouteRows(frame);
+        const riders = riderPositionsForFrame(frame);
+        const orders = ordersForMap(frame);
         mapStage.dataset.mapMode = inferenceState.mode;
         mapStage.dataset.frameId = frame.id;
-        mapStage.innerHTML = renderLiveMapLayer(frame);
+        if (!updateLiveLeafletOverlay(frame, routes, riders, orders)) {
+          destroyLiveMap();
+          mapStage.innerHTML = renderLiveMapLayer(frame, routes, riders, orders);
+          queueLiveMapHydration(frame, routes, riders, orders);
+        }
       }
       const startButton = document.getElementById("start-inference");
       if (startButton) {
@@ -1517,6 +1658,7 @@ def render_day_replay_index() -> str:
 
     function renderRoute(routeId) {
       const view = document.getElementById("route-view");
+      destroyLiveMap();
       view.dataset.routeView = routeId;
       const renderers = {
         live: renderLivePage,
@@ -1562,7 +1704,7 @@ def render_day_replay_index() -> str:
             </div>
             <div class="card map-panel">
               <div class="card-head"><h3>实时地图层</h3><span id="map-runtime-hint">merchants / orders / riders / routes / hotspots</span></div>
-              <div id="live-map-stage" class="schematic-map" data-map-layer="primary" data-map-mode="${escapeHtml(inferenceState.mode)}" data-frame-id="${escapeHtml(currentFrame.id)}">
+              <div id="live-map-stage" class="real-map-stage schematic-map" data-map-layer="primary" data-real-map-provider="leaflet" data-tile-layer="cartodb-light-nolabels" data-real-map-status="loading" data-map-mode="${escapeHtml(inferenceState.mode)}" data-frame-id="${escapeHtml(currentFrame.id)}">
                 ${renderLiveMapLayer(currentFrame)}
               </div>
             </div>
@@ -1731,17 +1873,17 @@ def render_day_replay_index() -> str:
       `;
     }
 
-    function renderLiveMapLayer(frame) {
-      const routes = mapRouteRows(frame);
-      const riders = riderPositionsForFrame(frame);
-      const orders = ordersForMap(frame);
+    function renderLiveMapLayer(frame, routes = mapRouteRows(frame), riders = riderPositionsForFrame(frame), orders = ordersForMap(frame)) {
       return `
         <div class="map-mode-chip">${escapeHtml(inferenceModeLabels[inferenceState.mode])} / ${escapeHtml(frame.id)}</div>
-        ${renderMapRoutes(routes)}
-        ${renderHotspots()}
-        ${renderMapDots("merchant", workbench.map.anchors.merchants.slice(0, 18), "position")}
-        ${renderMapDots("rider", riders, "position")}
-        ${renderMapDots("order", orders, "dropoff")}
+        <div id="leaflet-live-map" class="leaflet-live-map" data-leaflet-map="live" data-tile-provider="${escapeHtml(workbench.map.tile_provider || liveTileLayer.id)}" aria-label="匿名无标签真实地图"></div>
+        <div class="fallback-map-overlay" data-fallback-map="screen-coordinate" aria-hidden="true">
+          ${renderMapRoutes(routes)}
+          ${renderHotspots()}
+          ${renderMapDots("merchant", workbench.map.anchors.merchants.slice(0, 16), "position")}
+          ${renderMapDots("rider", riders.slice(0, 14), "position")}
+          ${renderMapDots("order", orders.slice(0, 22), "dropoff")}
+        </div>
         ${renderMapLegend()}
       `;
     }
@@ -1752,35 +1894,238 @@ def render_day_replay_index() -> str:
         <svg class="map-route" data-route-count="${routes.length}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           ${routes.map((route) => {
             const points = route.polyline.map((point) => `${point.screen_x},${point.screen_y}`).join(" ");
-            return `<polyline class="route-line" data-lane="${escapeHtml(route.renderLane || route.lane)}" data-order-id="${escapeHtml(route.order_id)}" data-courier-id="${escapeHtml(route.courier_id)}" points="${escapeHtml(points)}"></polyline>`;
+            return `<polyline class="route-line" data-lane="${escapeHtml(route.renderLane || route.lane)}" data-order-ref="${escapeHtml(mapEntityLabel("order", {id: route.order_id}))}" data-rider-ref="${escapeHtml(mapEntityLabel("rider", {id: route.courier_id}))}" points="${escapeHtml(points)}"></polyline>`;
           }).join("")}
         </svg>
       `;
     }
 
     function renderHotspots() {
-      return workbench.map.hotspots.map((hotspot) => `
-        <div class="hotspot" data-active="${hotspot.start_s <= inferenceState.currentTimeS && inferenceState.currentTimeS <= hotspot.end_s}" title="${escapeHtml(hotspot.summary)}" style="--x:${hotspot.center.screen_x};--y:${hotspot.center.screen_y};--severity:${hotspot.severity}"></div>
-      `).join("");
+      return workbench.map.hotspots.map((hotspot, index) => {
+        const active = hotspot.start_s <= inferenceState.currentTimeS && inferenceState.currentTimeS <= hotspot.end_s;
+        const label = mapEntityLabel("hotspot", hotspot, index);
+        return `<div class="hotspot" data-active="${active}" data-map-ref="${escapeHtml(label)}" title="${escapeHtml(mapEntityTitle("hotspot", label, {phase: active ? "active" : "inactive"}))}" style="--x:${hotspot.center.screen_x};--y:${hotspot.center.screen_y};--severity:${hotspot.severity}"></div>`;
+      }).join("");
     }
 
     function renderMapDots(kind, items, positionKey) {
-      return items.map((item) => {
+      return items.map((item, index) => {
         const pos = item[positionKey];
         const release = kind === "order" && item.created_at_s >= inferenceState.currentTimeS - 900 ? "new" : "stable";
         const motion = kind === "rider" ? (item.motion || "snapshot") : "";
-        return `<span class="map-dot" data-kind="${escapeHtml(kind)}" data-id="${escapeHtml(item.id)}" data-release="${escapeHtml(release)}" data-motion="${escapeHtml(motion)}" data-phase="${escapeHtml(item.phase || "")}" title="${escapeHtml(item.label || item.id)}" style="--x:${pos.screen_x};--y:${pos.screen_y}"></span>`;
+        const label = mapEntityLabel(kind, item, index);
+        const showLabel = kind === "rider" || kind === "order";
+        return `<span class="map-dot" data-kind="${escapeHtml(kind)}" data-map-ref="${escapeHtml(label)}" data-map-label="${escapeHtml(label)}" data-show-label="${showLabel}" data-release="${escapeHtml(release)}" data-motion="${escapeHtml(motion)}" data-phase="${escapeHtml(item.phase || "")}" title="${escapeHtml(mapEntityTitle(kind, label, item))}" aria-label="${escapeHtml(mapEntityTitle(kind, label, item))}" style="--x:${pos.screen_x};--y:${pos.screen_y}"></span>`;
       }).join("");
     }
 
     function renderMapLegend() {
-      const items = [
+      const routeItems = [
         ["ours", "我方路线"],
         ["previous", "旧路线淡出"],
         ["baseline", "基线差异"],
         ["difference", "叠加差异"]
       ];
-      return `<div class="map-legend">${items.map(([lane, label]) => `<span class="legend-item"><i class="legend-swatch" data-lane="${escapeHtml(lane)}"></i>${escapeHtml(label)}</span>`).join("")}</div>`;
+      const entityItems = [
+        ["rider", "骑手"],
+        ["merchant", "商家"],
+        ["order", "订单"],
+        ["hotspot", "热点"]
+      ];
+      return `
+        <div class="map-legend">
+          ${entityItems.map(([kind, label]) => `<span class="legend-item"><i class="legend-dot" data-kind="${escapeHtml(kind)}"></i>${escapeHtml(label)}</span>`).join("")}
+          ${routeItems.map(([lane, label]) => `<span class="legend-item"><i class="legend-swatch" data-lane="${escapeHtml(lane)}"></i>${escapeHtml(label)}</span>`).join("")}
+        </div>
+      `;
+    }
+
+    function mapEntityLabel(kind, item = {}, index = 0) {
+      const id = item.id || item.courier_id || item.order_id || item.merchant_id || "";
+      const aliasBuckets = workbench.map.aliases || {};
+      const bucketName = kind === "merchant" ? "merchants" : kind === "rider" ? "riders" : kind === "order" ? "orders" : "";
+      if (item.map_label) return item.map_label;
+      if (bucketName && aliasBuckets[bucketName] && aliasBuckets[bucketName][id]) return aliasBuckets[bucketName][id];
+      const prefix = kind === "merchant" ? "M" : kind === "rider" ? "R" : kind === "order" ? "O" : "H";
+      const width = kind === "order" ? 3 : 2;
+      return `${prefix}-${String(index + 1).padStart(width, "0")}`;
+    }
+
+    function mapEntityTitle(kind, label, item = {}) {
+      const kindLabel = {
+        merchant: "商家",
+        rider: "骑手",
+        order: "订单",
+        hotspot: "热点"
+      }[kind] || "实体";
+      const details = [];
+      if (item.risk_level) details.push(`risk:${item.risk_level}`);
+      if (item.phase) details.push(item.phase);
+      return `${kindLabel} ${label}${details.length ? ` / ${details.join(" / ")}` : ""}`;
+    }
+
+    function queueLiveMapHydration(frame, routes, riders, orders) {
+      const token = `${frame.id}:${Math.round(inferenceState.currentTimeS)}:${inferenceState.mode}`;
+      liveMapHydrationToken = token;
+      window.requestAnimationFrame(() => {
+        if (liveMapHydrationToken === token) hydrateLiveMap(frame, routes, riders, orders);
+      });
+    }
+
+    function destroyLiveMap() {
+      liveMapHydrationToken = "";
+      liveLeafletOverlayGroup = null;
+      if (liveLeafletMap) {
+        liveLeafletMap.remove();
+        liveLeafletMap = null;
+      }
+    }
+
+    function updateLiveLeafletOverlay(frame, routes, riders, orders) {
+      const stage = document.getElementById("live-map-stage");
+      if (!window.L || !stage || !liveLeafletMap || !liveLeafletOverlayGroup || stage.dataset.realMapStatus !== "leaflet") return false;
+      try {
+        stage.dataset.leafletRouteCount = String(routes.length);
+        stage.dataset.leafletMarkerCount = String(workbench.map.anchors.merchants.slice(0, 16).length + riders.slice(0, 14).length + orders.slice(0, 22).length);
+        const chip = stage.querySelector(".map-mode-chip");
+        if (chip) chip.textContent = `${inferenceModeLabels[inferenceState.mode]} / ${frame.id}`;
+        liveLeafletOverlayGroup.clearLayers();
+        renderLeafletMapLayers(liveLeafletOverlayGroup, routes, riders, orders);
+        return true;
+      } catch (error) {
+        console.warn("Live map overlay update fell back to rebuild", error);
+        return false;
+      }
+    }
+
+    function hydrateLiveMap(frame, routes, riders, orders) {
+      const stage = document.getElementById("live-map-stage");
+      const container = document.getElementById("leaflet-live-map");
+      if (!stage || !container) return;
+      if (!window.L) {
+        stage.dataset.realMapStatus = "fallback";
+        stage.dataset.leafletRouteCount = "0";
+        stage.dataset.leafletMarkerCount = "0";
+        return;
+      }
+      try {
+        stage.dataset.realMapStatus = "loading";
+        stage.dataset.leafletRouteCount = String(routes.length);
+        stage.dataset.leafletMarkerCount = String(workbench.map.anchors.merchants.slice(0, 16).length + riders.slice(0, 14).length + orders.slice(0, 22).length);
+        const map = window.L.map(container, {
+          attributionControl: true,
+          boxZoom: false,
+          doubleClickZoom: false,
+          preferCanvas: true,
+          scrollWheelZoom: false,
+          zoomControl: false
+        });
+        liveLeafletMap = map;
+        window.L.tileLayer(liveTileLayer.url, {
+          attribution: liveTileLayer.attribution,
+          maxZoom: 19,
+          subdomains: liveTileLayer.subdomains
+        }).addTo(map);
+        const bounds = mapBounds();
+        if (bounds) map.fitBounds(bounds, { animate: false, padding: [18, 18] });
+        else map.setView(mapPoint(workbench.map.center), 14);
+        liveLeafletOverlayGroup = window.L.layerGroup().addTo(map);
+        renderLeafletMapLayers(liveLeafletOverlayGroup, routes, riders, orders);
+        stage.dataset.realMapStatus = "leaflet";
+        window.setTimeout(() => map.invalidateSize(false), 0);
+      } catch (error) {
+        console.warn("Live map fell back to deterministic anonymous layer", error);
+        destroyLiveMap();
+        stage.dataset.realMapStatus = "fallback";
+        stage.dataset.leafletRouteCount = "0";
+        stage.dataset.leafletMarkerCount = "0";
+      }
+    }
+
+    function renderLeafletMapLayers(layerGroup, routes, riders, orders) {
+      renderLeafletHotspots(layerGroup);
+      renderLeafletRoutes(layerGroup, routes);
+      renderLeafletMarkers(layerGroup, "merchant", workbench.map.anchors.merchants.slice(0, 16), "position");
+      renderLeafletMarkers(layerGroup, "rider", riders.slice(0, 14), "position");
+      renderLeafletMarkers(layerGroup, "order", orders.slice(0, 22), "dropoff");
+    }
+
+    function mapBounds() {
+      if (!window.L || !workbench.map.bounds || workbench.map.bounds.length < 2) return null;
+      return window.L.latLngBounds(workbench.map.bounds.map(mapPoint));
+    }
+
+    function mapPoint(point) {
+      return [Number(point.lat), Number(point.lng)];
+    }
+
+    function renderLeafletHotspots(map) {
+      workbench.map.hotspots.forEach((hotspot, index) => {
+        const active = hotspot.start_s <= inferenceState.currentTimeS && inferenceState.currentTimeS <= hotspot.end_s;
+        const label = mapEntityLabel("hotspot", hotspot, index);
+        window.L.circle(mapPoint(hotspot.center), {
+          radius: 230 + Number(hotspot.severity || 1) * 220,
+          color: active ? "#b7791f" : "#94a3b8",
+          fillColor: active ? "#b7791f" : "#94a3b8",
+          fillOpacity: active ? .13 : .08,
+          opacity: active ? .34 : .18,
+          weight: 1
+        }).bindTooltip(escapeHtml(mapEntityTitle("hotspot", label, {phase: active ? "active" : "inactive"})), { sticky: true }).addTo(map);
+      });
+    }
+
+    function renderLeafletRoutes(map, routes) {
+      for (const route of routes) {
+        const points = (route.polyline || []).map(mapPoint).filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng));
+        if (points.length < 2) continue;
+        const lane = route.renderLane || route.lane;
+        window.L.polyline(points, routeStyle(lane)).bindTooltip(escapeHtml(routeTooltip(route)), { sticky: true }).addTo(map);
+      }
+    }
+
+    function routeStyle(lane) {
+      const styles = {
+        ours: { color: "#0f766e", weight: 4, opacity: .78 },
+        previous: { color: "#64748b", weight: 2, opacity: .28, dashArray: "3 8" },
+        baseline: { color: "#b42318", weight: 3, opacity: .34, dashArray: "5 7" },
+        difference: { color: "#b7791f", weight: 5, opacity: .82 }
+      };
+      return styles[lane] || styles.ours;
+    }
+
+    function routeTooltip(route) {
+      const laneLabel = {
+        ours: "我方路线",
+        previous: "旧路线",
+        baseline: "基线差异",
+        difference: "叠加差异"
+      }[route.renderLane || route.lane] || "路线";
+      return `${laneLabel} / ${mapEntityLabel("rider", {id: route.courier_id})} -> ${mapEntityLabel("order", {id: route.order_id})}`;
+    }
+
+    function renderLeafletMarkers(map, kind, items, positionKey) {
+      items.forEach((item, index) => {
+        const pos = item[positionKey];
+        if (!pos || !Number.isFinite(Number(pos.lat)) || !Number.isFinite(Number(pos.lng))) return;
+        const label = mapEntityLabel(kind, item, index);
+        const release = kind === "order" && item.created_at_s >= inferenceState.currentTimeS - 900 ? "new" : "stable";
+        const motion = kind === "rider" ? (item.motion || "snapshot") : "";
+        window.L.marker(mapPoint(pos), {
+          icon: renderLeafletMarker(kind, label, release, motion),
+          keyboard: false,
+          zIndexOffset: kind === "rider" ? 500 : kind === "order" ? 300 : 100
+        }).bindTooltip(escapeHtml(mapEntityTitle(kind, label, item)), { direction: "top", opacity: .92, sticky: true }).addTo(map);
+      });
+    }
+
+    function renderLeafletMarker(kind, label, release, motion) {
+      const showLabel = kind === "rider" || kind === "order";
+      return window.L.divIcon({
+        className: "leaflet-map-pin",
+        html: `<span class="leaflet-map-pin-body" data-kind="${escapeHtml(kind)}" data-release="${escapeHtml(release)}" data-motion="${escapeHtml(motion)}"></span>${showLabel ? `<span class="leaflet-map-pin-label">${escapeHtml(label)}</span>` : ""}`,
+        iconAnchor: [8, 8],
+        iconSize: [16, 16]
+      });
     }
 
     function renderScoreCard(label, value, detail, tone, metricId = "") {
@@ -2293,11 +2638,15 @@ def render_day_replay_index() -> str:
 
     function renderRiderMiniMap(rider) {
       const linkedOrders = rider.mini_map.linked_order_ids.map((orderId) => orderIndex[orderId]).filter(Boolean).slice(0, 4);
+      const riderMapLabel = mapEntityLabel("rider", rider);
       return `
         <div class="mini-map" data-rider-mini-map="${escapeHtml(rider.id)}">
           <span class="map-dot" data-kind="home" title="home" style="--x:${rider.mini_map.home.screen_x};--y:${rider.mini_map.home.screen_y}"></span>
-          <span class="map-dot" data-kind="rider" title="${escapeHtml(rider.name)}" style="--x:${rider.position.screen_x};--y:${rider.position.screen_y}"></span>
-          ${linkedOrders.map((order) => `<span class="map-dot" data-kind="linked-order" title="${escapeHtml(order.id)}" style="--x:${order.dropoff_position.screen_x};--y:${order.dropoff_position.screen_y}"></span>`).join("")}
+          <span class="map-dot" data-kind="rider" data-map-ref="${escapeHtml(riderMapLabel)}" title="${escapeHtml(mapEntityTitle("rider", riderMapLabel, {phase: rider.online_state}))}" style="--x:${rider.position.screen_x};--y:${rider.position.screen_y}"></span>
+          ${linkedOrders.map((order) => {
+            const orderMapLabel = mapEntityLabel("order", order);
+            return `<span class="map-dot" data-kind="linked-order" data-map-ref="${escapeHtml(orderMapLabel)}" title="${escapeHtml(mapEntityTitle("order", orderMapLabel, {risk_level: order.risk_level}))}" style="--x:${order.dropoff_position.screen_x};--y:${order.dropoff_position.screen_y}"></span>`;
+          }).join("")}
         </div>
       `;
     }

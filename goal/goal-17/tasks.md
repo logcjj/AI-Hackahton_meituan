@@ -60,7 +60,7 @@ Confidence loop:
 
 ## Task 2 - Real Map Foundation And Sensitive Label Anonymization
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Live page has a real map layer or a deterministic real-map fallback.
@@ -69,8 +69,43 @@ Independent verification:
 - Existing live controls still render.
 
 Work log:
+- Added Leaflet assets to the generated dispatch workbench shell and changed the Live map stage to a `real-map-stage` with:
+  - no-label Carto/OSM tile layer (`cartodb-light-nolabels`);
+  - stable Leaflet base map instance;
+  - overlay layer refresh for routes, hotspots, riders, merchants, and orders;
+  - deterministic anonymous fallback map when `window.L` is unavailable.
+- Added map-specific privacy metadata and aliases in `dispatch_workbench_data.py`:
+  - `M-01`, `R-01`, and `O-001` style labels;
+  - map alias dictionaries for merchants, riders, and orders;
+  - `map.privacy` declaring anonymized entity labels and hidden road labels.
+- Updated Live map DOM rendering so map markers and routes use anonymous `data-map-ref`, `title`, `aria-label`, and route refs rather than raw merchant/rider names.
+- Removed region names from map tooltips so the map layer does not expose `office_core`, `metro_exit`, or similar area labels.
+- Updated rider mini-map marker titles to use anonymous rider/order refs instead of rider names.
+- Reduced visible route clutter:
+  - current mode shows fewer active routes;
+  - compare/overlay modes only add limited baseline/difference routes;
+  - previous routes remain low-emphasis.
+- Expanded the map legend to distinguish riders, merchants, orders, hotspots, our route, previous route, baseline delta, and overlay delta.
+- Added browser-auditable `data-leaflet-route-count` and `data-leaflet-marker-count` to prove real-map overlay counts without depending on Leaflet internals.
+- Added tests for:
+  - Leaflet assets and real-map/fallback DOM markers;
+  - map alias generation and privacy metadata;
+  - absence of old raw marker-title patterns.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Browser QA on `http://127.0.0.1:18772/?v=goal17-task2c#/live`:
+  - Leaflet real map loaded with `data-real-map-status="leaflet"`;
+  - at 10:00 / `F-TS-1000`, real-map overlay reported 4 routes and 28 markers;
+  - visible map refs were anonymous (`H-01`, `M-01`, etc.);
+  - no map title leaks matched `Merchant`, `Courier`, `office_core`, `metro_exit`, or Chinese raw name patterns;
+  - live controls `start-inference`, `pause-inference`, `playback-speed`, and `inference-mode` all existed;
+  - simulated `window.L = undefined` rebuilt fallback with 4 routes and 28 anonymous markers;
+  - browser console reported 0 errors.
 
 Confidence loop:
+- 100% confidence for Task 2 scope: the Live page now has a real no-label Leaflet map layer with deterministic fallback, all map entity labels/titles/refs are anonymous, rider mini-map map titles are anonymized, route/marker categories are visually separated, route count is constrained to reduce clutter, existing live controls still render, automated tests pass, and browser QA proves both real-map and fallback modes work without console errors.
 
 ## Task 3 - Live Page Advantage-First Simplification
 

@@ -27,6 +27,12 @@ class DispatchWorkbenchDataTest(unittest.TestCase):
         self.assertEqual(len(payload["entities"]["merchants"]), len(contract.merchants))
         self.assertEqual(len(payload["decisions"]), len(contract.frames))
         self.assertEqual(len(payload["memory"]["items"]), len(contract.evolution_events))
+        self.assertEqual(payload["map"]["tile_provider"], "cartodb-light-nolabels-leaflet")
+        self.assertEqual(payload["map"]["privacy"]["entity_labels"], "anonymized")
+        self.assertEqual(payload["map"]["privacy"]["road_labels"], "hidden_by_default")
+        self.assertEqual(payload["map"]["aliases"]["merchants"][payload["map"]["anchors"]["merchants"][0]["id"]], "M-01")
+        self.assertEqual(payload["map"]["aliases"]["riders"][payload["map"]["anchors"]["riders"][0]["id"]], "R-01")
+        self.assertEqual(payload["map"]["aliases"]["orders"][payload["map"]["anchors"]["orders"][0]["id"]], "O-001")
         self.assertGreater(payload["inspection"]["order_count"], 100)
         self.assertEqual(payload["inspection"]["rider_count"], 18)
         self.assertTrue(payload["inspection"]["full_day_preloaded"])
@@ -43,6 +49,9 @@ class DispatchWorkbenchDataTest(unittest.TestCase):
         rider = payload["entities"]["riders"][0]
         decision = payload["decisions"][0]
         memory = payload["memory"]["items"][0]
+        merchant_anchor = payload["map"]["anchors"]["merchants"][0]
+        rider_anchor = payload["map"]["anchors"]["riders"][0]
+        order_anchor = payload["map"]["anchors"]["orders"][0]
 
         for key in (
             "id",
@@ -94,6 +103,11 @@ class DispatchWorkbenchDataTest(unittest.TestCase):
             "latest_hit_time_label",
         ):
             self.assertIn(key, memory)
+        self.assertRegex(merchant_anchor["map_label"], r"^M-\d{2}$")
+        self.assertRegex(rider_anchor["map_label"], r"^R-\d{2}$")
+        self.assertRegex(order_anchor["map_label"], r"^O-\d{3}$")
+        self.assertNotEqual(merchant_anchor["map_label"], merchant_anchor["label"])
+        self.assertNotEqual(rider_anchor["map_label"], rider_anchor["label"])
 
     def test_workbench_payload_is_deterministic_and_json_serializable(self):
         controls = DaySimulationControls(courier_count=18, order_scale=0.38, weather="mixed", congestion_profile="weekday")
