@@ -761,16 +761,47 @@ Confidence loop:
 
 ## Task 12 - Final Review, Fixes, And Goal Archive
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Final review covers C-side product experience, code structure, frontend behavior, data integrity, and security/robustness concerns.
 - Any discovered issue is fixed and verified.
-- Goal is marked complete with a completion/archive note in `goal/goal-16/`.
+- Completion/archive prep note exists in `goal/goal-16/`; final goal completion is left to Debug Cycle 4.
 
 Work log:
+- Re-read `goal/goal-16/input.md`, `goal/goal-16/plan.md`, and full `goal/goal-16/tasks.md` in chunks before starting Task 12.
+- Confirmed current branch is `codex/kandbox-dispatch-workbench` and the worktree was clean at Task 12 start.
+- Reviewed Task 11 browser QA evidence in `goal/goal-16/artifacts/task-11/browser-qa.json`.
+- Conducted final review across:
+  - C-side product experience;
+  - code structure;
+  - frontend behavior;
+  - data integrity;
+  - security and robustness.
+- Found one product-copy defect in the live scorecard:
+  - Task 11 evidence showed `空驶里程差异节省 -9.82 km`;
+  - this was mathematically ambiguous because a negative saved-distance delta means increased distance, not saved distance.
+- Fixed the defect in `web_agent_demo/day_replay_frontend.py`:
+  - added `fmtSavedDistance(valueKm)`;
+  - scorecard and cumulative metric chip now render `节省`, `增加`, or `持平` based on the signed empty-mileage delta.
+- Added regression coverage in `tests/test_web_agent_demo.py` for `function fmtSavedDistance`.
+- Verified the fix:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed;
+  - static render check confirms the new formatter is present and the old `节省 ${fmtNumber(score.deltas.empty_mileage_saved_km...)` pattern is gone;
+  - Chromium spot check at `#/live`, overlay mode, `14:00` confirms both the scorecard and cumulative chip now show `增加 9.82 km` with zero browser errors.
+- Ran final static review audit against `web_agent_demo.server.render_index()`:
+  - mode is `dispatch-workbench-shell`;
+  - routes are exactly `live`, `decisions`, `memory`, `orders`, `riders`;
+  - full-day counts are 207 orders, 18 riders, 40 decisions, and 120 memory items;
+  - live controls, live map layers, scorecard metrics, Decisions, Memory, Orders, Riders, visual markers, old-shell absence, empty-mileage copy fix, and secret-handling marker all pass.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py web_agent_demo/server.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
+- Added `goal/goal-16/final-review.md` as the Task 12 final review and archive-prep note.
+- Stopped the local browser-check server and left no stale app/browser processes running.
 
 Confidence loop:
+- 100% confidence for Task 12 scope: final review found one real product-copy defect, the defect was fixed and verified in static, focused-test, full-test, and browser checks, and the archive-prep review note records the final review evidence while correctly deferring overall goal completion to Debug Cycle 4.
 
 ## Debug Cycle 4 - Tasks 10-12 Final Comprehensive Check
 

@@ -170,6 +170,7 @@ class WebAgentDemoTest(unittest.TestCase):
             "function preDispatchScore",
             "function preDispatchDecision",
             "function preDispatchFrame",
+            "function fmtSavedDistance",
             "function renderLiveCumulativeMetrics",
             "function scoreForTime",
             "function decisionForTime",
