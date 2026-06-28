@@ -653,6 +653,85 @@ def render_day_replay_index() -> str:
       border-radius: 16px;
       background: rgba(255,255,255,.80);
     }
+    .input-workspace, .resource-workspace { grid-template-columns: 1fr; }
+    .operations-overview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .operations-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 14px;
+      align-items: start;
+    }
+    .orders-table-shell { max-height: 660px; }
+    .filter-bar .filter-count {
+      margin-left: auto;
+      align-self: center;
+      color: var(--muted);
+      font: 800 11px var(--mono);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .order-context-list, .rider-context-list {
+      display: grid;
+      gap: 9px;
+    }
+    .time-lane {
+      display: grid;
+      gap: 8px;
+    }
+    .time-lane-item {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .lane-bar {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    .lane-bar span {
+      display: block;
+      width: calc(var(--weight) * 100%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+    }
+    .result-pair {
+      display: grid;
+      gap: 2px;
+      font-size: 12px;
+    }
+    .result-pair b { color: var(--ink); font-weight: 800; }
+    .result-pair span { color: var(--muted); }
+    .rider-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .rider-card[data-state="busy"] { border-color: rgba(15,118,110,.30); }
+    .rider-card[data-state="ending_shift"] { border-color: rgba(183,121,31,.30); }
+    .rider-load {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    .rider-load span {
+      display: block;
+      width: calc(var(--load) * 100%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+    }
+    .mini-map .map-dot[data-kind="home"] { --size: 9px; background: #64748b; }
+    .mini-map .map-dot[data-kind="linked-order"] { --size: 8px; background: var(--amber); }
     .memory-card { min-height: 220px; }
     .memory-card[data-memory-section] .card-head span {
       font: 800 11px var(--mono);
@@ -752,6 +831,7 @@ def render_day_replay_index() -> str:
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .runtime-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .operations-overview, .operations-grid, .rider-board { grid-template-columns: 1fr; }
       .memory-overview, .memory-section-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
@@ -762,6 +842,7 @@ def render_day_replay_index() -> str:
       .route-view { padding: 14px; }
       .page-head { grid-template-columns: 1fr; }
       .algorithm-pair, .delta-grid, .metric-strip { grid-template-columns: 1fr; }
+      .operations-overview { grid-template-columns: 1fr; }
       .memory-overview, .memory-section-grid, .recall-lane, .memory-field-grid, .context-metric-grid { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
     }
@@ -839,6 +920,17 @@ def render_day_replay_index() -> str:
       lastTickAt: 0
     };
     let selectedDecisionId = workbench.decisions[0]?.id || "";
+    const orderIndex = Object.fromEntries(workbench.entities.orders.map((order) => [order.id, order]));
+    const orderFilterState = {
+      timeBand: "all",
+      area: "all",
+      status: "all",
+      risk: "all"
+    };
+    const riderFilterState = {
+      area: "all",
+      state: "all"
+    };
     const inferenceModeLabels = {
       current: "当前算法",
       compare: "对比",
@@ -1366,6 +1458,10 @@ def render_day_replay_index() -> str:
         hydrateLivePage();
       } else if (routeId === "decisions") {
         hydrateDecisionPage();
+      } else if (routeId === "orders") {
+        hydrateOrdersPage();
+      } else if (routeId === "riders") {
+        hydrateRidersPage();
       }
     }
 
@@ -1491,31 +1587,74 @@ def render_day_replay_index() -> str:
     }
 
     function renderOrdersPage() {
-      const orders = workbench.entities.orders;
+      const orders = filteredOrders();
       return `
         ${pageHeader("orders", "Jobs / Orders", "全天订单全集已经预置，页面定位是调度输入视图，不是后台录入表。")}
-        <div data-page="orders">
-          <div class="filter-bar" data-filter-bar="orders">
-            <select class="select-control"><option>全部时间段</option>${workbench.filters.order_time_bands.map((item) => `<option>${escapeHtml(item.label)}</option>`).join("")}</select>
-            <select class="select-control"><option>全部商圈</option>${workbench.filters.areas.map((item) => `<option>${escapeHtml(item)}</option>`).join("")}</select>
-            <select class="select-control"><option>全部状态</option>${workbench.filters.statuses.map((item) => `<option>${escapeHtml(item)}</option>`).join("")}</select>
-            <select class="select-control"><option>全部风险</option>${workbench.filters.risk_levels.map((item) => `<option>${escapeHtml(item)}</option>`).join("")}</select>
+        <div class="page-grid input-workspace" data-page="orders" data-orders-route="jobs-input">
+          <div id="orders-overview" class="operations-overview">
+            ${renderOrdersOverview(orders)}
           </div>
-          <div class="table-shell">
-            <table>
-              <thead><tr><th>订单编号</th><th>商家/提货点</th><th>下单时间</th><th>承诺送达</th><th>状态</th><th>风险</th><th>商圈</th><th>进入推理</th><th>基线结果</th><th>我方结果</th></tr></thead>
-              <tbody>${orders.map(renderOrderRow).join("")}</tbody>
-            </table>
+          <div id="orders-filter-bar" class="filter-bar" data-filter-bar="orders">
+            <select id="orders-filter-time" class="select-control" data-order-filter="timeBand">
+              <option value="all">全部时间段</option>
+              ${workbench.filters.order_time_bands.map((item) => `<option value="${escapeHtml(item.id)}"${item.id === orderFilterState.timeBand ? " selected" : ""}>${escapeHtml(item.label)} / ${escapeHtml(item.time_label)}</option>`).join("")}
+            </select>
+            <select id="orders-filter-area" class="select-control" data-order-filter="area">
+              <option value="all">全部商圈</option>
+              ${workbench.filters.areas.map((item) => `<option value="${escapeHtml(item)}"${item === orderFilterState.area ? " selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+            </select>
+            <select id="orders-filter-status" class="select-control" data-order-filter="status">
+              <option value="all">全部状态</option>
+              ${workbench.filters.statuses.map((item) => `<option value="${escapeHtml(item)}"${item === orderFilterState.status ? " selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+            </select>
+            <select id="orders-filter-risk" class="select-control" data-order-filter="risk">
+              <option value="all">全部风险</option>
+              ${workbench.filters.risk_levels.map((item) => `<option value="${escapeHtml(item)}"${item === orderFilterState.risk ? " selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+            </select>
+            <span id="orders-result-count" class="filter-count">${orders.length} / ${workbench.entities.orders.length} orders</span>
+          </div>
+          <div class="operations-grid">
+            <div class="table-shell orders-table-shell" data-order-universe="full-day">
+              <table>
+                <thead><tr><th>订单编号</th><th>商家/提货点</th><th>下单时间</th><th>承诺送达</th><th>当前状态</th><th>风险等级</th><th>所属商圈</th><th>进入推理</th><th>基线算法结果</th><th>我方算法结果</th></tr></thead>
+                <tbody id="orders-table-body">${orders.map(renderOrderRow).join("")}</tbody>
+              </table>
+            </div>
+            <aside class="card" id="orders-context-panel">
+              ${renderOrdersContext(orders)}
+            </aside>
           </div>
         </div>
       `;
     }
 
     function renderRidersPage() {
+      const riders = filteredRiders();
       return `
         ${pageHeader("riders", "Workers", "全天骑手资源预置为调度资源盘点：班次、状态、位置、负载和任务链。")}
-        <div class="page-grid rider-grid" data-page="riders">
-          ${workbench.entities.riders.map(renderRiderCard).join("")}
+        <div class="page-grid resource-workspace" data-page="riders" data-riders-route="workers-resource">
+          <div id="riders-overview" class="operations-overview">
+            ${renderRidersOverview(riders)}
+          </div>
+          <div id="riders-filter-bar" class="filter-bar" data-filter-bar="riders">
+            <select id="riders-filter-area" class="select-control" data-rider-filter="area">
+              <option value="all">全部区域</option>
+              ${workbench.filters.areas.map((item) => `<option value="${escapeHtml(item)}"${item === riderFilterState.area ? " selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+            </select>
+            <select id="riders-filter-state" class="select-control" data-rider-filter="state">
+              <option value="all">全部在线状态</option>
+              ${workbench.filters.rider_states.map((item) => `<option value="${escapeHtml(item)}"${item === riderFilterState.state ? " selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+            </select>
+            <span id="riders-result-count" class="filter-count">${riders.length} / ${workbench.entities.riders.length} riders</span>
+          </div>
+          <div class="operations-grid">
+            <div id="rider-resource-board" class="rider-board">
+              ${riders.map(renderRiderCard).join("")}
+            </div>
+            <aside class="card" id="rider-context-panel">
+              ${renderRidersContext(riders)}
+            </aside>
+          </div>
         </div>
       `;
     }
@@ -1886,36 +2025,224 @@ def render_day_replay_index() -> str:
       `;
     }
 
+    function orderTimeBandById(timeBandId) {
+      return workbench.filters.order_time_bands.find((item) => item.id === timeBandId) || null;
+    }
+
+    function orderMatchesFilters(order) {
+      const band = orderTimeBandById(orderFilterState.timeBand);
+      const inBand = !band || (order.created_at_s >= band.start_s && order.created_at_s <= band.end_s);
+      const inArea = orderFilterState.area === "all" || order.business_area === orderFilterState.area;
+      const inRisk = orderFilterState.risk === "all" || order.risk_level === orderFilterState.risk;
+      const inStatus = orderFilterState.status === "all"
+        || order.status === orderFilterState.status
+        || (orderFilterState.status === "entered_inference" && order.entered_inference);
+      return inBand && inArea && inRisk && inStatus;
+    }
+
+    function filteredOrders() {
+      return workbench.entities.orders.filter(orderMatchesFilters);
+    }
+
+    function riderMatchesFilters(rider) {
+      const inArea = riderFilterState.area === "all" || rider.business_area === riderFilterState.area;
+      const inState = riderFilterState.state === "all" || rider.online_state === riderFilterState.state;
+      return inArea && inState;
+    }
+
+    function filteredRiders() {
+      return workbench.entities.riders.filter(riderMatchesFilters);
+    }
+
+    function renderOrdersOverview(orders) {
+      const entered = orders.filter((order) => order.entered_inference).length;
+      const highRisk = orders.filter((order) => order.risk_level === "high").length;
+      const assigned = orders.filter((order) => order.our_result.state === "assigned").length;
+      const improved = orders.filter((order) => {
+        const ours = Number(order.our_result.eta_min);
+        const baseline = Number(order.baseline_result.eta_min);
+        return Number.isFinite(ours) && Number.isFinite(baseline) && ours < baseline;
+      }).length;
+      return [
+        renderMetricChip("orders-visible", "当前订单视图", `${orders.length}`, `full-day ${workbench.entities.orders.length}`),
+        renderMetricChip("orders-entered", "已进入推理", `${entered}`, "released to planner"),
+        renderMetricChip("orders-high-risk", "高风险订单", `${highRisk}`, "deadline / weather guardrail"),
+        renderMetricChip("orders-improved", "我方优于基线", `${improved}/${assigned}`, "assigned orders")
+      ].join("");
+    }
+
+    function countBy(items, keyFn) {
+      return items.reduce((counts, item) => {
+        const key = keyFn(item) || "-";
+        counts[key] = (counts[key] || 0) + 1;
+        return counts;
+      }, {});
+    }
+
+    function renderCountChips(counts, limit = 6) {
+      const rows = Object.entries(counts).sort((left, right) => right[1] - left[1]).slice(0, limit);
+      if (!rows.length) return `<p>当前筛选无数据</p>`;
+      return `<div class="chip-list">${rows.map(([key, value]) => `<span class="data-chip">${escapeHtml(key)} ${value}</span>`).join("")}</div>`;
+    }
+
+    function renderOrderTimeLane(orders) {
+      const maxCount = Math.max(...workbench.filters.order_time_bands.map((band) => orders.filter((order) => order.created_at_s >= band.start_s && order.created_at_s <= band.end_s).length), 1);
+      return `
+        <div class="time-lane">
+          ${workbench.filters.order_time_bands.map((band) => {
+            const count = orders.filter((order) => order.created_at_s >= band.start_s && order.created_at_s <= band.end_s).length;
+            return `
+              <div class="time-lane-item" data-order-time-band="${escapeHtml(band.id)}">
+                <b>${escapeHtml(band.label)}</b>
+                <div class="lane-bar" style="--weight:${count / maxCount}"><span></span></div>
+                <span>${count}</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderOrdersContext(orders) {
+      const riskCounts = countBy(orders, (order) => order.risk_level);
+      const areaCounts = countBy(orders, (order) => order.business_area);
+      const statusCounts = countBy(orders, (order) => order.entered_inference ? "entered_inference" : order.status);
+      return `
+        <div class="card-head"><h3>调度输入上下文</h3><span id="orders-context-count">${orders.length} visible</span></div>
+        <div class="card-body order-context-list">
+          <div class="list-item" id="orders-time-distribution"><strong>全天释放节奏</strong>${renderOrderTimeLane(orders)}</div>
+          <div class="list-item" id="orders-area-distribution"><strong>商圈分布</strong>${renderCountChips(areaCounts)}</div>
+          <div class="list-item" id="orders-risk-distribution"><strong>风险结构</strong>${renderCountChips(riskCounts)}</div>
+          <div class="list-item" id="orders-status-distribution"><strong>推理状态</strong>${renderCountChips(statusCounts)}</div>
+        </div>
+      `;
+    }
+
+    function renderAlgorithmResult(result) {
+      if (!result || result.state !== "assigned") {
+        return `<div class="result-pair"><b>未释放</b><span>${escapeHtml(result?.algorithm_id || "-")}</span></div>`;
+      }
+      return `
+        <div class="result-pair">
+          <b>${escapeHtml(result.courier_id)} / ${fmtNumber(result.eta_min, 1)} min</b>
+          <span>${fmtNumber(result.expected_cost_yuan, 1)} yuan / risk ${fmtNumber(result.timeout_risk, 3)}</span>
+        </div>
+      `;
+    }
+
+    function hydrateOrdersPage() {
+      for (const control of document.querySelectorAll("[data-order-filter]")) {
+        control.addEventListener("change", () => {
+          orderFilterState[control.dataset.orderFilter] = control.value;
+          updateOrdersView();
+        });
+      }
+      updateOrdersView();
+    }
+
+    function updateOrdersView() {
+      const orders = filteredOrders();
+      const overview = document.getElementById("orders-overview");
+      if (overview) overview.innerHTML = renderOrdersOverview(orders);
+      const body = document.getElementById("orders-table-body");
+      if (body) body.innerHTML = orders.map(renderOrderRow).join("") || `<tr><td colspan="10">当前筛选无订单，调整时间段、商圈、状态或风险。</td></tr>`;
+      const context = document.getElementById("orders-context-panel");
+      if (context) context.innerHTML = renderOrdersContext(orders);
+      setText("orders-result-count", `${orders.length} / ${workbench.entities.orders.length} orders`);
+    }
+
+    function renderRidersOverview(riders) {
+      const busy = riders.filter((rider) => rider.online_state === "busy").length;
+      const ending = riders.filter((rider) => rider.online_state === "ending_shift").length;
+      const tasks = riders.reduce((sum, rider) => sum + rider.task_chain_size, 0);
+      const avgLoad = riders.length ? riders.reduce((sum, rider) => sum + rider.current_load / Math.max(1, rider.capacity), 0) / riders.length : 0;
+      return [
+        renderMetricChip("riders-visible", "当前骑手资源", `${riders.length}`, `full-day ${workbench.entities.riders.length}`),
+        renderMetricChip("riders-busy", "忙碌骑手", `${busy}`, `${ending} ending shift`),
+        renderMetricChip("riders-task-chain", "任务链总量", `${tasks}`, "assigned by our planner"),
+        renderMetricChip("riders-avg-load", "平均负载", fmtNumber(avgLoad, 2), "current load / capacity")
+      ].join("");
+    }
+
+    function renderRidersContext(riders) {
+      const stateCounts = countBy(riders, (rider) => rider.online_state);
+      const areaCounts = countBy(riders, (rider) => rider.business_area);
+      const topChains = [...riders].sort((left, right) => right.task_chain_size - left.task_chain_size).slice(0, 5);
+      return `
+        <div class="card-head"><h3>资源盘点上下文</h3><span id="riders-context-count">${riders.length} visible</span></div>
+        <div class="card-body rider-context-list">
+          <div class="list-item" id="rider-state-distribution"><strong>在线状态</strong>${renderCountChips(stateCounts)}</div>
+          <div class="list-item" id="rider-area-distribution"><strong>区域供给</strong>${renderCountChips(areaCounts)}</div>
+          <div class="list-item" id="rider-chain-focus">
+            <strong>任务链焦点</strong>
+            ${topChains.length ? topChains.map((rider) => `<p>${escapeHtml(rider.id)} ${escapeHtml(rider.name)} / ${rider.task_chain_size} tasks / free ${escapeHtml(rider.estimated_free_at_label)}</p>`).join("") : "<p>当前筛选无骑手</p>"}
+          </div>
+        </div>
+      `;
+    }
+
+    function hydrateRidersPage() {
+      for (const control of document.querySelectorAll("[data-rider-filter]")) {
+        control.addEventListener("change", () => {
+          riderFilterState[control.dataset.riderFilter] = control.value;
+          updateRidersView();
+        });
+      }
+      updateRidersView();
+    }
+
+    function updateRidersView() {
+      const riders = filteredRiders();
+      const overview = document.getElementById("riders-overview");
+      if (overview) overview.innerHTML = renderRidersOverview(riders);
+      const board = document.getElementById("rider-resource-board");
+      if (board) board.innerHTML = riders.map(renderRiderCard).join("") || `<div class="list-item"><strong>当前筛选无骑手</strong><p>调整区域或在线状态筛选。</p></div>`;
+      const context = document.getElementById("rider-context-panel");
+      if (context) context.innerHTML = renderRidersContext(riders);
+      setText("riders-result-count", `${riders.length} / ${workbench.entities.riders.length} riders`);
+    }
+
     function renderOrderRow(order) {
       return `
-        <tr data-order-id="${escapeHtml(order.id)}">
+        <tr data-order-id="${escapeHtml(order.id)}" data-order-status="${escapeHtml(order.status)}" data-order-risk="${escapeHtml(order.risk_level)}" data-order-area="${escapeHtml(order.business_area)}">
           <td>${escapeHtml(order.id)}</td>
-          <td>${escapeHtml(order.pickup_label)}</td>
+          <td>${escapeHtml(order.merchant_label)}<br><span>${escapeHtml(order.pickup_label)}</span></td>
           <td>${escapeHtml(order.created_at_label)}</td>
           <td>${escapeHtml(order.promised_at_label)}</td>
           <td><span class="badge" data-state="${escapeHtml(order.status)}">${escapeHtml(order.status)}</span></td>
           <td><span class="badge" data-risk="${escapeHtml(order.risk_level)}">${escapeHtml(order.risk_level)}</span></td>
           <td>${escapeHtml(order.business_area)}</td>
           <td>${order.entered_inference ? "是" : "否"}</td>
-          <td>${escapeHtml(order.baseline_result.courier_id || "-")} / ${escapeHtml(order.baseline_result.eta_min ?? "-")}</td>
-          <td>${escapeHtml(order.our_result.courier_id || "-")} / ${escapeHtml(order.our_result.eta_min ?? "-")}</td>
+          <td>${renderAlgorithmResult(order.baseline_result)}</td>
+          <td>${renderAlgorithmResult(order.our_result)}</td>
         </tr>
       `;
     }
 
-    function renderRiderCard(rider) {
-      const pos = rider.position;
+    function renderRiderMiniMap(rider) {
+      const linkedOrders = rider.mini_map.linked_order_ids.map((orderId) => orderIndex[orderId]).filter(Boolean).slice(0, 4);
       return `
-        <article class="card rider-card" data-rider-id="${escapeHtml(rider.id)}">
+        <div class="mini-map" data-rider-mini-map="${escapeHtml(rider.id)}">
+          <span class="map-dot" data-kind="home" title="home" style="--x:${rider.mini_map.home.screen_x};--y:${rider.mini_map.home.screen_y}"></span>
+          <span class="map-dot" data-kind="rider" title="${escapeHtml(rider.name)}" style="--x:${rider.position.screen_x};--y:${rider.position.screen_y}"></span>
+          ${linkedOrders.map((order) => `<span class="map-dot" data-kind="linked-order" title="${escapeHtml(order.id)}" style="--x:${order.dropoff_position.screen_x};--y:${order.dropoff_position.screen_y}"></span>`).join("")}
+        </div>
+      `;
+    }
+
+    function renderRiderCard(rider) {
+      const loadRatio = clamp(rider.current_load / Math.max(1, rider.capacity), 0, 1);
+      return `
+        <article class="card rider-card" data-rider-id="${escapeHtml(rider.id)}" data-state="${escapeHtml(rider.online_state)}" data-area="${escapeHtml(rider.business_area)}">
           <div class="card-head"><h3>${escapeHtml(rider.name)}</h3><span>${escapeHtml(rider.online_state)}</span></div>
           <div class="card-body">
-            <div class="mini-map">
-              <span class="map-dot" data-kind="rider" style="--x:${pos.screen_x};--y:${pos.screen_y}"></span>
-            </div>
+            ${renderRiderMiniMap(rider)}
+            <div class="rider-load" style="--load:${loadRatio}"><span></span></div>
             <div class="compact-list">
-              <div class="list-item"><strong>${escapeHtml(rider.shift_label)} / ${escapeHtml(rider.business_area)}</strong><p>负载 ${rider.current_load}/${rider.capacity}，预计空闲 ${escapeHtml(rider.estimated_free_at_label)}</p></div>
-              <div class="list-item"><strong>当前任务链 ${rider.task_chain_size}</strong><p>${rider.task_chain.slice(0, 4).map((item) => item.order_id).join(", ") || "暂无任务"}</p></div>
-              <div class="list-item"><strong>历史表现摘要</strong><p>${escapeHtml(rider.performance.summary)}</p></div>
+              <div class="list-item"><strong>班次时间 / 所属区域</strong><p>${escapeHtml(rider.shift_label)} / ${escapeHtml(rider.business_area)}</p></div>
+              <div class="list-item"><strong>当前负载 / 预计空闲时间</strong><p>${rider.current_load}/${rider.capacity} / ${escapeHtml(rider.estimated_free_at_label)}</p></div>
+              <div class="list-item"><strong>当前任务链 ${rider.task_chain_size}</strong><p>${rider.task_chain.slice(0, 5).map((item) => `${item.order_id}(${fmtNumber(item.eta_min, 1)}m)`).join(", ") || "暂无任务"}</p></div>
+              <div class="list-item"><strong>历史表现摘要</strong><p>${escapeHtml(rider.performance.summary)} / willingness ${fmtNumber(rider.performance.willingness, 2)}</p></div>
             </div>
           </div>
         </article>
@@ -1949,7 +2276,19 @@ def render_day_replay_index() -> str:
       renderMemoryRecallCard,
       renderMemoryItem,
       renderOrdersPage,
+      hydrateOrdersPage,
+      updateOrdersView,
+      filteredOrders,
+      orderFilterState,
+      renderOrdersOverview,
+      renderOrdersContext,
       renderRidersPage,
+      hydrateRidersPage,
+      updateRidersView,
+      filteredRiders,
+      riderFilterState,
+      renderRidersOverview,
+      renderRidersContext,
       renderLiveCumulativeMetrics,
       inferenceState,
       startInference,

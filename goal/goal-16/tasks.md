@@ -506,7 +506,7 @@ Confidence loop:
 
 ## Task 9 - Orders And Riders Pages
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Orders page shows the full-day order universe with filters for time band, business area, status, and risk.
@@ -515,8 +515,71 @@ Independent verification:
 - Both pages feel like dispatch input/resource views rather than CRUD admin pages.
 
 Work log:
+- Reworked `#/orders` in `web_agent_demo/day_replay_frontend.py` into a Kandbox Jobs / Orders-style dispatch input route rather than a static CRUD-like table.
+- Added route-level Orders containers:
+  - `data-orders-route="jobs-input"`;
+  - `orders-overview`;
+  - `orders-filter-bar`;
+  - `orders-table-body`;
+  - `orders-context-panel`.
+- Implemented functional Orders filters:
+  - time band;
+  - business area;
+  - status, including `entered_inference`;
+  - risk level.
+- Added Orders summary and context components:
+  - current visible order count;
+  - entered-inference count;
+  - high-risk order count;
+  - our-algorithm-improved count;
+  - full-day release rhythm;
+  - area, risk and inference-status distributions.
+- Expanded order rows to show merchant and pickup, created time, promised time, current status, risk, business area, inference entry, baseline algorithm result, and our algorithm result with courier, ETA, cost and timeout risk.
+- Reworked `#/riders` into a Kandbox Workers-style resource inventory route rather than a personnel/admin grid.
+- Added route-level Riders containers:
+  - `data-riders-route="workers-resource"`;
+  - `riders-overview`;
+  - `riders-filter-bar`;
+  - `rider-resource-board`;
+  - `rider-context-panel`.
+- Implemented functional Riders filters by area and online state.
+- Added Riders summary and context components:
+  - current visible rider count;
+  - busy / ending-shift count;
+  - total task-chain count;
+  - average load;
+  - online-state distribution;
+  - area supply distribution;
+  - top task-chain focus.
+- Enhanced rider cards with shift, area, current load, estimated free time, task-chain ETA preview, performance summary, willingness, load meter, and mini-map markers for home/current rider/linked order locations.
+- Exposed Orders/Riders runtime helpers through `window.__DISPATCH_WORKBENCH__`:
+  - `hydrateOrdersPage`;
+  - `updateOrdersView`;
+  - `filteredOrders`;
+  - `orderFilterState`;
+  - `renderOrdersOverview`;
+  - `renderOrdersContext`;
+  - `hydrateRidersPage`;
+  - `updateRidersView`;
+  - `filteredRiders`;
+  - `riderFilterState`;
+  - `renderRidersOverview`;
+  - `renderRidersContext`.
+- Updated `tests/test_web_agent_demo.py` with Task 9 route, filter, context and helper markers.
+- Verified the generated JavaScript in Node VM:
+  - `#/orders` renders the Jobs input route with filter controls and context panel;
+  - default Orders view shows the full-day 207-order universe;
+  - risk, entered-inference status, time-band and business-area filters all constrain the returned order set correctly;
+  - `#/riders` renders the Workers resource route with filter controls and context panel;
+  - default Riders view shows all 18 full-day riders;
+  - online-state and business-area filters constrain the returned rider set correctly;
+  - required order and rider fields are present in every tested entity.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Task 9 scope: Orders and Riders now read as dispatch input/resource workbench pages, not data-maintenance screens; full-day data remains preloaded; required fields render; runtime filters are verified against actual generated JavaScript; and focused/full tests pass.
 
 ## Debug Cycle 3 - Tasks 7-9 Comprehensive Check
 
