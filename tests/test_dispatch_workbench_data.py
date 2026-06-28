@@ -109,7 +109,7 @@ class DispatchWorkbenchDataTest(unittest.TestCase):
         from web_agent_demo.server import render_index
 
         html = render_index()
-        start = html.index('<script id="day-replay-bootstrap" type="application/json">')
+        start = html.index('<script id="dispatch-workbench-bootstrap" type="application/json">')
         start = html.index(">", start) + 1
         end = html.index("</script>", start)
         payload = json.loads(html[start:end])

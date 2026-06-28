@@ -59,7 +59,7 @@ Confidence loop:
 
 ## Task 3 - App Shell, Routes, And Module Boundary Replacement
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - The old single-page replay shell is no longer the visible product structure.
@@ -67,8 +67,46 @@ Independent verification:
 - Route switching works without a page reload and defaults to Real-time inference.
 
 Work log:
+- Replaced the old generated replay frontend in `web_agent_demo/day_replay_frontend.py` with a new `dispatch-workbench-shell` static app.
+- Preserved the Python server entrypoint and bootstrap data, but changed bootstrap mode from `full-day-replay-shell` to `dispatch-workbench-shell`.
+- Added a persistent enterprise workbench shell:
+  - left navigation;
+  - top status bar;
+  - route view container;
+  - Kandbox mapping labels for Live Map, Planner / Chart, History / assistance, Jobs / Orders and Workers.
+- Added five hash routes with route-level renderers:
+  - `#/live` for Real-time inference;
+  - `#/decisions` for Decisions;
+  - `#/memory` for Memory;
+  - `#/orders` for Orders;
+  - `#/riders` for Riders.
+- Added new route shell modules:
+  - live page scaffold with control strip, map layer, scorecard, event flow and round summary;
+  - decisions page scaffold with timeline, reasoning stages and context/result pane;
+  - memory page scaffold with new, curated, active and feedback sections;
+  - orders page scaffold with preloaded full-day order table and filter controls;
+  - riders page scaffold with preloaded rider cards and mini-map previews.
+- Updated frontend tests from old replay-shell assertions to new workbench-shell assertions.
+- Verified static render no longer contains old primary shell ids/functions:
+  - `day-replay-shell`;
+  - `side-by-side-replay`;
+  - `greedy-map-panel`;
+  - `autosolver-map-panel`;
+  - `bootstrapDayReplayShell`.
+- Verified rendered HTML contains `dispatch-workbench-shell`, `dispatch-workbench-bootstrap`, all five route paths and `window.__DISPATCH_WORKBENCH__`.
+- Verified route execution through Node VM with a DOM stub against the actual generated script:
+  - `live ok hash=#/live`;
+  - `decisions ok hash=#/decisions`;
+  - `memory ok hash=#/memory`;
+  - `orders ok hash=#/orders`;
+  - `riders ok hash=#/riders`.
+- Attempted Chrome headless `--dump-dom`; it timed out in this local mac environment on the large inline bootstrap payload, while the local server and Node VM route execution both succeeded.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`.
+- Ran `uv run --with pytest pytest -q tests/test_dispatch_workbench_data.py tests/test_web_agent_demo.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Task 3 scope: the visible frontend shell is no longer the old single-page replay product, the generated app exposes five Kandbox-style workbench routes, and the actual route functions update hash, active route state and route DOM without reload in the executed JS verification.
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 

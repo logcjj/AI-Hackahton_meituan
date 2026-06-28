@@ -8,157 +8,58 @@ from unittest import mock
 
 
 class WebAgentDemoTest(unittest.TestCase):
-    def test_home_page_contains_full_day_replay_shell(self):
+    def test_home_page_contains_dispatch_workbench_shell(self):
         from web_agent_demo.server import render_index
 
         html = render_index()
 
         required_markers = [
-            "AutoSolver Agent",
-            "全日配送模拟推演对比台",
-            "一天订单流",
-            "跨时间片推演",
-            "纯贪心和 AutoSolver 并排对比",
-            "指标节省",
-            "算法推理流程",
-            "Memory 自进化",
-            "本地确定性仿真引擎",
-            "CourierSim event simulator",
-            "CourierSim runtime + Leaflet renderer",
-            "leaflet@1.9.4",
-            "OpenStreetMap",
-            "CartoDB Positron NoLabels",
-            "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
-            "osm-real-map-tiles",
-            "no-label-real-map-tiles",
-            "courier-motion-trail",
-            "real-map-engine",
-            '.map-stage[data-map-engine-status="leaflet-osm"] .schematic-layer',
-            "display: none;",
-            'data-real-map-engine="leaflet"',
-            'data-tile-provider="cartodb-nolabels"',
-            "data-map-engine-status",
-            "data-tile-provider",
-            "data-marker-count",
-            "data-route-count",
-            "data-motion-count",
-            "realMapEngine",
-            "simulationProvider",
-            "runtimeTick",
-            "lastTraceMeta",
-            "simulationTick",
-            "lastMotionSummary",
-            "existing-project-operational-map",
-            "overflow: auto",
-            "grid-template-rows: auto auto auto auto minmax(540px, auto) auto",
-            "min-height: 540px",
-            "min-height: 280px",
-            'id="day-replay-shell"',
-            'id="kpi-strip"',
-            'id="replay-controls"',
-            'id="advantage-board"',
-            'id="advantage-pressure"',
-            'id="advantage-pressure-detail"',
-            'id="advantage-greedy-failure"',
-            'id="advantage-greedy-detail"',
-            'id="advantage-agent"',
-            'id="advantage-agent-detail"',
-            'id="advantage-savings"',
-            'id="advantage-savings-detail"',
-            'id="side-by-side-replay"',
-            'id="greedy-map-panel"',
-            'id="autosolver-map-panel"',
-            'id="greedy-map-stage"',
-            'id="autosolver-map-stage"',
-            'id="reasoning-flow-panel"',
-            'id="memory-evolution-panel"',
-            'id="memory-evolution-stack"',
-            'id="day-replay-bootstrap"',
-            'id="courier-count"',
-            'id="order-scale"',
-            'id="weather-mode"',
-            'id="playback-speed"',
-            'id="timeline-scrubber"',
-            'id="play-replay"',
-            'id="pause-replay"',
-            'id="compare-algorithms"',
-            "Pure Greedy Replay",
-            "AutoSolver Agent Replay",
-            "nearest_greedy",
-            "autosolver_agent",
-            "Time Saved",
-            "Cost Saved",
-            "Delivered",
-            "Timeout Risk",
-            "Average ETA",
-            "Utilization",
-            "当前帧 vs nearest greedy",
-            "全日累计",
-            "Why AutoSolver Wins",
-            "Current Pressure",
-            "Greedy Failure",
-            "Agent Advantage",
-            "Full-Day Savings",
-            'data-advantage-card="current_pressure"',
-            'data-advantage-card="greedy_failure"',
-            'data-advantage-card="agent_advantage"',
-            'data-advantage-card="full_day_savings"',
-            "关键决策点",
-            "预计影响",
-            "商家",
-            "骑手",
-            "订单",
+            "外卖配送智能调度工作台",
+            'id="dispatch-workbench-shell"',
+            'data-shell="dispatch-workbench-shell"',
+            'data-product-reference="kandbox-dispatch"',
+            'id="dispatch-workbench-bootstrap"',
+            'id="route-nav"',
+            'id="route-view"',
+            'id="topbar-stats"',
+            "#/live",
+            "#/decisions",
+            "#/memory",
+            "#/orders",
+            "#/riders",
+            "Live Map",
+            "Planner / Chart",
+            "History / assistance",
+            "Jobs / Orders",
+            "Workers",
+            "实时推理页",
+            "决策页",
+            "Memory 页",
+            "订单页",
+            "骑手页",
+            "开始推理",
+            "实时累计对比栏",
+            "决策轮次时间线",
+            "新沉淀记忆",
+            "全天订单全集",
+            "全天骑手资源",
+            "function bootstrapDispatchWorkbench",
+            "function routeFromHash",
+            "function setRoute",
+            "function renderRoute",
+            "function renderLivePage",
+            "function renderDecisionsPage",
+            "function renderMemoryPage",
+            "function renderOrdersPage",
+            "function renderRidersPage",
+            "window.__DISPATCH_WORKBENCH__",
+            "data-route-link",
+            "data-route-view",
+            "data-control-strip",
+            "data-filter-bar",
+            "data-memory-section",
+            "data-secret-handling",
             "env-only-redacted",
-            "function bootstrapDayReplayShell",
-            "function setFrameIndex",
-            "function renderKpis",
-            "function renderMaps",
-            "function latLng",
-            "function distanceMeters",
-            "function headingDeg",
-            "function frameIndexFor",
-            "function simulationTrace",
-            "function removeRealMapPanel",
-            "function realMapIcon",
-            "function trackTickPoints",
-            "function animatePanelTracks",
-            "function renderRealMapPanel",
-            "function setRealMapEngineStatus",
-            "function renderReasoning",
-            "function renderMemory",
-            "function setKpiCard",
-            "function timeSliceForFrame",
-            "function finalDelta",
-            "function greedyFailureMode",
-            "function agentAdvantageMode",
-            "function renderAdvantageBoard",
-            "function traceForFrame",
-            "function renderDecisionHighlights",
-            "function applyDecisionHighlight",
-            "function bindDecisionCards",
-            "function apiJson",
-            "function dayRunRequest",
-            "function runDaySimulation",
-            "function scheduleReplayRun",
-            "function playReplay",
-            "function pauseReplay",
-            "function compareAlgorithms",
-            "function playbackDelayMs",
-            "function schedulePlaybackTick",
-            "window.__AUTO_SOLVER_DAY_REPLAY__",
-            "window.__AUTO_SOLVER_DAY_REPLAY_READY__",
-            "对比完成",
-            "merchant_burst",
-            "data-shock-ids",
-            "data-order-id",
-            "data-courier-id",
-            "data-order-ids",
-            "data-courier-ids",
-            "data-highlight-card",
-            'id="decision-highlight-summary"',
-            "map-hud",
-            "burst-marker",
-            "highlight-route",
         ]
         for marker in required_markers:
             self.assertIn(marker, html)
@@ -173,6 +74,16 @@ class WebAgentDemoTest(unittest.TestCase):
             self.assertIn(endpoint, html)
 
         for forbidden in [
+            'id="day-replay-shell"',
+            'id="side-by-side-replay"',
+            'id="greedy-map-panel"',
+            'id="autosolver-map-panel"',
+            'id="greedy-map-stage"',
+            'id="autosolver-map-stage"',
+            "function bootstrapDayReplayShell",
+            "window.__AUTO_SOLVER_DAY_REPLAY__",
+            "Pure Greedy Replay",
+            "AutoSolver Agent Replay",
             'id="simulation-sandbox"',
             'id="simulation-map"',
             'id="algorithm-compare-table"',
@@ -208,17 +119,18 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("@media (max-width: 1180px)", html)
         self.assertIn("@media (max-width: 720px)", html)
 
-    def test_home_page_bootstrap_contains_full_day_contract_preview(self):
+    def test_home_page_bootstrap_contains_dispatch_workbench_model(self):
         from web_agent_demo.server import render_index
 
         html = render_index()
-        start = html.index('<script id="day-replay-bootstrap" type="application/json">')
+        start = html.index('<script id="dispatch-workbench-bootstrap" type="application/json">')
         start = html.index(">", start) + 1
         end = html.index("</script>", start)
         payload = json.loads(html[start:end])
         contract = payload["contract"]
+        workbench = payload["workbench"]
 
-        self.assertEqual(payload["mode"], "full-day-replay-shell")
+        self.assertEqual(payload["mode"], "dispatch-workbench-shell")
         self.assertEqual(payload["endpoints"]["run"], "/api/day-simulation/run")
         self.assertEqual(contract["scenario"]["id"], "weekday_full_day")
         self.assertEqual(contract["baseline_run"]["algorithm_id"], "nearest_greedy")
@@ -241,6 +153,16 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertFalse(contract["frames"][0]["challenger"]["simulation_trace"]["map_labels_visible"])
         self.assertTrue(contract["frames"][0]["challenger"]["simulation_trace"]["courier_tracks"])
         self.assertTrue(contract["frames"][0]["challenger"]["simulation_trace"]["event_queue"])
+        self.assertEqual(workbench["model_version"], "dispatch-workbench-v1")
+        self.assertEqual(
+            [route["id"] for route in workbench["routes"]],
+            ["live", "decisions", "memory", "orders", "riders"],
+        )
+        self.assertEqual(workbench["inspection"]["order_count"], len(contract["orders"]))
+        self.assertEqual(workbench["inspection"]["rider_count"], len(contract["couriers"]))
+        self.assertEqual(workbench["inspection"]["decision_count"], len(contract["frames"]))
+        self.assertTrue(workbench["inspection"]["full_day_preloaded"])
+        self.assertTrue(workbench["inspection"]["deterministic"])
 
     def test_day_simulation_api_payloads_support_replay_controls(self):
         from web_agent_demo.server import (
@@ -610,7 +532,7 @@ class WebAgentDemoTest(unittest.TestCase):
         self.assertIn("memory_writeback", html)
         self.assertIn("future_policy_shift", html)
         self.assertIn("data-secret-handling", html)
-        self.assertIn("function renderMemory", html)
+        self.assertIn("function renderMemoryPage", html)
 
     def test_case_listing_exposes_large_seed301_without_local_paths(self):
         from web_agent_demo.server import list_cases
