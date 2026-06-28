@@ -9,6 +9,7 @@ from web_agent_demo.day_simulation import (
     day_comparison_to_dict,
     run_full_day_comparison,
 )
+from web_agent_demo.dispatch_workbench_data import build_dispatch_workbench_payload
 
 
 @lru_cache(maxsize=1)
@@ -17,6 +18,7 @@ def _bootstrap_payload() -> dict[str, object]:
     contract = run_full_day_comparison(seed="frontend-shell", controls=controls)
     return {
         "contract": day_comparison_to_dict(contract),
+        "workbench": build_dispatch_workbench_payload(contract),
         "endpoints": dict(DAY_SIMULATION_ENDPOINTS),
         "mode": "full-day-replay-shell",
     }

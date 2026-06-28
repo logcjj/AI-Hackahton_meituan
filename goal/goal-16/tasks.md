@@ -23,7 +23,7 @@ Confidence loop:
 
 ## Task 2 - Data Contract And Workbench Dataset
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - A frontend bootstrap data model contains full-day orders, riders, decisions, memory entries, metrics, event timeline, and map anchors.
@@ -31,8 +31,31 @@ Independent verification:
 - Data normalization is deterministic and can be inspected from the browser.
 
 Work log:
+- Added `web_agent_demo/dispatch_workbench_data.py` as a dedicated Kandbox-style workbench normalization layer on top of the existing full-day simulation contract.
+- Exposed a new `workbench` object from the existing frontend bootstrap payload without changing server routing yet.
+- The workbench model now includes:
+  - five route descriptors: live, decisions, memory, orders, riders;
+  - full-day preloaded orders, riders, merchants and shocks;
+  - map center, bounds, anchors, hotspots and route overlays;
+  - timeline slices and event stream;
+  - cumulative baseline-vs-ours scorecard series;
+  - decision records with trigger, input orders, candidate riders, filtering, scoring, final actions, abandoned actions, result and writeback;
+  - memory items and sections for new, curated, active and feedback memories.
+- Added `tests/test_dispatch_workbench_data.py` to verify required sections, page-field coverage, deterministic JSON serialization, and browser-inspectable bootstrap exposure.
+- Verified direct bootstrap inspection:
+  - `model_version = dispatch-workbench-v1`;
+  - `order_count = 207`;
+  - `rider_count = 18`;
+  - `decision_count = 40`;
+  - `memory_count = 120`;
+  - routes are `live`, `decisions`, `memory`, `orders`, `riders`.
+- Ran `python3 -m py_compile web_agent_demo/dispatch_workbench_data.py web_agent_demo/day_replay_frontend.py`.
+- Ran `uv run --with pytest pytest -q tests/test_dispatch_workbench_data.py`: 4 passed.
+- Ran `uv run --with pytest pytest -q tests/test_day_simulation_contract.py tests/test_web_agent_demo.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Task 2 scope: the frontend bootstrap now contains a deterministic, inspectable, full-day dispatch workbench data model with the required orders, riders, decisions, memory, metrics, events and map anchors, and focused tests prove the data exists, is complete for this task, and serializes consistently.
 
 ## Task 3 - App Shell, Routes, And Module Boundary Replacement
 
