@@ -440,6 +440,11 @@ def render_day_replay_index() -> str:
       border-color: rgba(148,163,184,.22);
     }
     .score-stack { display: grid; gap: 10px; }
+    .algorithm-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
     .score-card {
       padding: 13px;
       border: 1px solid var(--line);
@@ -450,6 +455,25 @@ def render_day_replay_index() -> str:
     .score-card span { color: var(--muted); font-size: 12px; }
     .score-card[data-tone="good"] { background: var(--green-soft); border-color: rgba(15,118,110,.24); }
     .score-card[data-tone="warn"] { background: var(--amber-soft); border-color: rgba(183,121,31,.24); }
+    .score-card[data-tone="risk"] { background: var(--red-soft); border-color: rgba(180,35,24,.22); }
+    .delta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+    .metric-chip {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-2);
+    }
+    .metric-chip b { display: block; margin-bottom: 2px; font: 800 16px var(--mono); }
+    .metric-chip span { display: block; color: var(--muted); font-size: 12px; }
     .live-grid[data-inference-state="running"] .map-panel {
       outline: 2px solid rgba(15,118,110,.14);
     }
@@ -469,6 +493,28 @@ def render_day_replay_index() -> str:
     }
     .list-item strong { display: block; margin-bottom: 4px; font-size: 13px; }
     .list-item span, .list-item p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .event-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+    }
+    .event-tag {
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: var(--accent-2);
+      background: var(--green-soft);
+      font: 800 10px var(--mono);
+      white-space: nowrap;
+    }
+    .event-tag[data-family="order"] { color: #92400e; background: var(--amber-soft); }
+    .event-tag[data-family="score"] { color: var(--accent-2); background: var(--green-soft); }
+    .event-tag[data-family="memory"] { color: #1d4ed8; background: #dbeafe; }
+    .event-tag[data-family="decision"] { color: #334155; background: #e2e8f0; }
+    .round-summary-grid {
+      display: grid;
+      gap: 9px;
+    }
     .timeline-item { text-align: left; width: 100%; border: 1px solid var(--line); background: var(--surface-2); border-radius: 12px; padding: 10px; }
     .timeline-item[data-active="true"] { border-color: rgba(15,118,110,.42); background: var(--green-soft); }
     .stage-row {
@@ -541,6 +587,7 @@ def render_day_replay_index() -> str:
       .topbar { grid-template-columns: 1fr; }
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .runtime-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .workbench-shell { display: block; }
@@ -549,6 +596,7 @@ def render_day_replay_index() -> str:
       .nav-link { padding: 8px 4px; }
       .route-view { padding: 14px; }
       .page-head { grid-template-columns: 1fr; }
+      .algorithm-pair, .delta-grid, .metric-strip { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
     }
   </style>
@@ -629,6 +677,22 @@ def render_day_replay_index() -> str:
       compare: "对比",
       overlay: "叠加"
     };
+    const eventTypeClasses = {
+      order_entered: "event-type-order_entered",
+      decision_round: "event-type-decision_round",
+      score_update: "event-type-score_update",
+      memory_writeback: "event-type-memory_writeback",
+      memory_recall: "event-type-memory_recall",
+      future_policy_shift: "event-type-future_policy_shift"
+    };
+    const eventMeta = {
+      order_entered: { label: "订单进入", family: "order" },
+      decision_round: { label: "决策轮次", family: "decision" },
+      score_update: { label: "累计更新", family: "score" },
+      memory_writeback: { label: "记忆写入", family: "memory" },
+      memory_recall: { label: "记忆命中", family: "memory" },
+      future_policy_shift: { label: "策略整理", family: "memory" }
+    };
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -643,6 +707,20 @@ def render_day_replay_index() -> str:
     function fmtNumber(value, digits = 0) {
       if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
       return Number(value).toLocaleString("zh-CN", { maximumFractionDigits: digits, minimumFractionDigits: digits });
+    }
+
+    function fmtSigned(value, digits = 1) {
+      const numberValue = Number(value);
+      if (Number.isNaN(numberValue)) return "-";
+      const sign = numberValue > 0 ? "+" : "";
+      return `${sign}${fmtNumber(numberValue, digits)}`;
+    }
+
+    function fmtFewer(value, unit, digits = 0) {
+      const numberValue = Number(value) || 0;
+      if (numberValue < 0) return `少 ${fmtNumber(Math.abs(numberValue), digits)} ${unit}`;
+      if (numberValue > 0) return `多 ${fmtNumber(numberValue, digits)} ${unit}`;
+      return `持平 ${fmtNumber(0, digits)} ${unit}`;
     }
 
     function clock(seconds) {
@@ -918,6 +996,7 @@ def render_day_replay_index() -> str:
       setText("inference-event-count", events.length);
       setText("map-runtime-hint", `${stateLabel} / ${clock(inferenceState.currentTimeS)} / ${inferenceModeLabels[inferenceState.mode]}`);
       setText("event-flow-caption", `${events.length} events released automatically`);
+      setText("cumulative-metrics-caption", `${currentScore.time_label} 累计优势`);
       setText("round-summary-time", currentDecision.trigger_time_label);
       const progressBar = document.getElementById("inference-progress-bar");
       if (progressBar) progressBar.style.setProperty("--progress", `${inferenceProgressPct()}%`);
@@ -939,6 +1018,8 @@ def render_day_replay_index() -> str:
       if (scoreStack) scoreStack.innerHTML = renderLiveScoreCards(currentScore);
       const eventFlow = document.getElementById("live-event-flow");
       if (eventFlow) eventFlow.innerHTML = events.slice(-9).reverse().map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>点击开始推理后，订单进入、候选分配和累计结果将自动释放。</p></div>`;
+      const cumulativeMetrics = document.getElementById("live-cumulative-metrics");
+      if (cumulativeMetrics) cumulativeMetrics.innerHTML = renderLiveCumulativeMetrics(currentScore);
       const summary = document.getElementById("live-round-summary");
       if (summary) summary.innerHTML = renderRoundSummary(currentDecision);
     }
@@ -1038,6 +1119,12 @@ def render_day_replay_index() -> str:
             <div class="card">
               <div class="card-head"><h3>轻量事件流</h3><span id="event-flow-caption">按全天推演时间释放</span></div>
               <div id="live-event-flow" class="card-body event-list">${events.map(renderEventItem).join("")}</div>
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>累积指标区</h3><span id="cumulative-metrics-caption">${escapeHtml(currentScore.time_label)} 累计优势</span></div>
+              <div id="live-cumulative-metrics" class="card-body metric-strip">
+                ${renderLiveCumulativeMetrics(currentScore)}
+              </div>
             </div>
           </div>
           <aside class="page-grid">
@@ -1203,31 +1290,93 @@ def render_day_replay_index() -> str:
       return `<div class="map-legend">${items.map(([lane, label]) => `<span class="legend-item"><i class="legend-swatch" data-lane="${escapeHtml(lane)}"></i>${escapeHtml(label)}</span>`).join("")}</div>`;
     }
 
-    function renderScoreCard(label, value, detail, tone) {
-      return `<div class="score-card" data-tone="${escapeHtml(tone)}"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b><span>${escapeHtml(detail)}</span></div>`;
+    function renderScoreCard(label, value, detail, tone, metricId = "") {
+      const metricAttrs = metricId ? ` id="${escapeHtml(metricId)}" data-metric="${escapeHtml(metricId)}"` : "";
+      return `<div class="score-card" data-tone="${escapeHtml(tone)}"${metricAttrs}><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b><span>${escapeHtml(detail)}</span></div>`;
     }
 
     function renderLiveScoreCards(score) {
+      const timeoutTone = score.deltas.timeout_order_delta <= 0 ? "good" : "risk";
+      const emptyTone = score.deltas.empty_mileage_saved_km >= 0 ? "good" : "risk";
+      const profitTone = score.deltas.profit_delta_yuan >= 0 ? "good" : "risk";
+      return `
+        <div class="algorithm-pair" data-score-section="algorithm-cumulative">
+          ${renderScoreCard("基线/弹金算法累计", `${fmtNumber(score.baseline.total_cost_yuan, 1)} 元`, `${fmtNumber(score.baseline.total_time_cost_min, 1)} 分钟 / ${score.baseline.late_orders} 超时单`, "warn", "metric-baseline-cumulative")}
+          ${renderScoreCard("我们的算法累计", `${fmtNumber(score.ours.total_cost_yuan, 1)} 元`, `${fmtNumber(score.ours.total_time_cost_min, 1)} 分钟 / ${score.ours.late_orders} 超时单`, "good", "metric-ours-cumulative")}
+        </div>
+        <div class="delta-grid" data-score-section="advantage-deltas">
+          ${renderScoreCard("时间差异", `节省 ${fmtNumber(score.deltas.time_saved_min, 1)} 分钟`, score.deltas.headline, "good", "metric-time-delta")}
+          ${renderScoreCard("金钱差异", `节省 ${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, `收益 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} 元 / 利润 ${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, profitTone, "metric-money-delta")}
+          ${renderScoreCard("超时单差异", fmtFewer(score.deltas.timeout_order_delta, "单"), `风险差异 ${fmtSigned(score.deltas.timeout_risk_delta, 3)}`, timeoutTone, "metric-timeout-delta")}
+          ${renderScoreCard("空驶里程差异", `节省 ${fmtNumber(score.deltas.empty_mileage_saved_km, 2)} km`, "对比/叠加模式只强调差异路线", emptyTone, "metric-empty-mileage-delta")}
+          ${renderScoreCard("收益/成本差异", `${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, `收入 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} 元 / 成本节省 ${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, profitTone, "metric-profit-delta")}
+        </div>
+      `;
+    }
+
+    function renderMetricChip(metricId, label, value, detail) {
+      return `<div class="metric-chip" id="metric-chip-${escapeHtml(metricId)}" data-metric="${escapeHtml(metricId)}"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b><span>${escapeHtml(detail)}</span></div>`;
+    }
+
+    function renderLiveCumulativeMetrics(score) {
       return [
-        renderScoreCard("基线/弹金算法累计", `${fmtNumber(score.baseline.total_cost_yuan, 1)} 元`, `${fmtNumber(score.baseline.total_time_cost_min, 1)} 分钟成本`, "warn"),
-        renderScoreCard("我们的算法累计", `${fmtNumber(score.ours.total_cost_yuan, 1)} 元`, `${fmtNumber(score.ours.total_time_cost_min, 1)} 分钟成本`, "good"),
-        renderScoreCard("时间差异", `${fmtNumber(score.deltas.time_saved_min, 1)} 分钟`, score.deltas.headline, "good"),
-        renderScoreCard("金钱差异", `${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, `收益/成本差异 ${fmtNumber(score.deltas.profit_delta_yuan, 1)} 元`, "good"),
-        renderScoreCard("超时单差异", `${fmtNumber(score.deltas.timeout_order_delta, 0)} 单`, `风险差异 ${fmtNumber(score.deltas.timeout_risk_delta, 3)}`, "good"),
-        renderScoreCard("空驶里程差异", `${fmtNumber(score.deltas.empty_mileage_saved_km, 2)} km`, "只强调差异部分，不铺满两套路由", "good")
+        renderMetricChip("time-delta", "时间差异", `${fmtNumber(score.deltas.time_saved_min, 1)} min`, `baseline ${fmtNumber(score.baseline.total_time_cost_min, 1)} / ours ${fmtNumber(score.ours.total_time_cost_min, 1)}`),
+        renderMetricChip("money-delta", "金钱差异", `${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, `baseline ${fmtNumber(score.baseline.total_cost_yuan, 1)} / ours ${fmtNumber(score.ours.total_cost_yuan, 1)}`),
+        renderMetricChip("timeout-delta", "超时单差异", fmtFewer(score.deltas.timeout_order_delta, "单"), `baseline ${score.baseline.late_orders} / ours ${score.ours.late_orders}`),
+        renderMetricChip("empty-mileage-delta", "空驶里程差异", `${fmtNumber(score.deltas.empty_mileage_saved_km, 2)} km`, `总距离差异 ${fmtSigned(score.deltas.empty_mileage_saved_m, 0)} m`),
+        renderMetricChip("profit-delta", "收益/成本差异", `${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, `收益 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} / 成本 ${fmtNumber(score.deltas.money_saved_yuan, 1)}`)
       ].join("");
     }
 
+    function actionSummary(actions, limit = 3) {
+      if (!actions || !actions.length) return "暂无动作";
+      const preview = actions.slice(0, limit).map((item) => {
+        const eta = item.total_eta_min === undefined ? "" : ` / ${fmtNumber(item.total_eta_min, 1)}min`;
+        return `${item.order_id}->${item.courier_id}${eta}`;
+      }).join(", ");
+      return actions.length > limit ? `${preview} +${actions.length - limit} more` : preview;
+    }
+
     function renderRoundSummary(decision) {
+      const finalActions = actionSummary(decision.final_actions, 3);
+      const abandonedActions = actionSummary(decision.abandoned_actions, 3);
+      const filterSummary = decision.filtering_process.slice(0, 3).map((stage) => `${stage.stage}: ${stage.remaining}`).join(" / ");
+      const scoreSummary = decision.scoring_process.slice(0, 3).map((item) => `${item.algorithm_id} ${fmtNumber(item.score, 3)}`).join(" / ") || "等待评分";
+      const writebackIds = decision.result_writeback.memory_event_ids.slice(0, 4).join(", ") || "无";
       return `
-        <div class="list-item"><strong>${escapeHtml(decision.trigger_reason)}</strong><p>${escapeHtml(decision.round_result.summary)}</p></div>
-        <div class="list-item"><strong>候选集合</strong><p>${decision.input_order_ids.length} orders / ${decision.candidate_rider_ids.length} riders</p></div>
-        <div class="list-item"><strong>本轮累计优势</strong><p>节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，节省 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元。</p></div>
+        <div class="round-summary-grid" data-decision-id="${escapeHtml(decision.id)}">
+          <div class="list-item" id="round-trigger"><strong>触发原因</strong><p>${escapeHtml(decision.trigger_reason)}</p></div>
+          <div class="list-item" id="round-input-context"><strong>输入上下文</strong><p>${decision.input_order_ids.length} orders / ${decision.candidate_rider_ids.length} riders / ${escapeHtml(decision.context.weather)} / congestion ${fmtNumber(decision.context.congestion_level, 2)}</p></div>
+          <div class="list-item" id="round-filtering"><strong>过滤过程</strong><p>${escapeHtml(filterSummary)}</p></div>
+          <div class="list-item" id="round-scoring"><strong>评分过程</strong><p>${escapeHtml(scoreSummary)}</p></div>
+          <div class="list-item" id="round-final-actions"><strong>最终动作</strong><p>${escapeHtml(finalActions)}</p></div>
+          <div class="list-item" id="round-abandoned-actions"><strong>被放弃动作</strong><p>${escapeHtml(abandonedActions)}</p></div>
+          <div class="list-item" id="round-writeback"><strong>结果回写</strong><p>${decision.result_writeback.writeback_count} writebacks / ${escapeHtml(writebackIds)}</p></div>
+          <div class="list-item" id="round-metric-impact"><strong>本轮结果</strong><p>${escapeHtml(decision.round_result.summary)}；节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，节省 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元，风险差异 ${fmtSigned(decision.round_result.timeout_risk_delta, 3)}。</p></div>
+        </div>
       `;
     }
 
     function renderEventItem(event) {
-      return `<div class="list-item" data-event-type="${escapeHtml(event.type)}"><strong>${escapeHtml(event.time_label)} ${escapeHtml(event.type)}</strong><p>${escapeHtml(event.summary)}</p></div>`;
+      const meta = eventMeta[event.type] || { label: event.type, family: "decision" };
+      const typeClass = eventTypeClasses[event.type] || "event-type-other";
+      const detailParts = [];
+      if (event.order_id) detailParts.push(`order ${event.order_id}`);
+      if (event.order_ids) detailParts.push(`${event.order_ids.length} orders`);
+      if (event.courier_ids) detailParts.push(`${event.courier_ids.length} riders`);
+      if (event.business_area) detailParts.push(event.business_area);
+      if (event.memory_id) detailParts.push(`memory ${event.memory_id}`);
+      const detail = detailParts.join(" / ");
+      return `
+        <div class="list-item event-item ${escapeHtml(typeClass)}" data-event-type="${escapeHtml(event.type)}" data-event-sequence="${escapeHtml(event.sequence)}">
+          <span class="event-tag" data-family="${escapeHtml(meta.family)}">${escapeHtml(meta.label)}</span>
+          <div>
+            <strong>${escapeHtml(event.time_label)} ${escapeHtml(meta.label)}</strong>
+            <p>${escapeHtml(event.summary)}</p>
+            ${detail ? `<p>${escapeHtml(detail)}</p>` : ""}
+          </div>
+        </div>
+      `;
     }
 
     function renderStageRow(label, count, summary) {
@@ -1300,6 +1449,7 @@ def render_day_replay_index() -> str:
       renderMemoryPage,
       renderOrdersPage,
       renderRidersPage,
+      renderLiveCumulativeMetrics,
       inferenceState,
       startInference,
       toggleInferencePause,

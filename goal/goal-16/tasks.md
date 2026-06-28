@@ -255,7 +255,7 @@ Confidence loop:
 
 ## Task 6 - Real-Time Scorecard, Event Stream, And Round Summary
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - The live page includes a same-page cumulative scorecard comparing baseline vs our algorithm.
@@ -263,8 +263,50 @@ Independent verification:
 - Bottom event stream, current-round summary, and compact cumulative metrics are visible without becoming a large table.
 
 Work log:
+- Reworked the live same-page cumulative scorecard in `web_agent_demo/day_replay_frontend.py` so it now separates:
+  - baseline cumulative cost and time;
+  - our algorithm cumulative cost and time;
+  - time delta;
+  - money delta;
+  - timeout-order and timeout-risk delta;
+  - empty-mileage delta;
+  - revenue / cost / profit delta.
+- Added stable runtime metric markers for the scorecard:
+  - `metric-time-delta`;
+  - `metric-money-delta`;
+  - `metric-timeout-delta`;
+  - `metric-empty-mileage-delta`;
+  - `metric-profit-delta`.
+- Added a bottom compact cumulative metrics strip:
+  - `live-cumulative-metrics`;
+  - time, money, timeout, empty-mileage, and profit chips.
+- Upgraded the event stream from plain list items to typed dispatch events with compact tags:
+  - order entered;
+  - decision round;
+  - score update;
+  - memory writeback / recall / policy shift.
+- Expanded the live current-round summary so it now shows:
+  - trigger reason;
+  - input context;
+  - filtering process;
+  - scoring process;
+  - final actions;
+  - abandoned actions;
+  - result writeback;
+  - this-round metric impact.
+- Added regression markers to `tests/test_web_agent_demo.py` for the cumulative metrics area, metric IDs, typed event classes, event tags, and round action/writeback summary sections.
+- Verified actual generated JavaScript in Node VM:
+  - runtime scorecard metric IDs exist after live render;
+  - bottom cumulative metric chips exist;
+  - `setInferenceTime()` changes scorecard, cumulative metrics, event flow, and round summary;
+  - `event-type-score_update` appears in the released event flow;
+  - `round-final-actions` and `round-writeback` appear in the live round summary.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Task 6 scope: the live page now has a dynamic same-page cumulative comparison, compact non-table metric strip, typed event stream, and complete current-round summary; both focused and full tests pass, and the generated JavaScript VM check proves all live sections update as simulated time advances.
 
 ## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
 
