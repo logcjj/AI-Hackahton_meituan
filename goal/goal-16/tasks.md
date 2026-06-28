@@ -452,7 +452,7 @@ Confidence loop:
 
 ## Task 8 - Memory Page
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Memory page shows new memories, curated memories, active hits, and feedback.
@@ -460,8 +460,49 @@ Independent verification:
 - Page reads as long-term system memory, not an asset table, log list, or document center.
 
 Work log:
+- Reworked `#/memory` in `web_agent_demo/day_replay_frontend.py` from a simple four-card scaffold into a Hermes-style long-term memory workspace.
+- Added route-level Memory containers:
+  - `data-memory-route="hermes-long-term"`;
+  - `memory-overview`;
+  - `memory-current-recall`;
+  - `memory-section-grid`;
+  - runtime section ids for new, curated, active and feedback memory groups.
+- Added a Memory overview strip for long-term memory total, average confidence, cumulative recalls, latest hit and linked-decision coverage.
+- Added a current recall lane that highlights active hit memories and their linked decisions.
+- Expanded every Memory card to show the required fields:
+  - trigger scenario;
+  - context summary;
+  - strategy summary;
+  - decision result;
+  - effect feedback;
+  - confidence;
+  - recall count;
+  - latest hit time.
+- Added memory-specific visual components:
+  - stage pills;
+  - memory field grid;
+  - confidence meter;
+  - recall cards;
+  - compact tags and linked-decision chips.
+- Exposed Memory helpers through `window.__DISPATCH_WORKBENCH__`:
+  - `memoryStats`;
+  - `memoryItemsForSection`;
+  - `renderMemoryRecallCard`;
+  - `renderMemoryItem`.
+- Updated `tests/test_web_agent_demo.py` with stable Memory route, section, field and helper markers.
+- Verified the generated JavaScript in Node VM:
+  - `#/memory` renders with route view `memory`;
+  - runtime section ids exist for new, curated, active and feedback;
+  - required Memory fields are visible in rendered DOM;
+  - data contains 120 memory items;
+  - sections contain new 40, curated 40, active 40 and feedback 80 entries;
+  - memory stats report 120 total items, 280 recalls, latest hit `22:45` and 40 linked decisions.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
 
 Confidence loop:
+- 100% confidence for Task 8 scope: the Memory page now behaves as a long-term system memory view with new, curated, active-hit and feedback sections, every required Memory field is rendered from the shared workbench data, runtime DOM generation is verified through the actual generated JavaScript, and focused/full tests pass.
 
 ## Task 9 - Orders And Riders Pages
 

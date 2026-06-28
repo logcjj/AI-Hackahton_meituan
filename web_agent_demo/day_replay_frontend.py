@@ -218,6 +218,17 @@ def render_day_replay_index() -> str:
       align-items: start;
     }
     .memory-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .memory-workspace { grid-template-columns: 1fr; }
+    .memory-overview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .memory-section-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
     .rider-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .card {
       border: 1px solid var(--line);
@@ -643,6 +654,77 @@ def render_day_replay_index() -> str:
       background: rgba(255,255,255,.80);
     }
     .memory-card { min-height: 220px; }
+    .memory-card[data-memory-section] .card-head span {
+      font: 800 11px var(--mono);
+    }
+    .memory-item {
+      display: grid;
+      gap: 8px;
+    }
+    .memory-item-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .memory-item-head strong { margin: 0; }
+    .memory-stage {
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: var(--accent-2);
+      background: var(--green-soft);
+      font: 800 10px var(--mono);
+      white-space: nowrap;
+    }
+    .memory-stage[data-stage="curated"] { color: #1d4ed8; background: #dbeafe; }
+    .memory-stage[data-stage="active"] { color: #92400e; background: var(--amber-soft); }
+    .memory-stage[data-stage="feedback"] { color: #334155; background: #e2e8f0; }
+    .memory-field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+    .memory-field {
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .memory-field b {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--accent-2);
+      font: 800 10px var(--mono);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .memory-field span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .memory-meter {
+      height: 7px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    .memory-meter span {
+      display: block;
+      width: calc(var(--confidence) * 100%);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #22c55e);
+    }
+    .recall-lane {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .recall-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-2);
+    }
+    .recall-card strong { display: block; margin-bottom: 6px; font-size: 13px; }
+    .recall-card p { margin: 0 0 8px; color: var(--muted); font-size: 12px; line-height: 1.45; }
     .rider-card .card-body { display: grid; gap: 10px; }
     .mini-map {
       position: relative;
@@ -670,6 +752,7 @@ def render_day_replay_index() -> str:
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .runtime-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .memory-overview, .memory-section-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
       .workbench-shell { display: block; }
@@ -679,6 +762,7 @@ def render_day_replay_index() -> str:
       .route-view { padding: 14px; }
       .page-head { grid-template-columns: 1fr; }
       .algorithm-pair, .delta-grid, .metric-strip { grid-template-columns: 1fr; }
+      .memory-overview, .memory-section-grid, .recall-lane, .memory-field-grid, .context-metric-grid { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
     }
   </style>
@@ -1378,17 +1462,30 @@ def render_day_replay_index() -> str:
         ["feedback", "记忆效果反馈"]
       ];
       const byId = Object.fromEntries(workbench.memory.items.map((item) => [item.id, item]));
+      const stats = memoryStats();
+      const activeHits = memoryItemsForSection("active", byId).slice(0, 3);
       return `
         ${pageHeader("memory", "Hermes-style Memory", "这里展示系统长期记忆的形成、整理、命中和反馈，不做资产表或文档中心。")}
-        <div class="page-grid memory-grid" data-page="memory">
-          ${sections.map(([sectionId, title]) => `
-            <div class="card memory-card" data-memory-section="${escapeHtml(sectionId)}">
-              <div class="card-head"><h3>${escapeHtml(title)}</h3><span>${workbench.memory.sections[sectionId].length}</span></div>
-              <div class="card-body memory-list">
-                ${workbench.memory.sections[sectionId].slice(0, 4).map((id) => renderMemoryItem(byId[id])).join("")}
-              </div>
+        <div class="page-grid memory-workspace" data-page="memory" data-memory-route="hermes-long-term">
+          <div id="memory-overview" class="memory-overview">
+            ${renderMemoryOverview(stats)}
+          </div>
+          <div class="card" id="memory-current-recall">
+            <div class="card-head"><h3>当前召回链路</h3><span>${activeHits.length} active hits</span></div>
+            <div class="card-body recall-lane">
+              ${activeHits.map(renderMemoryRecallCard).join("")}
             </div>
-          `).join("")}
+          </div>
+          <div class="memory-section-grid">
+            ${sections.map(([sectionId, title]) => `
+              <div class="card memory-card" id="memory-section-${escapeHtml(sectionId)}" data-memory-section="${escapeHtml(sectionId)}">
+                <div class="card-head"><h3>${escapeHtml(title)}</h3><span>${workbench.memory.sections[sectionId].length} memories</span></div>
+                <div class="card-body memory-list">
+                  ${memoryItemsForSection(sectionId, byId).slice(0, 5).map(renderMemoryItem).join("")}
+                </div>
+              </div>
+            `).join("")}
+          </div>
         </div>
       `;
     }
@@ -1714,13 +1811,77 @@ def render_day_replay_index() -> str:
       return `<div class="stage-row"><b>${escapeHtml(label)}</b><span>${escapeHtml(summary || "Pending")}</span><em>${escapeHtml(count)}</em></div>`;
     }
 
+    function memoryItemsForSection(sectionId, byId = null) {
+      const itemById = byId || Object.fromEntries(workbench.memory.items.map((item) => [item.id, item]));
+      return (workbench.memory.sections[sectionId] || [])
+        .map((id) => itemById[id])
+        .filter(Boolean)
+        .sort((a, b) => (b.latest_hit_time_s || 0) - (a.latest_hit_time_s || 0));
+    }
+
+    function memoryStats() {
+      const items = workbench.memory.items;
+      const totalConfidence = items.reduce((sum, item) => sum + (Number(item.confidence) || 0), 0);
+      const totalRecalls = items.reduce((sum, item) => sum + (Number(item.recall_count) || 0), 0);
+      const latest = items.reduce((selected, item) => !selected || item.latest_hit_time_s > selected.latest_hit_time_s ? item : selected, null);
+      return {
+        total: items.length,
+        avgConfidence: items.length ? totalConfidence / items.length : 0,
+        totalRecalls,
+        latestHitLabel: latest?.latest_hit_time_label || "-",
+        linkedDecisionCount: new Set(items.map((item) => item.linked_decision_id)).size
+      };
+    }
+
+    function renderMemoryOverview(stats) {
+      return [
+        renderMetricChip("memory-total", "长期记忆总量", `${stats.total}`, "new / curated / active / feedback"),
+        renderMetricChip("memory-confidence", "平均置信度", fmtNumber(stats.avgConfidence, 2), "confidence after feedback"),
+        renderMetricChip("memory-recalls", "累计召回", `${stats.totalRecalls}`, "historical case hits"),
+        renderMetricChip("memory-latest-hit", "最近命中", stats.latestHitLabel, `${stats.linkedDecisionCount} linked decisions`)
+      ].join("");
+    }
+
+    function renderMemoryRecallCard(item) {
+      if (!item) return "";
+      return `
+        <div class="recall-card" data-memory-id="${escapeHtml(item.id)}" data-memory-recall="active">
+          <strong>${escapeHtml(item.latest_hit_time_label)} / ${escapeHtml(item.trigger_scenario)}</strong>
+          <p>${escapeHtml(item.strategy_summary)}</p>
+          <div class="memory-meter" style="--confidence:${clamp(item.confidence, 0, 1)}"><span></span></div>
+          <p>decision ${escapeHtml(item.linked_decision_id)} / recalls ${item.recall_count}</p>
+        </div>
+      `;
+    }
+
+    function renderMemoryField(label, value) {
+      return `<div class="memory-field"><b>${escapeHtml(label)}</b><span>${escapeHtml(value || "-")}</span></div>`;
+    }
+
     function renderMemoryItem(item) {
       if (!item) return "";
       return `
-        <div class="list-item" data-memory-id="${escapeHtml(item.id)}">
-          <strong>${escapeHtml(item.latest_hit_time_label)} / ${escapeHtml(item.trigger_scenario)}</strong>
-          <p>${escapeHtml(item.context_summary)}</p>
-          <p>${escapeHtml(item.effect_feedback)} Confidence ${fmtNumber(item.confidence, 2)} / recalls ${item.recall_count}</p>
+        <div class="list-item memory-item" data-memory-id="${escapeHtml(item.id)}" data-memory-stage="${escapeHtml(item.stage)}">
+          <div class="memory-item-head">
+            <strong>${escapeHtml(item.latest_hit_time_label)} / ${escapeHtml(item.id)}</strong>
+            <span class="memory-stage" data-stage="${escapeHtml(item.stage)}">${escapeHtml(item.stage)}</span>
+          </div>
+          <div class="memory-field-grid">
+            ${renderMemoryField("触发场景", item.trigger_scenario)}
+            ${renderMemoryField("上下文摘要", item.context_summary)}
+            ${renderMemoryField("策略摘要", item.strategy_summary)}
+            ${renderMemoryField("决策结果", item.decision_result)}
+            ${renderMemoryField("效果反馈", item.effect_feedback)}
+            ${renderMemoryField("最近命中时间", item.latest_hit_time_label)}
+          </div>
+          <div class="context-metric-grid">
+            ${renderMetricChip(`${item.id}-confidence`, "置信度", fmtNumber(item.confidence, 2), `before ${fmtNumber(item.confidence_before, 2)} / after ${fmtNumber(item.confidence_after, 2)}`)}
+            ${renderMetricChip(`${item.id}-recall`, "召回次数", `${item.recall_count}`, item.recalled_case_ids.join(", ") || "no recalled cases")}
+          </div>
+          <div class="chip-list">
+            <span class="data-chip">decision ${escapeHtml(item.linked_decision_id)}</span>
+            ${item.tags.map((tag) => `<span class="data-chip">${escapeHtml(tag)}</span>`).join("")}
+          </div>
         </div>
       `;
     }
@@ -1783,6 +1944,10 @@ def render_day_replay_index() -> str:
       hydrateDecisionPage,
       selectDecisionRound,
       renderMemoryPage,
+      memoryStats,
+      memoryItemsForSection,
+      renderMemoryRecallCard,
+      renderMemoryItem,
       renderOrdersPage,
       renderRidersPage,
       renderLiveCumulativeMetrics,
