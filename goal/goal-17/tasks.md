@@ -465,7 +465,7 @@ Confidence loop:
 
 ## Task 7 - Final Visual Polish, QA, And Archive
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Full automated tests pass.
@@ -474,5 +474,56 @@ Independent verification:
 - Final result directly addresses the user's critique: cleaner UI, real map, anonymized map labels, clearer algorithm advantage, better Memory, less clutter.
 
 Work log:
+- Re-read `goal/goal-17/input.md`, `goal/goal-17/plan.md`, and `goal/goal-17/tasks.md` before starting final QA and archive work.
+- Confirmed starting state:
+  - branch `codex/kandbox-dispatch-workbench`;
+  - latest checkpoint commit `44e3b5d fix: verify workbench responsive debug cycle`;
+  - worktree was clean before Task 7 edits.
+- Ran final automated verification:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Ran final static requirement audit:
+  - confirmed source has the advantage-first Live hero, Leaflet/no-label map tile layer, deterministic fallback map, Hermes Memory sections, demand/risk Orders command center, capacity Riders command center, and ReasonGraph decision markers;
+  - confirmed old dense/similar-page copy such as `调度输入上下文`, `资源盘点上下文`, `memory-current-recall`, and `memory-section-grid` does not remain in frontend/data source files;
+  - confirmed map-display leakage patterns such as raw `Merchant`, raw `Courier`, `office_core`, and `metro_exit` are absent from frontend/data source files except internal function names that do not render to users.
+- Ran final desktop browser QA across all five routes:
+  - `#/live` renders the advantage-first hero, dominant score stack, no-label real map, fallback map layer, anonymous map titles, live controls, and no horizontal overflow;
+  - `#/decisions` renders the advantage-first ReasonGraph surface, six nodes, candidate path elimination board, and all ten required evidence fields;
+  - `#/memory` renders the Hermes model with 4 memory layers, 3 profiles, 4 recall-chain steps, 4 writeback steps, explicit non-asset/log/document copy, and no old Memory section grid;
+  - `#/orders` renders demand/risk input, 6 priority order cards, secondary 207-row full-day table evidence, and no old `调度输入上下文` copy;
+  - `#/riders` renders capacity/coverage input, 6 rider focus cards, 8 secondary rider cards, and no old `资源盘点上下文` copy;
+  - desktop browser console reported 0 page errors.
+- Ran final Live interaction QA:
+  - `#start-inference`, `#pause-inference`, `#playback-speed`, and `#inference-mode` are unique controls;
+  - clicking start changes the Live page from `ready` to `running`;
+  - clicking pause changes the page to `paused` and the button text to `继续`;
+  - setting speed to `4x` and continuing automatically advanced from `pre-dispatch` to later frames without additional manual step clicks;
+  - the replay reached `F-TS-2245`, headline `已节省 433.0 分钟`, 407 released events, 4 visible event-flow items, 5 compact round-summary items, and active Leaflet route/marker counts;
+  - live map title/aria leakage check returned no sensitive merchant/rider/location names;
+  - live interaction browser console reported 0 page errors.
+- Ran final phone browser QA at 390px:
+  - browser probe confirmed `innerWidth=390` and the `max-width: 720px` breakpoint is active;
+  - all five routes use a one-column shell with five equal top navigation columns;
+  - all five routes keep their page identity, module mapping, role card, page-specific structures, and no horizontal overflow;
+  - phone browser console reported 0 page errors.
+- Completed a final code/security review:
+  - user-visible content is deterministic static workbench payload generated server-side from the day simulation contract;
+  - dynamic HTML writes use project-controlled deterministic data and existing escaping helpers;
+  - no `eval`, `fetch`, local storage, auth, upload, or external write side effects are present in the frontend shell;
+  - CDN Leaflet assets were pinned to version 1.9.4 but lacked SRI before this task.
+- Applied one final hardening polish:
+  - added SHA-256 SRI and `crossorigin="anonymous"` to Leaflet CSS and JS;
+  - added frontend contract test coverage for both SRI hashes and `crossorigin`.
+- Re-ran final verification after the SRI change:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Restarted the local preview server on `http://127.0.0.1:18772` and ran a final SRI browser smoke test:
+  - Leaflet CSS/JS integrity attributes and anonymous CORS attributes render in the page;
+  - Live map still reports `data-real-map-status="leaflet"`;
+  - browser console reported 0 page errors.
+- Added `goal/goal-17/completion.md` as the goal completion/archive note.
 
 Confidence loop:
+- 100% confidence for Task 7 scope and the whole Goal 17 objective: the final UI directly addresses the user's critique with a cleaner and less cluttered dispatch workbench, real anonymized map, clearer advantage-first Live page, differentiated navigation/pages, Hermes-style Memory, simplified Orders/Riders/Decisions, strengthened reasoning view, desktop and phone browser QA, full automated tests, and a completed archive note.
