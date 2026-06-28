@@ -96,9 +96,14 @@ def render_day_replay_index() -> str:
     .workbench-shell {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: 252px minmax(0, 1fr);
+      grid-template-columns: 286px minmax(0, 1fr);
       background: linear-gradient(90deg, rgba(23,33,43,.03), transparent 18%);
     }
+    body[data-route="live"] { --route-accent: #0f766e; --route-soft: #e6f4f1; --route-ink: #115e59; }
+    body[data-route="decisions"] { --route-accent: #1d4ed8; --route-soft: #dbeafe; --route-ink: #1e3a8a; }
+    body[data-route="memory"] { --route-accent: #b7791f; --route-soft: #fbf1db; --route-ink: #92400e; }
+    body[data-route="orders"] { --route-accent: #b45309; --route-soft: #ffedd5; --route-ink: #9a3412; }
+    body[data-route="riders"] { --route-accent: #475569; --route-soft: #e2e8f0; --route-ink: #334155; }
     .workbench-nav {
       position: sticky;
       top: 0;
@@ -136,14 +141,14 @@ def render_day_replay_index() -> str:
       letter-spacing: .08em;
       text-transform: uppercase;
     }
-    .nav-list { display: grid; gap: 6px; }
+    .nav-list { display: grid; gap: 8px; }
     .nav-link {
       display: grid;
-      grid-template-columns: 26px 1fr;
+      grid-template-columns: 30px 1fr;
       gap: 10px;
-      align-items: center;
-      padding: 10px 10px;
-      border-radius: 12px;
+      align-items: start;
+      padding: 11px 10px;
+      border-radius: 14px;
       color: #c8d4df;
       text-decoration: none;
       border: 1px solid transparent;
@@ -162,6 +167,41 @@ def render_day_replay_index() -> str:
       place-items: center;
       background: rgba(255,255,255,.08);
       font: 800 11px var(--mono);
+    }
+    .nav-copy { min-width: 0; }
+    .nav-title-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .nav-title-line strong {
+      color: #eef7fb;
+      font-size: 14px;
+      letter-spacing: -.01em;
+    }
+    .nav-role {
+      padding: 3px 6px;
+      border-radius: 999px;
+      color: #9fb0c0;
+      background: rgba(255,255,255,.07);
+      font: 800 9px var(--mono);
+      white-space: nowrap;
+    }
+    .nav-hint {
+      display: block;
+      margin-top: 4px;
+      color: #9fb0c0;
+      font-size: 12px;
+      line-height: 1.32;
+    }
+    .nav-module {
+      display: block;
+      margin-top: 5px;
+      color: #7f93a5;
+      font: 800 10px var(--mono);
+      letter-spacing: .04em;
+      text-transform: uppercase;
     }
     .nav-meta {
       position: absolute;
@@ -225,10 +265,19 @@ def render_day_replay_index() -> str:
     }
     .page-head {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) 280px;
       gap: 14px;
-      align-items: end;
+      align-items: stretch;
       margin-bottom: 16px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--route-accent, var(--accent));
+      border-radius: 20px;
+      background:
+        linear-gradient(120deg, var(--route-soft, var(--green-soft)), rgba(255,255,255,.82) 42%),
+        var(--surface-glass);
+      box-shadow: var(--shadow-tight);
+      backdrop-filter: blur(12px);
     }
     .eyebrow {
       color: var(--accent);
@@ -238,6 +287,45 @@ def render_day_replay_index() -> str:
     }
     .page-head h2 { margin: 5px 0 6px; font-size: 28px; letter-spacing: -.04em; }
     .page-head p { margin: 0; max-width: 820px; color: var(--muted); line-height: 1.55; }
+    .page-role-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 12px;
+    }
+    .page-role-strip span {
+      padding: 6px 8px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 999px;
+      color: var(--route-ink, var(--accent-2));
+      background: rgba(255,255,255,.70);
+      font: 800 11px var(--mono);
+    }
+    .page-role-card {
+      display: grid;
+      align-content: center;
+      gap: 6px;
+      padding: 12px;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,.76);
+    }
+    .page-role-card b {
+      color: var(--route-ink, var(--accent-2));
+      font-size: 15px;
+    }
+    .page-role-card span {
+      color: var(--ink-2);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .page-role-card em {
+      color: var(--muted);
+      font: 800 10px var(--mono);
+      font-style: normal;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
     .page-grid { display: grid; gap: 14px; }
     .live-grid {
       grid-template-columns: 1fr;
@@ -1150,7 +1238,7 @@ def render_day_replay_index() -> str:
     @media (max-width: 1180px) {
       .workbench-shell { grid-template-columns: 78px minmax(0, 1fr); }
       .brand { grid-template-columns: 1fr; }
-      .brand strong, .brand span, .nav-link span:not(.nav-icon), .nav-section-title, .nav-meta { display: none; }
+      .brand strong, .brand span, .nav-copy, .nav-section-title, .nav-meta { display: none; }
       .nav-link { grid-template-columns: 1fr; justify-items: center; }
       .live-grid, .decision-grid, .memory-grid, .rider-grid { grid-template-columns: 1fr; }
       .live-advantage-hero, .live-ops-shell, .decision-grid { grid-template-columns: 1fr; }
@@ -1206,8 +1294,8 @@ def render_day_replay_index() -> str:
       <div class="nav-section-title">Workbench</div>
       <nav id="route-nav" class="nav-list"></nav>
       <div class="nav-meta">
-        <strong>Dispatch scope</strong><br>
-        Full-day orders, riders, planner decisions, live map, score and memory share one model.
+        <strong>工作台导览</strong><br>
+        先看实时推理优势，再追溯决策链路、长期记忆、订单输入和运力资源。
       </div>
     </aside>
     <main class="workbench-main">
@@ -1229,27 +1317,52 @@ def render_day_replay_index() -> str:
     const routeCopy = {
       live: {
         icon: "LM",
-        title: "实时推理页",
+        title: "实时推理 / 优势总览",
+        navLabel: "实时推理",
+        navRole: "主工作台",
+        navHint: "看系统自动推演、地图动作和累计优势。",
+        module: "Live Map",
+        outcome: "自动推演 + 优势证明",
         subtitle: "Live Map 工作台：订单释放、骑手资源、路线变化和累计对比在同一个运营视图中联动。"
       },
       decisions: {
         icon: "PL",
-        title: "决策页",
+        title: "决策链路",
+        navLabel: "决策链路",
+        navRole: "推导页",
+        navHint: "看每一轮为什么这样派、放弃了什么。",
+        module: "Planner / Chart",
+        outcome: "评分过程 + 动作回写",
         subtitle: "Planner / Chart 角色：每一轮触发、过滤、评分、动作和回写独立成页。"
       },
       memory: {
         icon: "ME",
-        title: "Memory 页",
+        title: "长期记忆",
+        navLabel: "长期记忆",
+        navRole: "Memory",
+        navHint: "看系统沉淀、召回和验证的调度经验。",
+        module: "History / assistance",
+        outcome: "记忆沉淀 + 召回反馈",
         subtitle: "长期记忆视图：展示新沉淀、已整理、当前命中和效果反馈，而不是资产表。"
       },
       orders: {
         icon: "JO",
-        title: "订单页",
+        title: "订单输入",
+        navLabel: "订单输入",
+        navRole: "需求侧",
+        navHint: "看全天订单、时段、风险和进入推理状态。",
+        module: "Jobs / Orders",
+        outcome: "需求全集 + 风险筛选",
         subtitle: "Jobs / Orders 输入视图：全天订单全集预置，仅用于调度可见性和筛选。"
       },
       riders: {
         icon: "WK",
-        title: "骑手页",
+        title: "运力资源",
+        navLabel: "运力资源",
+        navRole: "供给侧",
+        navHint: "看骑手班次、位置、负载和任务链。",
+        module: "Workers",
+        outcome: "供给盘点 + 负载判断",
         subtitle: "Workers 资源视图：骑手班次、状态、位置、负载和任务链统一盘点。"
       }
     };
@@ -1616,13 +1729,22 @@ def render_day_replay_index() -> str:
     function pageHeader(routeId, eyebrow, description) {
       const copy = routeCopy[routeId];
       return `
-        <div class="page-head">
+        <div class="page-head" data-page-identity="${escapeHtml(routeId)}" data-page-module="${escapeHtml(copy.module)}">
           <div>
             <div class="eyebrow">${escapeHtml(eyebrow)}</div>
             <h2>${escapeHtml(copy.title)}</h2>
             <p>${escapeHtml(description || copy.subtitle)}</p>
+            <div class="page-role-strip" data-page-role-strip="${escapeHtml(routeId)}">
+              <span>${escapeHtml(copy.navRole)}</span>
+              <span>Kandbox: ${escapeHtml(copy.module)}</span>
+              <span>${escapeHtml(copy.outcome)}</span>
+            </div>
           </div>
-          <div class="badge">${escapeHtml(workbench.source.scenario_name)}</div>
+          <aside class="page-role-card" aria-label="current page role">
+            <b>${escapeHtml(copy.navLabel)}</b>
+            <span>${escapeHtml(copy.navHint)}</span>
+            <em>${escapeHtml(workbench.source.scenario_name)}</em>
+          </aside>
         </div>
       `;
     }
@@ -1811,12 +1933,13 @@ def render_day_replay_index() -> str:
       document.getElementById("route-nav").innerHTML = workbench.routes.map((route) => {
         const copy = routeCopy[route.id];
         return `
-          <a class="nav-link" href="${escapeHtml(route.path)}" data-route-link="${escapeHtml(route.id)}">
+          <a class="nav-link" href="${escapeHtml(route.path)}" data-route-link="${escapeHtml(route.id)}" data-route-role="${escapeHtml(copy.navRole)}" data-kandbox-module="${escapeHtml(copy.module)}" aria-label="${escapeHtml(`${copy.navLabel}：${copy.navHint}`)}">
             <span class="nav-icon">${escapeHtml(copy.icon)}</span>
-            <span>
-              <strong>${escapeHtml(route.label)}</strong><br>
-              <small>${escapeHtml(route.kandbox_module)}</small>
-            </span>
+            <div class="nav-copy">
+              <span class="nav-title-line"><strong>${escapeHtml(copy.navLabel || route.label)}</strong><em class="nav-role">${escapeHtml(copy.navRole)}</em></span>
+              <span class="nav-hint">${escapeHtml(copy.navHint)}</span>
+              <span class="nav-module">${escapeHtml(copy.module || route.kandbox_module)}</span>
+            </div>
           </a>
         `;
       }).join("");
@@ -2223,7 +2346,9 @@ def render_day_replay_index() -> str:
         liveLeafletOverlayGroup = window.L.layerGroup().addTo(map);
         renderLeafletMapLayers(liveLeafletOverlayGroup, routes, riders, orders);
         stage.dataset.realMapStatus = "leaflet";
-        window.setTimeout(() => map.invalidateSize(false), 0);
+        window.setTimeout(() => {
+          if (liveLeafletMap === map && container.isConnected) map.invalidateSize(false);
+        }, 0);
       } catch (error) {
         console.warn("Live map fell back to deterministic anonymous layer", error);
         destroyLiveMap();

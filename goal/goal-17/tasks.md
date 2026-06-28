@@ -231,7 +231,7 @@ Confidence loop:
 
 ## Task 4 - Navigation Clarity And Page Differentiation
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Left navigation has useful page hints and clear module roles.
@@ -239,8 +239,71 @@ Independent verification:
 - Users can understand what each page is for before clicking deeply.
 
 Work log:
+- Changed route labels in the workbench payload from generic English labels to business-role labels:
+  - `实时推理`;
+  - `决策链路`;
+  - `长期记忆`;
+  - `订单输入`;
+  - `运力资源`.
+- Kept the Kandbox module mapping visible as secondary reference:
+  - Live Map;
+  - Planner / Chart;
+  - History / assistance;
+  - Jobs / Orders;
+  - Workers.
+- Expanded `routeCopy` with page-specific:
+  - `navLabel`;
+  - `navRole`;
+  - `navHint`;
+  - `module`;
+  - `outcome`.
+- Rebuilt the left navigation so each item now shows:
+  - Chinese business title;
+  - role badge such as `主工作台`, `推导页`, `需求侧`, `供给侧`;
+  - one-line user-facing hint explaining what the page is for before clicking;
+  - Kandbox module reference as a small technical label.
+- Replaced the old English `Dispatch scope` footer with a Chinese guide:
+  - `工作台导览`;
+  - `先看实时推理优势，再追溯决策链路、长期记忆、订单输入和运力资源。`
+- Added route-aware page identity surfaces:
+  - each page header now has `data-page-identity` and `data-page-module`;
+  - each page shows a `page-role-strip` with role, Kandbox module, and expected output;
+  - each page shows a `page-role-card` explaining the current page purpose.
+- Added route-specific visual theme variables for page differentiation:
+  - Live: teal;
+  - Decisions: blue;
+  - Memory: amber;
+  - Orders: orange;
+  - Riders: slate.
+- Preserved each page's existing structural layout while making the role distinction explicit:
+  - `live-grid`;
+  - `decision-grid`;
+  - `memory-workspace`;
+  - `input-workspace`;
+  - `resource-workspace`.
+- Fixed a browser console regression found during route switching:
+  - Leaflet `invalidateSize` could run after the Live map had been destroyed;
+  - added a live map/container survival check before calling `invalidateSize`.
+- Updated tests for:
+  - Chinese route labels in payload;
+  - nav hints, nav roles, nav modules;
+  - page role card and role strip markers;
+  - route-aware theme variables.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> 19 passed
+  - `uv run --with pytest pytest -q` -> 107 passed
+- Browser QA on `http://127.0.0.1:18772/?v=goal17-task4b#/live` confirmed:
+  - all five nav items expose Chinese labels, role badges, hints, Kandbox modules, and useful aria labels;
+  - all five pages expose distinct `routeTitle`, `data-page-identity`, `data-page-module`, role strip, role card, and page layout class;
+  - active nav follows route switching correctly;
+  - desktop console reported 0 errors.
+- Responsive browser QA confirmed:
+  - at 1000px width, the nav collapses to a 78px icon rail and hides text copy cleanly;
+  - at 390px width, the nav becomes a 5-column icon grid, page role card is single-column, and no nav copy overflows.
 
 Confidence loop:
+- 100% confidence for Task 4 scope: the left navigation now communicates each module's role before clicking, each page shows its purpose and Kandbox mapping after clicking, page headers and route themes are visually differentiated, route switching has no Leaflet console errors, automated tests pass, and responsive QA confirms the nav does not break on narrow screens.
 
 ## Task 5 - Hermes-Style Memory Redesign
 

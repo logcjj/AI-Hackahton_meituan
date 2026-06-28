@@ -75,11 +75,11 @@ def build_dispatch_workbench_payload(contract: DaySimulationContract) -> dict[st
             "generated_at": "deterministic-contract-build",
         },
         "routes": [
-            {"id": "live", "path": "#/live", "label": "Real-time inference", "kandbox_module": "Live Map"},
-            {"id": "decisions", "path": "#/decisions", "label": "Decisions", "kandbox_module": "Planner / Chart"},
-            {"id": "memory", "path": "#/memory", "label": "Memory", "kandbox_module": "History / assistance"},
-            {"id": "orders", "path": "#/orders", "label": "Orders", "kandbox_module": "Jobs / Orders"},
-            {"id": "riders", "path": "#/riders", "label": "Riders", "kandbox_module": "Workers"},
+            {"id": "live", "path": "#/live", "label": "实时推理", "kandbox_module": "Live Map"},
+            {"id": "decisions", "path": "#/decisions", "label": "决策链路", "kandbox_module": "Planner / Chart"},
+            {"id": "memory", "path": "#/memory", "label": "长期记忆", "kandbox_module": "History / assistance"},
+            {"id": "orders", "path": "#/orders", "label": "订单输入", "kandbox_module": "Jobs / Orders"},
+            {"id": "riders", "path": "#/riders", "label": "运力资源", "kandbox_module": "Workers"},
         ],
         "entities": {
             "orders": orders,
