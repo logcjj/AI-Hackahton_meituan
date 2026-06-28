@@ -695,7 +695,7 @@ Confidence loop:
 
 ## Task 11 - Automated And Browser QA
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Python compile checks pass for touched files.
@@ -704,8 +704,60 @@ Independent verification:
 - Screenshots or audit artifacts are saved under `goal/goal-16/` when useful.
 
 Work log:
+- Re-read `goal/goal-16/input.md`, `goal/goal-16/plan.md`, and full `goal/goal-16/tasks.md` in chunks before starting Task 11.
+- Re-read the Playwright skill instructions before browser QA.
+- Confirmed current branch is `codex/kandbox-dispatch-workbench`, the worktree was clean, `npx` is available, the Playwright wrapper exists, and no stale local app/browser processes were running before QA.
+- Ran `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py web_agent_demo/server.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`.
+- Ran `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`: 19 passed.
+- Ran `uv run --with pytest pytest -q`: 107 passed.
+- Ran a static bootstrap/render audit against `web_agent_demo.server.render_index()`:
+  - bootstrap script `dispatch-workbench-bootstrap` exists;
+  - mode is `dispatch-workbench-shell`;
+  - routes are exactly `live`, `decisions`, `memory`, `orders`, `riders`;
+  - model version is `dispatch-workbench-v1`;
+  - full-day preloaded counts are 207 orders, 18 riders, 40 decisions, and 120 memory items;
+  - old shell markers are absent: `day-replay-shell`, `side-by-side-replay`, `greedy-map-panel`, `autosolver-map-panel`, `bootstrapDayReplayShell`;
+  - visual and route markers are present: `enterprise-dispatch-v2`, `high-information`, `start-inference`, `metric-profit-delta`, `decision-reasoning-canvas`, `memory-section-grid`, `orders-filter-bar`, `rider-resource-board`.
+- Started a fresh local server at `http://127.0.0.1:18769`.
+- Ran direct cached-Playwright Chromium browser QA and saved evidence under `goal/goal-16/artifacts/task-11/`.
+- Browser QA verified the default route renders the real-time inference workspace and the shell keeps 5 primary nav routes.
+- Browser QA verified the live inference flow:
+  - clicked `开始推理`;
+  - selected `4x`;
+  - selected `叠加`;
+  - clock advanced from `07:00` to `07:42`;
+  - pause held the clock at `07:42`;
+  - resume advanced to `08:24`;
+  - runtime inspection at `14:00` showed overlay mode, 14 routes, 5 difference routes, 5 baseline routes, 5 moving riders, 5 newly released orders, 4 hotspots, live score deltas, final actions, and writeback summary.
+- Browser QA verified Decisions route:
+  - all 40 decision rounds render;
+  - selecting a later round updates active selection;
+  - required stages exist for trigger, input orders, candidate riders, filtering, scoring, final actions, abandoned actions, round result, and result writeback.
+- Browser QA verified Memory route:
+  - Hermes long-term route kind is present;
+  - sections include new, curated, active, and feedback;
+  - active recall cards render;
+  - required Memory field labels are present.
+- Browser QA verified Orders route:
+  - default view renders all 207 full-day orders;
+  - high-risk filter constrains rows and returns only high-risk orders;
+  - entered-inference status filter further constrains rows;
+  - required order fields are present.
+- Browser QA verified Riders route:
+  - default view renders all 18 riders;
+  - ending-shift filter constrains cards and returns only ending-shift riders;
+  - every visible filtered rider keeps a mini-map preview;
+  - required rider fields are present.
+- Browser QA verified responsive behavior at desktop `1280x920`, tablet `760x900`, and phone `390x840` across all five routes, with usable route width and no horizontal overflow above threshold.
+- Browser QA captured 0 browser runtime errors, 0 page errors, and 0 `console.error` events.
+- Saved QA artifacts:
+  - `goal/goal-16/artifacts/task-11/browser-qa.json`;
+  - `goal/goal-16/artifacts/task-11/live-overlay-desktop.png`;
+  - `goal/goal-16/artifacts/task-11/memory-phone.png`.
+- Stopped the local server after QA and confirmed no stale app/browser processes remained.
 
 Confidence loop:
+- 100% confidence for Task 11 scope: compile, focused tests, full tests, static bootstrap inspection, real-browser primary flows, route responsiveness, console/runtime monitoring, and saved QA artifacts all prove the automated and browser QA gates for the rebuilt workbench are passing.
 
 ## Task 12 - Final Review, Fixes, And Goal Archive
 

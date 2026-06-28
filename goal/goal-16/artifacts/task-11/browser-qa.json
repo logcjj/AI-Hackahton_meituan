@@ -1,0 +1,199 @@
+{
+  "startedAt": "2026-06-28T15:02:16.722Z",
+  "base": "http://127.0.0.1:18769",
+  "routes": {
+    "default": {
+      "route": "live",
+      "hash": "#/live",
+      "routeView": "live",
+      "title": "实时推理页",
+      "width": 1028,
+      "overflowX": 0,
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5
+    },
+    "decisions": {
+      "route": "decisions",
+      "hash": "#/decisions",
+      "routeView": "decisions",
+      "title": "决策页",
+      "width": 1028,
+      "overflowX": 0,
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5
+    },
+    "memory": {
+      "route": "memory",
+      "hash": "#/memory",
+      "routeView": "memory",
+      "title": "Memory 页",
+      "width": 1028,
+      "overflowX": 0,
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5
+    },
+    "orders": {
+      "route": "orders",
+      "hash": "#/orders",
+      "routeView": "orders",
+      "title": "订单页",
+      "width": 1028,
+      "overflowX": 0,
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5
+    },
+    "riders": {
+      "route": "riders",
+      "hash": "#/riders",
+      "routeView": "riders",
+      "title": "骑手页",
+      "width": 1028,
+      "overflowX": 0,
+      "visualSystem": "enterprise-dispatch-v2",
+      "density": "high-information",
+      "navLinks": 5
+    }
+  },
+  "liveFlow": {
+    "currentClock": "14:00",
+    "modeLabel": "叠加",
+    "routeCount": 14,
+    "differenceRoutes": 5,
+    "baselineRoutes": 5,
+    "movingRiders": 5,
+    "newOrders": 5,
+    "hotspots": 4,
+    "activeHotspots": 0,
+    "eventRows": 9,
+    "timeDelta": "时间差异节省 304.3 分钟AutoSolver saves 304.3 minutes and 249.8 yuan cumulatively.",
+    "moneyDelta": "金钱差异节省 249.8 元收益 0.0 元 / 利润 +249.8 元",
+    "timeoutDelta": "超时单差异少 3 单风险差异 -0.112",
+    "emptyMileageDelta": "空驶里程差异节省 -9.82 km对比/叠加模式只强调差异路线",
+    "profitDelta": "收益/成本差异+249.8 元收入 0.0 元 / 成本节省 249.8 元",
+    "roundHasFinalActions": true,
+    "roundHasWriteback": true,
+    "clockAfterStart": "07:42",
+    "pausedClock": "07:42",
+    "pausedClockAfterWait": "07:42",
+    "clockAfterResume": "08:24"
+  },
+  "decisionsFlow": {
+    "timelineRounds": 40,
+    "selectedRound": "D-F-TS-1200",
+    "stages": 10,
+    "hasTrigger": true,
+    "hasInputOrders": true,
+    "hasCandidateRiders": true,
+    "hasFiltering": true,
+    "hasScoring": true,
+    "hasFinalActions": true,
+    "hasAbandonedActions": true,
+    "hasRoundResult": true,
+    "hasWriteback": true
+  },
+  "memoryFlow": {
+    "routeKind": "hermes-long-term",
+    "sections": [
+      "new",
+      "curated",
+      "active",
+      "feedback"
+    ],
+    "recallCards": 3,
+    "memoryItems": 23,
+    "requiredTextPresent": true
+  },
+  "ordersFlow": {
+    "initialOrderRows": 207,
+    "highRiskRows": 100,
+    "allHighRisk": true,
+    "enteredHighRiskRows": 100,
+    "hasRequiredLabels": true
+  },
+  "ridersFlow": {
+    "initialRiderCards": 18,
+    "endingShiftCards": 12,
+    "allEndingShift": true,
+    "miniMaps": 12,
+    "hasRequiredLabels": true
+  },
+  "responsive": {
+    "desktop": {
+      "live": {
+        "width": 1028,
+        "overflowX": 0
+      },
+      "decisions": {
+        "width": 1028,
+        "overflowX": 0
+      },
+      "memory": {
+        "width": 1028,
+        "overflowX": 0
+      },
+      "orders": {
+        "width": 1028,
+        "overflowX": 0
+      },
+      "riders": {
+        "width": 1028,
+        "overflowX": 0
+      }
+    },
+    "tablet": {
+      "live": {
+        "width": 682,
+        "overflowX": 0
+      },
+      "decisions": {
+        "width": 682,
+        "overflowX": 0
+      },
+      "memory": {
+        "width": 682,
+        "overflowX": 0
+      },
+      "orders": {
+        "width": 682,
+        "overflowX": 0
+      },
+      "riders": {
+        "width": 682,
+        "overflowX": 0
+      }
+    },
+    "phone": {
+      "live": {
+        "width": 390,
+        "overflowX": 0
+      },
+      "decisions": {
+        "width": 390,
+        "overflowX": 0
+      },
+      "memory": {
+        "width": 390,
+        "overflowX": 0
+      },
+      "orders": {
+        "width": 390,
+        "overflowX": 0
+      },
+      "riders": {
+        "width": 390,
+        "overflowX": 0
+      }
+    }
+  },
+  "artifacts": [
+    "goal/goal-16/artifacts/task-11/live-overlay-desktop.png",
+    "goal/goal-16/artifacts/task-11/memory-phone.png"
+  ],
+  "runtimeErrors": [],
+  "finishedAt": "2026-06-28T15:02:23.402Z",
+  "ok": true
+}
