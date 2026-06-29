@@ -1230,7 +1230,9 @@ def render_day_replay_index() -> str:
     .decision-canvas { display: grid; gap: 12px; }
     .decision-advantage-hero,
     .input-command-center,
-    .resource-command-center {
+    .resource-command-center,
+    .demand-command-center,
+    .capacity-command-center {
       display: grid;
       grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr);
       gap: 14px;
@@ -1244,14 +1246,18 @@ def render_day_replay_index() -> str:
     }
     .decision-advantage-copy,
     .input-command-copy,
-    .resource-command-copy {
+    .resource-command-copy,
+    .demand-command-copy,
+    .capacity-command-copy {
       display: grid;
       align-content: center;
       gap: 9px;
     }
     .decision-advantage-copy h3,
     .input-command-copy h3,
-    .resource-command-copy h3 {
+    .resource-command-copy h3,
+    .demand-command-copy h3,
+    .capacity-command-copy h3 {
       margin: 0;
       font-size: clamp(24px, 3vw, 42px);
       line-height: 1;
@@ -1259,7 +1265,9 @@ def render_day_replay_index() -> str:
     }
     .decision-advantage-copy p,
     .input-command-copy p,
-    .resource-command-copy p {
+    .resource-command-copy p,
+    .demand-command-copy p,
+    .capacity-command-copy p {
       margin: 0;
       color: var(--ink-2);
       font-size: 13px;
@@ -1267,7 +1275,9 @@ def render_day_replay_index() -> str:
     }
     .reason-kicker,
     .input-kicker,
-    .resource-kicker {
+    .resource-kicker,
+    .demand-kicker,
+    .capacity-kicker {
       width: fit-content;
       padding: 5px 8px;
       border: 1px solid rgba(15,23,42,.08);
@@ -1280,7 +1290,9 @@ def render_day_replay_index() -> str:
     }
     .decision-advantage-metrics,
     .input-signal-grid,
-    .resource-signal-grid {
+    .resource-signal-grid,
+    .demand-signal-grid,
+    .capacity-signal-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 9px;
@@ -1631,7 +1643,7 @@ def render_day_replay_index() -> str:
       background: var(--surface-glass);
       box-shadow: var(--shadow-tight);
     }
-    .input-workspace, .resource-workspace { grid-template-columns: 1fr; }
+    .input-workspace, .resource-workspace, .demand-workspace, .capacity-workspace { grid-template-columns: 1fr; }
     .operations-overview {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1699,6 +1711,13 @@ def render_day_replay_index() -> str:
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
+    }
+    .rider-evidence-shell {
+      display: grid;
+      overflow: hidden;
+    }
+    .rider-evidence-shell .rider-board {
+      padding: 14px;
     }
     .rider-card[data-state="busy"] { border-color: rgba(15,118,110,.30); }
     .rider-card[data-state="ending_shift"] { border-color: rgba(183,121,31,.30); }
@@ -1810,7 +1829,7 @@ def render_day_replay_index() -> str:
       .nav-copy { display: block; min-width: 0; }
       .nav-title-line strong { font-size: 13px; }
       .live-grid, .decision-grid, .memory-grid, .rider-grid { grid-template-columns: 1fr; }
-      .live-advantage-hero, .live-ops-shell, .decision-grid, .decision-advantage-hero, .input-command-center, .resource-command-center, .memory-command-center, .memory-operating-grid, .memory-flow-grid { grid-template-columns: 1fr; }
+      .live-advantage-hero, .live-ops-shell, .decision-grid, .decision-advantage-hero, .input-command-center, .resource-command-center, .demand-command-center, .capacity-command-center, .memory-command-center, .memory-operating-grid, .memory-flow-grid { grid-template-columns: 1fr; }
       .live-side-rail, .decision-grid > aside, .operations-grid > aside, .control-dock { position: static; }
       .topbar { grid-template-columns: 1fr; }
       .topbar-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1838,7 +1857,7 @@ def render_day_replay_index() -> str:
       .live-advantage-hero .algorithm-pair, .live-advantage-hero .delta-grid { grid-template-columns: 1fr; }
       .live-control-dock .runtime-strip { flex-basis: 100%; grid-template-columns: 1fr; }
       .operations-overview { grid-template-columns: 1fr; }
-      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid, .decision-advantage-metrics, .input-signal-grid, .resource-signal-grid, .reason-graph, .candidate-path-board, .decision-plan-board, .decision-evidence-grid, .decision-proof-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
+      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid, .decision-advantage-metrics, .input-signal-grid, .resource-signal-grid, .demand-signal-grid, .capacity-signal-grid, .reason-graph, .candidate-path-board, .decision-plan-board, .decision-evidence-grid, .decision-proof-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
       .map-action-status { left: 12px; top: 58px; max-width: calc(100% - 24px); }
       .action-grid, .runtime-strip { grid-template-columns: 1fr; }
@@ -2973,15 +2992,15 @@ def render_day_replay_index() -> str:
     function renderOrdersPage() {
       const orders = filteredOrders();
       return `
-        ${pageHeader("orders", "订单池看板", "全天订单全集已经预置，首屏只回答需求压力、风险结构和我方相对基线的改善。")}
-        <div class="page-grid input-workspace" data-page="orders" data-orders-route="jobs-input">
-          <section id="orders-input-command" class="input-command-center" data-orders-surface="demand-risk-input">
-            <div class="input-command-copy">
-              <span class="input-kicker">预置订单池</span>
-              <h3>订单池视图</h3>
-              <p>这里不是手工维护表。全天订单已经预置，调度员先看哪些时间段、商圈和高风险订单会影响派单，而不是先扫 200 行明细。</p>
+        ${pageHeader("orders", "订单池看板", "全天订单已经预置并按时间进入推理，这里只看需求压力、风险结构和算法结果。")}
+        <div class="page-grid demand-workspace" data-page="orders" data-orders-route="preloaded-demand-pool">
+          <section id="orders-command" class="demand-command-center" data-orders-surface="preloaded-order-pool">
+            <div class="demand-command-copy">
+              <span class="demand-kicker">只读订单池</span>
+              <h3>今天订单怎么来</h3>
+              <p>不录入、不编辑。调度员只按时间段、商圈、状态和风险筛选，先判断哪批订单会影响超时、成本和骑手负载。</p>
             </div>
-            <div id="orders-overview" class="input-signal-grid">
+            <div id="orders-overview" class="demand-signal-grid">
               ${renderOrdersOverview(orders)}
             </div>
           </section>
@@ -3006,7 +3025,7 @@ def render_day_replay_index() -> str:
           </div>
           <div class="operations-grid" data-density="summary-first">
             <div class="card" id="orders-priority-panel" data-orders-surface="priority-demand">
-              <div class="card-head"><h3>需关注订单</h3><span>风险、释放时间和效果优先</span></div>
+              <div class="card-head"><h3>优先关注订单</h3><span>先看可能影响超时和收益的订单</span></div>
               <div id="orders-priority-list" class="card-body order-focus-list">
                 ${renderOrderFocusList(orders)}
               </div>
@@ -3016,9 +3035,9 @@ def render_day_replay_index() -> str:
             </aside>
           </div>
           <div class="table-shell orders-table-shell" data-order-universe="full-day" data-evidence-role="secondary">
-              <div class="card-head"><h3>订单全集明细</h3><span>二级证据，不做手工录入</span></div>
+              <div class="card-head"><h3>订单全集核对</h3><span>只读证据，不做录入维护</span></div>
               <table>
-                <thead><tr><th>订单编号</th><th>商家/提货点</th><th>下单时间</th><th>承诺送达</th><th>当前状态</th><th>风险等级</th><th>所属商圈</th><th>进入推理</th><th>基线算法结果</th><th>我方算法结果</th></tr></thead>
+                <thead><tr><th>订单</th><th>商家/商圈</th><th>时间窗口</th><th>状态/风险</th><th>推理状态</th><th>基线结果</th><th>我方结果</th></tr></thead>
                 <tbody id="orders-table-body">${orders.map(renderOrderRow).join("")}</tbody>
               </table>
           </div>
@@ -3029,15 +3048,15 @@ def render_day_replay_index() -> str:
     function renderRidersPage() {
       const riders = filteredRiders();
       return `
-        ${pageHeader("riders", "骑手运力看板", "骑手页不是人事后台，而是运力覆盖、班次压力、负载和可承接链路的资源盘点。")}
-        <div class="page-grid resource-workspace" data-page="riders" data-riders-route="workers-resource">
-          <section id="riders-resource-command" class="resource-command-center" data-riders-surface="capacity-coverage">
-            <div class="resource-command-copy">
-              <span class="resource-kicker">骑手运力池</span>
-              <h3>运力覆盖视图</h3>
-              <p>全天骑手资源已经预置。系统先看区域供给、班次尾段和负载链路，再决定哪些骑手适合进入候选集合。人员明细只作为二级证据。</p>
+        ${pageHeader("riders", "骑手运力看板", "全天骑手班次已经预置，这里只看当前可用性、区域覆盖、负载和预计空闲。")}
+        <div class="page-grid capacity-workspace" data-page="riders" data-riders-route="capacity-board">
+          <section id="riders-command" class="capacity-command-center" data-riders-surface="capacity-board">
+            <div class="capacity-command-copy">
+              <span class="capacity-kicker">只读运力池</span>
+              <h3>现在运力够不够</h3>
+              <p>不是人事后台。调度员先看哪些区域有可接单骑手、哪些骑手负载偏高、哪些班次快结束，再进入候选骑手判断。</p>
             </div>
-            <div id="riders-overview" class="resource-signal-grid">
+            <div id="riders-overview" class="capacity-signal-grid">
               ${renderRidersOverview(riders)}
             </div>
           </section>
@@ -3054,7 +3073,7 @@ def render_day_replay_index() -> str:
           </div>
           <div class="operations-grid" data-density="summary-first">
             <div class="card" id="riders-capacity-panel" data-riders-surface="capacity-focus">
-              <div class="card-head"><h3>可调度运力焦点</h3><span>覆盖、负载和预计空闲</span></div>
+              <div class="card-head"><h3>优先可用骑手</h3><span>先看状态、负载和预计空闲</span></div>
               <div id="riders-capacity-list" class="card-body rider-focus-list">
                 ${renderRiderFocusList(riders)}
               </div>
@@ -3063,9 +3082,12 @@ def render_day_replay_index() -> str:
               ${renderRidersContext(riders)}
             </aside>
           </div>
-          <div id="rider-resource-board" class="rider-board" data-evidence-role="secondary">
-            ${riders.slice(0, 8).map(renderRiderCard).join("")}
-          </div>
+          <section class="card rider-evidence-shell" id="rider-evidence-panel" data-evidence-role="secondary">
+            <div class="card-head"><h3>骑手小地图核对</h3><span>位置、负载和任务链，仅作二级证据</span></div>
+            <div id="rider-resource-board" class="rider-board">
+              ${riders.slice(0, 8).map(renderRiderCard).join("")}
+            </div>
+          </section>
         </div>
       `;
     }
@@ -4048,10 +4070,10 @@ def render_day_replay_index() -> str:
         return Number.isFinite(ours) && Number.isFinite(baseline) && ours < baseline;
       }).length;
       return [
-        renderMetricChip("orders-visible", "当前订单视图", `${orders.length}`, `全天共 ${workbench.entities.orders.length} 单`),
-        renderMetricChip("orders-entered", "已进入推理", `${entered}`, "已按时间释放"),
-        renderMetricChip("orders-high-risk", "高风险订单", `${highRisk}`, "承诺时效和天气保护"),
-        renderMetricChip("orders-improved", "我方优于基线", `${improved}/${assigned}`, "已分配订单")
+        renderMetricChip("orders-visible", "当前可见", `${orders.length}`, `全天 ${workbench.entities.orders.length} 单`),
+        renderMetricChip("orders-entered", "已进入推理", `${entered}`, "按下单时间释放"),
+        renderMetricChip("orders-high-risk", "高风险", `${highRisk}`, "优先保护承诺送达"),
+        renderMetricChip("orders-improved", "已见改善", `${improved}/${assigned}`, "我方预计更快")
       ].join("");
     }
 
@@ -4077,15 +4099,16 @@ def render_day_replay_index() -> str:
       }
       return focusOrders.map((order) => {
         const etaGain = orderEtaAdvantage(order);
-        const advantage = etaGain > 0 ? `我方 ETA 快 ${fmtNumber(etaGain, 1)} 分钟` : "等待或持平";
+        const advantage = etaGain > 0 ? `我方预计快 ${fmtNumber(etaGain, 1)} 分钟` : "等待对比结果";
         return `
           <article class="order-focus-card" data-order-focus="${escapeHtml(order.id)}" data-risk="${escapeHtml(order.risk_level)}">
             <div class="focus-card-top">
               <strong>${escapeHtml(order.id)}</strong>
               <span class="focus-badge">${escapeHtml(displayRisk(order.risk_level))}</span>
             </div>
-            <p>${escapeHtml(order.created_at_label)} 下单 / ${escapeHtml(order.promised_at_label)} 承诺 / ${escapeHtml(order.business_area)}</p>
-            <p>${escapeHtml(advantage)}；${order.entered_inference ? "已进入推理" : "等待释放"}。</p>
+            <p>${escapeHtml(order.merchant_label)} / ${escapeHtml(order.business_area)}</p>
+            <p>${escapeHtml(order.created_at_label)} 下单，${escapeHtml(order.promised_at_label)} 前送达。</p>
+            <p>${escapeHtml(advantage)}；${order.entered_inference ? "已进入推理" : "等待按时间释放"}。</p>
             <div class="chip-list">
               <span class="data-chip">基线 ${escapeHtml(displayStatus(order.baseline_result?.state || "scheduled"))}</span>
               <span class="data-chip">我方 ${escapeHtml(displayStatus(order.our_result?.state || "scheduled"))}</span>
@@ -4132,12 +4155,12 @@ def render_day_replay_index() -> str:
       const areaCounts = countBy(orders, (order) => order.business_area);
       const statusCounts = countBy(orders, (order) => order.entered_inference ? "entered_inference" : order.status);
       return `
-        <div class="card-head"><h3>订单池概览</h3><span id="orders-context-count">${orders.length} 单可见</span></div>
+        <div class="card-head"><h3>需求概览</h3><span id="orders-context-count">${orders.length} 单可见</span></div>
         <div class="card-body order-context-list">
-          <div class="list-item" id="orders-time-distribution"><strong>全天释放节奏</strong>${renderOrderTimeLane(orders)}</div>
-          <div class="list-item" id="orders-area-distribution"><strong>商圈分布</strong>${renderCountChips(areaCounts)}</div>
+          <div class="list-item" id="orders-time-distribution"><strong>释放节奏</strong>${renderOrderTimeLane(orders)}</div>
+          <div class="list-item" id="orders-area-distribution"><strong>商圈热度</strong>${renderCountChips(areaCounts)}</div>
           <div class="list-item" id="orders-risk-distribution"><strong>风险结构</strong>${renderCountChips(riskCounts, 6, displayRisk)}</div>
-          <div class="list-item" id="orders-status-distribution"><strong>推理状态</strong>${renderCountChips(statusCounts, 6, displayStatus)}<p>订单全集只作为调度输入证据，不作为数据维护主叙事。</p></div>
+          <div class="list-item" id="orders-status-distribution"><strong>推理进度</strong>${renderCountChips(statusCounts, 6, displayStatus)}<p>订单全集只用于解释推理，不作为数据维护主叙事。</p></div>
         </div>
       `;
     }
@@ -4171,7 +4194,7 @@ def render_day_replay_index() -> str:
       const priority = document.getElementById("orders-priority-list");
       if (priority) priority.innerHTML = renderOrderFocusList(orders);
       const body = document.getElementById("orders-table-body");
-      if (body) body.innerHTML = orders.map(renderOrderRow).join("") || `<tr><td colspan="10">当前筛选无订单，调整时间段、商圈、状态或风险。</td></tr>`;
+      if (body) body.innerHTML = orders.map(renderOrderRow).join("") || `<tr><td colspan="7">当前筛选无订单，调整时间段、商圈、状态或风险。</td></tr>`;
       const context = document.getElementById("orders-context-panel");
       if (context) context.innerHTML = renderOrdersContext(orders);
       setText("orders-result-count", `${orders.length} / ${workbench.entities.orders.length} 单`);
@@ -4196,13 +4219,13 @@ def render_day_replay_index() -> str:
 
     function renderRidersOverview(riders) {
       const busy = riders.filter((rider) => rider.online_state === "busy").length;
+      const available = riders.filter((rider) => rider.online_state === "available").length;
       const ending = riders.filter((rider) => rider.online_state === "ending_shift").length;
-      const tasks = riders.reduce((sum, rider) => sum + rider.task_chain_size, 0);
       const avgLoad = riders.length ? riders.reduce((sum, rider) => sum + rider.current_load / Math.max(1, rider.capacity), 0) / riders.length : 0;
       return [
-        renderMetricChip("riders-visible", "当前骑手资源", `${riders.length}`, `全天共 ${workbench.entities.riders.length} 名`),
-        renderMetricChip("riders-busy", "忙碌骑手", `${busy}`, `${ending} 名临近下线`),
-        renderMetricChip("riders-task-chain", "任务链总量", `${tasks}`, "我方已分配任务"),
+        renderMetricChip("riders-visible", "当前可见", `${riders.length}`, `全天 ${workbench.entities.riders.length} 名`),
+        renderMetricChip("riders-available", "可接单", `${available}`, "可进入候选集合"),
+        renderMetricChip("riders-busy", "配送中", `${busy}`, `${ending} 名临近下线`),
         renderMetricChip("riders-avg-load", "平均负载", fmtNumber(avgLoad, 2), "当前负载 / 容量")
       ].join("");
     }
@@ -4229,8 +4252,8 @@ def render_day_replay_index() -> str:
               <span class="focus-badge">${escapeHtml(displayRiderState(rider.online_state))}</span>
             </div>
             <div class="rider-load" style="--load:${loadRatio}"><span></span></div>
-            <p>${escapeHtml(rider.business_area)} / ${escapeHtml(rider.shift_label)} / 负载 ${rider.current_load}/${rider.capacity}</p>
-            <p>预计空闲 ${escapeHtml(rider.estimated_free_at_label)}；任务链 ${rider.task_chain_size} 单。</p>
+            <p>${escapeHtml(rider.business_area)} / 班次 ${escapeHtml(rider.shift_label)}</p>
+            <p>当前负载 ${rider.current_load}/${rider.capacity}；${escapeHtml(rider.estimated_free_at_label)} 预计空闲；任务链 ${rider.task_chain_size} 单。</p>
           </article>
         `;
       }).join("");
@@ -4241,12 +4264,12 @@ def render_day_replay_index() -> str:
       const areaCounts = countBy(riders, (rider) => rider.business_area);
       const topChains = [...riders].sort((left, right) => right.task_chain_size - left.task_chain_size).slice(0, 5);
       return `
-        <div class="card-head"><h3>运力覆盖上下文</h3><span id="riders-context-count">${riders.length} 名可见</span></div>
+        <div class="card-head"><h3>区域覆盖与班次压力</h3><span id="riders-context-count">${riders.length} 名可见</span></div>
         <div class="card-body rider-context-list">
           <div class="list-item" id="rider-state-distribution"><strong>在线状态</strong>${renderCountChips(stateCounts, 6, displayRiderState)}</div>
-          <div class="list-item" id="rider-area-distribution"><strong>区域供给覆盖</strong>${renderCoverageCards(areaCounts, riders.length)}</div>
+          <div class="list-item" id="rider-area-distribution"><strong>区域覆盖</strong>${renderCoverageCards(areaCounts, riders.length)}</div>
           <div class="list-item" id="rider-chain-focus">
-            <strong>任务链焦点</strong>
+            <strong>任务链较长</strong>
             ${topChains.length ? topChains.map((rider) => `<p>骑手 ${escapeHtml(rider.id)} / ${rider.task_chain_size} 单任务 / ${escapeHtml(rider.estimated_free_at_label)} 空闲</p>`).join("") : "<p>当前筛选无骑手</p>"}
           </div>
         </div>
@@ -4280,13 +4303,10 @@ def render_day_replay_index() -> str:
       return `
         <tr data-order-id="${escapeHtml(order.id)}" data-order-status="${escapeHtml(order.status)}" data-order-risk="${escapeHtml(order.risk_level)}" data-order-area="${escapeHtml(order.business_area)}">
           <td>${escapeHtml(order.id)}</td>
-          <td>${escapeHtml(order.merchant_label)}<br><span>${escapeHtml(order.pickup_label)}</span></td>
-          <td>${escapeHtml(order.created_at_label)}</td>
-          <td>${escapeHtml(order.promised_at_label)}</td>
-          <td><span class="badge" data-state="${escapeHtml(order.status)}">${escapeHtml(displayStatus(order.status))}</span></td>
-          <td><span class="badge" data-risk="${escapeHtml(order.risk_level)}">${escapeHtml(displayRisk(order.risk_level))}</span></td>
-          <td>${escapeHtml(order.business_area)}</td>
-          <td>${order.entered_inference ? "是" : "否"}</td>
+          <td>${escapeHtml(order.merchant_label)}<br><span>${escapeHtml(order.business_area)}</span></td>
+          <td>${escapeHtml(order.created_at_label)} 下单<br><span>${escapeHtml(order.promised_at_label)} 承诺送达</span></td>
+          <td><span class="badge" data-state="${escapeHtml(order.status)}">${escapeHtml(displayStatus(order.status))}</span><br><span class="badge" data-risk="${escapeHtml(order.risk_level)}">${escapeHtml(displayRisk(order.risk_level))}</span></td>
+          <td>${order.entered_inference ? "已进入" : "等待释放"}</td>
           <td>${renderAlgorithmResult(order.baseline_result)}</td>
           <td>${renderAlgorithmResult(order.our_result)}</td>
         </tr>
@@ -4312,14 +4332,13 @@ def render_day_replay_index() -> str:
       const loadRatio = clamp(rider.current_load / Math.max(1, rider.capacity), 0, 1);
       return `
         <article class="card rider-card" data-rider-id="${escapeHtml(rider.id)}" data-state="${escapeHtml(rider.online_state)}" data-area="${escapeHtml(rider.business_area)}">
-          <div class="card-head"><h3>骑手 ${escapeHtml(rider.id)}</h3><span>骑手编号 ${escapeHtml(rider.id)} / ${escapeHtml(displayRiderState(rider.online_state))}</span></div>
+          <div class="card-head"><h3>骑手 ${escapeHtml(rider.id)}</h3><span>${escapeHtml(displayRiderState(rider.online_state))} / ${escapeHtml(rider.business_area)}</span></div>
           <div class="card-body">
             ${renderRiderMiniMap(rider)}
             <div class="rider-load" style="--load:${loadRatio}"><span></span></div>
             <div class="compact-list">
-              <div class="list-item"><strong>班次时间 / 所属区域</strong><p>${escapeHtml(rider.shift_label)} / ${escapeHtml(rider.business_area)}</p></div>
-              <div class="list-item"><strong>当前负载 / 预计空闲时间</strong><p>${rider.current_load}/${rider.capacity} / ${escapeHtml(rider.estimated_free_at_label)}</p></div>
-              <div class="list-item"><strong>当前任务链 ${rider.task_chain_size}</strong><p>${rider.task_chain.slice(0, 5).map((item) => `${item.order_id}(${fmtNumber(item.eta_min, 1)}分钟)`).join(", ") || "暂无任务"}</p></div>
+              <div class="list-item"><strong>班次与负载</strong><p>${escapeHtml(rider.shift_label)} / ${rider.current_load}/${rider.capacity} / ${escapeHtml(rider.estimated_free_at_label)} 空闲</p></div>
+              <div class="list-item"><strong>当前任务链 ${rider.task_chain_size} 单</strong><p>${rider.task_chain.slice(0, 5).map((item) => `${item.order_id}(${fmtNumber(item.eta_min, 1)}分钟)`).join(", ") || "暂无任务"}</p></div>
               <div class="list-item"><strong>历史表现摘要</strong><p>${escapeHtml(displayRiderPerformance(rider.performance.summary))} / 接单意愿 ${fmtNumber(rider.performance.willingness, 2)}</p></div>
             </div>
           </div>

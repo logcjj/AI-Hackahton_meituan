@@ -282,7 +282,7 @@ Confidence loop:
 
 ## Task 5 - Orders And Riders Simplification
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Orders page is framed as a preloaded order pool/demand board, not manual input or CRUD.
@@ -292,8 +292,51 @@ Independent verification:
 - Riders first screen is simple and readable.
 
 Work log:
+- Reworked the Orders page into a read-only preloaded demand board:
+  - route marker changed from `jobs-input` to `preloaded-demand-pool`;
+  - command section changed from `orders-input-command` to `orders-command`;
+  - visible hero now says `只读订单池` and `今天订单怎么来`;
+  - first-screen explanation now explicitly says `不录入、不编辑`;
+  - old wording such as `订单池视图`, `需关注订单`, and `订单全集明细` is removed.
+- Simplified Orders information hierarchy:
+  - overview chips now read `当前可见`, `已进入推理`, `高风险`, and `已见改善`;
+  - focus list title changed to `优先关注订单`;
+  - order cards now show merchant,商圈,下单时间,承诺送达,推理释放状态, and simple baseline/our-state chips;
+  - removed visible `ETA` mixed-English wording from the focus cards;
+  - context panel changed to `需求概览`, `释放节奏`, `商圈热度`, `风险结构`, and `推理进度`;
+  - table changed from 10 separate columns to 7 clearer evidence columns: `订单`, `商家/商圈`, `时间窗口`, `状态/风险`, `推理状态`, `基线结果`, `我方结果`.
+- Reworked the Riders page into a read-only capacity board:
+  - route marker changed from `workers-resource` to `capacity-board`;
+  - command section changed from `riders-resource-command` to `riders-command`;
+  - visible hero now says `只读运力池` and `现在运力够不够`;
+  - page copy explicitly says this is `不是人事后台`;
+  - old wording such as `运力覆盖视图`, `可调度运力焦点`, `运力覆盖上下文`, `区域供给覆盖`, and `骑手编号` is removed.
+- Simplified Riders information hierarchy:
+  - overview chips now read `当前可见`, `可接单`, `配送中`, and `平均负载`;
+  - focus list title changed to `优先可用骑手`;
+  - rider focus cards now prioritize area, shift, load, estimated free time, and task chain;
+  - context panel changed to `区域覆盖与班次压力`, `区域覆盖`, and `任务链较长`;
+  - detailed rider cards are grouped under `骑手小地图核对` and marked as secondary evidence.
+- Updated CSS with neutral demand/capacity command classes while retaining responsive behavior.
+- Updated regression tests:
+  - required markers now assert the new read-only Orders/Riders contracts;
+  - forbidden markers now prevent the old input/resource wording from returning.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`;
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - static scan found no frontend occurrences of the old Orders/Riders visible wording including `订单池视图`, `需关注订单`, `订单全集明细`, `订单池概览`, `基线算法结果`, `我方算法结果`, `运力覆盖视图`, `可调度运力焦点`, `运力覆盖上下文`, `区域供给覆盖`, `骑手编号`, or `我方 ETA`.
+- Browser verification:
+  - restarted `127.0.0.1:18772` with the latest code;
+  - desktop `1280x720` Orders: confirmed `只读订单池`, `不录入、不编辑`, `优先关注订单`, `需求概览`, 6 focus cards, 7 table headers, no old terms, and no horizontal overflow;
+  - desktop `1280x720` Riders: confirmed `现在运力够不够`, `不是人事后台`, `优先可用骑手`, `区域覆盖与班次压力`, `骑手小地图核对`, 6 focus cards, 8 rider cards, 8 mini maps, no old terms, and no horizontal overflow;
+  - mobile `390x780` Orders and Riders: nav remained Chinese-readable, key simplified sections were present, old terms were absent, and no horizontal overflow occurred;
+  - filter interactions verified: high-risk order filter produced only `high` order rows/cards; available-rider filter produced only `available` rider rows/cards;
+  - browser console page errors: 0;
+  - browser left on the Riders page for user review.
 
 Confidence loop:
+- 100% confidence for Task 5 scope: the Orders page is now a read-only preloaded order pool rather than an input/CRUD surface, and the Riders page is now a capacity/coverage board rather than an HR/resource inventory. The first-screen language is simpler, old confusing labels are prevented by regression tests, both pages render without horizontal overflow on desktop and phone widths, filtering behavior is browser-verified, and full automated tests pass. Broader visual polish is intentionally left for Task 6.
 
 ## Task 6 - Visual Polish Toward Chinese Enterprise Product Style
 
