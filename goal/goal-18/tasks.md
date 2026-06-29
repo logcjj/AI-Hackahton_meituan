@@ -455,7 +455,7 @@ Confidence loop:
 
 ## Task 7 - Final QA, Completion Audit, And Archive
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Full automated tests pass.
@@ -466,5 +466,52 @@ Independent verification:
 - Goal folder has completion/archive note.
 
 Work log:
+- Re-read the full goal context before starting the final task:
+  - `goal/goal-18/input.md`;
+  - `goal/goal-18/plan.md`;
+  - `goal/goal-18/tasks.md`.
+- Confirmed branch and starting state:
+  - branch `codex/kandbox-dispatch-workbench`;
+  - latest prior commit `cdf1834 test: verify dispatch workbench polish cycle`;
+  - worktree was clean before Task 7 code work.
+- Final automated verification before repair:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`;
+  - `uv run --with pytest pytest -q` -> `107 passed`.
+- Final browser QA before repair:
+  - desktop `1280x720` checked `#/live`, `#/decisions`, `#/memory`, `#/orders`, and `#/riders`;
+  - mobile `390x780` checked all five routes;
+  - confirmed Chinese route labels stay visible, no abbreviation-only nav returns, no horizontal overflow, and `data-visual-polish="chinese-enterprise-workbench-v3"` is present;
+  - confirmed Live starts at `等待开始推理`, `未开始`, `全日结论暂不展示`, without pre-start full-day savings;
+  - confirmed Live map is Leaflet, zoom controls exist, and zoom-in changes tile level from 14 to 15;
+  - confirmed start/pause/continue/speed/mode controls work, route count increases during replay, and at least one Leaflet rider marker enters `data-motion="moving"` during active route playback;
+  - confirmed Decisions timeline switching updates the six-step reasoning flow, accepted plan, rejected plan, score comparison, proof panel, and right-side context;
+  - confirmed browser console page errors: 0.
+- Found and fixed one final clarity defect during audit:
+  - Decisions proof panel still exposed raw memory event IDs such as `ME-F-TS-...`;
+  - Memory page and recall chain still exposed raw text such as `linked decision ...` and pipe-separated scenario keys such as `night_supply_gap|clear|low_congestion|scarce_supply|steady`;
+  - added display helpers for readable decision labels, readable memory labels, memory reference chips, recalled-case count text, memory scenario translation, and memory step summaries;
+  - changed visible decision status, decision proof writeback, Memory evidence headers, Memory recall cards, Memory item headers, linked decision chips, trigger scenarios, and recall-chain summaries to Chinese-readable labels such as `第 1 轮`, `记忆 01`, and `夜间供给缺口 / 晴天 / 低拥堵 / 供给偏紧 / 压力稳定`.
+- Final automated verification after repair:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`;
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - `git diff --check` -> no whitespace errors;
+  - static scan found no frontend/data occurrences of old visible terms including old nav abbreviations, old English page headings, old decision wording, old Orders/Riders wording, `fallback ready`, `fallback map`, or `引擎音效`.
+- Final browser verification after repair:
+  - restarted the preview server on `127.0.0.1:18772`;
+  - desktop `1280x720` checked all five routes: all required page text present, no forbidden visible terms, no raw `ME-...`, `D-...`, `*-TS-...`, `linked decision`, or pipe-separated scenario keys, no horizontal overflow;
+  - mobile `390x780` checked all five routes with the same result;
+  - Live initial state remains truthful and zoom-in still changes tile level from 14 to 15;
+  - browser console page errors: 0.
+- Opened the visible in-app browser on `http://127.0.0.1:18772/?v=finalqa-complete-1782703130448-open-now#/live` and clicked `开始推理`:
+  - page is left visible for review;
+  - state is `自动推理中`;
+  - clock had advanced to `07:10`;
+  - map status is `leaflet`.
+- Archive note:
+  - Goal 18 is marked complete and archived in this task record on 2026-06-29;
+  - all planned tasks, both comprehensive debug cycles, final QA, final repair, browser handoff, and verification evidence are recorded in this folder.
 
 Confidence loop:
+- 100% confidence for Task 7 and Goal 18 completion: final automated tests pass, browser QA covers all five routes on desktop and phone, Live initial-state truthfulness and zoom are verified after the final repair, earlier active replay verification proved moving rider markers and route takeover, Decisions and Memory no longer expose raw internal IDs in visible copy, browser console page errors are clean, and the preview is open on the running Live page for the user to inspect. The only remaining non-page noise observed was a Browser plugin Statsig network timeout in tool output, not a page console error and not caused by the app.
