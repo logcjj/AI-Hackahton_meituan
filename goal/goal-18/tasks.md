@@ -340,7 +340,7 @@ Confidence loop:
 
 ## Task 6 - Visual Polish Toward Chinese Enterprise Product Style
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Overall frontend feels more like a polished Chinese enterprise workbench.
@@ -349,8 +349,50 @@ Independent verification:
 - Desktop and phone layouts remain stable.
 
 Work log:
+- Added an explicit visual polish contract:
+  - body now exposes `data-visual-polish="chinese-enterprise-workbench-v3"`;
+  - tests assert the visual polish marker and core visual tokens.
+- Reworked the global visual system:
+  - switched to Chinese product-oriented font stack with `HarmonyOS Sans SC`, `MiSans`, `PingFang SC`, and `Microsoft YaHei`;
+  - softened the background into a restrained enterprise gray surface with subtle Meituan-like warm highlight and dispatch-green hint;
+  - added `--shadow-card` and lighter shadow hierarchy to avoid heavy demo-style cards;
+  - added `--nav-active` and warm active navigation treatment.
+- Polished the shell and navigation:
+  - sidebar width and active state were tuned for a more stable enterprise workbench;
+  - brand mark changed to a restrained warm yellow dispatch badge;
+  - active route now has a left rail indicator and stronger but controlled visual state;
+  - navigation no longer repeats the route role when it equals the route label, fixing the duplicated `长期记忆 长期记忆` display.
+- Polished page headers and cards:
+  - page header now uses a calmer white/tinted command-strip style with a route accent rail;
+  - cards, card headers, metric chips, list items, timelines, decision cards, memory cards, order/rider cards, and tables were normalized to lighter borders and softer shadows;
+  - buttons and selects were restyled to a restrained enterprise action style, with the primary action using a controlled warm-yellow emphasis.
+- Polished the Live map presentation:
+  - map stage height increased on desktop and normalized on mobile;
+  - map stage, map action card, map legend, Leaflet controls, and fallback map treatment were refined;
+  - fallback map messages changed from mixed English (`fallback ready`, `fallback map`) to Chinese (`备用底图就绪`, `匿名备用底图`).
+- Polished mobile layout:
+  - mobile navigation is sticky at the top and keeps only the readable Chinese page names visible;
+  - mobile map, legend, page header, and route view spacing were adjusted to avoid cramped layout;
+  - computed browser styles confirmed mobile nav hints and role badges are hidden while the five Chinese route names remain visible.
+- Updated regression tests:
+  - required markers now include `data-visual-polish`, `--shadow-card`, `--nav-active`, and Chinese fallback-map messages;
+  - forbidden markers now include the old English fallback-map messages.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`;
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - static scan found no frontend occurrences of old visible terms including `fallback ready`, `fallback map`, old nav abbreviations, old English page headings, old Orders/Riders wording, or `引擎音效`.
+- Browser verification:
+  - restarted `127.0.0.1:18772` with the latest code;
+  - desktop `1280x720` checked all five routes: `data-visual-polish` present, Chinese nav readable, page headers and cards present, no old terms, and no horizontal overflow;
+  - desktop Live map checked: map height 478px, map action card present, Leaflet zoom control present, and no horizontal overflow;
+  - mobile `390x780` checked all five routes: Chinese route names visible, no abbreviation-only nav nodes, no horizontal overflow, and visual polish marker present;
+  - mobile computed style check confirmed `.nav-hint` and `.nav-role` are hidden while route titles remain visible;
+  - browser console page errors: 0;
+  - browser left on the Live page for review.
 
 Confidence loop:
+- 100% confidence for Task 6 scope: the frontend now has a more polished Chinese enterprise workbench visual system across typography, color, shadows, page headers, cards, controls, map framing, and mobile navigation. The changes are covered by regression markers, full automated tests pass, browser checks covered all five routes on desktop and phone widths, and the browser confirmed no horizontal overflow or console errors. Remaining work is the scheduled Debug Cycle 2 and final audit/archive, not additional Task 6 implementation.
 
 ## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
 
