@@ -214,7 +214,7 @@ class WebAgentDemoTest(unittest.TestCase):
             'data-fallback-map="screen-coordinate"',
             "leafletRouteCount",
             "leafletMarkerCount",
-            "zoomControl: true",
+            'window.L.control.zoom({ position: "bottomright" }).addTo(map)',
             "scrollWheelZoom: true",
             "cartodb-light-nolabels",
             "匿名无标签真实地图",

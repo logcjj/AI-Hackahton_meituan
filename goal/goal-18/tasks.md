@@ -172,7 +172,7 @@ Confidence loop:
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -181,8 +181,49 @@ Independent verification:
 - Fix any discovered defect before continuing.
 
 Work log:
+- Re-read the full goal context:
+  - `goal/goal-18/input.md`;
+  - `goal/goal-18/plan.md`;
+  - `goal/goal-18/tasks.md`.
+- Confirmed branch/worktree state before the debug cycle:
+  - branch `codex/kandbox-dispatch-workbench`;
+  - latest task commit `41e93f0 feat: upgrade live replay map controls`;
+  - worktree was clean before this debug cycle started.
+- Automated verification:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`;
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - source scan found no live frontend/data occurrences of old primary nav abbreviations, old English page headings, pre-start `全日可节省` / `全天可节省`, `重点订单队列`, or `Courier N` style titles.
+- Browser verification at the screenshot-like 643px width:
+  - nav labels were readable Chinese: `实时推理 / 决策过程 / 长期记忆 / 订单池 / 骑手运力`;
+  - Live initial state showed `等待开始推理`, `开始后累计验证`, `全日结论暂不展示`, `未开始`, and `引擎音效：关`;
+  - no horizontal overflow.
+- Browser verification at desktop `1280x720`:
+  - found a real regression: after page scroll, the sticky topbar could cover the default top-left Leaflet zoom control, so clicking did not change tile level;
+  - first attempted bottom-left zoom placement, but it overlapped the map legend;
+  - fixed by disabling the default zoom control and adding `window.L.control.zoom({ position: "bottomright" }).addTo(map)`;
+  - re-verified the right-bottom zoom button center hits the `+` control and clicking changes map tile levels from 13 to 14.
+- Browser runtime/control verification:
+  - start button begins automatic inference;
+  - speed selector can switch to `4x`;
+  - mode selector can switch to `叠加`;
+  - map action card shows an active rider executing an order;
+  - Leaflet contains moving rider pins;
+  - sound remains off before user action, toggles to `引擎音效：开` only after click, and turns back off after testing;
+  - pause/continue switches between `已暂停` and `自动推理中`.
+- Browser mobile verification at `390x780`:
+  - all five routes render with Chinese route titles;
+  - nav remains readable and not abbreviation-only;
+  - no horizontal overflow on Live, Decisions, Memory, Orders, or Riders;
+  - fresh Live reload starts from `等待开始推理` and `未开始`;
+  - mobile map zoom click changes tile level from 13 to 14;
+  - browser console errors: none.
+- Final verification after the zoom-position fix:
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - source old-copy scan -> no matches in frontend/data files.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 1 scope: the goal files were re-read, automated tests pass, static scans cover the known old-copy regressions, browser checks covered 643px, desktop 1280px, and phone 390px, and a discovered zoom-control hit-target defect was fixed rather than ignored. The remaining major user complaints about Decisions, Orders, Riders, and broader visual polish are explicitly outside Tasks 1-3 and remain scheduled for Tasks 4-6.
 
 ## Task 4 - Decisions Page Human-Readable Reasoning Redesign
 

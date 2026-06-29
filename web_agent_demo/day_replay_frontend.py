@@ -3249,9 +3249,10 @@ def render_day_replay_index() -> str:
           doubleClickZoom: true,
           preferCanvas: true,
           scrollWheelZoom: true,
-          zoomControl: true
+          zoomControl: false
         });
         liveLeafletMap = map;
+        window.L.control.zoom({ position: "bottomright" }).addTo(map);
         window.L.tileLayer(liveTileLayer.url, {
           attribution: liveTileLayer.attribution,
           maxZoom: 19,
