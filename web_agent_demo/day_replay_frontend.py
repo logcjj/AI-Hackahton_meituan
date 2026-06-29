@@ -829,6 +829,42 @@ def render_day_replay_index() -> str:
     .real-map-stage[data-real-map-status="fallback"] .leaflet-live-map::after {
       content: "匿名 fallback map";
     }
+    .leaflet-control-zoom {
+      border: 1px solid rgba(15,23,42,.12) !important;
+      border-radius: 12px !important;
+      overflow: hidden;
+      box-shadow: 0 10px 22px rgba(15,23,42,.12);
+    }
+    .leaflet-control-zoom a {
+      color: var(--ink) !important;
+      background: rgba(255,255,255,.92) !important;
+    }
+    .map-action-status {
+      position: absolute;
+      z-index: 6;
+      left: 58px;
+      top: 14px;
+      display: grid;
+      gap: 3px;
+      max-width: min(360px, calc(100% - 204px));
+      padding: 9px 11px;
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: 14px;
+      color: var(--ink);
+      background: rgba(255,255,255,.90);
+      box-shadow: 0 10px 24px rgba(15,23,42,.12);
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+    }
+    .map-action-status strong {
+      font-size: 13px;
+      letter-spacing: -.01em;
+    }
+    .map-action-status span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
     .map-mode-chip {
       position: absolute;
       z-index: 5;
@@ -926,6 +962,13 @@ def render_day_replay_index() -> str:
       stroke-dasharray: 2 7;
       opacity: .23;
     }
+    .route-line[data-lane="active-progress"] {
+      stroke: #059669;
+      stroke-width: 4.2;
+      opacity: .95;
+      stroke-dasharray: 5 6;
+      animation: route-progress-flow 1.1s linear infinite;
+    }
     .map-dot {
       --size: 12px;
       position: absolute;
@@ -959,6 +1002,17 @@ def render_day_replay_index() -> str:
     }
     .map-dot[data-motion="moving"] {
       outline: 5px solid rgba(15,118,110,.10);
+    }
+    .map-dot[data-motion="moving"]::before {
+      position: absolute;
+      inset: -7px;
+      border: 1px solid rgba(15,118,110,.18);
+      border-radius: 999px;
+      content: "";
+      animation: rider-drive-ring 1.45s ease-out infinite;
+    }
+    .map-dot[data-motion="moving"]::after {
+      content: attr(data-map-label) " 移动中";
     }
     .map-dot[data-release="new"] {
       animation: order-enter-pulse 1.8s ease-in-out infinite;
@@ -998,6 +1052,19 @@ def render_day_replay_index() -> str:
       height: 16px;
       background: var(--accent);
       box-shadow: 0 0 0 6px rgba(15,118,110,.10), 0 7px 18px rgba(15,23,42,.18);
+    }
+    .leaflet-map-pin-body[data-kind="rider"][data-motion="moving"] {
+      animation: rider-drive-ring 1.45s ease-out infinite;
+    }
+    .leaflet-map-pin-body[data-kind="rider"][data-motion="moving"]::after {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-35%, -50%);
+      color: #fff;
+      content: "›";
+      font: 900 14px var(--font);
+      line-height: 1;
     }
     .leaflet-map-pin-body[data-kind="order"] {
       width: 12px;
@@ -1104,6 +1171,13 @@ def render_day_replay_index() -> str:
     @keyframes order-enter-pulse {
       0%, 100% { box-shadow: 0 5px 16px rgba(15,23,42,.18); }
       50% { box-shadow: 0 0 0 7px rgba(183,121,31,.14), 0 5px 16px rgba(15,23,42,.18); }
+    }
+    @keyframes route-progress-flow {
+      to { stroke-dashoffset: -22; }
+    }
+    @keyframes rider-drive-ring {
+      0% { box-shadow: 0 0 0 0 rgba(15,118,110,.24), 0 7px 18px rgba(15,23,42,.18); }
+      100% { box-shadow: 0 0 0 11px rgba(15,118,110,0), 0 7px 18px rgba(15,23,42,.18); }
     }
     .event-list, .timeline-list, .memory-list, .compact-list {
       display: grid;
@@ -1671,6 +1745,7 @@ def render_day_replay_index() -> str:
       .operations-overview { grid-template-columns: 1fr; }
       .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid, .decision-advantage-metrics, .input-signal-grid, .resource-signal-grid, .reason-graph, .candidate-path-board, .decision-evidence-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
+      .map-action-status { left: 12px; top: 58px; max-width: calc(100% - 24px); }
       .action-grid, .runtime-strip { grid-template-columns: 1fr; }
       .score-row, .stage-row, .time-lane-item { grid-template-columns: 1fr; }
     }
@@ -1901,6 +1976,12 @@ def render_day_replay_index() -> str:
     let liveLeafletMap = null;
     let liveLeafletOverlayGroup = null;
     let liveMapHydrationToken = "";
+    const liveAudioState = {
+      enabled: false,
+      context: null,
+      oscillator: null,
+      gain: null
+    };
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -2377,9 +2458,11 @@ def render_day_replay_index() -> str:
       const pauseButton = document.getElementById("pause-inference");
       const speedSelect = document.getElementById("playback-speed");
       const modeSelect = document.getElementById("inference-mode");
-      if (!startButton || !pauseButton || !speedSelect || !modeSelect) return;
+      const soundButton = document.getElementById("toggle-engine-sound");
+      if (!startButton || !pauseButton || !speedSelect || !modeSelect || !soundButton) return;
       startButton.addEventListener("click", startInference);
       pauseButton.addEventListener("click", toggleInferencePause);
+      soundButton.addEventListener("click", toggleEngineSound);
       speedSelect.value = String(inferenceState.speed);
       modeSelect.value = inferenceState.mode;
       speedSelect.addEventListener("change", () => setInferenceSpeed(Number(speedSelect.value)));
@@ -2392,6 +2475,7 @@ def render_day_replay_index() -> str:
       inferenceState.currentTimeS = workbench.timeline.start_s;
       inferenceState.lastTickAt = Date.now();
       scheduleInferenceTick();
+      syncEngineSound();
       renderLiveRuntimeState();
     }
 
@@ -2407,6 +2491,7 @@ def render_day_replay_index() -> str:
       } else {
         clearInferenceTimer();
       }
+      syncEngineSound();
       renderLiveRuntimeState();
     }
 
@@ -2424,11 +2509,81 @@ def render_day_replay_index() -> str:
       renderLiveRuntimeState();
     }
 
+    function toggleEngineSound() {
+      liveAudioState.enabled = !liveAudioState.enabled;
+      syncEngineSound();
+      renderLiveRuntimeState();
+    }
+
+    function syncEngineSound() {
+      if (liveAudioState.enabled && inferenceState.running) {
+        startEngineSound();
+      } else {
+        stopEngineSound();
+      }
+      const soundButton = document.getElementById("toggle-engine-sound");
+      if (soundButton) {
+        soundButton.setAttribute("aria-pressed", liveAudioState.enabled ? "true" : "false");
+        soundButton.dataset.soundState = liveAudioState.enabled ? "on" : "off";
+        soundButton.textContent = liveAudioState.enabled ? "引擎音效：开" : "引擎音效：关";
+      }
+    }
+
+    function startEngineSound() {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext || liveAudioState.oscillator) return;
+        const context = liveAudioState.context || new AudioContext();
+        liveAudioState.context = context;
+        if (context.state === "suspended") context.resume();
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = "sawtooth";
+        oscillator.frequency.setValueAtTime(62, context.currentTime);
+        gain.gain.setValueAtTime(0.0001, context.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.018, context.currentTime + 0.18);
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start();
+        liveAudioState.oscillator = oscillator;
+        liveAudioState.gain = gain;
+      } catch (error) {
+        liveAudioState.enabled = false;
+        console.warn("引擎音效初始化失败", error);
+      }
+    }
+
+    function stopEngineSound() {
+      if (!liveAudioState.oscillator) return;
+      try {
+        const context = liveAudioState.context;
+        if (liveAudioState.gain && context) {
+          liveAudioState.gain.gain.cancelScheduledValues(context.currentTime);
+          liveAudioState.gain.gain.setValueAtTime(Math.max(0.0001, liveAudioState.gain.gain.value || 0.0001), context.currentTime);
+          liveAudioState.gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.08);
+        }
+        const oscillator = liveAudioState.oscillator;
+        window.setTimeout(() => {
+          try { oscillator.stop(); } catch (error) {}
+          try { oscillator.disconnect(); } catch (error) {}
+        }, 90);
+      } finally {
+        liveAudioState.oscillator = null;
+        liveAudioState.gain = null;
+      }
+    }
+
     function clearInferenceTimer() {
       if (inferenceState.timerId !== null) {
         clearInterval(inferenceState.timerId);
         inferenceState.timerId = null;
       }
+    }
+
+    function stopLiveRuntime() {
+      inferenceState.running = false;
+      clearInferenceTimer();
+      stopEngineSound();
     }
 
     function scheduleInferenceTick() {
@@ -2451,13 +2606,15 @@ def render_day_replay_index() -> str:
         inferenceState.running = false;
         clearInferenceTimer();
       }
+      syncEngineSound();
       renderLiveRuntimeState();
     }
 
     function renderLiveRuntimeState() {
       const liveGrid = document.querySelector("[data-page='live']");
       if (!liveGrid) return;
-      const stateLabel = inferenceState.running ? "自动推理中" : inferenceState.started ? "已暂停" : "未开始";
+      const inferenceFinished = inferenceState.started && inferenceState.currentTimeS >= workbench.timeline.end_s;
+      const stateLabel = inferenceState.running ? "自动推理中" : inferenceFinished ? "推演完成" : inferenceState.started ? "已暂停" : "未开始";
       const events = releasedEvents(inferenceState.currentTimeS);
       const currentScore = scoreForTime(inferenceState.currentTimeS);
       const currentDecision = decisionForTime(inferenceState.currentTimeS);
@@ -2469,6 +2626,8 @@ def render_day_replay_index() -> str:
       setText("inference-event-count", events.length);
       setText("live-advantage-headline", liveAdvantageHeadline(currentScore));
       setText("live-advantage-copy", liveAdvantageCopy(currentScore));
+      const targetRow = document.getElementById("advantage-target-row");
+      if (targetRow) targetRow.innerHTML = renderAdvantageTargetRow(currentScore);
       setText("map-runtime-hint", `${stateLabel} / ${clock(inferenceState.currentTimeS)} / ${inferenceModeLabels[inferenceState.mode]}`);
       setText("event-flow-caption", `${events.length} 个事件已自动释放`);
       setText("cumulative-metrics-caption", `${currentScore.time_label} 累计优势`);
@@ -2483,6 +2642,8 @@ def render_day_replay_index() -> str:
         const orders = ordersForMap(frame);
         mapStage.dataset.mapMode = inferenceState.mode;
         mapStage.dataset.frameId = frame.id;
+        const actionStatus = mapStage.querySelector("#map-action-status");
+        if (actionStatus) actionStatus.innerHTML = renderMapActionStatus(frame, routes, riders, orders);
         if (!updateLiveLeafletOverlay(frame, routes, riders, orders)) {
           destroyLiveMap();
           mapStage.innerHTML = renderLiveMapLayer(frame, routes, riders, orders);
@@ -2495,7 +2656,11 @@ def render_day_replay_index() -> str:
         startButton.textContent = inferenceState.started ? "重新开始" : "开始推理";
       }
       const pauseButton = document.getElementById("pause-inference");
-      if (pauseButton) pauseButton.textContent = inferenceState.running ? "暂停" : "继续";
+      if (pauseButton) {
+        pauseButton.textContent = inferenceState.running ? "暂停" : inferenceFinished ? "已完成" : "继续";
+        pauseButton.disabled = inferenceFinished && !inferenceState.running;
+      }
+      syncEngineSound();
       const scoreStack = document.getElementById("live-score-stack");
       if (scoreStack) scoreStack.innerHTML = renderLiveScoreCards(currentScore);
       const eventFlow = document.getElementById("live-event-flow");
@@ -2513,12 +2678,11 @@ def render_day_replay_index() -> str:
 
     function renderTopbarStats() {
       const stats = workbench.inspection;
-      const finalDelta = workbench.metrics.final.deltas;
       document.getElementById("topbar-stats").innerHTML = [
         ["订单", stats.order_count],
         ["骑手", stats.rider_count],
         ["决策轮次", stats.decision_count],
-        ["预计节省分钟", fmtNumber(finalDelta.time_saved_min, 1)]
+        ["优势验证", "开始后累计"]
       ].map(([label, value]) => `
         <div class="stat-pill"><b>${escapeHtml(value)}</b><span>${escapeHtml(label)}</span></div>
       `).join("");
@@ -2526,11 +2690,15 @@ def render_day_replay_index() -> str:
 
     function liveAdvantageHeadline(score) {
       const delta = score.deltas || {};
-      const finalDelta = workbench.metrics.final.deltas;
       const timeSaved = Number(delta.time_saved_min || 0);
-      const moneySaved = Number(delta.money_saved_yuan || 0);
-      if (!inferenceState.started || timeSaved <= 0) {
-        return `全日可节省 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟`;
+      if (!inferenceState.started) {
+        return "等待开始推理";
+      }
+      if (inferenceState.currentTimeS >= workbench.timeline.end_s) {
+        return `全日推演完成：节省 ${fmtNumber(timeSaved, 1)} 分钟`;
+      }
+      if (timeSaved <= 0) {
+        return "正在等待首轮有效优势";
       }
       return `已节省 ${fmtNumber(timeSaved, 1)} 分钟`;
     }
@@ -2541,10 +2709,40 @@ def render_day_replay_index() -> str:
       const timeSaved = Number(delta.time_saved_min || 0);
       const moneySaved = Number(delta.money_saved_yuan || 0);
       const timeoutText = fmtFewer(delta.timeout_order_delta || 0, "单");
-      if (!inferenceState.started || timeSaved <= 0) {
-        return `当前等待首轮规划评分。全日回放最终显示：我方比基线少 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟、少 ${fmtNumber(finalDelta.money_saved_yuan, 1)} 元成本，超时单${fmtFewer(finalDelta.timeout_order_delta, "单")}。`;
+      if (!inferenceState.started) {
+        return "点击开始推理后，系统会按全天时间线自动释放订单、移动骑手、重算路线，并实时累计我方相对基线的优势。";
+      }
+      if (timeSaved <= 0) {
+        return "推理已开始，当前仍在等待首轮规划评分。优势卡片只展示已经推演到的累计结果，不提前展示全日结论。";
+      }
+      if (inferenceState.currentTimeS >= workbench.timeline.end_s) {
+        return `全日回放已完成：我方比基线少 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟、少 ${fmtNumber(finalDelta.money_saved_yuan, 1)} 元成本，超时单${fmtFewer(finalDelta.timeout_order_delta, "单")}。`;
       }
       return `推理正在自动推进：当前累计少 ${fmtNumber(moneySaved, 1)} 元成本，超时单${timeoutText}，地图只展示我方动作和差异路线。`;
+    }
+
+    function renderAdvantageTargetRow(score) {
+      if (!inferenceState.started) {
+        return `
+          <span>开始后累计验证</span>
+          <span>全日结论暂不展示</span>
+          <span>地图将自动推进</span>
+        `;
+      }
+      const delta = score.deltas || {};
+      if (inferenceState.currentTimeS >= workbench.timeline.end_s) {
+        const finalDelta = workbench.metrics.final.deltas;
+        return `
+          <span>全日节省 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟</span>
+          <span>成本优势 ${fmtNumber(finalDelta.money_saved_yuan, 1)} 元</span>
+          <span>超时单${fmtFewer(finalDelta.timeout_order_delta, "单")}</span>
+        `;
+      }
+      return `
+        <span>当前进度 ${fmtNumber(inferenceProgressPct(), 1)}%</span>
+        <span>已累计 ${fmtNumber(delta.time_saved_min || 0, 1)} 分钟</span>
+        <span>成本 ${fmtNumber(delta.money_saved_yuan || 0, 1)} 元</span>
+      `;
     }
 
     function renderNav() {
@@ -2579,6 +2777,7 @@ def render_day_replay_index() -> str:
 
     function renderRoute(routeId) {
       const view = document.getElementById("route-view");
+      if (routeId !== "live") stopLiveRuntime();
       destroyLiveMap();
       view.dataset.routeView = routeId;
       const renderers = {
@@ -2605,7 +2804,6 @@ def render_day_replay_index() -> str:
       const events = releasedEvents(inferenceState.currentTimeS).slice(-4).reverse();
       const currentDecision = decisionForTime(inferenceState.currentTimeS);
       const currentFrame = frameForTime(inferenceState.currentTimeS);
-      const finalScore = workbench.metrics.final;
       return `
         ${pageHeader("live", "实时推演总览", "首屏先回答算法是否更强：实时地图承接推理动作，右侧只保留当前决策和运行信号。")}
         <div class="page-grid live-grid" data-page="live" data-inference-state="${inferenceState.running ? "running" : inferenceState.started ? "paused" : "ready"}">
@@ -2614,10 +2812,8 @@ def render_day_replay_index() -> str:
               <span class="advantage-kicker">实时累计对比栏</span>
               <h3 id="live-advantage-headline">${escapeHtml(liveAdvantageHeadline(currentScore))}</h3>
               <p id="live-advantage-copy">${escapeHtml(liveAdvantageCopy(currentScore))}</p>
-              <div class="advantage-target-row" aria-label="full day final advantage target">
-                <span>全日目标 ${fmtNumber(finalScore.deltas.time_saved_min, 1)} 分钟</span>
-                <span>成本优势 ${fmtNumber(finalScore.deltas.money_saved_yuan, 1)} 元</span>
-                <span>超时单${fmtFewer(finalScore.deltas.timeout_order_delta, "单")}</span>
+              <div id="advantage-target-row" class="advantage-target-row" aria-label="全天最终优势目标">
+                ${renderAdvantageTargetRow(currentScore)}
               </div>
             </div>
             <div id="live-score-stack" class="live-advantage-metrics" data-score-role="dominant-advantage">
@@ -2631,6 +2827,7 @@ def render_day_replay_index() -> str:
               <button id="pause-inference" class="ghost-button" data-control="pause-resume">暂停/继续</button>
               <select id="playback-speed" class="select-control" data-control="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select>
               <select id="inference-mode" class="select-control" data-control="mode"><option value="current">当前算法</option><option value="compare">对比</option><option value="overlay">叠加</option></select>
+              <button id="toggle-engine-sound" class="ghost-button" data-control="engine-sound" data-sound-state="off" type="button" aria-pressed="false">引擎音效：关</button>
               <div class="runtime-strip" data-inference-runtime="status">
                 <div class="runtime-cell"><span>状态</span><b id="inference-state-label">未开始</b></div>
                 <div class="runtime-cell"><span>推演时间</span><b id="inference-clock">${escapeHtml(clock(inferenceState.currentTimeS))}</b></div>
@@ -2858,10 +3055,11 @@ def render_day_replay_index() -> str:
 
     function renderLiveMapLayer(frame, routes = mapRouteRows(frame), riders = riderPositionsForFrame(frame), orders = ordersForMap(frame)) {
       return `
+        <div id="map-action-status" class="map-action-status" data-map-action="active">${renderMapActionStatus(frame, routes, riders, orders)}</div>
         <div class="map-mode-chip">${escapeHtml(inferenceModeLabels[inferenceState.mode])} / ${escapeHtml(frame.id)}</div>
         <div id="leaflet-live-map" class="leaflet-live-map" data-leaflet-map="live" data-tile-provider="${escapeHtml(workbench.map.tile_provider || liveTileLayer.id)}" aria-label="匿名无标签真实地图"></div>
         <div class="fallback-map-overlay" data-fallback-map="screen-coordinate" aria-hidden="true">
-          ${renderMapRoutes(routes)}
+          ${renderMapRoutes(routes, riders)}
           ${renderHotspots()}
           ${renderMapDots("merchant", workbench.map.anchors.merchants.slice(0, 16), "position")}
           ${renderMapDots("rider", riders.slice(0, 14), "position")}
@@ -2871,16 +3069,66 @@ def render_day_replay_index() -> str:
       `;
     }
 
-    function renderMapRoutes(routes) {
+    function renderMapRoutes(routes, riders = []) {
       if (!routes.length) return "";
+      const progressLines = activeProgressRoutes(routes, riders);
       return `
         <svg class="map-route" data-route-count="${routes.length}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           ${routes.map((route) => {
             const points = route.polyline.map((point) => `${point.screen_x},${point.screen_y}`).join(" ");
             return `<polyline class="route-line" data-lane="${escapeHtml(route.renderLane || route.lane)}" data-order-ref="${escapeHtml(mapEntityLabel("order", {id: route.order_id}))}" data-rider-ref="${escapeHtml(mapEntityLabel("rider", {id: route.courier_id}))}" points="${escapeHtml(points)}"></polyline>`;
           }).join("")}
+          ${progressLines.map((route) => {
+            const points = route.progressPolyline.map((point) => `${point.screen_x},${point.screen_y}`).join(" ");
+            return `<polyline class="route-line" data-lane="active-progress" data-order-ref="${escapeHtml(mapEntityLabel("order", {id: route.order_id}))}" data-rider-ref="${escapeHtml(mapEntityLabel("rider", {id: route.courier_id}))}" points="${escapeHtml(points)}"></polyline>`;
+          }).join("")}
         </svg>
       `;
+    }
+
+    function activeMapRider(riders = []) {
+      return riders.find((rider) => rider.motion === "moving") || null;
+    }
+
+    function activeProgressRoutes(routes = [], riders = []) {
+      const movingByPair = new Map(riders.filter((rider) => rider.motion === "moving").map((rider) => [`${rider.id}:${rider.order_id}`, rider]));
+      return routes
+        .filter((route) => !["baseline", "previous"].includes(route.renderLane || route.lane))
+        .map((route) => {
+          const rider = movingByPair.get(`${route.courier_id}:${route.order_id}`);
+          if (!rider) return null;
+          const progressPolyline = progressPolylineForRoute(route, rider);
+          return progressPolyline.length >= 2 ? {...route, progressPolyline} : null;
+        })
+        .filter(Boolean)
+        .slice(0, 4);
+    }
+
+    function progressPolylineForRoute(route, rider) {
+      const points = route.polyline || [];
+      if (points.length < 2) return [];
+      const progress = clamp(Number(rider.progress || 0), 0, 1);
+      const keep = Math.max(1, Math.ceil((points.length - 1) * progress));
+      const polyline = points.slice(0, keep + 1);
+      if (rider.position) polyline.push(rider.position);
+      return polyline;
+    }
+
+    function renderMapActionStatus(frame, routes = [], riders = [], orders = []) {
+      if (!inferenceState.started) {
+        return `<strong>等待开始推理</strong><span>点击开始后，订单、骑手、路线和优势指标会按全天时间自动推进。</span>`;
+      }
+      const moving = activeMapRider(riders);
+      if (moving) {
+        const orderLabel = moving.order_id ? mapEntityLabel("order", {id: moving.order_id}) : "当前订单";
+        const riderLabel = mapEntityLabel("rider", moving);
+        return `<strong>${escapeHtml(riderLabel)} 正在执行 ${escapeHtml(orderLabel)}</strong><span>路线进度 ${fmtNumber((moving.progress || 0) * 100, 0)}%，地图只突出我方动作和必要差异。</span>`;
+      }
+      const route = routes.find((item) => (item.renderLane || item.lane) === "ours") || routes[0];
+      if (route) {
+        return `<strong>本轮路线已接管</strong><span>${escapeHtml(mapEntityLabel("rider", {id: route.courier_id}))} -> ${escapeHtml(mapEntityLabel("order", {id: route.order_id}))}，等待下一次路线重算。</span>`;
+      }
+      return `<strong>等待首轮路线</strong><span>已释放 ${orders.length} 个地图订单点，系统正在等待可评分的派单窗口。</span>`;
     }
 
     function renderHotspots() {
@@ -2997,11 +3245,11 @@ def render_day_replay_index() -> str:
         stage.dataset.leafletMarkerCount = String(workbench.map.anchors.merchants.slice(0, 16).length + riders.slice(0, 14).length + orders.slice(0, 22).length);
         const map = window.L.map(container, {
           attributionControl: true,
-          boxZoom: false,
-          doubleClickZoom: false,
+          boxZoom: true,
+          doubleClickZoom: true,
           preferCanvas: true,
-          scrollWheelZoom: false,
-          zoomControl: false
+          scrollWheelZoom: true,
+          zoomControl: true
         });
         liveLeafletMap = map;
         window.L.tileLayer(liveTileLayer.url, {
@@ -3029,7 +3277,7 @@ def render_day_replay_index() -> str:
 
     function renderLeafletMapLayers(layerGroup, routes, riders, orders) {
       renderLeafletHotspots(layerGroup);
-      renderLeafletRoutes(layerGroup, routes);
+      renderLeafletRoutes(layerGroup, routes, riders);
       renderLeafletMarkers(layerGroup, "merchant", workbench.map.anchors.merchants.slice(0, 16), "position");
       renderLeafletMarkers(layerGroup, "rider", riders.slice(0, 14), "position");
       renderLeafletMarkers(layerGroup, "order", orders.slice(0, 22), "dropoff");
@@ -3059,13 +3307,19 @@ def render_day_replay_index() -> str:
       });
     }
 
-    function renderLeafletRoutes(map, routes) {
+    function renderLeafletRoutes(map, routes, riders = []) {
+      const progressRoutes = activeProgressRoutes(routes, riders);
       for (const route of routes) {
         const points = (route.polyline || []).map(mapPoint).filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng));
         if (points.length < 2) continue;
         const lane = route.renderLane || route.lane;
         window.L.polyline(points, routeHaloStyle(lane)).addTo(map);
         window.L.polyline(points, routeStyle(lane)).bindTooltip(escapeHtml(routeTooltip(route)), { sticky: true }).addTo(map);
+      }
+      for (const route of progressRoutes) {
+        const points = route.progressPolyline.map(mapPoint).filter(([lat, lng]) => Number.isFinite(lat) && Number.isFinite(lng));
+        if (points.length < 2) continue;
+        window.L.polyline(points, routeProgressStyle()).bindTooltip(escapeHtml(`当前执行 / ${routeTooltip(route)}`), { sticky: true }).addTo(map);
       }
     }
 
@@ -3087,6 +3341,16 @@ def render_day_replay_index() -> str:
         opacity: lane === "previous" ? .18 : .62,
         dashArray: style.dashArray || null,
         interactive: false
+      };
+    }
+
+    function routeProgressStyle() {
+      return {
+        color: "#059669",
+        dashArray: "5 7",
+        interactive: false,
+        opacity: .94,
+        weight: 6
       };
     }
 

@@ -114,7 +114,7 @@ Confidence loop:
 
 ## Task 3 - Live Page Truthful State And Map Interaction Upgrade
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Before start, Live page does not present final full-day savings as already inferred.
@@ -125,8 +125,50 @@ Independent verification:
 - No sensitive map labels leak.
 
 Work log:
+- Reworked Live page pre-start advantage copy:
+  - initial headline is now `等待开始推理`;
+  - the target strip says `开始后累计验证 / 全日结论暂不展示 / 地图将自动推进`;
+  - removed the old pre-start `全日可节省` / `全日目标` contradiction from visible first-screen state;
+  - topbar now says `优势验证 / 开始后累计` instead of presenting a final saved-minute value before inference.
+- Added a clearer map action layer:
+  - `map-action-status` explains the current state before start, during route takeover, during rider movement, and while waiting for the first route;
+  - active rider/order text is Chinese and scoped to anonymized rider/order IDs;
+  - the overlay has `pointer-events: none` and is positioned away from Leaflet controls so it cannot block zoom.
+- Upgraded map interaction:
+  - enabled Leaflet `zoomControl`, `scrollWheelZoom`, `boxZoom`, and `doubleClickZoom`;
+  - browser-verified that clicking zoom changes tile level from 13 to 14;
+  - kept the anonymous no-label tile layer and fallback deterministic coordinate map.
+- Added motion cues:
+  - moving rider pins now pulse and show `移动中` in fallback mode;
+  - Leaflet rider markers expose `data-motion="moving"`;
+  - active progress route segments are rendered for moving rider/order pairs;
+  - the action card describes which rider is executing which order and the route progress percentage.
+- Added optional engine sound:
+  - `引擎音效：关` is the default and does not autoplay;
+  - sound can only turn on after the user clicks the toggle;
+  - sound stops on pause, completion, or leaving the Live route while keeping the user's explicit toggle state.
+- Fixed runtime state cleanup:
+  - added `stopLiveRuntime()` so switching away from Live clears the timer and stops sound;
+  - final replay state now displays `推演完成`, and the pause/continue button becomes `已完成` until the user starts a new run.
+- Updated regression tests with markers for the new sound control, truthful pre-start copy, map action status, zoom settings, motion helpers, and completion state.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`
+  - `uv run --with pytest pytest -q` -> `107 passed`
+- Browser verification:
+  - restarted `127.0.0.1:18772` with the latest code;
+  - refreshed `http://127.0.0.1:18772/?v=open-now#/live`;
+  - confirmed initial Live state shows `等待开始推理`, `全日结论暂不展示`, `未开始`, and `引擎音效：关`;
+  - confirmed forbidden pre-start text `全日可节省` / `全天可节省` is not visible;
+  - confirmed Leaflet zoom control exists and clicking zoom changes tile level from 13 to 14;
+  - confirmed start/pause/continue controls switch between `自动推理中` and `已暂停`;
+  - confirmed speed can switch to `4x` and mode can switch to `叠加`;
+  - confirmed after auto-advancing, the map action card shows an active rider executing an order and Leaflet has moving rider pins;
+  - confirmed sound remains off before user action, toggles to `引擎音效：开` only after click, and was turned back off after testing;
+  - confirmed browser console page errors: none.
 
 Confidence loop:
+- 100% confidence for Task 3 scope: automated tests and browser checks cover the user's three core Live-page complaints. The page no longer claims full-day savings before inference starts, map zoom is both visible and actually clickable, the replay has a clear moving-rider/action narrative, sound is explicit user-triggered feedback rather than autoplay, and page errors are clean. One discovered defect, the action card blocking the zoom control, was fixed and re-verified by observing the tile level change after clicking zoom.
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
