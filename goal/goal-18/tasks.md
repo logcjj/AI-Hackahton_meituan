@@ -227,7 +227,7 @@ Confidence loop:
 
 ## Task 4 - Decisions Page Human-Readable Reasoning Redesign
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Decisions page is visibly a Chinese "算法推理过程" page.
@@ -236,8 +236,49 @@ Independent verification:
 - Required decision evidence remains accessible.
 
 Work log:
+- Adjusted to the updated objective:
+  - user clarified that engine sound is not needed;
+  - removed the visible `引擎音效` control and Web Audio runtime from the Live page;
+  - updated `goal/goal-18/plan.md` so future work prioritizes realistic visual replay and reliable map zoom instead of sound.
+- Rebuilt the Decisions page visible structure:
+  - route surface changed from `data-decision-route="planner"` to `data-decision-route="reasoning"`;
+  - middle panel title changed from `优势推理链` to `本轮推理说明`;
+  - right panel title changed from `输入上下文 + 输出结果` to `本轮输入与输出`;
+  - page description now explains that each round shows trigger, orders, riders, filtering, scoring, adopted actions, rejected actions, and memory writeback.
+- Added a plain Chinese six-step reasoning flow:
+  - `为什么触发这一轮`;
+  - `看哪些订单`;
+  - `候选骑手怎么选`;
+  - `先过滤不可行方案`;
+  - `再给可行方案打分`;
+  - `输出派单并回写记忆`.
+- Replaced the old candidate-path framing:
+  - removed visible `候选路径对比与淘汰`;
+  - added `采纳方案`, `放弃方案`, and `评分对比`;
+  - scoring now displays Chinese algorithm labels and Chinese reasoning, not raw `nearest_greedy` / English reasons.
+- Preserved traceability evidence:
+  - added/kept anchors for trigger time and reason, input orders, candidate riders, filtering process, scoring process, abandoned actions, round result, and result writeback;
+  - right context panel now explains the current scenario, input orders, candidate riders, final actions, abandoned-action count, and writeback summary in plain Chinese.
+- Updated CSS for the new decision step flow, plan comparison cards, and proof grid, including responsive single-column behavior.
+- Updated regression tests:
+  - removed sound-control expectations;
+  - added expectations for the six-step Chinese reasoning flow;
+  - added forbidden checks for `引擎音效`, old `优势推理链`, and old `候选路径对比与淘汰`.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`
+  - `uv run --with pytest pytest -q` -> `107 passed`
+- Browser verification:
+  - restarted `127.0.0.1:18772` with the latest code;
+  - opened `http://127.0.0.1:18772/?v=task4-refresh-1#/decisions`;
+  - confirmed the Decisions page shows `本轮推理说明`, `本轮输入与输出`, six decision steps, `采纳方案`, `放弃方案`, and `评分对比`;
+  - confirmed old visible copy `ReasonGraph`, `Planner / Chart`, `candidate path`, `候选路径对比与淘汰`, `优势推理链`, and `引擎音效` is absent;
+  - clicked a second decision round and confirmed active timeline, context slice, six-step flow, and proof panel update to that round;
+  - verified mobile `390x780`: readable nav, six-step flow present, no horizontal overflow, no sound button, no console errors;
+  - restored browser to the Decisions page for review.
 
 Confidence loop:
+- 100% confidence for Task 4 scope: the rendered page is now a Chinese decision-process page, not an English-heavy technical chain. It directly explains trigger, orders, riders, filtering, scoring, final action, rejected action, result, and memory writeback; the old visible decision framing is absent; timeline switching updates the reasoning; automated tests and browser checks pass on desktop-like and phone widths. The remaining simplified Orders/Riders work is intentionally left for Task 5.
 
 ## Task 5 - Orders And Riders Simplification
 

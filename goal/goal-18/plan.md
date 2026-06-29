@@ -4,6 +4,10 @@
 
 The user is reacting to the current Goal 17 frontend after seeing it in the browser and screenshot. The core issues are not about adding more features; they are about clarity, recognizability, and narrative.
 
+Update during execution:
+
+- The user clarified that engine sound is not needed. The priority is a more realistic visual map/replay effect and reliable map zoom, not audio feedback.
+
 Explicit feedback:
 
 - The left navigation is still unclear because it collapses to unreadable abbreviations like `LM`, `PL`, `ME`, `JO`, and `WK`.
@@ -11,7 +15,7 @@ Explicit feedback:
 - Too much English remains in labels, section names, route subtitles, and system copy. Mixed English/Chinese makes the UI hard to understand.
 - The Live page should not claim "全日可节省 433 分钟" before inference starts, because that reads as a logical contradiction.
 - The map should be zoomable and easier to understand.
-- The live replay feels static. The user wants a more visual motion solution: simulated vehicle/rider movement, route animation, and optionally engine-style sound feedback.
+- The live replay feels static. The user wants a more visual motion solution: simulated vehicle/rider movement and route animation; audio feedback is no longer required.
 - The Decisions page does not explain the algorithm reasoning in a human-readable way; it is too English-heavy and too complex.
 - Orders should not imply manual order input. It should be a simple preloaded order/demand view.
 - Orders and Riders are still too cluttered; confusing phrases like "重点订单队列" should be simplified or renamed.
@@ -34,7 +38,7 @@ Main direction:
   - add clear map action layer with current rider/order/merchant focus;
   - add moving vehicle/rider indicator along active route;
   - add route pulse/progress animation;
-  - add optional sound toggle using Web Audio, not autoplay.
+  - do not foreground engine sound or audio controls.
 - Decisions page should become a clear Chinese "算法推理过程":
   - trigger;
   - available orders;
@@ -98,7 +102,7 @@ Implementation layers:
    - Add map action status explaining current active assignment.
    - Animate active route progress.
    - Add moving rider/vehicle marker along route.
-   - Add optional "引擎音效" toggle that starts only after user click and can be turned off.
+   - Remove/avoid audio controls; the user clarified that visual realism matters more than sound.
    - Ensure no sensitive labels leak.
 
 4. Decisions simplification:
@@ -125,7 +129,7 @@ Implementation layers:
 
 - Existing tests assert many English/Kandbox strings; tests must be updated carefully to preserve structural contract while removing user-facing English.
 - Leaflet zoom can be disabled accidentally by overlay CSS; browser verification must interact with zoom state.
-- Web Audio cannot autoplay; sound must be user-initiated and optional.
+- Audio controls are no longer a goal; avoid adding sound back while improving visual replay.
 - Route animation should be clear but not game-like.
 - Removing too much detail can break the original requirement that decisions remain traceable. Details should remain secondary, not disappear.
 
@@ -154,7 +158,7 @@ Browser:
   - clicking start updates cumulative advantage over time;
   - map zoom controls work;
   - moving marker / route progress visible;
-  - optional sound toggle works after click and can stop;
+  - no engine sound control is visible;
   - no console errors.
 - Phone:
   - nav remains readable, not abbreviation-only;
@@ -164,6 +168,6 @@ Browser:
 ## 7. Rollback Plan
 
 - Keep each change scoped to the frontend generator and tests.
-- If motion or sound causes instability, keep map zoom/readability and disable sound or animation behind a control.
+- If motion causes instability, keep map zoom/readability and degrade to deterministic visual replay.
 - If copy simplification removes required evidence, restore it in a collapsible/secondary panel.
 - If browser tile/CDN assets fail, retain deterministic fallback map.

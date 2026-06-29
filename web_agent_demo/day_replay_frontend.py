@@ -1376,6 +1376,101 @@ def render_day_replay_index() -> str:
       background: #f8fafc;
       opacity: .82;
     }
+    .decision-step-flow {
+      display: grid;
+      gap: 10px;
+    }
+    .decision-step-card {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(15,23,42,.04);
+    }
+    .decision-step-card[data-step-status="final"] {
+      border-color: rgba(15,118,110,.28);
+      background: linear-gradient(180deg, rgba(230,244,241,.84), #fff);
+    }
+    .decision-step-index {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--route-accent, var(--accent));
+      font: 900 13px var(--mono);
+      box-shadow: 0 8px 18px rgba(15,118,110,.16);
+    }
+    .decision-step-body {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+    .decision-step-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .decision-step-top strong {
+      font-size: 14px;
+      letter-spacing: -.01em;
+    }
+    .decision-step-top span,
+    .decision-plan-status {
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: var(--route-ink, var(--accent-2));
+      background: var(--route-soft, var(--green-soft));
+      font: 800 10px var(--mono);
+      white-space: nowrap;
+    }
+    .decision-step-card p,
+    .decision-plan-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .decision-plan-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .decision-plan-card {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fff;
+    }
+    .decision-plan-card[data-plan="accepted"] {
+      border-color: rgba(15,118,110,.32);
+      background: linear-gradient(180deg, rgba(230,244,241,.90), #fff);
+    }
+    .decision-plan-card[data-plan="rejected"] {
+      background: #f8fafc;
+    }
+    .decision-plan-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .decision-plan-top strong {
+      font-size: 14px;
+    }
+    .decision-proof-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
     .decision-evidence-grid,
     .order-focus-list,
     .rider-focus-list,
@@ -1722,7 +1817,7 @@ def render_day_replay_index() -> str:
       .runtime-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .metric-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .live-advantage-hero .delta-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .operations-overview, .operations-grid, .operations-grid[data-density="summary-first"], .rider-board, .reason-graph, .candidate-path-board, .decision-evidence-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
+      .operations-overview, .operations-grid, .operations-grid[data-density="summary-first"], .rider-board, .reason-graph, .candidate-path-board, .decision-plan-board, .decision-evidence-grid, .decision-proof-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
       .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 720px) {
@@ -1743,7 +1838,7 @@ def render_day_replay_index() -> str:
       .live-advantage-hero .algorithm-pair, .live-advantage-hero .delta-grid { grid-template-columns: 1fr; }
       .live-control-dock .runtime-strip { flex-basis: 100%; grid-template-columns: 1fr; }
       .operations-overview { grid-template-columns: 1fr; }
-      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid, .decision-advantage-metrics, .input-signal-grid, .resource-signal-grid, .reason-graph, .candidate-path-board, .decision-evidence-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
+      .memory-overview, .memory-command-metrics, .memory-layer-grid, .recall-lane, .memory-field-grid, .context-metric-grid, .decision-advantage-metrics, .input-signal-grid, .resource-signal-grid, .reason-graph, .candidate-path-board, .decision-plan-board, .decision-evidence-grid, .decision-proof-grid, .order-focus-list, .rider-focus-list { grid-template-columns: 1fr; }
       .schematic-map { height: 360px; }
       .map-action-status { left: 12px; top: 58px; max-width: calc(100% - 24px); }
       .action-grid, .runtime-strip { grid-template-columns: 1fr; }
@@ -1976,12 +2071,6 @@ def render_day_replay_index() -> str:
     let liveLeafletMap = null;
     let liveLeafletOverlayGroup = null;
     let liveMapHydrationToken = "";
-    const liveAudioState = {
-      enabled: false,
-      context: null,
-      oscillator: null,
-      gain: null
-    };
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -2458,11 +2547,9 @@ def render_day_replay_index() -> str:
       const pauseButton = document.getElementById("pause-inference");
       const speedSelect = document.getElementById("playback-speed");
       const modeSelect = document.getElementById("inference-mode");
-      const soundButton = document.getElementById("toggle-engine-sound");
-      if (!startButton || !pauseButton || !speedSelect || !modeSelect || !soundButton) return;
+      if (!startButton || !pauseButton || !speedSelect || !modeSelect) return;
       startButton.addEventListener("click", startInference);
       pauseButton.addEventListener("click", toggleInferencePause);
-      soundButton.addEventListener("click", toggleEngineSound);
       speedSelect.value = String(inferenceState.speed);
       modeSelect.value = inferenceState.mode;
       speedSelect.addEventListener("change", () => setInferenceSpeed(Number(speedSelect.value)));
@@ -2475,7 +2562,6 @@ def render_day_replay_index() -> str:
       inferenceState.currentTimeS = workbench.timeline.start_s;
       inferenceState.lastTickAt = Date.now();
       scheduleInferenceTick();
-      syncEngineSound();
       renderLiveRuntimeState();
     }
 
@@ -2491,7 +2577,6 @@ def render_day_replay_index() -> str:
       } else {
         clearInferenceTimer();
       }
-      syncEngineSound();
       renderLiveRuntimeState();
     }
 
@@ -2509,70 +2594,6 @@ def render_day_replay_index() -> str:
       renderLiveRuntimeState();
     }
 
-    function toggleEngineSound() {
-      liveAudioState.enabled = !liveAudioState.enabled;
-      syncEngineSound();
-      renderLiveRuntimeState();
-    }
-
-    function syncEngineSound() {
-      if (liveAudioState.enabled && inferenceState.running) {
-        startEngineSound();
-      } else {
-        stopEngineSound();
-      }
-      const soundButton = document.getElementById("toggle-engine-sound");
-      if (soundButton) {
-        soundButton.setAttribute("aria-pressed", liveAudioState.enabled ? "true" : "false");
-        soundButton.dataset.soundState = liveAudioState.enabled ? "on" : "off";
-        soundButton.textContent = liveAudioState.enabled ? "引擎音效：开" : "引擎音效：关";
-      }
-    }
-
-    function startEngineSound() {
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext || liveAudioState.oscillator) return;
-        const context = liveAudioState.context || new AudioContext();
-        liveAudioState.context = context;
-        if (context.state === "suspended") context.resume();
-        const oscillator = context.createOscillator();
-        const gain = context.createGain();
-        oscillator.type = "sawtooth";
-        oscillator.frequency.setValueAtTime(62, context.currentTime);
-        gain.gain.setValueAtTime(0.0001, context.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.018, context.currentTime + 0.18);
-        oscillator.connect(gain);
-        gain.connect(context.destination);
-        oscillator.start();
-        liveAudioState.oscillator = oscillator;
-        liveAudioState.gain = gain;
-      } catch (error) {
-        liveAudioState.enabled = false;
-        console.warn("引擎音效初始化失败", error);
-      }
-    }
-
-    function stopEngineSound() {
-      if (!liveAudioState.oscillator) return;
-      try {
-        const context = liveAudioState.context;
-        if (liveAudioState.gain && context) {
-          liveAudioState.gain.gain.cancelScheduledValues(context.currentTime);
-          liveAudioState.gain.gain.setValueAtTime(Math.max(0.0001, liveAudioState.gain.gain.value || 0.0001), context.currentTime);
-          liveAudioState.gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.08);
-        }
-        const oscillator = liveAudioState.oscillator;
-        window.setTimeout(() => {
-          try { oscillator.stop(); } catch (error) {}
-          try { oscillator.disconnect(); } catch (error) {}
-        }, 90);
-      } finally {
-        liveAudioState.oscillator = null;
-        liveAudioState.gain = null;
-      }
-    }
-
     function clearInferenceTimer() {
       if (inferenceState.timerId !== null) {
         clearInterval(inferenceState.timerId);
@@ -2583,7 +2604,6 @@ def render_day_replay_index() -> str:
     function stopLiveRuntime() {
       inferenceState.running = false;
       clearInferenceTimer();
-      stopEngineSound();
     }
 
     function scheduleInferenceTick() {
@@ -2606,7 +2626,6 @@ def render_day_replay_index() -> str:
         inferenceState.running = false;
         clearInferenceTimer();
       }
-      syncEngineSound();
       renderLiveRuntimeState();
     }
 
@@ -2660,7 +2679,6 @@ def render_day_replay_index() -> str:
         pauseButton.textContent = inferenceState.running ? "暂停" : inferenceFinished ? "已完成" : "继续";
         pauseButton.disabled = inferenceFinished && !inferenceState.running;
       }
-      syncEngineSound();
       const scoreStack = document.getElementById("live-score-stack");
       if (scoreStack) scoreStack.innerHTML = renderLiveScoreCards(currentScore);
       const eventFlow = document.getElementById("live-event-flow");
@@ -2827,7 +2845,6 @@ def render_day_replay_index() -> str:
               <button id="pause-inference" class="ghost-button" data-control="pause-resume">暂停/继续</button>
               <select id="playback-speed" class="select-control" data-control="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select>
               <select id="inference-mode" class="select-control" data-control="mode"><option value="current">当前算法</option><option value="compare">对比</option><option value="overlay">叠加</option></select>
-              <button id="toggle-engine-sound" class="ghost-button" data-control="engine-sound" data-sound-state="off" type="button" aria-pressed="false">引擎音效：关</button>
               <div class="runtime-strip" data-inference-runtime="status">
                 <div class="runtime-cell"><span>状态</span><b id="inference-state-label">未开始</b></div>
                 <div class="runtime-cell"><span>推演时间</span><b id="inference-clock">${escapeHtml(clock(inferenceState.currentTimeS))}</b></div>
@@ -2869,8 +2886,8 @@ def render_day_replay_index() -> str:
     function renderDecisionsPage() {
       const decision = selectedDecision();
       return `
-        ${pageHeader("decisions", "算法推理过程", "把规划视图压缩成可追溯推理链：先看本轮为什么赢，再看候选路径如何被接受或淘汰。")}
-        <div class="page-grid decision-grid" data-page="decisions" data-decision-route="planner">
+        ${pageHeader("decisions", "算法推理过程", "按时间回放每一轮派单推理：先看为什么触发，再看订单、骑手、过滤、评分、采纳和放弃原因。")}
+        <div class="page-grid decision-grid" data-page="decisions" data-decision-route="reasoning">
           <div class="card">
             <div class="card-head"><h3>决策轮次时间线</h3><span id="decision-route-status">${workbench.decisions.length} 轮决策</span></div>
             <div id="decision-timeline" class="card-body timeline-list decision-scroll">
@@ -2878,13 +2895,13 @@ def render_day_replay_index() -> str:
             </div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>优势推理链</h3><span id="decision-reasoning-phase">${escapeHtml(displayDemandPhase(decision.context.demand_phase))}</span></div>
+            <div class="card-head"><h3>本轮推理说明</h3><span id="decision-reasoning-phase">${escapeHtml(displayDemandPhase(decision.context.demand_phase))}</span></div>
             <div id="decision-reasoning-canvas" class="card-body decision-canvas">
               ${renderDecisionReasoning(decision)}
             </div>
           </div>
           <aside class="card">
-            <div class="card-head"><h3>输入上下文 + 输出结果</h3><span id="decision-context-slice">${escapeHtml(decision.context.time_slice_id)}</span></div>
+            <div class="card-head"><h3>本轮输入与输出</h3><span id="decision-context-slice">${escapeHtml(decision.context.time_slice_id)}</span></div>
             <div id="decision-context-pane" class="card-body compact-list">
               ${renderDecisionContext(decision)}
             </div>
@@ -3477,9 +3494,9 @@ def render_day_replay_index() -> str:
     }
 
     function renderDecisionTimeline(activeId) {
-      return workbench.decisions.map((item) => `
+      return workbench.decisions.map((item, index) => `
         <button class="timeline-item" data-decision-id="${escapeHtml(item.id)}" data-active="${item.id === activeId}">
-          <strong>${escapeHtml(item.trigger_time_label)} ${escapeHtml(item.id)}</strong>
+          <strong>第 ${index + 1} 轮 / ${escapeHtml(item.trigger_time_label)}</strong>
           <span>${escapeHtml(displayTriggerReason(item.trigger_reason))}</span>
           <span class="timeline-meta">
             <em>${item.input_order_ids.length} 单</em>
@@ -3512,10 +3529,10 @@ def render_day_replay_index() -> str:
         const normalized = clamp((Number(item.score) || 0) / maxScore, 0.04, 1);
         return `
           <div class="score-row" data-algorithm-id="${escapeHtml(item.algorithm_id)}">
-            <b>${escapeHtml(item.algorithm_id)}</b>
+            <b>${escapeHtml(candidateLabel(item.algorithm_id))}</b>
             <div>
               <div class="score-bar" style="--score:${normalized}"><span></span></div>
-              <p>${escapeHtml(item.reason)}</p>
+              <p>${escapeHtml(displayCandidateReason(item.reason))}</p>
             </div>
             <em>${fmtNumber(item.score, 3)}</em>
           </div>
@@ -3536,6 +3553,40 @@ def render_day_replay_index() -> str:
           </div>
         `;
       }).join("")}</div>`;
+    }
+
+    function decisionInputOrderIds(decision) {
+      return (decision.input_orders || []).length ? decision.input_orders.map((item) => item.id) : (decision.input_order_ids || []);
+    }
+
+    function decisionCandidateRiderIds(decision) {
+      return (decision.candidate_riders || []).length ? decision.candidate_riders.map((item) => item.id) : (decision.candidate_rider_ids || []);
+    }
+
+    function topDecisionScore(decision) {
+      return [...(decision.scoring_process || [])].sort((left, right) => Number(right.score || 0) - Number(left.score || 0))[0] || null;
+    }
+
+    function decisionFilterSentence(decision) {
+      const parts = (decision.filtering_process || []).map((stage) => `${displayStage(stage.stage)}后剩 ${stage.remaining}`);
+      return parts.length ? parts.join("，") : "暂无过滤记录";
+    }
+
+    function decisionScoreSentence(decision) {
+      const scores = decision.scoring_process || [];
+      if (!scores.length) return "当前轮还没有评分结果。";
+      const best = topDecisionScore(decision);
+      const compared = scores.map((item) => `${candidateLabel(item.algorithm_id)} ${fmtNumber(item.score, 3)}`).join("，");
+      return `综合比较时间、成本、风险和可用性：${compared}。本轮保留 ${candidateLabel(best.algorithm_id)}。`;
+    }
+
+    function decisionActionSentence(actions, limit = 3) {
+      if (!actions || !actions.length) return "暂无动作";
+      const text = actions.slice(0, limit).map((item) => {
+        const eta = item.total_eta_min === undefined ? "" : `，预计 ${fmtNumber(item.total_eta_min, 1)} 分钟`;
+        return `${item.order_id} 派给 ${item.courier_id}${eta}`;
+      }).join("；");
+      return actions.length > limit ? `${text}；另有 ${actions.length - limit} 个动作` : text;
     }
 
     function decisionAdvantageHeadline(decision) {
@@ -3562,28 +3613,31 @@ def render_day_replay_index() -> str:
       `;
     }
 
-    function renderReasonNode(nodeId, index, title, status, body, meta) {
+    function renderDecisionStep(stepId, index, title, status, body, metaItems = []) {
       return `
-        <article class="reason-node" id="${escapeHtml(nodeId)}" data-reason-node="${escapeHtml(nodeId)}" data-status="${escapeHtml(status)}">
-          <div class="reason-node-top"><strong>${escapeHtml(title)}</strong><span class="reason-node-index">${index}</span></div>
-          <p>${body}</p>
-          <div class="chip-list"><span class="data-chip">${escapeHtml(meta)}</span></div>
+        <article class="decision-step-card" id="${escapeHtml(stepId)}" data-decision-step="${escapeHtml(stepId)}" data-step-status="${escapeHtml(status)}">
+          <div class="decision-step-index">${index}</div>
+          <div class="decision-step-body">
+            <div class="decision-step-top"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(status === "final" ? "已输出" : "已完成")}</span></div>
+            <p>${body}</p>
+            ${renderChipList(metaItems, "暂无补充信息")}
+          </div>
         </article>
       `;
     }
 
-    function renderReasonGraph(decision) {
-      const inputOrderIds = decision.input_orders.length ? decision.input_orders.map((item) => item.id) : decision.input_order_ids;
-      const candidateRiderIds = decision.candidate_riders.length ? decision.candidate_riders.map((item) => item.id) : decision.candidate_rider_ids;
-      const bestScore = [...decision.scoring_process].sort((left, right) => Number(right.score || 0) - Number(left.score || 0))[0];
+    function renderDecisionStepFlow(decision) {
+      const inputOrderIds = decisionInputOrderIds(decision);
+      const candidateRiderIds = decisionCandidateRiderIds(decision);
+      const bestScore = topDecisionScore(decision);
       return `
-        <section class="reason-graph" data-reasoning-pattern="reasongraph-six-node">
-          ${renderReasonNode("decision-trigger-time", 1, "输入订单与骑手状态", "passed", `${escapeHtml(decision.trigger_time_label)} 触发 ${inputOrderIds.length} 单、${candidateRiderIds.length} 名候选骑手进入本轮。`, decision.id)}
-          ${renderReasonNode("decision-trigger-reason", 2, "场景识别与风险判断", "passed", `${escapeHtml(displayTriggerReason(decision.trigger_reason))}；天气 ${escapeHtml(displayWeather(decision.context.weather))}，拥堵 ${fmtNumber(decision.context.congestion_level, 2)}。`, decision.context.time_slice_id)}
-          ${renderReasonNode("decision-input-orders", 3, "候选策略生成", "running", `生成最近距离基线与我方风险均衡候选，并保留订单/骑手集合用于复核。`, `${inputOrderIds.length} 单`)}
-          ${renderReasonNode("decision-filtering-process", 4, "路线可行性校验", "passed", `按供给、拥堵、班次和冲击事件过滤，剩余候选进入评分。`, `${decision.filtering_process.length} 个过滤步骤`)}
-          ${renderReasonNode("decision-scoring-process", 5, "成本与风险评估", "passed", `最高评分 ${escapeHtml(candidateLabel(bestScore?.algorithm_id || "-"))}，同时比较预计时长、成本和超时风险。`, `${decision.scoring_process.length} 个方案`)}
-          ${renderReasonNode("decision-final-actions", 6, "最终派单方案输出", "passed", `输出 ${decision.final_actions.length} 个动作，放弃 ${decision.abandoned_actions.length} 个基线动作，并回写记忆。`, `节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟`)}
+        <section id="decision-step-flow" class="decision-step-flow" data-reasoning-pattern="plain-six-step">
+          ${renderDecisionStep("decision-trigger-time", 1, "为什么触发这一轮", "done", `${escapeHtml(decision.trigger_time_label)}，${escapeHtml(displayTriggerReason(decision.trigger_reason))}`, [decision.id, displayDemandPhase(decision.context.demand_phase)])}
+          ${renderDecisionStep("decision-input-orders", 2, "看哪些订单", "done", `本轮把 ${inputOrderIds.length} 个已经进入推理窗口的订单放进同一批判断，不让单个订单孤立决策。`, inputOrderIds.slice(0, 8))}
+          ${renderDecisionStep("decision-candidate-riders", 3, "候选骑手怎么选", "done", `系统只从在线、同区域或可及时赶到的骑手里选候选，共 ${candidateRiderIds.length} 名。`, candidateRiderIds.slice(0, 8))}
+          ${renderDecisionStep("decision-filtering-process", 4, "先过滤不可行方案", "done", `先按时间窗口、区域班次、拥堵和承诺送达时间过滤，${escapeHtml(decisionFilterSentence(decision))}。`, (decision.filtering_process || []).map((stage) => `${displayStage(stage.stage)} ${stage.remaining}`))}
+          ${renderDecisionStep("decision-scoring-process", 5, "再给可行方案打分", "done", `${escapeHtml(decisionScoreSentence(decision))}`, bestScore ? [candidateLabel(bestScore.algorithm_id), `评分 ${fmtNumber(bestScore.score, 3)}`, `风险 ${fmtNumber(bestScore.risk_score, 3)}`] : ["等待评分"])}
+          ${renderDecisionStep("decision-final-actions", 6, "输出派单并回写记忆", "final", `最终输出 ${decision.final_actions.length} 个派单动作，放弃 ${decision.abandoned_actions.length} 个基线动作；本轮节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，回写 ${decision.result_writeback.writeback_count} 条有效记忆。`, [`成本优势 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元`, `风险变化 ${fmtSigned(decision.round_result.timeout_risk_delta, 3)}`])}
         </section>
       `;
     }
@@ -3609,52 +3663,57 @@ def render_day_replay_index() -> str:
       return "未成为当前最高综合评分候选。";
     }
 
-    function renderCandidatePaths(decision) {
+    function renderDecisionPlanComparison(decision) {
       const scores = decision.scoring_process || [];
-      if (!scores.length) return `<p>等待候选策略评分。</p>`;
+      const acceptedScore = topDecisionScore(decision);
       return `
-        <div class="list-item" data-reasoning-surface="candidate-summary">
-          <strong>候选路径对比与淘汰</strong>
-          <p>候选方案按综合评分、预计成本、运行耗时和无人/超时风险判断，失败路径灰化并写明业务原因。</p>
-        </div>
-        <section class="candidate-path-board" id="decision-candidate-paths" data-reasoning-pattern="candidate-elimination">
-          ${scores.map((score, index) => {
-            const status = candidateStatus(score, index, scores);
-            const selected = status === "selected";
-            return `
-              <article class="candidate-path" data-candidate-path="${escapeHtml(score.algorithm_id)}" data-status="${escapeHtml(status)}">
-                <div class="candidate-path-top">
-                  <strong>${escapeHtml(candidateLabel(score.algorithm_id))}</strong>
-                  <span class="path-status">${selected ? "保留" : "淘汰"}</span>
-                </div>
-                <p>${escapeHtml(displayCandidateReason(score.reason))}</p>
-                <div class="context-metric-grid">
-                  ${renderMetricChip(`${score.algorithm_id}-score`, "综合评分", fmtNumber(score.score, 3), "分数高者保留")}
-                  ${renderMetricChip(`${score.algorithm_id}-risk`, "无人/超时风险", fmtNumber(score.risk_score, 3), "风险分")}
-                  ${renderMetricChip(`${score.algorithm_id}-cost`, "预计成本", `${fmtNumber(score.expected_cost_yuan, 1)} 元`, "预估")}
-                  ${renderMetricChip(`${score.algorithm_id}-runtime`, "运行耗时", `${fmtNumber(score.estimated_runtime_ms, 1)} 毫秒`, "计算耗时")}
-                </div>
-                <p>${escapeHtml(selected ? "最终路径保留：综合时间、成本、风险和可用性后优于基线。" : candidateRejectReason(score))}</p>
-              </article>
-            `;
-          }).join("")}
+        <section id="decision-plan-comparison" class="decision-plan-board" data-reasoning-pattern="accepted-and-rejected">
+          <article id="decision-accepted-plan" class="decision-plan-card" data-plan="accepted">
+            <div class="decision-plan-top">
+              <strong>采纳方案</strong>
+              <span class="decision-plan-status">${escapeHtml(acceptedScore ? candidateLabel(acceptedScore.algorithm_id) : "等待评分")}</span>
+            </div>
+            <p>${escapeHtml(acceptedScore ? displayCandidateReason(acceptedScore.reason) : "等待评分结果。")}</p>
+            <p>${escapeHtml(decisionActionSentence(decision.final_actions, 4))}</p>
+            <div class="context-metric-grid">
+              ${renderMetricChip("accepted-score", "综合评分", acceptedScore ? fmtNumber(acceptedScore.score, 3) : "-", "分数高者保留")}
+              ${renderMetricChip("accepted-risk", "超时风险", acceptedScore ? fmtNumber(acceptedScore.risk_score, 3) : "-", "风险越低越好")}
+              ${renderMetricChip("accepted-time", "时间优势", `${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟`, "相对基线")}
+              ${renderMetricChip("accepted-cost", "成本优势", `${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元`, "本轮")}
+            </div>
+          </article>
+          <article id="decision-rejected-plan" class="decision-plan-card" data-plan="rejected">
+            <div class="decision-plan-top">
+              <strong>放弃方案</strong>
+              <span class="decision-plan-status">基线备选</span>
+            </div>
+            <p>${escapeHtml(decision.abandoned_actions.length ? "以下动作来自最近距离基线，但在综合时效、成本和风险评分中被淘汰。" : "本轮没有需要放弃的基线动作。")}</p>
+            ${renderDecisionActions(decision.abandoned_actions.slice(0, 4), "abandoned")}
+          </article>
+          <article id="decision-score-comparison" class="decision-plan-card" data-plan="scores">
+            <div class="decision-plan-top">
+              <strong>评分对比</strong>
+              <span class="decision-plan-status">${scores.length} 个方案</span>
+            </div>
+            ${renderDecisionScoreRows(scores)}
+          </article>
         </section>
       `;
     }
 
     function renderDecisionEvidence(decision) {
-      const inputOrderIds = decision.input_orders.length ? decision.input_orders.map((item) => item.id) : decision.input_order_ids;
-      const candidateRiderIds = decision.candidate_riders.length ? decision.candidate_riders.map((item) => item.id) : decision.candidate_rider_ids;
+      const inputOrderIds = decisionInputOrderIds(decision);
+      const candidateRiderIds = decisionCandidateRiderIds(decision);
       return `
-        <section class="decision-evidence-grid" data-reasoning-surface="required-fields">
-          ${renderDecisionStage("decision-candidate-riders", "候选骑手集合", `${candidateRiderIds.length} 名骑手`, renderChipList(candidateRiderIds, "暂无候选骑手"))}
+        <section id="decision-proof-panel" class="decision-proof-grid" data-reasoning-surface="required-fields">
+          ${renderDecisionStage("decision-trigger-reason", "触发时间与原因", decision.trigger_time_label, `<p>${escapeHtml(displayTriggerReason(decision.trigger_reason))}</p>`)}
+          ${renderDecisionStage("decision-input-orders", "输入订单集合", `${inputOrderIds.length} 单`, renderChipList(inputOrderIds.slice(0, 20), "当前轮无释放订单"))}
+          ${renderDecisionStage("decision-candidate-riders", "候选骑手集合", `${candidateRiderIds.length} 名骑手`, renderChipList(candidateRiderIds.slice(0, 20), "暂无候选骑手"))}
+          ${renderDecisionStage("decision-filtering-process", "过滤过程", `${(decision.filtering_process || []).length} 步`, `<p>${escapeHtml(decisionFilterSentence(decision))}</p>`)}
+          ${renderDecisionStage("decision-scoring-process", "评分过程", `${(decision.scoring_process || []).length} 个方案`, `<p>${escapeHtml(decisionScoreSentence(decision))}</p>`)}
           ${renderDecisionStage("decision-abandoned-actions", "被放弃动作", `${decision.abandoned_actions.length} 个备选`, renderDecisionActions(decision.abandoned_actions.slice(0, 4), "abandoned"))}
           ${renderDecisionStage("decision-round-result", "本轮结果", `节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟`, `<p>${escapeHtml(displayDecisionSummary(decision.round_result.summary))}</p>`)}
           ${renderDecisionStage("decision-result-writeback", "结果回写", `${decision.result_writeback.writeback_count} 次回写`, `<p>${escapeHtml(displayDecisionSummary(decision.result_writeback.summary))}</p>${renderChipList(decision.result_writeback.memory_event_ids, "无回写记忆")}`)}
-        </section>
-        <section class="decision-stage" data-reasoning-surface="debug-evidence">
-          <div class="decision-stage-head"><b>输入订单集合</b><span>${inputOrderIds.length} 单</span></div>
-          <div class="decision-stage-body">${renderChipList(inputOrderIds.slice(0, 20), "当前轮无释放订单")}</div>
         </section>
       `;
     }
@@ -3662,18 +3721,30 @@ def render_day_replay_index() -> str:
     function renderDecisionReasoning(decision) {
       return `
         ${renderDecisionAdvantageHero(decision)}
-        ${renderReasonGraph(decision)}
-        ${renderCandidatePaths(decision)}
+        ${renderDecisionStepFlow(decision)}
+        ${renderDecisionPlanComparison(decision)}
         ${renderDecisionEvidence(decision)}
       `;
     }
 
     function renderDecisionContext(decision) {
+      const inputOrderIds = decisionInputOrderIds(decision);
+      const candidateRiderIds = decisionCandidateRiderIds(decision);
       return `
         <div class="list-item" id="decision-context-input">
-          <strong>输入上下文</strong>
-          <p>${escapeHtml(displayDemandPhase(decision.context.demand_phase))} / ${escapeHtml(displayWeather(decision.context.weather))} / 拥堵 ${fmtNumber(decision.context.congestion_level, 2)} / 供给 ${decision.context.courier_supply}</p>
+          <strong>这轮发生在什么场景</strong>
+          <p>${escapeHtml(decision.trigger_time_label)} / ${escapeHtml(displayDemandPhase(decision.context.demand_phase))} / ${escapeHtml(displayWeather(decision.context.weather))} / 拥堵 ${fmtNumber(decision.context.congestion_level, 2)} / 在线供给 ${decision.context.courier_supply} 名</p>
           <p>冲击事件：${decision.context.shock_ids.length ? decision.context.shock_ids.map((item) => escapeHtml(displayShock(item))).join(", ") : "无"}</p>
+        </div>
+        <div class="list-item" id="decision-context-orders">
+          <strong>输入订单</strong>
+          <p>${inputOrderIds.length} 单进入本轮推理。</p>
+          ${renderChipList(inputOrderIds.slice(0, 8), "暂无订单")}
+        </div>
+        <div class="list-item" id="decision-context-riders">
+          <strong>候选骑手</strong>
+          <p>${candidateRiderIds.length} 名骑手进入候选集合。</p>
+          ${renderChipList(candidateRiderIds.slice(0, 8), "暂无骑手")}
         </div>
         <div class="list-item" id="decision-output-result">
           <strong>输出结果</strong>
@@ -3686,12 +3757,16 @@ def render_day_replay_index() -> str:
           ${renderMetricChip("decision-extra-delivered", "额外交付", `${decision.round_result.extra_delivered_orders} 单`, "相对基线")}
         </div>
         <div class="list-item" id="decision-round-summary">
-          <strong>本轮摘要</strong>
+          <strong>最终动作</strong>
+          <p>${escapeHtml(decisionActionSentence(decision.final_actions, 5))}</p>
+        </div>
+        <div class="list-item" id="decision-abandoned-summary">
+          <strong>被放弃动作</strong>
           <p>输入 ${decision.input_order_ids.length} 单，候选 ${decision.candidate_rider_ids.length} 名骑手，最终 ${decision.final_actions.length} 个动作，放弃 ${decision.abandoned_actions.length} 个基线动作。</p>
         </div>
         <div class="list-item" id="decision-writeback-summary">
           <strong>结果回写</strong>
-          <p>${decision.result_writeback.writeback_count} 次回写 / ${decision.result_writeback.memory_event_ids.map(escapeHtml).join(", ") || "无"}</p>
+          <p>${decision.result_writeback.writeback_count} 次有效回写，形成 ${decision.result_writeback.memory_event_ids.length} 条可召回记忆。</p>
         </div>
       `;
     }
@@ -4272,8 +4347,8 @@ def render_day_replay_index() -> str:
       renderDecisionReasoning,
       renderDecisionContext,
       renderDecisionAdvantageHero,
-      renderReasonGraph,
-      renderCandidatePaths,
+      renderDecisionStepFlow,
+      renderDecisionPlanComparison,
       hydrateDecisionPage,
       selectDecisionRound,
       renderMemoryPage,
