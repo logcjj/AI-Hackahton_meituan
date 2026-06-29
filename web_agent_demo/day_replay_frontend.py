@@ -2184,13 +2184,6 @@ def render_day_replay_index() -> str:
       return `持平 ${fmtNumber(0, digits)} ${unit}`;
     }
 
-    function fmtSavedDistance(valueKm) {
-      const numberValue = Number(valueKm) || 0;
-      if (numberValue > 0) return `节省 ${fmtNumber(numberValue, 2)} km`;
-      if (numberValue < 0) return `增加 ${fmtNumber(Math.abs(numberValue), 2)} km`;
-      return `持平 ${fmtNumber(0, 2)} km`;
-    }
-
     function displayFrom(map, value) {
       return map[value] || value || "-";
     }
@@ -3539,7 +3532,6 @@ def render_day_replay_index() -> str:
 
     function renderLiveScoreCards(score) {
       const timeoutTone = score.deltas.timeout_order_delta <= 0 ? "good" : "risk";
-      const emptyTone = score.deltas.empty_mileage_saved_km >= 0 ? "good" : "risk";
       const profitTone = score.deltas.profit_delta_yuan >= 0 ? "good" : "risk";
       return `
         <div class="algorithm-pair" data-score-section="algorithm-cumulative">
@@ -3550,7 +3542,6 @@ def render_day_replay_index() -> str:
           ${renderScoreCard("时间差异", `节省 ${fmtNumber(score.deltas.time_saved_min, 1)} 分钟`, score.deltas.headline, "good", "metric-time-delta")}
           ${renderScoreCard("金钱差异", `节省 ${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, `收益 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} 元 / 利润 ${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, profitTone, "metric-money-delta")}
           ${renderScoreCard("超时单差异", fmtFewer(score.deltas.timeout_order_delta, "单"), `风险差异 ${fmtSigned(score.deltas.timeout_risk_delta, 3)}`, timeoutTone, "metric-timeout-delta")}
-          ${renderScoreCard("空驶里程差异", fmtSavedDistance(score.deltas.empty_mileage_saved_km), "对比/叠加模式只强调差异路线", emptyTone, "metric-empty-mileage-delta")}
           ${renderScoreCard("收益/成本差异", `${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, `收入 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} 元 / 成本节省 ${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, profitTone, "metric-profit-delta")}
         </div>
       `;
@@ -3565,7 +3556,6 @@ def render_day_replay_index() -> str:
         renderMetricChip("time-delta", "时间差异", `${fmtNumber(score.deltas.time_saved_min, 1)} 分钟`, `基线 ${fmtNumber(score.baseline.total_time_cost_min, 1)} / 我方 ${fmtNumber(score.ours.total_time_cost_min, 1)}`),
         renderMetricChip("money-delta", "金钱差异", `${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, `基线 ${fmtNumber(score.baseline.total_cost_yuan, 1)} / 我方 ${fmtNumber(score.ours.total_cost_yuan, 1)}`),
         renderMetricChip("timeout-delta", "超时单差异", fmtFewer(score.deltas.timeout_order_delta, "单"), `基线 ${score.baseline.late_orders} / 我方 ${score.ours.late_orders}`),
-        renderMetricChip("empty-mileage-delta", "空驶里程差异", fmtSavedDistance(score.deltas.empty_mileage_saved_km), `总距离差异 ${fmtSigned(score.deltas.empty_mileage_saved_m, 0)} m`),
         renderMetricChip("profit-delta", "收益/成本差异", `${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, `收益 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} / 成本 ${fmtNumber(score.deltas.money_saved_yuan, 1)}`)
       ].join("");
     }
