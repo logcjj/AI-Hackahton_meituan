@@ -1,0 +1,179 @@
+# Goal 18 Tasks
+
+## Task 1 - Goal Setup And Current UI Clarity Audit
+
+Status: Completed
+
+Independent verification:
+- `goal/goal-18/input.md`, `goal/goal-18/plan.md`, and `goal/goal-18/tasks.md` exist before frontend code edits.
+- User screenshot and current browser UI are inspected.
+- Current defects are mapped to concrete implementation tasks.
+
+Work log:
+- Created `goal/goal-18/` as the next available goal directory after `goal-17`.
+- Saved the new `/goal` request verbatim in `goal/goal-18/input.md`, including the referenced screenshot path.
+- Wrote `goal/goal-18/plan.md` with the concrete redesign direction:
+  - Chinese-first navigation and page copy;
+  - truthful Live page state before inference starts;
+  - zoomable and more animated map;
+  - human-readable decision reasoning;
+  - simpler Orders and Riders pages;
+  - final desktop/phone QA and archive.
+- Wrote `goal/goal-18/tasks.md` with seven tasks and a debug cycle after every three tasks.
+- Confirmed starting branch and state:
+  - branch `codex/kandbox-dispatch-workbench`;
+  - latest prior commit `7a0053f chore: archive dispatch workbench polish goal`;
+  - worktree had no pre-existing uncommitted changes before goal setup.
+- Inspected the user screenshot:
+  - current compact nav shows only `FD`, `LM`, `PL`, `ME`, `JO`, and `WK`, which is not understandable to a non-technical viewer;
+  - the Riders page screenshot still shows visible English such as `Workers`, `ORDERS`, `DECISIONS`, and `assigned by`;
+  - the page looks like a narrow technical dashboard rather than a polished Chinese product surface.
+- Browser-audited the current open page at `http://127.0.0.1:18772/?v=preview-open#/live`:
+  - viewport was 643px wide;
+  - shell columns were `78px minmax(0px, 1fr)`, so the sidebar collapsed too early;
+  - each nav item's text block was hidden and only the abbreviation icon remained visible;
+  - the nav icons were `LM`, `PL`, `ME`, `JO`, and `WK`;
+  - visible route subtitle still used `Live Map 工作台`;
+  - role card still showed `Weekday full-day delivery replay`;
+  - Live headline showed `已节省 433.0 分钟` because the page had retained a prior paused/replayed state, reinforcing the user's concern that the system can appear to claim a full-day result before the viewer understands the inference process;
+  - `.leaflet-control-zoom` buttons were absent, confirming the map cannot be zoomed through normal controls;
+  - browser console reported 0 errors, so this is a product/UX issue rather than a crash.
+- Browser-audited all five routes:
+  - all routes contain repeated visible English/Kandbox terms such as `Dispatch`, `Live Map`, `Planner`, `Chart`, `Memory`, `Jobs`, `Orders`, `Workers`, `assigned`, `recall`, and `writeback`;
+  - Live contains `Live Map / Advantage Console` and still foregrounds final savings copy;
+  - Decisions contains `ReasonGraph Planner`, `Planner / Chart`, `candidate`, and too many English reasoning terms;
+  - Memory is structurally better but still contains `Memory`, `Planner`, `recall`, and `writeback` in visible copy;
+  - Orders contains `Demand Input Board`, `Jobs / Orders`, and the confusing heading `重点订单队列`;
+  - Riders contains `Capacity Resource Board`, `Workers`, `assigned by our planner`, and visible rider card titles like `Courier 1` through `Courier 8`.
+- Source-mapped the main defects:
+  - `routeCopy` still uses abbreviation icons and English module names around `web_agent_demo/day_replay_frontend.py` lines 1717-1763;
+  - the 1180px breakpoint hides `.nav-copy`, causing abbreviation-only navigation around lines 1636-1641;
+  - Live pre-start/fallback copy still references final full-day savings and `Planner` around lines 2313-2325;
+  - `pageHeader` calls still expose `Live Map / Advantage Console`, `ReasonGraph Planner`, `Demand Input Board`, and `Capacity Resource Board`;
+  - Leaflet is initialized with `scrollWheelZoom: false` and `zoomControl: false`, making map zoom unavailable;
+  - Orders and Riders metric captions still use English such as `assigned orders` and `assigned by our planner`.
+- Mapped next implementation:
+  - Task 2 should fix nav/readability and broad Chinese-first copy.
+  - Task 3 should fix Live initial-state truthfulness, map zoom, movement visualization, and optional sound control.
+  - Task 4 should rebuild Decisions into a plain Chinese reasoning process.
+  - Task 5 should simplify Orders and Riders wording/layout.
+  - Task 6 should do final visual polish toward a Chinese enterprise product feel.
+
+Confidence loop:
+- 100% confidence for Task 1 scope: the required goal files exist before frontend code edits, the user screenshot was visually inspected, the current browser UI was audited across all five routes, console state was checked, the specific source locations for the main defects were identified, and the findings are mapped to later tasks.
+
+## Task 2 - Chinese Navigation And User-Facing Copy Cleanup
+
+Status: Pending
+
+Independent verification:
+- Sidebar/compact/mobile navigation uses readable Chinese labels, not abbreviation-only `LM/PL/ME/JO/WK`.
+- Main visible labels, subtitles, cards, and route roles avoid confusing English/Chinese mixing.
+- Structural test attributes can remain, but visible copy is Chinese and understandable.
+
+Work log:
+
+Confidence loop:
+
+## Task 3 - Live Page Truthful State And Map Interaction Upgrade
+
+Status: Pending
+
+Independent verification:
+- Before start, Live page does not present final full-day savings as already inferred.
+- Start/pause/continue/speed/mode controls still work.
+- Map zoom controls are visible and browser-verified.
+- Active route and moving rider/vehicle marker make replay movement understandable.
+- Optional sound control is user-triggered and does not autoplay.
+- No sensitive map labels leak.
+
+Work log:
+
+Confidence loop:
+
+## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
+
+Status: Pending
+
+Independent verification:
+- Re-read `input.md`, `plan.md`, and `tasks.md`.
+- Run automated tests.
+- Browser-check Live page, nav, initial-state truthfulness, map zoom, motion, sound control, desktop/mobile layout, and console errors.
+- Fix any discovered defect before continuing.
+
+Work log:
+
+Confidence loop:
+
+## Task 4 - Decisions Page Human-Readable Reasoning Redesign
+
+Status: Pending
+
+Independent verification:
+- Decisions page is visibly a Chinese "算法推理过程" page.
+- It explains trigger, orders, riders, filtering, scoring, final action, rejected alternatives, and memory feedback in a simple sequence.
+- English-heavy visible concepts like `ReasonGraph Planner`, `candidate path`, and `Planner / Chart` are removed or hidden from user-facing copy.
+- Required decision evidence remains accessible.
+
+Work log:
+
+Confidence loop:
+
+## Task 5 - Orders And Riders Simplification
+
+Status: Pending
+
+Independent verification:
+- Orders page is framed as a preloaded order pool/demand board, not manual input or CRUD.
+- Confusing copy such as "重点订单队列" is replaced with clearer Chinese.
+- Orders first screen is simple and readable.
+- Riders page is framed as rider capacity/dispatch coverage, not HR/resource inventory.
+- Riders first screen is simple and readable.
+
+Work log:
+
+Confidence loop:
+
+## Task 6 - Visual Polish Toward Chinese Enterprise Product Style
+
+Status: Pending
+
+Independent verification:
+- Overall frontend feels more like a polished Chinese enterprise workbench.
+- Typography, colors, spacing, page headers, and cards are cleaner and less developer-demo-like.
+- The UI is simpler without losing the core algorithm advantage narrative.
+- Desktop and phone layouts remain stable.
+
+Work log:
+
+Confidence loop:
+
+## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
+
+Status: Pending
+
+Independent verification:
+- Re-read `input.md`, `plan.md`, and `tasks.md`.
+- Run automated tests.
+- Browser-check Decisions, Orders, Riders, visual polish, desktop/mobile layout, and console errors.
+- Fix any discovered defect before continuing.
+
+Work log:
+
+Confidence loop:
+
+## Task 7 - Final QA, Completion Audit, And Archive
+
+Status: Pending
+
+Independent verification:
+- Full automated tests pass.
+- Browser QA passes on desktop and phone across all five routes.
+- Live replay clearly shows why the system is running and how advantage accumulates.
+- Map zoom/motion are verified.
+- User-facing copy is Chinese-first and understandable.
+- Goal folder has completion/archive note.
+
+Work log:
+
+Confidence loop:
