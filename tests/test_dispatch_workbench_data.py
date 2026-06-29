@@ -24,7 +24,7 @@ class DispatchWorkbenchDataTest(unittest.TestCase):
         )
         self.assertEqual(
             [route["label"] for route in payload["routes"]],
-            ["实时推理", "决策链路", "长期记忆", "订单输入", "运力资源"],
+            ["实时推理", "决策过程", "长期记忆", "订单池", "骑手运力"],
         )
         self.assertEqual(len(payload["entities"]["orders"]), len(contract.orders))
         self.assertEqual(len(payload["entities"]["riders"]), len(contract.couriers))

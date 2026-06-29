@@ -64,7 +64,7 @@ Confidence loop:
 
 ## Task 2 - Chinese Navigation And User-Facing Copy Cleanup
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Sidebar/compact/mobile navigation uses readable Chinese labels, not abbreviation-only `LM/PL/ME/JO/WK`.
@@ -72,8 +72,45 @@ Independent verification:
 - Structural test attributes can remain, but visible copy is Chinese and understandable.
 
 Work log:
+- Replaced abbreviation-first navigation:
+  - brand changed from `FD / Food Dispatch` to `调度 / 外卖调度`;
+  - route icons changed from `LM/PL/ME/JO/WK` to Chinese one-character cues;
+  - route labels changed to `实时推理 / 决策过程 / 长期记忆 / 订单池 / 骑手运力`.
+- Fixed responsive navigation:
+  - at `max-width: 1180px`, the sidebar now keeps readable Chinese route names instead of hiding `.nav-copy`;
+  - at `max-width: 720px`, the top navigation displays the five Chinese page names and hides only the decorative icon.
+- Converted main page copy from mixed English/reference terms to Chinese product language:
+  - removed visible `Live Map / Advantage Console`, `ReasonGraph Planner`, `Hermes Memory Hub`, `Demand Input Board`, `Capacity Resource Board`;
+  - page headers now use `实时推演总览`, `算法推理过程`, `长期记忆中心`, `订单池看板`, `骑手运力看板`;
+  - the page role strip no longer says `Kandbox: ...`, while structural `data-*` markers remain.
+- Updated user-facing data labels:
+  - statuses now show `待释放 / 已进推理 / 已分配 / 已送达 / 超时风险`;
+  - risks show `低风险 / 中风险 / 高风险`;
+  - rider states show `可接单 / 配送中 / 临近下线 / 离线`;
+  - demand phases, weather, shock tags, memory stages, memory channels, and profile types now have Chinese display labels.
+- Cleaned decision and memory visible reasoning text:
+  - algorithm labels now show `最近距离基线`, `成本优先基线`, `风险感知基线`, `我方智能调度方案`;
+  - common English reasoning summaries from the replay data are translated in the display layer;
+  - counts and units now read as `单`, `名骑手`, `次回写`, `分钟`, `毫秒`.
+- Simplified orders/riders copy at the label level:
+  - `订单输入` changed to `订单池`;
+  - `重点订单队列` changed to `需关注订单`;
+  - `运力资源` changed to `骑手运力`;
+  - rider cards no longer show `Courier 1` style names as the main visible title, using `骑手 RID` instead.
+- Synchronized route payload labels in `web_agent_demo/dispatch_workbench_data.py`.
+- Updated frontend/data tests so Chinese labels are the contract and old visible English/abbreviations are forbidden.
+- Verification run:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`
+  - `uv run --with pytest pytest -q` -> `107 passed`
+- Browser verification:
+  - restarted `127.0.0.1:18772` with the updated server code;
+  - at 643px width, nav displayed `实时推理 / 决策过程 / 长期记忆 / 订单池 / 骑手运力`, not `LM/PL/ME/JO/WK`;
+  - at 390px width across all five routes, nav remained readable, no horizontal overflow, no old visible page titles, and no console errors;
+  - restored the browser to the Live page after verification.
 
 Confidence loop:
+- 100% confidence for Task 2 scope: automated tests pass, the browser confirmed readable Chinese navigation at the user screenshot width and phone width, all five route headers are Chinese-first, old visible English page titles and abbreviation-only nav labels are covered by regression tests, and the remaining English found by static scan is internal data/test code rather than primary visible UI copy. Map zoom/motion, pre-start result truthfulness, and deeper page simplification are intentionally deferred to later tasks.
 
 ## Task 3 - Live Page Truthful State And Map Interaction Upgrade
 
