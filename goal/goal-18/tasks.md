@@ -396,7 +396,7 @@ Confidence loop:
 
 ## Debug Cycle 2 - Tasks 4-6 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -405,8 +405,53 @@ Independent verification:
 - Fix any discovered defect before continuing.
 
 Work log:
+- Re-read the full goal context before running the cycle:
+  - `goal/goal-18/input.md`;
+  - `goal/goal-18/plan.md`;
+  - `goal/goal-18/tasks.md`.
+- Confirmed current branch and clean state before debug work:
+  - branch `codex/kandbox-dispatch-workbench`;
+  - latest implementation commit `403f79c feat: polish enterprise workbench visuals`;
+  - worktree had no uncommitted changes before the debug cycle.
+- Automated verification:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`;
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - static scan found no frontend/data occurrences of old visible terms including old nav abbreviations, old English page headings, old decision wording, old Orders/Riders wording, `fallback ready`, `fallback map`, or `引擎音效`.
+- Browser verification setup:
+  - restarted `127.0.0.1:18772` with the latest code;
+  - used the in-app browser against the fresh preview server.
+- Desktop browser verification at `1280x720`:
+  - checked `#/decisions`, `#/orders`, and `#/riders`;
+  - confirmed `data-visual-polish="chinese-enterprise-workbench-v3"` is present;
+  - confirmed Chinese navigation remains readable;
+  - confirmed page headers and cards are present;
+  - confirmed no horizontal overflow;
+  - confirmed old visible terms are absent.
+- Decisions page regression checks:
+  - verified `本轮推理说明`, `本轮输入与输出`, six-step reasoning, `采纳方案`, `放弃方案`, and `评分对比`;
+  - verified old `ReasonGraph`, `Planner / Chart`, `candidate path`, `候选路径对比与淘汰`, and `优势推理链` text is absent.
+- Orders page regression checks:
+  - verified `只读订单池`, `不录入、不编辑`, `优先关注订单`, and `订单全集核对`;
+  - verified table headers are exactly `订单 / 商家/商圈 / 时间窗口 / 状态/风险 / 推理状态 / 基线结果 / 我方结果`;
+  - verified old input/CRUD wording is absent.
+- Riders page regression checks:
+  - verified `只读运力池`, `不是人事后台`, `优先可用骑手`, `区域覆盖与班次压力`, and `骑手小地图核对`;
+  - verified old HR/resource wording is absent.
+- Mobile browser verification at `390x780`:
+  - checked `#/decisions`, `#/orders`, and `#/riders`;
+  - confirmed the five visible route titles are `实时推理 / 决策过程 / 长期记忆 / 订单池 / 骑手运力`;
+  - confirmed `.nav-hint` and `.nav-role` are hidden at mobile width;
+  - confirmed no abbreviation-only nav nodes exist;
+  - confirmed each page retains the Task 4-6 simplified content;
+  - confirmed no horizontal overflow.
+- Browser console verification:
+  - console page errors: 0.
+- No regressions were found during Debug Cycle 2, so no code repair was needed.
+- Restored browser to the Decisions page for review.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 2 scope: the goal files were re-read, all automated tests pass, static scans cover known old-copy regressions, desktop browser checks cover Decisions/Orders/Riders and the visual polish marker, mobile checks cover readable Chinese navigation and no overflow, and console errors are clean. Since no defects were found, this cycle only records verification evidence and leaves Task 7 as the remaining final audit/archive step.
 
 ## Task 7 - Final QA, Completion Audit, And Archive
 
