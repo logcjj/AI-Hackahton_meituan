@@ -120,7 +120,7 @@ Confidence loop:
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Re-read `input.md`, `plan.md`, and `tasks.md`.
@@ -129,8 +129,37 @@ Independent verification:
 - Fix any regression before continuing.
 
 Work log:
+- Re-read the full goal context:
+  - `goal/goal-19/input.md`;
+  - `goal/goal-19/plan.md`;
+  - `goal/goal-19/tasks.md`.
+- Automated verification:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py web_agent_demo/dispatch_workbench_data.py tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py`;
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - static scan found no frontend/data occurrences of the old visible self-talk phrases or old English/Kandbox visible page labels.
+- Desktop browser verification:
+  - Live start button starts inference;
+  - pause button changes state to `已暂停`;
+  - Leaflet zoom button exists and tile zoom level changes from 14 to 15;
+  - no horizontal overflow.
+- Decisions browser verification:
+  - timeline has 40 rounds;
+  - clicking the second round changes the active round to `第 2 轮 / 10:15`;
+  - step labels are `触发 / 订单 / 候选骑手 / 过滤 / 评分 / 输出`;
+  - no old reasoning self-talk is visible.
+- Orders/Riders browser verification:
+  - high-risk order filter returns only high-risk focus cards and `100 / 207 单`;
+  - available-rider filter returns only available focus cards and `6 / 18 名骑手`;
+  - English business-area keys and `Merchant N` labels are not visible.
+- Mobile browser verification at `390x780`:
+  - all five routes keep readable Chinese nav;
+  - visible `.page-head` count is `0`;
+  - noisy-copy check is false on every route;
+  - no horizontal overflow.
+- Browser console errors: none.
 
 Confidence loop:
+- 100% confidence for Debug Cycle 1: full automated tests pass, static regression scan is clean, Live interactions including map zoom work, Decisions/Orders/Riders interactions work, desktop and mobile layouts are stable, and no browser console errors were found.
 
 ## Task 4 - Regression Tests And Final Polish
 
