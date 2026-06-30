@@ -36,7 +36,7 @@ Confidence loop:
 
 ## Task 2 - Primary Surface Copy Compression
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Page headers, command cards, role strips, guide text, helper text, and empty states are concise.
@@ -44,8 +44,47 @@ Independent verification:
 - No important controls or evidence are removed.
 
 Work log:
+- Removed explanation-heavy header surfaces from the rendered shell:
+  - removed sidebar guide copy;
+  - removed topbar subtitle DOM;
+  - removed page header description, role strip, and page role card rendering;
+  - removed hidden nav hint/module spans from rendered navigation.
+- Compressed route copy into short product labels such as `地图 / 评分 / 事件`, `轮次 / 评分 / 输出`, and `沉淀 / 召回 / 反馈`.
+- Reworked Live pre-start state:
+  - `开始后累计验证` -> `累计优势 待计算`;
+  - `全日结论暂不展示` -> `全日结论 待生成`;
+  - `地图将自动推进` -> `地图推进 待启动`;
+  - event caption now shows `事件 N`.
+- Compressed Decisions page:
+  - `本轮推理说明` -> `推理步骤`;
+  - six-step reasoning labels are now `触发 / 订单 / 候选骑手 / 过滤 / 评分 / 输出`;
+  - removed long "先解释为什么..." hero paragraph;
+  - shortened right-side context and Live decision summary into field-style metrics.
+- Compressed Memory page:
+  - `记忆概览` -> `记忆状态`;
+  - removed `这里不是...` and profile disclaimer paragraphs;
+  - removed visible `用于调度` narrative from memory layer cards;
+  - mapped `AutoSolver saves...` result headlines into Chinese short metrics.
+- Compressed Orders and Riders:
+  - removed `不录入、不编辑` and `不是人事后台` disclaimers;
+  - `订单来源` -> `订单状态`;
+  - `订单全集核对 / 只读证据，不做录入维护` -> `订单全集 / 全量订单`;
+  - `只读运力池` -> `运力池`.
+- Added display-layer Chinese mapping for business areas and merchant labels:
+  - `Merchant 15 / metro_exit` now renders as `商家 15 / 地铁口`;
+  - `office_core`, `mall_foodcourt`, and other area keys now render as Chinese labels in visible lists, filters, tables, and cards.
+- Updated regression tests:
+  - visual polish marker advanced to `chinese-enterprise-workbench-v4`;
+  - required markers now assert short product labels;
+  - forbidden markers prevent old explanatory copy from returning.
+- Verification:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py::WebAgentDemoTest::test_home_page_contains_dispatch_workbench_shell` -> passed;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`;
+  - browser audit across Live, Decisions, Memory, Orders, Riders: visible noisy-copy count `0`, no horizontal overflow, no console errors.
 
 Confidence loop:
+- 100% confidence for Task 2 scope: the primary surfaces now use short product labels rather than explanatory paragraphs, the old self-talk phrases are forbidden by tests, browser verification covered all five routes, and no controls/evidence panels were removed.
 
 ## Task 3 - Visual Density And Layout Tightening
 

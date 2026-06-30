@@ -1942,28 +1942,23 @@ def render_day_replay_index() -> str:
     }
   </style>
 </head>
-<body data-shell="dispatch-workbench-shell" data-visual-system="enterprise-dispatch-v2" data-visual-polish="chinese-enterprise-workbench-v3" data-density="high-information" data-secret-handling="env-only-redacted">
+<body data-shell="dispatch-workbench-shell" data-visual-system="enterprise-dispatch-v2" data-visual-polish="chinese-enterprise-workbench-v4" data-density="high-information" data-secret-handling="env-only-redacted">
   <div id="dispatch-workbench-shell" class="workbench-shell" data-product-reference="kandbox-dispatch">
     <aside class="workbench-nav" aria-label="调度工作台导航">
       <div class="brand">
         <div class="brand-mark">调度</div>
         <div>
           <strong>外卖调度</strong>
-          <span>智能推演工作台</span>
+          <span>实时调度台</span>
         </div>
       </div>
       <div class="nav-section-title">核心页面</div>
       <nav id="route-nav" class="nav-list"></nav>
-      <div class="nav-meta">
-        <strong>工作台导览</strong><br>
-        先看实时推理优势，再追溯决策过程、长期记忆、订单池和骑手运力。
-      </div>
     </aside>
     <main class="workbench-main">
       <header class="topbar">
         <div>
           <h1 id="route-title">外卖配送智能调度工作台</h1>
-          <p id="route-subtitle">围绕订单、骑手、地图、决策和记忆构建的实时调度工作台。</p>
         </div>
         <div id="topbar-stats" class="topbar-stats"></div>
       </header>
@@ -1981,50 +1976,50 @@ def render_day_replay_index() -> str:
         title: "实时推理",
         navLabel: "实时推理",
         navRole: "主控台",
-        navHint: "看系统自动推演、地图动作和累计优势。",
+        navHint: "地图 / 评分 / 事件",
         module: "地图推演",
-        outcome: "自动推演 + 优势证明",
-        subtitle: "订单释放、骑手移动、路线变化和累计对比在同一个运营视图中联动。"
+        outcome: "地图 / 评分",
+        subtitle: "地图 / 评分 / 事件"
       },
       decisions: {
         icon: "决",
         title: "决策过程",
         navLabel: "决策过程",
         navRole: "可追溯",
-        navHint: "看每一轮为什么这样派、放弃了什么。",
+        navHint: "轮次 / 评分 / 输出",
         module: "推导链路",
-        outcome: "评分过程 + 动作回写",
-        subtitle: "每一轮触发、过滤、评分、派单动作和结果回写独立成页。"
+        outcome: "评分 / 回写",
+        subtitle: "轮次 / 评分 / 输出"
       },
       memory: {
         icon: "忆",
         title: "长期记忆",
         navLabel: "长期记忆",
         navRole: "长期记忆",
-        navHint: "看系统沉淀、召回和验证的调度经验。",
+        navHint: "沉淀 / 召回 / 反馈",
         module: "经验沉淀",
-        outcome: "记忆沉淀 + 召回反馈",
-        subtitle: "长期记忆视图：展示新沉淀、已整理、当前命中和效果反馈，而不是资产表。"
+        outcome: "召回 / 反馈",
+        subtitle: "沉淀 / 召回 / 反馈"
       },
       orders: {
         icon: "单",
         title: "订单池",
         navLabel: "订单池",
         navRole: "需求视图",
-        navHint: "看全天订单、时段、风险和进入推理状态。",
+        navHint: "订单 / 时段 / 风险",
         module: "订单池",
-        outcome: "需求全集 + 风险筛选",
-        subtitle: "全天订单全集已预置，只用于调度可见性、筛选和风险判断。"
+        outcome: "订单 / 风险",
+        subtitle: "订单 / 时段 / 风险"
       },
       riders: {
         icon: "骑",
         title: "骑手运力",
         navLabel: "骑手运力",
         navRole: "供给视图",
-        navHint: "看骑手班次、位置、负载和任务链。",
+        navHint: "班次 / 位置 / 负载",
         module: "运力池",
-        outcome: "供给盘点 + 负载判断",
-        subtitle: "骑手班次、在线状态、位置、负载和任务链统一盘点。"
+        outcome: "供给 / 负载",
+        subtitle: "班次 / 位置 / 负载"
       }
     };
     const routeOrder = ["live", "decisions", "memory", "orders", "riders"];
@@ -2150,6 +2145,12 @@ def render_day_replay_index() -> str:
       courier_shortage: "骑手短缺",
       traffic_block: "道路拥堵"
     };
+    const businessAreaLabels = {
+      office_core: "办公核心区",
+      mall_foodcourt: "商场餐饮区",
+      metro_exit: "地铁口",
+      residential_edge: "社区边缘"
+    };
     const liveTileLayer = {
       id: "cartodb-light-nolabels",
       url: "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
@@ -2237,6 +2238,14 @@ def render_day_replay_index() -> str:
       return displayFrom(shockLabels, value);
     }
 
+    function displayBusinessArea(value) {
+      return displayFrom(businessAreaLabels, value);
+    }
+
+    function displayMerchant(value) {
+      return String(value || "-").replace(/^Merchant\\s+/, "商家 ");
+    }
+
     function displayTag(value) {
       return displayShock(displayWeather(displayDemandPhase(value)));
     }
@@ -2245,40 +2254,42 @@ def render_day_replay_index() -> str:
       const text = String(value || "");
       if (!text) return "-";
       if (text.startsWith("Pressure change:")) return `压力变化：${text.replace("Pressure change:", "").replace(".", "").trim()}`;
-      if (text === "Planner comparison due under current order pressure.") return "当前订单压力达到阈值，触发算法对比。";
+      if (text === "Planner comparison due under current order pressure.") return "压力阈值触发";
       const scheduled = text.match(/^Scheduled (.+) dispatch round\\.$/);
-      if (scheduled) return `按计划进入${displayDemandPhase(scheduled[1])}派单轮次。`;
+      if (scheduled) return `${displayDemandPhase(scheduled[1])}计划轮次`;
       return text;
     }
 
     function displayDecisionSummary(value) {
       const text = String(value || "");
       if (!text) return "-";
+      const autoSolverSaved = text.match(/^AutoSolver saves ([0-9.]+) minutes and ([0-9.]+) yuan cumulatively\\.$/);
+      if (autoSolverSaved) return `累计节省 ${autoSolverSaved[1]} 分钟 / ${autoSolverSaved[2]} 元`;
       const autoMatch = text.match(/^AutoSolver assigned (\\d+) orders with risk-aware availability scoring; avg ETA ([0-9.]+) min\\.$/);
-      if (autoMatch) return `我方方案分配 ${autoMatch[1]} 单，综合骑手可用性和超时风险，平均预计 ${autoMatch[2]} 分钟。`;
+      if (autoMatch) return `我方 ${autoMatch[1]} 单 / 均 ${autoMatch[2]} 分钟`;
       const greedyMatch = text.match(/^Nearest greedy assigned (\\d+) orders by pickup distance; avg ETA ([0-9.]+) min\\.$/);
-      if (greedyMatch) return `最近距离基线分配 ${greedyMatch[1]} 单，只按取餐距离排序，平均预计 ${greedyMatch[2]} 分钟。`;
-      if (text === "No orders in this time slice.") return "当前时间片没有新订单。";
-      if (text === "Uses memory recall and risk scoring to choose a lower-timeout route.") return "召回历史经验并结合风险评分，选择更低超时风险的路线。";
-      if (text === "Dispatches by nearest distance while ignoring rain congestion and future order pressure.") return "只按最近距离派单，未考虑雨天拥堵和后续订单压力。";
-      if (text === "Decision outcome updates dispatch memory when the challenger improves cumulative cost or risk.") return "当我方方案改善累计成本或风险时，把结果写回调度记忆。";
+      if (greedyMatch) return `基线 ${greedyMatch[1]} 单 / 均 ${greedyMatch[2]} 分钟`;
+      if (text === "No orders in this time slice.") return "无新订单";
+      if (text === "Uses memory recall and risk scoring to choose a lower-timeout route.") return "记忆召回 / 风险评分";
+      if (text === "Dispatches by nearest distance while ignoring rain congestion and future order pressure.") return "最近距离基线";
+      if (text === "Decision outcome updates dispatch memory when the challenger improves cumulative cost or risk.") return "结果回写";
       return text;
     }
 
     function displayCandidateReason(value) {
       const text = String(value || "");
       if (!text) return "-";
-      if (text === "Baseline optimizes nearest pickup, so queueing and deadline risk can accumulate.") return "基线只优化最近取餐点，排队和承诺时效风险容易累积。";
-      if (text === "AutoSolver evaluates availability, congestion, route cost and deadline pressure.") return "我方同时评估骑手可用性、拥堵、路线成本和承诺时效压力。";
-      if (text === "Nearest distance gives a quick feasible answer but carries high rain congestion risk.") return "最近距离能快速给出可行解，但在雨天和拥堵下超时风险偏高。";
-      if (text === "Memory recall matches rainy lunch peak and reduces timeout risk.") return "召回雨天午高峰经验后，超时风险更低。";
+      if (text === "Baseline optimizes nearest pickup, so queueing and deadline risk can accumulate.") return "最近取餐优先 / 风险累积";
+      if (text === "AutoSolver evaluates availability, congestion, route cost and deadline pressure.") return "可用性 / 拥堵 / 成本 / 时效";
+      if (text === "Nearest distance gives a quick feasible answer but carries high rain congestion risk.") return "可行但拥堵风险高";
+      if (text === "Memory recall matches rainy lunch peak and reduces timeout risk.") return "命中雨天午高峰记忆";
       return text;
     }
 
     function displayActionReason(value) {
       const text = String(value || "");
       if (!text || text === "Baseline nearest-only assignment was rejected by risk-balanced scoring.") {
-        return "基线只看最近距离，本轮被我方综合时效、成本和风险评分淘汰。";
+        return "综合评分淘汰";
       }
       return displayCandidateReason(text);
     }
@@ -2291,19 +2302,22 @@ def render_day_replay_index() -> str:
       if (text === "Positive policy shift retained for similar contexts.") return "相似场景下保留正向策略调整。";
       if (text === "Historical context recalled before scoring candidates.") return "评分候选骑手前已召回历史上下文。";
       if (text === "Writeback confidence updated after round outcome.") return "本轮结果产生后，已更新回写置信度。";
+      if (text === "当前窗口只展示与本轮推理相关的命中，不把历史日志全部铺开。") return "本轮命中";
       if (text.startsWith("For ") && text.includes("prefer AutoSolver risk-balanced dispatch over nearest greedy.")) {
         const match = text.match(/^For (.+) with (.+) and congestion ([0-9.]+), prefer AutoSolver risk-balanced dispatch over nearest greedy\\.$/);
-        if (match) return `${displayDemandPhase(match[1])}、${displayWeather(match[2])}、拥堵 ${match[3]} 时，优先使用我方风险均衡派单，而不是最近距离基线。`;
+        if (match) return `${displayDemandPhase(match[1])} / ${displayWeather(match[2])} / 拥堵 ${match[3]}：我方优先`;
       }
       if (text.startsWith("For ") && text.includes("keep greedy as a guardrail")) {
         const match = text.match(/^For (.+), keep greedy as a guardrail when risk-balanced dispatch has weak savings\\.$/);
-        if (match) return `${displayDemandPhase(match[1])}下，如果风险均衡方案收益不明显，保留贪心基线作为保护。`;
+        if (match) return `${displayDemandPhase(match[1])}：保留基线保护`;
       }
       if (text.startsWith("Future policy: assign ")) {
         const match = text.match(/^Future policy: assign (.+) priority to AutoSolver when context matches (.+) and courier supply is (\\d+)\\.$/);
-        if (match) return `未来相似${displayDemandPhase(match[2])}且骑手供给为 ${match[3]} 时，提高我方方案优先级。`;
+        if (match) return `${displayDemandPhase(match[2])} / 供给 ${match[3]}：提高我方权重`;
       }
       if (text.startsWith("Recall ") && text.includes("nearest-only matching")) return "召回相似历史场景，优先排序风险均衡派单，再比较最近距离方案。";
+      const autoSolverSaved = text.match(/^AutoSolver saves ([0-9.]+) minutes and ([0-9.]+) yuan cumulatively\\.$/);
+      if (autoSolverSaved) return `累计节省 ${autoSolverSaved[1]} 分钟 / ${autoSolverSaved[2]} 元`;
       if (text.includes("congestion") && text.includes("riders")) {
         return text
           .replaceAll("breakfast", "早餐时段")
@@ -2416,7 +2430,7 @@ def render_day_replay_index() -> str:
           profit_delta_yuan: 0,
           extra_delivered_orders: 0,
           utilization_delta: 0,
-          headline: "等待首轮规划评分，订单正在进入推理队列。"
+          headline: "待评分"
         }
       };
     }
@@ -2441,20 +2455,20 @@ def render_day_replay_index() -> str:
         frame_id: "pre-dispatch",
         trigger_time_s: simTimeS,
         trigger_time_label: clock(simTimeS),
-        trigger_reason: "等待首轮规划决策触发。",
+        trigger_reason: "待触发",
         input_order_ids: queuedOrders,
         input_orders: [],
         candidate_rider_ids: onlineRiders,
         candidate_riders: [],
         filtering_process: [
-          { stage: "order_release", remaining: queuedOrders.length, summary: "订单逐步进入推理队列，尚未触发首轮评分。" },
-          { stage: "rider_pool", remaining: onlineRiders.length, summary: "在线骑手资源已预载，等待规划窗口开启。" }
+          { stage: "order_release", remaining: queuedOrders.length, summary: "待评分" },
+          { stage: "rider_pool", remaining: onlineRiders.length, summary: "待窗口" }
         ],
         scoring_process: [],
         final_actions: [],
         abandoned_actions: [],
         round_result: {
-          summary: "首轮决策尚未生成；当前仅展示已进入队列的订单和资源上下文。",
+          summary: "待首轮决策",
           time_saved_min: 0,
           cost_saved_yuan: 0,
           timeout_risk_delta: 0,
@@ -2463,7 +2477,7 @@ def render_day_replay_index() -> str:
         result_writeback: {
           memory_event_ids: [],
           writeback_count: 0,
-          summary: "首轮规划前暂无记忆回写。"
+          summary: "暂无回写"
         },
         context: {
           time_slice_id: "pre-dispatch",
@@ -2633,25 +2647,14 @@ def render_day_replay_index() -> str:
       return routeOrder.includes(value) ? value : "live";
     }
 
-    function pageHeader(routeId, eyebrow, description) {
+    function pageHeader(routeId, eyebrow) {
       const copy = routeCopy[routeId];
       return `
         <div class="page-head" data-page-identity="${escapeHtml(routeId)}" data-page-module="${escapeHtml(copy.module)}">
           <div>
             <div class="eyebrow">${escapeHtml(eyebrow)}</div>
             <h2>${escapeHtml(copy.title)}</h2>
-            <p>${escapeHtml(description || copy.subtitle)}</p>
-            <div class="page-role-strip" data-page-role-strip="${escapeHtml(routeId)}">
-              <span>${escapeHtml(copy.navRole)}</span>
-              <span>${escapeHtml(copy.module)}</span>
-              <span>${escapeHtml(copy.outcome)}</span>
-            </div>
           </div>
-          <aside class="page-role-card" aria-label="当前页面说明">
-            <b>${escapeHtml(copy.navLabel)}</b>
-            <span>${escapeHtml(copy.navHint)}</span>
-            <em>全天预置数据回放</em>
-          </aside>
         </div>
       `;
     }
@@ -2767,7 +2770,7 @@ def render_day_replay_index() -> str:
       const targetRow = document.getElementById("advantage-target-row");
       if (targetRow) targetRow.innerHTML = renderAdvantageTargetRow(currentScore);
       setText("map-runtime-hint", `${stateLabel} / ${clock(inferenceState.currentTimeS)} / ${inferenceModeLabels[inferenceState.mode]}`);
-      setText("event-flow-caption", `${events.length} 个事件已自动释放`);
+      setText("event-flow-caption", `事件 ${events.length}`);
       setText("cumulative-metrics-caption", `${currentScore.time_label} 累计优势`);
       setText("round-summary-time", currentDecision.trigger_time_label);
       const progressBar = document.getElementById("inference-progress-bar");
@@ -2819,7 +2822,7 @@ def render_day_replay_index() -> str:
         ["订单", stats.order_count],
         ["骑手", stats.rider_count],
         ["决策轮次", stats.decision_count],
-        ["优势验证", "开始后累计"]
+        ["累计优势", "待启动"]
       ].map(([label, value]) => `
         <div class="stat-pill"><b>${escapeHtml(value)}</b><span>${escapeHtml(label)}</span></div>
       `).join("");
@@ -2835,7 +2838,7 @@ def render_day_replay_index() -> str:
         return `全日推演完成：节省 ${fmtNumber(timeSaved, 1)} 分钟`;
       }
       if (timeSaved <= 0) {
-        return "正在等待首轮有效优势";
+        return "等待有效优势";
       }
       return `已节省 ${fmtNumber(timeSaved, 1)} 分钟`;
     }
@@ -2850,7 +2853,7 @@ def render_day_replay_index() -> str:
         return "等待启动。";
       }
       if (timeSaved <= 0) {
-        return "等待首轮评分。";
+        return "待评分。";
       }
       if (inferenceState.currentTimeS >= workbench.timeline.end_s) {
         return `完成：少 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟，少 ${fmtNumber(finalDelta.money_saved_yuan, 1)} 元。`;
@@ -2861,9 +2864,9 @@ def render_day_replay_index() -> str:
     function renderAdvantageTargetRow(score) {
       if (!inferenceState.started) {
         return `
-          <span>开始后累计验证</span>
-          <span>全日结论暂不展示</span>
-          <span>地图将自动推进</span>
+          <span>累计优势 待计算</span>
+          <span>全日结论 待生成</span>
+          <span>地图推进 待启动</span>
         `;
       }
       const delta = score.deltas || {};
@@ -2887,12 +2890,10 @@ def render_day_replay_index() -> str:
         const copy = routeCopy[route.id];
         const roleBadge = copy.navRole && copy.navRole !== copy.navLabel ? `<em class="nav-role">${escapeHtml(copy.navRole)}</em>` : "";
         return `
-          <a class="nav-link" href="${escapeHtml(route.path)}" data-route-link="${escapeHtml(route.id)}" data-route-role="${escapeHtml(copy.navRole)}" data-kandbox-module="${escapeHtml(copy.module)}" aria-label="${escapeHtml(`${copy.navLabel}：${copy.navHint}`)}">
+          <a class="nav-link" href="${escapeHtml(route.path)}" data-route-link="${escapeHtml(route.id)}" data-route-role="${escapeHtml(copy.navRole)}" data-kandbox-module="${escapeHtml(copy.module)}" aria-label="${escapeHtml(copy.navLabel)}">
             <span class="nav-icon">${escapeHtml(copy.icon)}</span>
             <div class="nav-copy">
               <span class="nav-title-line"><strong>${escapeHtml(copy.navLabel || route.label)}</strong>${roleBadge}</span>
-              <span class="nav-hint">${escapeHtml(copy.navHint)}</span>
-              <span class="nav-module">${escapeHtml(copy.module || route.kandbox_module)}</span>
             </div>
           </a>
         `;
@@ -2906,7 +2907,6 @@ def render_day_replay_index() -> str:
       }
       document.body.dataset.route = safeRoute;
       document.getElementById("route-title").textContent = routeCopy[safeRoute].title;
-      document.getElementById("route-subtitle").textContent = routeCopy[safeRoute].subtitle;
       for (const link of document.querySelectorAll("[data-route-link]")) {
         link.setAttribute("aria-current", link.dataset.routeLink === safeRoute ? "page" : "false");
       }
@@ -2943,7 +2943,7 @@ def render_day_replay_index() -> str:
       const currentDecision = decisionForTime(inferenceState.currentTimeS);
       const currentFrame = frameForTime(inferenceState.currentTimeS);
       return `
-        ${pageHeader("live", "实时推演总览", "首屏先回答算法是否更强：实时地图承接推理动作，右侧只保留当前决策和运行信号。")}
+        ${pageHeader("live", "实时推演总览")}
         <div class="page-grid live-grid" data-page="live" data-inference-state="${inferenceState.running ? "running" : inferenceState.started ? "paused" : "ready"}">
           <section id="live-advantage-hero" class="live-advantage-hero" data-live-priority="advantage-first">
             <div class="advantage-lead">
@@ -2989,7 +2989,7 @@ def render_day_replay_index() -> str:
                 </div>
               </div>
               <div class="card live-run-panel">
-                <div class="card-head"><h3>运行信号</h3><span><em id="cumulative-metrics-caption">${escapeHtml(currentScore.time_label)} 累计优势</em> / <em id="event-flow-caption">按全天推演时间释放</em></span></div>
+                <div class="card-head"><h3>运行信号</h3><span><em id="cumulative-metrics-caption">${escapeHtml(currentScore.time_label)} 累计优势</em> / <em id="event-flow-caption">事件 ${releasedEvents(inferenceState.currentTimeS).length}</em></span></div>
                 <div class="card-body">
                   <div id="live-cumulative-metrics" class="metric-strip" aria-label="compact cumulative advantage">
                     ${renderLiveCumulativeMetrics(currentScore)}
@@ -3006,7 +3006,7 @@ def render_day_replay_index() -> str:
     function renderDecisionsPage() {
       const decision = selectedDecision();
       return `
-        ${pageHeader("decisions", "算法推理过程", "按时间回放每一轮派单推理：先看为什么触发，再看订单、骑手、过滤、评分、采纳和放弃原因。")}
+        ${pageHeader("decisions", "算法推理过程")}
         <div class="page-grid decision-grid" data-page="decisions" data-decision-route="reasoning">
           <div class="card">
             <div class="card-head"><h3>决策轮次时间线</h3><span id="decision-route-status">${workbench.decisions.length} 轮决策</span></div>
@@ -3015,7 +3015,7 @@ def render_day_replay_index() -> str:
             </div>
           </div>
           <div class="card">
-            <div class="card-head"><h3>本轮推理说明</h3><span id="decision-reasoning-phase">${escapeHtml(displayDemandPhase(decision.context.demand_phase))}</span></div>
+            <div class="card-head"><h3>推理步骤</h3><span id="decision-reasoning-phase">${escapeHtml(displayDemandPhase(decision.context.demand_phase))}</span></div>
             <div id="decision-reasoning-canvas" class="card-body decision-canvas">
               ${renderDecisionReasoning(decision)}
             </div>
@@ -3039,13 +3039,12 @@ def render_day_replay_index() -> str:
       const recallChain = workbench.memory.recall_chain || [];
       const writebackLoop = workbench.memory.writeback_loop || [];
       return `
-        ${pageHeader("memory", "长期记忆中心", "把调度经验组织为长期记忆、画像、召回链和回写反馈，展示记忆如何让下一轮派单更强。")}
+        ${pageHeader("memory", "长期记忆中心")}
         <div class="page-grid memory-workspace hermes-memory-workspace" data-page="memory" data-memory-route="hermes-long-term" data-memory-model="global-profile-recall-feedback">
           <section id="memory-command-center" class="memory-command-center" aria-label="Hermes-style long term memory command center">
             <div class="memory-command-copy">
-              <span class="memory-kicker">长期记忆视图</span>
-              <h3>记忆概览</h3>
-              <p>这里不是日志列表、资产表或文档中心。系统把每天推理中的有效经验沉淀为全局策略记忆和画像记忆，再在新一轮规划评分前召回，最后用调度结果回写置信度。</p>
+              <span class="memory-kicker">记忆中心</span>
+              <h3>记忆状态</h3>
               <div class="memory-model-row">
                 <span>全局记忆</span>
                 <span>画像记忆</span>
@@ -3065,8 +3064,7 @@ def render_day_replay_index() -> str:
               </div>
             </section>
             <aside id="memory-profile-board" class="memory-profile-board" data-memory-surface="profiles">
-              <h3>画像记忆</h3>
-              <p>画像不是人员档案，而是系统在历史推理中沉淀的供给、商圈和订单风险模式。</p>
+              <h3>画像状态</h3>
               <div class="memory-profile-list">
                 ${profiles.map(renderMemoryProfile).join("")}
               </div>
@@ -3093,13 +3091,12 @@ def render_day_replay_index() -> str:
     function renderOrdersPage() {
       const orders = filteredOrders();
       return `
-        ${pageHeader("orders", "订单池看板", "全天订单已经预置并按时间进入推理，这里只看需求压力、风险结构和算法结果。")}
+        ${pageHeader("orders", "订单池看板")}
         <div class="page-grid demand-workspace" data-page="orders" data-orders-route="preloaded-demand-pool">
           <section id="orders-command" class="demand-command-center" data-orders-surface="preloaded-order-pool">
             <div class="demand-command-copy">
-              <span class="demand-kicker">只读订单池</span>
-              <h3>订单来源</h3>
-              <p>不录入、不编辑。调度员只按时间段、商圈、状态和风险筛选，先判断哪批订单会影响超时、成本和骑手负载。</p>
+              <span class="demand-kicker">订单池</span>
+              <h3>订单状态</h3>
             </div>
             <div id="orders-overview" class="demand-signal-grid">
               ${renderOrdersOverview(orders)}
@@ -3112,7 +3109,7 @@ def render_day_replay_index() -> str:
             </select>
             <select id="orders-filter-area" class="select-control" data-order-filter="area">
               <option value="all">全部商圈</option>
-              ${workbench.filters.areas.map((item) => `<option value="${escapeHtml(item)}"${item === orderFilterState.area ? " selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+              ${workbench.filters.areas.map((item) => `<option value="${escapeHtml(item)}"${item === orderFilterState.area ? " selected" : ""}>${escapeHtml(displayBusinessArea(item))}</option>`).join("")}
             </select>
             <select id="orders-filter-status" class="select-control" data-order-filter="status">
               <option value="all">全部状态</option>
@@ -3136,7 +3133,7 @@ def render_day_replay_index() -> str:
             </aside>
           </div>
           <div class="table-shell orders-table-shell" data-order-universe="full-day" data-evidence-role="secondary">
-              <div class="card-head"><h3>订单全集核对</h3><span>只读证据，不做录入维护</span></div>
+              <div class="card-head"><h3>订单全集</h3><span>全量订单</span></div>
               <table>
                 <thead><tr><th>订单</th><th>商家/商圈</th><th>时间窗口</th><th>状态/风险</th><th>推理状态</th><th>基线结果</th><th>我方结果</th></tr></thead>
                 <tbody id="orders-table-body">${orders.map(renderOrderRow).join("")}</tbody>
@@ -3149,13 +3146,12 @@ def render_day_replay_index() -> str:
     function renderRidersPage() {
       const riders = filteredRiders();
       return `
-        ${pageHeader("riders", "骑手运力看板", "全天骑手班次已经预置，这里只看当前可用性、区域覆盖、负载和预计空闲。")}
+        ${pageHeader("riders", "骑手运力看板")}
         <div class="page-grid capacity-workspace" data-page="riders" data-riders-route="capacity-board">
           <section id="riders-command" class="capacity-command-center" data-riders-surface="capacity-board">
             <div class="capacity-command-copy">
-              <span class="capacity-kicker">只读运力池</span>
+              <span class="capacity-kicker">运力池</span>
               <h3>运力状态</h3>
-              <p>不是人事后台。调度员先看哪些区域有可接单骑手、哪些骑手负载偏高、哪些班次快结束，再进入候选骑手判断。</p>
             </div>
             <div id="riders-overview" class="capacity-signal-grid">
               ${renderRidersOverview(riders)}
@@ -3164,7 +3160,7 @@ def render_day_replay_index() -> str:
           <div id="riders-filter-bar" class="filter-bar" data-filter-bar="riders">
             <select id="riders-filter-area" class="select-control" data-rider-filter="area">
               <option value="all">全部区域</option>
-              ${workbench.filters.areas.map((item) => `<option value="${escapeHtml(item)}"${item === riderFilterState.area ? " selected" : ""}>${escapeHtml(item)}</option>`).join("")}
+              ${workbench.filters.areas.map((item) => `<option value="${escapeHtml(item)}"${item === riderFilterState.area ? " selected" : ""}>${escapeHtml(displayBusinessArea(item))}</option>`).join("")}
             </select>
             <select id="riders-filter-state" class="select-control" data-rider-filter="state">
               <option value="all">全部在线状态</option>
@@ -3751,7 +3747,6 @@ def render_day_replay_index() -> str:
           <div class="decision-advantage-copy">
             <span class="reason-kicker">本轮结论</span>
             <h3>${escapeHtml(decisionAdvantageHeadline(decision))}</h3>
-            <p>先解释为什么我方方案优于基线：候选策略经过场景识别、可行性校验、风险评分和结果回写，最终保留能降低时间、成本和超时风险的动作。</p>
           </div>
           <div class="decision-advantage-metrics">
             ${renderMetricChip("reason-time-advantage", "时间优势", `${fmtNumber(result.time_saved_min || 0, 1)} 分钟`, "相对最近距离基线")}
@@ -3782,12 +3777,12 @@ def render_day_replay_index() -> str:
       const bestScore = topDecisionScore(decision);
       return `
         <section id="decision-step-flow" class="decision-step-flow" data-reasoning-pattern="plain-six-step">
-          ${renderDecisionStep("decision-trigger-time", 1, "为什么触发这一轮", "done", `${escapeHtml(decision.trigger_time_label)}，${escapeHtml(displayTriggerReason(decision.trigger_reason))}`, [readableDecisionLabel(decision.id), displayDemandPhase(decision.context.demand_phase)])}
-          ${renderDecisionStep("decision-input-orders", 2, "看哪些订单", "done", `本轮把 ${inputOrderIds.length} 个已经进入推理窗口的订单放进同一批判断，不让单个订单孤立决策。`, inputOrderIds.slice(0, 8))}
-          ${renderDecisionStep("decision-candidate-riders", 3, "候选骑手怎么选", "done", `系统只从在线、同区域或可及时赶到的骑手里选候选，共 ${candidateRiderIds.length} 名。`, candidateRiderIds.slice(0, 8))}
-          ${renderDecisionStep("decision-filtering-process", 4, "先过滤不可行方案", "done", `先按时间窗口、区域班次、拥堵和承诺送达时间过滤，${escapeHtml(decisionFilterSentence(decision))}。`, (decision.filtering_process || []).map((stage) => `${displayStage(stage.stage)} ${stage.remaining}`))}
-          ${renderDecisionStep("decision-scoring-process", 5, "再给可行方案打分", "done", `${escapeHtml(decisionScoreSentence(decision))}`, bestScore ? [candidateLabel(bestScore.algorithm_id), `评分 ${fmtNumber(bestScore.score, 3)}`, `风险 ${fmtNumber(bestScore.risk_score, 3)}`] : ["等待评分"])}
-          ${renderDecisionStep("decision-final-actions", 6, "输出派单并回写记忆", "final", `最终输出 ${decision.final_actions.length} 个派单动作，放弃 ${decision.abandoned_actions.length} 个基线动作；本轮节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，回写 ${decision.result_writeback.writeback_count} 条有效记忆。`, [`成本优势 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元`, `风险变化 ${fmtSigned(decision.round_result.timeout_risk_delta, 3)}`])}
+          ${renderDecisionStep("decision-trigger-time", 1, "触发", "done", `${escapeHtml(decision.trigger_time_label)} / ${escapeHtml(displayTriggerReason(decision.trigger_reason))}`, [readableDecisionLabel(decision.id), displayDemandPhase(decision.context.demand_phase)])}
+          ${renderDecisionStep("decision-input-orders", 2, "订单", "done", `${inputOrderIds.length} 单`, inputOrderIds.slice(0, 8))}
+          ${renderDecisionStep("decision-candidate-riders", 3, "候选骑手", "done", `${candidateRiderIds.length} 名`, candidateRiderIds.slice(0, 8))}
+          ${renderDecisionStep("decision-filtering-process", 4, "过滤", "done", `${(decision.filtering_process || []).length} 步`, (decision.filtering_process || []).map((stage) => `${displayStage(stage.stage)} ${stage.remaining}`))}
+          ${renderDecisionStep("decision-scoring-process", 5, "评分", "done", bestScore ? `${candidateLabel(bestScore.algorithm_id)} / ${fmtNumber(bestScore.score, 3)}` : "待评分", bestScore ? [`风险 ${fmtNumber(bestScore.risk_score, 3)}`] : ["等待评分"])}
+          ${renderDecisionStep("decision-final-actions", 6, "输出", "final", `派单 ${decision.final_actions.length} / 放弃 ${decision.abandoned_actions.length} / 回写 ${decision.result_writeback.writeback_count}`, [`节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟`, `成本 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元`])}
         </section>
       `;
     }
@@ -3837,7 +3832,7 @@ def render_day_replay_index() -> str:
               <strong>放弃方案</strong>
               <span class="decision-plan-status">基线备选</span>
             </div>
-            <p>${escapeHtml(decision.abandoned_actions.length ? "以下动作来自最近距离基线，但在综合时效、成本和风险评分中被淘汰。" : "本轮没有需要放弃的基线动作。")}</p>
+            <p>${escapeHtml(decision.abandoned_actions.length ? "基线备选已淘汰。" : "无淘汰动作。")}</p>
             ${renderDecisionActions(decision.abandoned_actions.slice(0, 4), "abandoned")}
           </article>
           <article id="decision-score-comparison" class="decision-plan-card" data-plan="scores">
@@ -3882,18 +3877,18 @@ def render_day_replay_index() -> str:
       const candidateRiderIds = decisionCandidateRiderIds(decision);
       return `
         <div class="list-item" id="decision-context-input">
-          <strong>这轮发生在什么场景</strong>
+          <strong>场景</strong>
           <p>${escapeHtml(decision.trigger_time_label)} / ${escapeHtml(displayDemandPhase(decision.context.demand_phase))} / ${escapeHtml(displayWeather(decision.context.weather))} / 拥堵 ${fmtNumber(decision.context.congestion_level, 2)} / 在线供给 ${decision.context.courier_supply} 名</p>
           <p>冲击事件：${decision.context.shock_ids.length ? decision.context.shock_ids.map((item) => escapeHtml(displayShock(item))).join(", ") : "无"}</p>
         </div>
         <div class="list-item" id="decision-context-orders">
           <strong>输入订单</strong>
-          <p>${inputOrderIds.length} 单进入本轮推理。</p>
+          <p>${inputOrderIds.length} 单</p>
           ${renderChipList(inputOrderIds.slice(0, 8), "暂无订单")}
         </div>
         <div class="list-item" id="decision-context-riders">
           <strong>候选骑手</strong>
-          <p>${candidateRiderIds.length} 名骑手进入候选集合。</p>
+          <p>${candidateRiderIds.length} 名</p>
           ${renderChipList(candidateRiderIds.slice(0, 8), "暂无骑手")}
         </div>
         <div class="list-item" id="decision-output-result">
@@ -3912,11 +3907,11 @@ def render_day_replay_index() -> str:
         </div>
         <div class="list-item" id="decision-abandoned-summary">
           <strong>被放弃动作</strong>
-          <p>输入 ${decision.input_order_ids.length} 单，候选 ${decision.candidate_rider_ids.length} 名骑手，最终 ${decision.final_actions.length} 个动作，放弃 ${decision.abandoned_actions.length} 个基线动作。</p>
+          <p>输入 ${decision.input_order_ids.length} 单 / 候选 ${decision.candidate_rider_ids.length} 名 / 输出 ${decision.final_actions.length} / 放弃 ${decision.abandoned_actions.length}</p>
         </div>
         <div class="list-item" id="decision-writeback-summary">
           <strong>结果回写</strong>
-          <p>${decision.result_writeback.writeback_count} 次有效回写，形成 ${decision.result_writeback.memory_event_ids.length} 条可召回记忆。</p>
+          <p>${decision.result_writeback.writeback_count} 次 / ${decision.result_writeback.memory_event_ids.length} 条记忆</p>
         </div>
       `;
     }
@@ -3934,7 +3929,7 @@ def render_day_replay_index() -> str:
             <div class="list-item" id="round-final-actions"><strong>最终动作</strong><p>${escapeHtml(finalActions)}</p></div>
             <div class="list-item" id="round-abandoned-actions"><strong>被放弃动作</strong><p>${escapeHtml(abandonedActions)}</p></div>
             <div class="list-item" id="round-writeback"><strong>结果回写</strong><p>${decision.result_writeback.writeback_count} 次回写 / ${escapeHtml(writebackIds)}</p></div>
-            <div class="list-item" id="round-metric-impact"><strong>本轮结果</strong><p>${escapeHtml(displayDecisionSummary(decision.round_result.summary))}；节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，成本优势 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元。</p></div>
+            <div class="list-item" id="round-metric-impact"><strong>本轮结果</strong><p>节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟 / 成本 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元</p></div>
           </div>
         `;
       }
@@ -3947,7 +3942,7 @@ def render_day_replay_index() -> str:
           <div class="list-item" id="round-final-actions"><strong>最终动作</strong><p>${escapeHtml(finalActions)}</p></div>
           <div class="list-item" id="round-abandoned-actions"><strong>被放弃动作</strong><p>${escapeHtml(abandonedActions)}</p></div>
           <div class="list-item" id="round-writeback"><strong>结果回写</strong><p>${decision.result_writeback.writeback_count} 次回写 / ${escapeHtml(writebackIds)}</p></div>
-          <div class="list-item" id="round-metric-impact"><strong>本轮结果</strong><p>${escapeHtml(displayDecisionSummary(decision.round_result.summary))}；节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟，节省 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元，风险差异 ${fmtSigned(decision.round_result.timeout_risk_delta, 3)}。</p></div>
+          <div class="list-item" id="round-metric-impact"><strong>本轮结果</strong><p>节省 ${fmtNumber(decision.round_result.time_saved_min, 1)} 分钟 / 成本 ${fmtNumber(decision.round_result.cost_saved_yuan, 1)} 元 / 风险 ${fmtSigned(decision.round_result.timeout_risk_delta, 3)}</p></div>
         </div>
       `;
     }
@@ -3959,7 +3954,7 @@ def render_day_replay_index() -> str:
       if (event.order_id) detailParts.push(`订单 ${event.order_id}`);
       if (event.order_ids) detailParts.push(`${event.order_ids.length} 单`);
       if (event.courier_ids) detailParts.push(`${event.courier_ids.length} 名骑手`);
-      if (event.business_area) detailParts.push(event.business_area);
+      if (event.business_area) detailParts.push(displayBusinessArea(event.business_area));
       if (event.memory_id) detailParts.push(`记忆 ${event.memory_id}`);
       const detail = detailParts.join(" / ");
       return `
@@ -4006,10 +4001,10 @@ def render_day_replay_index() -> str:
       const totalRecalls = system.recall_count ?? stats.totalRecalls;
       const latestHit = system.latest_hit_time_label || stats.latestHitLabel;
       return [
-        renderMetricChip("memory-total", "长期记忆总量", `${total}`, "来自全天推演回放"),
-        renderMetricChip("memory-confidence", "平均置信度", fmtNumber(avgConfidence, 2), "全局 / 画像 / 召回 / 反馈"),
-        renderMetricChip("memory-recalls", "累计召回", `${totalRecalls}`, "评分前命中的历史经验"),
-        renderMetricChip("memory-latest-hit", "最近命中", latestHit, `${system.linked_decision_count ?? stats.linkedDecisionCount} 个关联决策`)
+        renderMetricChip("memory-total", "长期记忆总量", `${total}`, "全日回放"),
+        renderMetricChip("memory-confidence", "平均置信度", fmtNumber(avgConfidence, 2), "全局 / 画像"),
+        renderMetricChip("memory-recalls", "累计召回", `${totalRecalls}`, "命中次数"),
+        renderMetricChip("memory-latest-hit", "最近命中", latestHit, `关联 ${system.linked_decision_count ?? stats.linkedDecisionCount} 轮`)
       ].join("");
     }
 
@@ -4026,10 +4021,8 @@ def render_day_replay_index() -> str:
             <span>${escapeHtml(layer.recall_count)} 次召回</span>
             <span>${escapeHtml(layer.latest_hit_time_label)}</span>
           </div>
-          <p>${escapeHtml(layer.summary)}</p>
           <div class="memory-meter" style="--confidence:${clamp(confidence, 0, 1)}"><span></span></div>
-          <p><b>用于调度：</b>${escapeHtml(layer.dispatch_use)}</p>
-          <div class="memory-effect-line"><span>${escapeHtml(layer.effect)}</span></div>
+          <div class="memory-effect-line"><span>${escapeHtml(displayMemoryText(layer.effect))}</span></div>
         </article>
       `;
     }
@@ -4042,12 +4035,11 @@ def render_day_replay_index() -> str:
             <span class="memory-profile-type">${escapeHtml(displayProfileType(profile.profile_type))}</span>
           </div>
           <p>${escapeHtml(displayMemoryText(profile.context))}</p>
-          <p><b>策略摘要：</b>${escapeHtml(displayMemoryText(profile.strategy))}</p>
+          <p>${escapeHtml(displayMemoryText(profile.strategy))}</p>
           <div class="memory-profile-meta">
             <span>置信度 ${fmtNumber(profile.confidence || 0, 2)}</span>
             <span>最近命中 ${escapeHtml(profile.latest_hit_time_label)}</span>
           </div>
-          <p>${escapeHtml(displayMemoryText(profile.dispatch_effect))}</p>
         </article>
       `;
     }
@@ -4234,7 +4226,7 @@ def render_day_replay_index() -> str:
               <strong>${escapeHtml(order.id)}</strong>
               <span class="focus-badge">${escapeHtml(displayRisk(order.risk_level))}</span>
             </div>
-            <p>${escapeHtml(order.merchant_label)} / ${escapeHtml(order.business_area)}</p>
+            <p>${escapeHtml(displayMerchant(order.merchant_label))} / ${escapeHtml(displayBusinessArea(order.business_area))}</p>
             <p>${escapeHtml(order.created_at_label)} 下单，${escapeHtml(order.promised_at_label)} 前送达。</p>
             <p>${escapeHtml(advantage)}；${order.entered_inference ? "已进入推理" : "等待按时间释放"}。</p>
             <div class="chip-list">
@@ -4280,7 +4272,7 @@ def render_day_replay_index() -> str:
 
     function renderOrdersContext(orders) {
       const riskCounts = countBy(orders, (order) => order.risk_level);
-      const areaCounts = countBy(orders, (order) => order.business_area);
+      const areaCounts = countBy(orders, (order) => displayBusinessArea(order.business_area));
       const statusCounts = countBy(orders, (order) => order.entered_inference ? "entered_inference" : order.status);
       return `
         <div class="card-head"><h3>需求概览</h3><span id="orders-context-count">${orders.length} 单可见</span></div>
@@ -4380,7 +4372,7 @@ def render_day_replay_index() -> str:
               <span class="focus-badge">${escapeHtml(displayRiderState(rider.online_state))}</span>
             </div>
             <div class="rider-load" style="--load:${loadRatio}"><span></span></div>
-            <p>${escapeHtml(rider.business_area)} / 班次 ${escapeHtml(rider.shift_label)}</p>
+            <p>${escapeHtml(displayBusinessArea(rider.business_area))} / 班次 ${escapeHtml(rider.shift_label)}</p>
             <p>当前负载 ${rider.current_load}/${rider.capacity}；${escapeHtml(rider.estimated_free_at_label)} 预计空闲；任务链 ${rider.task_chain_size} 单。</p>
           </article>
         `;
@@ -4389,7 +4381,7 @@ def render_day_replay_index() -> str:
 
     function renderRidersContext(riders) {
       const stateCounts = countBy(riders, (rider) => rider.online_state);
-      const areaCounts = countBy(riders, (rider) => rider.business_area);
+      const areaCounts = countBy(riders, (rider) => displayBusinessArea(rider.business_area));
       const topChains = [...riders].sort((left, right) => right.task_chain_size - left.task_chain_size).slice(0, 5);
       return `
         <div class="card-head"><h3>区域覆盖与班次压力</h3><span id="riders-context-count">${riders.length} 名可见</span></div>
@@ -4431,7 +4423,7 @@ def render_day_replay_index() -> str:
       return `
         <tr data-order-id="${escapeHtml(order.id)}" data-order-status="${escapeHtml(order.status)}" data-order-risk="${escapeHtml(order.risk_level)}" data-order-area="${escapeHtml(order.business_area)}">
           <td>${escapeHtml(order.id)}</td>
-          <td>${escapeHtml(order.merchant_label)}<br><span>${escapeHtml(order.business_area)}</span></td>
+          <td>${escapeHtml(displayMerchant(order.merchant_label))}<br><span>${escapeHtml(displayBusinessArea(order.business_area))}</span></td>
           <td>${escapeHtml(order.created_at_label)} 下单<br><span>${escapeHtml(order.promised_at_label)} 承诺送达</span></td>
           <td><span class="badge" data-state="${escapeHtml(order.status)}">${escapeHtml(displayStatus(order.status))}</span><br><span class="badge" data-risk="${escapeHtml(order.risk_level)}">${escapeHtml(displayRisk(order.risk_level))}</span></td>
           <td>${order.entered_inference ? "已进入" : "等待释放"}</td>
@@ -4460,7 +4452,7 @@ def render_day_replay_index() -> str:
       const loadRatio = clamp(rider.current_load / Math.max(1, rider.capacity), 0, 1);
       return `
         <article class="card rider-card" data-rider-id="${escapeHtml(rider.id)}" data-state="${escapeHtml(rider.online_state)}" data-area="${escapeHtml(rider.business_area)}">
-          <div class="card-head"><h3>骑手 ${escapeHtml(rider.id)}</h3><span>${escapeHtml(displayRiderState(rider.online_state))} / ${escapeHtml(rider.business_area)}</span></div>
+          <div class="card-head"><h3>骑手 ${escapeHtml(rider.id)}</h3><span>${escapeHtml(displayRiderState(rider.online_state))} / ${escapeHtml(displayBusinessArea(rider.business_area))}</span></div>
           <div class="card-body">
             ${renderRiderMiniMap(rider)}
             <div class="rider-load" style="--load:${loadRatio}"><span></span></div>
