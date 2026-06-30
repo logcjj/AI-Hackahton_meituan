@@ -88,7 +88,7 @@ Confidence loop:
 
 ## Task 3 - Visual Density And Layout Tightening
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Removing copy does not leave awkward empty space.
@@ -96,8 +96,27 @@ Independent verification:
 - Desktop and mobile layouts remain stable.
 
 Work log:
+- Removed the visible duplicate page-title card:
+  - `pageHeader()` now emits a hidden `page-anchor` structure marker only;
+  - topbar remains the single visible route title;
+  - all five routes now start directly with the workbench surface.
+- Advanced the visual contract marker to `chinese-enterprise-workbench-v5`.
+- Tightened layout density:
+  - route view top padding reduced;
+  - Live advantage hero padding/gap reduced;
+  - Live headline size reduced from large presentation scale to dashboard scale;
+  - Memory command center padding/gap and title size reduced;
+  - Decisions/Orders/Riders command card padding/gap and title size reduced.
+- Updated tests for the v5 visual contract.
+- Verification:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py::WebAgentDemoTest::test_home_page_contains_dispatch_workbench_shell` -> passed;
+  - browser desktop audit at `1280x720`: visible `.page-head` count `0`, each route first card starts immediately under topbar, no horizontal overflow, no console errors;
+  - browser mobile audit at `390x780`: readable Chinese nav, visible `.page-head` count `0`, no horizontal overflow;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py tests/test_dispatch_workbench_data.py` -> `19 passed`.
 
 Confidence loop:
+- 100% confidence for Task 3 scope: the visible duplicate title layer is gone, the main workbench surfaces are more compact, desktop/mobile browser layout is stable, and the regression tests pass.
 
 ## Debug Cycle 1 - Tasks 1-3 Comprehensive Check
 

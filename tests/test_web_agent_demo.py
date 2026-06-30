@@ -23,7 +23,7 @@ class WebAgentDemoTest(unittest.TestCase):
             'id="dispatch-workbench-shell"',
             'data-shell="dispatch-workbench-shell"',
             'data-visual-system="enterprise-dispatch-v2"',
-            'data-visual-polish="chinese-enterprise-workbench-v4"',
+            'data-visual-polish="chinese-enterprise-workbench-v5"',
             'data-density="high-information"',
             'data-product-reference="kandbox-dispatch"',
             'id="dispatch-workbench-bootstrap"',

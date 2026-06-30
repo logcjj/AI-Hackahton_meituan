@@ -284,8 +284,9 @@ def render_day_replay_index() -> str:
     }
     .route-view {
       min-width: 0;
-      padding: 24px 26px;
+      padding: 18px 22px 24px;
     }
+    .page-anchor { display: none; }
     .page-head {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
@@ -366,8 +367,8 @@ def render_day_replay_index() -> str:
     .live-advantage-hero {
       display: grid;
       grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
-      gap: 16px;
-      padding: 16px;
+      gap: 12px;
+      padding: 14px;
       border: 1px solid rgba(15,118,110,.24);
       border-radius: 22px;
       background:
@@ -380,8 +381,8 @@ def render_day_replay_index() -> str:
     .advantage-lead {
       display: grid;
       align-content: center;
-      gap: 11px;
-      padding: 8px 6px;
+      gap: 9px;
+      padding: 4px 2px;
     }
     .advantage-kicker {
       display: inline-flex;
@@ -408,9 +409,9 @@ def render_day_replay_index() -> str:
     .advantage-lead h3 {
       margin: 0;
       color: var(--ink);
-      font-size: clamp(30px, 4.2vw, 56px);
-      line-height: .96;
-      letter-spacing: -.06em;
+      font-size: clamp(24px, 3vw, 38px);
+      line-height: 1.02;
+      letter-spacing: -.045em;
     }
     .advantage-lead p {
       margin: 0;
@@ -479,8 +480,8 @@ def render_day_replay_index() -> str:
     .memory-command-center {
       display: grid;
       grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr);
-      gap: 16px;
-      padding: 16px;
+      gap: 12px;
+      padding: 14px;
       border: 1px solid rgba(183,121,31,.26);
       border-radius: 22px;
       background:
@@ -493,14 +494,14 @@ def render_day_replay_index() -> str:
     .memory-command-copy {
       display: grid;
       align-content: center;
-      gap: 11px;
-      padding: 6px;
+      gap: 8px;
+      padding: 4px;
     }
     .memory-command-copy h3 {
       margin: 0;
-      font-size: clamp(28px, 3.4vw, 48px);
-      line-height: 1;
-      letter-spacing: -.055em;
+      font-size: clamp(22px, 2.4vw, 32px);
+      line-height: 1.04;
+      letter-spacing: -.04em;
     }
     .memory-command-copy p {
       display: none;
@@ -1285,8 +1286,8 @@ def render_day_replay_index() -> str:
     .capacity-command-center {
       display: grid;
       grid-template-columns: minmax(260px, .8fr) minmax(0, 1.2fr);
-      gap: 14px;
-      padding: 14px;
+      gap: 12px;
+      padding: 12px;
       border: 1px solid rgba(15,23,42,.10);
       border-radius: 18px;
       background:
@@ -1301,7 +1302,7 @@ def render_day_replay_index() -> str:
     .capacity-command-copy {
       display: grid;
       align-content: center;
-      gap: 9px;
+      gap: 7px;
     }
     .decision-advantage-copy h3,
     .input-command-copy h3,
@@ -1309,9 +1310,9 @@ def render_day_replay_index() -> str:
     .demand-command-copy h3,
     .capacity-command-copy h3 {
       margin: 0;
-      font-size: clamp(24px, 3vw, 42px);
-      line-height: 1;
-      letter-spacing: -.05em;
+      font-size: clamp(21px, 2.3vw, 30px);
+      line-height: 1.04;
+      letter-spacing: -.04em;
     }
     .decision-advantage-copy p,
     .input-command-copy p,
@@ -1942,7 +1943,7 @@ def render_day_replay_index() -> str:
     }
   </style>
 </head>
-<body data-shell="dispatch-workbench-shell" data-visual-system="enterprise-dispatch-v2" data-visual-polish="chinese-enterprise-workbench-v4" data-density="high-information" data-secret-handling="env-only-redacted">
+<body data-shell="dispatch-workbench-shell" data-visual-system="enterprise-dispatch-v2" data-visual-polish="chinese-enterprise-workbench-v5" data-density="high-information" data-secret-handling="env-only-redacted">
   <div id="dispatch-workbench-shell" class="workbench-shell" data-product-reference="kandbox-dispatch">
     <aside class="workbench-nav" aria-label="调度工作台导航">
       <div class="brand">
@@ -2649,14 +2650,7 @@ def render_day_replay_index() -> str:
 
     function pageHeader(routeId, eyebrow) {
       const copy = routeCopy[routeId];
-      return `
-        <div class="page-head" data-page-identity="${escapeHtml(routeId)}" data-page-module="${escapeHtml(copy.module)}">
-          <div>
-            <div class="eyebrow">${escapeHtml(eyebrow)}</div>
-            <h2>${escapeHtml(copy.title)}</h2>
-          </div>
-        </div>
-      `;
+      return `<div class="page-anchor" data-page-identity="${escapeHtml(routeId)}" data-page-module="${escapeHtml(copy.module)}" data-page-eyebrow="${escapeHtml(eyebrow)}" aria-hidden="true"></div>`;
     }
 
     function hydrateLivePage() {
