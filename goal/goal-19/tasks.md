@@ -223,6 +223,9 @@ Work log:
 - Archive status:
   - Goal 19 is marked complete on 2026-06-30;
   - all planned tasks and the comprehensive debug cycle are recorded in this folder.
+- Remote publication:
+  - attempted SSH push through local SOCKS proxy `127.0.0.1:7890`, but the proxy connection closed before GitHub authentication;
+  - pushed the same HEAD to `main` via SSH direct successfully: `e08dab6..b1275b7  HEAD -> main`.
 
 Confidence loop:
-- 100% confidence for Task 5 scope: the goal is complete, verification evidence is recorded, changes are committed through Task 4, and this final archive record closes the goal before remote publication.
+- 100% confidence for Task 5 scope: the goal is complete, verification evidence is recorded, implementation and archive commits exist, and remote `main` publication succeeded after the proxy attempt failed.
