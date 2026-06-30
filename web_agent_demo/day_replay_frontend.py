@@ -152,7 +152,7 @@ def render_day_replay_index() -> str:
       display: grid;
       grid-template-columns: 30px 1fr;
       gap: 10px;
-      align-items: start;
+      align-items: center;
       padding: 11px 10px;
       border-radius: 14px;
       color: #c8d4df;
@@ -202,6 +202,7 @@ def render_day_replay_index() -> str:
       letter-spacing: -.01em;
     }
     .nav-role {
+      display: none;
       padding: 3px 6px;
       border-radius: 999px;
       color: #9fb0c0;
@@ -210,14 +211,14 @@ def render_day_replay_index() -> str:
       white-space: nowrap;
     }
     .nav-hint {
-      display: block;
+      display: none;
       margin-top: 4px;
       color: #9fb0c0;
       font-size: 12px;
       line-height: 1.32;
     }
     .nav-module {
-      display: block;
+      display: none;
       margin-top: 5px;
       color: #7f93a5;
       font: 800 10px var(--mono);
@@ -225,6 +226,7 @@ def render_day_replay_index() -> str:
       text-transform: uppercase;
     }
     .nav-meta {
+      display: none;
       position: absolute;
       left: 14px;
       right: 14px;
@@ -250,15 +252,15 @@ def render_day_replay_index() -> str:
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 16px;
       align-items: center;
-      min-height: 72px;
-      padding: 14px 22px;
+      min-height: 60px;
+      padding: 10px 22px;
       background: rgba(255,255,255,.94);
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(18px);
       box-shadow: 0 8px 18px rgba(15,23,42,.045);
     }
     .topbar h1 { margin: 0 0 3px; font-size: 18px; letter-spacing: -.02em; font-weight: 850; }
-    .topbar p { margin: 0; color: var(--muted); font-size: 13px; }
+    .topbar p { display: none; }
     .topbar-stats {
       display: grid;
       grid-template-columns: repeat(4, auto);
@@ -286,11 +288,11 @@ def render_day_replay_index() -> str:
     }
     .page-head {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 280px;
+      grid-template-columns: minmax(0, 1fr);
       gap: 14px;
       align-items: stretch;
-      margin-bottom: 18px;
-      padding: 18px;
+      margin-bottom: 14px;
+      padding: 14px 16px;
       border: 1px solid var(--line);
       border-radius: 20px;
       background:
@@ -314,10 +316,10 @@ def render_day_replay_index() -> str:
       font-weight: 850;
       letter-spacing: .02em;
     }
-    .page-head h2 { margin: 5px 0 6px; font-size: 29px; letter-spacing: -.04em; font-weight: 900; }
-    .page-head p { margin: 0; max-width: 820px; color: var(--muted); line-height: 1.55; }
+    .page-head h2 { margin: 3px 0 0; font-size: 24px; letter-spacing: -.035em; font-weight: 900; }
+    .page-head p { display: none; }
     .page-role-strip {
-      display: flex;
+      display: none;
       flex-wrap: wrap;
       gap: 7px;
       margin-top: 12px;
@@ -331,7 +333,7 @@ def render_day_replay_index() -> str:
       font: 800 11px var(--mono);
     }
     .page-role-card {
-      display: grid;
+      display: none;
       align-content: center;
       gap: 6px;
       padding: 12px;
@@ -414,8 +416,8 @@ def render_day_replay_index() -> str:
       margin: 0;
       max-width: 560px;
       color: var(--ink-2);
-      font-size: 14px;
-      line-height: 1.58;
+      font-size: 13px;
+      line-height: 1.45;
     }
     .advantage-target-row {
       display: flex;
@@ -501,6 +503,7 @@ def render_day_replay_index() -> str:
       letter-spacing: -.055em;
     }
     .memory-command-copy p {
+      display: none;
       margin: 0;
       max-width: 620px;
       color: var(--ink-2);
@@ -625,6 +628,7 @@ def render_day_replay_index() -> str:
       font-size: 15px;
     }
     .memory-profile-board > p {
+      display: none;
       margin: 0;
       color: var(--muted);
       font-size: 12px;
@@ -1314,6 +1318,7 @@ def render_day_replay_index() -> str:
     .resource-command-copy p,
     .demand-command-copy p,
     .capacity-command-copy p {
+      display: none;
       margin: 0;
       color: var(--ink-2);
       font-size: 13px;
@@ -2796,7 +2801,7 @@ def render_day_replay_index() -> str:
       const scoreStack = document.getElementById("live-score-stack");
       if (scoreStack) scoreStack.innerHTML = renderLiveScoreCards(currentScore);
       const eventFlow = document.getElementById("live-event-flow");
-      if (eventFlow) eventFlow.innerHTML = events.slice(-4).reverse().map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>点击开始推理后，订单进入、候选分配和累计结果将自动释放。</p></div>`;
+      if (eventFlow) eventFlow.innerHTML = events.slice(-4).reverse().map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>暂无事件</p></div>`;
       const cumulativeMetrics = document.getElementById("live-cumulative-metrics");
       if (cumulativeMetrics) cumulativeMetrics.innerHTML = renderLiveCumulativeMetrics(currentScore);
       const summary = document.getElementById("live-round-summary");
@@ -2842,15 +2847,15 @@ def render_day_replay_index() -> str:
       const moneySaved = Number(delta.money_saved_yuan || 0);
       const timeoutText = fmtFewer(delta.timeout_order_delta || 0, "单");
       if (!inferenceState.started) {
-        return "点击开始推理后，系统会按全天时间线自动释放订单、移动骑手、重算路线，并实时累计我方相对基线的优势。";
+        return "等待启动。";
       }
       if (timeSaved <= 0) {
-        return "推理已开始，当前仍在等待首轮规划评分。优势卡片只展示已经推演到的累计结果，不提前展示全日结论。";
+        return "等待首轮评分。";
       }
       if (inferenceState.currentTimeS >= workbench.timeline.end_s) {
-        return `全日回放已完成：我方比基线少 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟、少 ${fmtNumber(finalDelta.money_saved_yuan, 1)} 元成本，超时单${fmtFewer(finalDelta.timeout_order_delta, "单")}。`;
+        return `完成：少 ${fmtNumber(finalDelta.time_saved_min, 1)} 分钟，少 ${fmtNumber(finalDelta.money_saved_yuan, 1)} 元。`;
       }
-      return `推理正在自动推进：当前累计少 ${fmtNumber(moneySaved, 1)} 元成本，超时单${timeoutText}，地图只展示我方动作和差异路线。`;
+      return `运行中：成本少 ${fmtNumber(moneySaved, 1)} 元，超时单${timeoutText}。`;
     }
 
     function renderAdvantageTargetRow(score) {
@@ -2989,7 +2994,7 @@ def render_day_replay_index() -> str:
                   <div id="live-cumulative-metrics" class="metric-strip" aria-label="compact cumulative advantage">
                     ${renderLiveCumulativeMetrics(currentScore)}
                   </div>
-                  <div id="live-event-flow" class="event-list">${events.map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>点击开始推理后，订单进入、候选分配和累计结果将自动释放。</p></div>`}</div>
+                  <div id="live-event-flow" class="event-list">${events.map(renderEventItem).join("") || `<div class="list-item"><strong>等待开始</strong><p>暂无事件</p></div>`}</div>
                 </div>
               </div>
             </aside>
@@ -3039,7 +3044,7 @@ def render_day_replay_index() -> str:
           <section id="memory-command-center" class="memory-command-center" aria-label="Hermes-style long term memory command center">
             <div class="memory-command-copy">
               <span class="memory-kicker">长期记忆视图</span>
-              <h3>长期记忆中枢</h3>
+              <h3>记忆概览</h3>
               <p>这里不是日志列表、资产表或文档中心。系统把每天推理中的有效经验沉淀为全局策略记忆和画像记忆，再在新一轮规划评分前召回，最后用调度结果回写置信度。</p>
               <div class="memory-model-row">
                 <span>全局记忆</span>
@@ -3093,7 +3098,7 @@ def render_day_replay_index() -> str:
           <section id="orders-command" class="demand-command-center" data-orders-surface="preloaded-order-pool">
             <div class="demand-command-copy">
               <span class="demand-kicker">只读订单池</span>
-              <h3>今天订单怎么来</h3>
+              <h3>订单来源</h3>
               <p>不录入、不编辑。调度员只按时间段、商圈、状态和风险筛选，先判断哪批订单会影响超时、成本和骑手负载。</p>
             </div>
             <div id="orders-overview" class="demand-signal-grid">
@@ -3121,7 +3126,7 @@ def render_day_replay_index() -> str:
           </div>
           <div class="operations-grid" data-density="summary-first">
             <div class="card" id="orders-priority-panel" data-orders-surface="priority-demand">
-              <div class="card-head"><h3>优先关注订单</h3><span>先看可能影响超时和收益的订单</span></div>
+              <div class="card-head"><h3>优先关注订单</h3><span>高风险 / 高收益</span></div>
               <div id="orders-priority-list" class="card-body order-focus-list">
                 ${renderOrderFocusList(orders)}
               </div>
@@ -3149,7 +3154,7 @@ def render_day_replay_index() -> str:
           <section id="riders-command" class="capacity-command-center" data-riders-surface="capacity-board">
             <div class="capacity-command-copy">
               <span class="capacity-kicker">只读运力池</span>
-              <h3>现在运力够不够</h3>
+              <h3>运力状态</h3>
               <p>不是人事后台。调度员先看哪些区域有可接单骑手、哪些骑手负载偏高、哪些班次快结束，再进入候选骑手判断。</p>
             </div>
             <div id="riders-overview" class="capacity-signal-grid">
@@ -3169,7 +3174,7 @@ def render_day_replay_index() -> str:
           </div>
           <div class="operations-grid" data-density="summary-first">
             <div class="card" id="riders-capacity-panel" data-riders-surface="capacity-focus">
-              <div class="card-head"><h3>优先可用骑手</h3><span>先看状态、负载和预计空闲</span></div>
+              <div class="card-head"><h3>优先可用骑手</h3><span>状态 / 负载 / 空闲</span></div>
               <div id="riders-capacity-list" class="card-body rider-focus-list">
                 ${renderRiderFocusList(riders)}
               </div>
@@ -3251,19 +3256,19 @@ def render_day_replay_index() -> str:
 
     function renderMapActionStatus(frame, routes = [], riders = [], orders = []) {
       if (!inferenceState.started) {
-        return `<strong>等待开始推理</strong><span>点击开始后，订单、骑手、路线和优势指标会按全天时间自动推进。</span>`;
+        return `<strong>等待开始</strong><span>订单 0 / 路线 0</span>`;
       }
       const moving = activeMapRider(riders);
       if (moving) {
         const orderLabel = moving.order_id ? mapEntityLabel("order", {id: moving.order_id}) : "当前订单";
         const riderLabel = mapEntityLabel("rider", moving);
-        return `<strong>${escapeHtml(riderLabel)} 正在执行 ${escapeHtml(orderLabel)}</strong><span>路线进度 ${fmtNumber((moving.progress || 0) * 100, 0)}%，地图只突出我方动作和必要差异。</span>`;
+        return `<strong>${escapeHtml(riderLabel)} -> ${escapeHtml(orderLabel)}</strong><span>进度 ${fmtNumber((moving.progress || 0) * 100, 0)}%</span>`;
       }
       const route = routes.find((item) => (item.renderLane || item.lane) === "ours") || routes[0];
       if (route) {
-        return `<strong>本轮路线已接管</strong><span>${escapeHtml(mapEntityLabel("rider", {id: route.courier_id}))} -> ${escapeHtml(mapEntityLabel("order", {id: route.order_id}))}，等待下一次路线重算。</span>`;
+        return `<strong>路线已接管</strong><span>${escapeHtml(mapEntityLabel("rider", {id: route.courier_id}))} -> ${escapeHtml(mapEntityLabel("order", {id: route.order_id}))}</span>`;
       }
-      return `<strong>等待首轮路线</strong><span>已释放 ${orders.length} 个地图订单点，系统正在等待可评分的派单窗口。</span>`;
+      return `<strong>等待路线</strong><span>订单 ${orders.length}</span>`;
     }
 
     function renderHotspots() {
@@ -3539,7 +3544,7 @@ def render_day_replay_index() -> str:
           ${renderScoreCard("我们的算法累计", `${fmtNumber(score.ours.total_cost_yuan, 1)} 元`, `${fmtNumber(score.ours.total_time_cost_min, 1)} 分钟 / ${score.ours.late_orders} 超时单`, "good", "metric-ours-cumulative")}
         </div>
         <div class="delta-grid" data-score-section="advantage-deltas">
-          ${renderScoreCard("时间差异", `节省 ${fmtNumber(score.deltas.time_saved_min, 1)} 分钟`, score.deltas.headline, "good", "metric-time-delta")}
+          ${renderScoreCard("时间差异", `节省 ${fmtNumber(score.deltas.time_saved_min, 1)} 分钟`, "累计时间成本对比", "good", "metric-time-delta")}
           ${renderScoreCard("金钱差异", `节省 ${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, `收益 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} 元 / 利润 ${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, profitTone, "metric-money-delta")}
           ${renderScoreCard("超时单差异", fmtFewer(score.deltas.timeout_order_delta, "单"), `风险差异 ${fmtSigned(score.deltas.timeout_risk_delta, 3)}`, timeoutTone, "metric-timeout-delta")}
           ${renderScoreCard("收益/成本差异", `${fmtSigned(score.deltas.profit_delta_yuan, 1)} 元`, `收入 ${fmtSigned(score.deltas.revenue_delta_yuan, 1)} 元 / 成本节省 ${fmtNumber(score.deltas.money_saved_yuan, 1)} 元`, profitTone, "metric-profit-delta")}
@@ -4283,7 +4288,7 @@ def render_day_replay_index() -> str:
           <div class="list-item" id="orders-time-distribution"><strong>释放节奏</strong>${renderOrderTimeLane(orders)}</div>
           <div class="list-item" id="orders-area-distribution"><strong>商圈热度</strong>${renderCountChips(areaCounts)}</div>
           <div class="list-item" id="orders-risk-distribution"><strong>风险结构</strong>${renderCountChips(riskCounts, 6, displayRisk)}</div>
-          <div class="list-item" id="orders-status-distribution"><strong>推理进度</strong>${renderCountChips(statusCounts, 6, displayStatus)}<p>订单全集只用于解释推理，不作为数据维护主叙事。</p></div>
+          <div class="list-item" id="orders-status-distribution"><strong>推理进度</strong>${renderCountChips(statusCounts, 6, displayStatus)}</div>
         </div>
       `;
     }
