@@ -163,7 +163,7 @@ Confidence loop:
 
 ## Task 4 - Regression Tests And Final Polish
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Tests prevent verbose/demo/self-talk copy from returning.
@@ -171,8 +171,26 @@ Independent verification:
 - Full automated tests pass.
 
 Work log:
+- Removed unused hidden explanation-layer styles from the frontend:
+  - `page-role-card`;
+  - `page-role-strip`;
+  - `nav-hint`;
+  - `nav-module`;
+  - `nav-meta`;
+  - old hidden page/header paragraph styles.
+- Kept the structural route contract through `page-anchor`, not through visible or hidden explanatory cards.
+- Updated tests:
+  - `page-anchor` is now required;
+  - old explanation-layer class names and labels are forbidden.
+- Verification:
+  - `python3 -m py_compile web_agent_demo/day_replay_frontend.py tests/test_web_agent_demo.py`;
+  - `uv run --with pytest pytest -q tests/test_web_agent_demo.py::WebAgentDemoTest::test_home_page_contains_dispatch_workbench_shell` -> passed;
+  - source scan found no old explanation-layer class names or old self-talk copy in `web_agent_demo/day_replay_frontend.py`;
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - browser audit across all five routes: `oldLayerText=false`, `noisyVisible=false`, `pageAnchorCount=1`, no horizontal overflow, no console errors.
 
 Confidence loop:
+- 100% confidence for Task 4 scope: tests now prevent the old demo/self-talk surfaces from returning, full automated tests pass, source scan is clean, and browser verification confirms the rendered pages retain compact workbench structure without explanation-layer remnants.
 
 ## Task 5 - Commit, Optional Push, And Goal Archive
 
