@@ -194,7 +194,7 @@ Confidence loop:
 
 ## Task 5 - Commit, Optional Push, And Goal Archive
 
-Status: Pending
+Status: Completed
 
 Independent verification:
 - Worktree contains only intended changes.
@@ -203,5 +203,26 @@ Independent verification:
 - Goal folder records completion/archive status.
 
 Work log:
+- Confirmed branch and commit state before archive:
+  - branch `codex/kandbox-dispatch-workbench`;
+  - latest implementation commit `67b3dec test: lock down concise workbench surfaces`;
+  - worktree was clean before writing this archive record.
+- Goal 19 completed the requested optimization:
+  - removed visible self-talk/explanatory primary surfaces;
+  - removed hidden old explanation-layer render nodes and styles;
+  - compressed Live, Decisions, Memory, Orders, and Riders into concise workbench labels;
+  - localized visible business objects such as merchant and business-area labels;
+  - tightened first-screen density and removed duplicate page-title cards.
+- Final verification already completed in Tasks 2-4 and Debug Cycle 1:
+  - `uv run --with pytest pytest -q` -> `107 passed`;
+  - browser checks across all five routes on desktop and mobile passed;
+  - Live start/pause/map zoom passed;
+  - Decisions timeline switching passed;
+  - Orders/Riders filters passed;
+  - no visible old self-talk, no horizontal overflow, and no page console errors.
+- Archive status:
+  - Goal 19 is marked complete on 2026-06-30;
+  - all planned tasks and the comprehensive debug cycle are recorded in this folder.
 
 Confidence loop:
+- 100% confidence for Task 5 scope: the goal is complete, verification evidence is recorded, changes are committed through Task 4, and this final archive record closes the goal before remote publication.
